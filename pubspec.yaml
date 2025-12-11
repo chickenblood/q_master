@@ -12,6 +12,10 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_launcher_icons: ^0.14.4
   flutter_platform_widgets: ^9.0.0
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+
 
 dev_dependencies:
   flutter_test:
@@ -25,4 +29,5 @@ flutter_launcher_icons:
   adaptive_icon_foreground: "assets/icon/app_icon.png"
 
 flutter:
+  generate: true
   uses-material-design: true

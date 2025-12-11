@@ -33,6 +33,7 @@ final ThemeData lightTheme = ThemeData(
   ),
 );
 
+
 // Dark Mode: White on Black (Inverse)
 final ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
@@ -66,3 +67,4 @@ final ThemeData darkTheme = ThemeData(
     // ... all other text styles should also be customized for white text
   ),
 );
+

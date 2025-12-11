@@ -1,7 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'theme/theme.dart';
+import 'l10n/l10n.dart';
 
 void main() {
   runApp(const MainApp());
@@ -20,6 +20,7 @@ class _MainAppState extends State<MainApp> {
   final List<Widget> _tabPages = [
     Container(color: Colors.green),
     Container(color: Colors.blue),
+    Container(color: Colors.deepPurple),
   ];
 
   void _itemChanged(int index) {
@@ -30,19 +31,21 @@ class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) => PlatformApp(
       title: 'Q Master',
+      localizationsDelegates: L10n.localizationsDelegates,
+      supportedLocales: L10n.supportedLocales,
       material: (_, _) => MaterialAppData(
         theme: lightTheme,
         darkTheme: darkTheme,
-      themeMode: ThemeMode.system,
+        themeMode: ThemeMode.system,
       ),
       cupertino: (context, _) => CupertinoAppData(
         theme: MaterialBasedCupertinoThemeData(
           materialTheme: MediaQuery.platformBrightnessOf(context) == Brightness.light ? lightTheme : darkTheme,
         ),
       ),
-      home: PlatformScaffold(
+      home: Builder(builder: (context) => PlatformScaffold(
         appBar: PlatformAppBar(
-          title: const Text('F3 Q Master'),
+          title: Text(L10n.of(context)!.appBarTitle),
         ),
         body: _tabPages[_selectedTabIndex],
         bottomNavBar: PlatformNavBar(
@@ -50,15 +53,20 @@ class _MainAppState extends State<MainApp> {
           itemChanged: _itemChanged,
           items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
+              icon: Icon(Icons.history),
+              label: L10n.of(context)!.workoutsTabTitle,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.history),
-              label: 'Workouts',
+              icon: Icon(Icons.sports_soccer),
+              label: L10n.of(context)!.gamesTabTitle,
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.timer),
+              label: L10n.of(context)!.timerTabTitle,
             ),
           ],
         ),
+      ),
       ),
     );
 }
