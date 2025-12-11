@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'icons/adaptive_icons.dart';
 import 'theme/theme.dart';
 import 'l10n/l10n.dart';
 
@@ -44,29 +45,29 @@ class _MainAppState extends State<MainApp> {
         ),
       ),
       home: Builder(builder: (context) => PlatformScaffold(
-        appBar: PlatformAppBar(
-          title: Text(L10n.of(context)!.appBarTitle),
+          appBar: PlatformAppBar(
+            title: Text(L10n.of(context)!.appBarTitle),
+          ),
+          body: _tabPages[_selectedTabIndex],
+          bottomNavBar: PlatformNavBar(
+            currentIndex: _selectedTabIndex,
+            itemChanged: _itemChanged,
+            items: [
+              BottomNavigationBarItem(
+                icon: Icon(AdaptiveIcons.history),
+                label: L10n.of(context)!.workoutsTabTitle,
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(AdaptiveIcons.sports),
+                label: L10n.of(context)!.gamesTabTitle,
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(AdaptiveIcons.timer),
+                label: L10n.of(context)!.timerTabTitle,
+              ),
+            ],
+          ),
         ),
-        body: _tabPages[_selectedTabIndex],
-        bottomNavBar: PlatformNavBar(
-          currentIndex: _selectedTabIndex,
-          itemChanged: _itemChanged,
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.history),
-              label: L10n.of(context)!.workoutsTabTitle,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.sports_soccer),
-              label: L10n.of(context)!.gamesTabTitle,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.timer),
-              label: L10n.of(context)!.timerTabTitle,
-            ),
-          ],
-        ),
-      ),
       ),
     );
 }
