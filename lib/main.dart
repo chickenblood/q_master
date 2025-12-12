@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'timer/timer_tab.dart';
+import 'workouts/create_workout_modal.dart';
 import 'workouts/workouts_tab.dart';
 import 'icons/adaptive_icons.dart';
 import 'theme/theme.dart';
@@ -21,6 +22,7 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
+  final _navigatorKey = GlobalKey<NavigatorState>();
   Tab _sectedTab = Tab.workouts;
 
   final List<Widget> _tabPages = [WorkoutsTab(), GamesTab(), TimerTab()];
@@ -31,11 +33,20 @@ class _MainAppState extends State<MainApp> {
     });
   }
 
+  void _showComposeWorkoutModal() {
+    assert(_navigatorKey.currentContext != null);
+    showPlatformModalSheet(
+      context: _navigatorKey.currentContext!,
+      builder: (context) => const ComposeWorkoutModal(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) => PlatformApp(
     title: 'Q Master',
     localizationsDelegates: L10n.localizationsDelegates,
     supportedLocales: L10n.supportedLocales,
+    navigatorKey: _navigatorKey,
     material: (_, _) => MaterialAppData(
       theme: lightTheme,
       darkTheme: darkTheme,
@@ -52,12 +63,14 @@ class _MainAppState extends State<MainApp> {
     home: Builder(
       builder: (context) => PlatformScaffold(
         appBar: PlatformAppBar(
+          cupertino: (_, __) =>
+              CupertinoNavigationBarData(backgroundColor: Colors.transparent),
           title: Text(L10n.of(context)!.appBarTitle),
           trailingActions: [
             if (_sectedTab == Tab.workouts)
               PlatformIconButton(
                 icon: Icon(PlatformIcons(context).add),
-                onPressed: () {},
+                onPressed: _showComposeWorkoutModal,
               ),
           ],
         ),

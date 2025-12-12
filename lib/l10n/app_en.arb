@@ -10,5 +10,7 @@
     "dodGameTileTitle": "Dodecahedron of Death\n(coming soon)",
     "@dodGameTileTitle": {},
     "dopGameTileTitle": "Deck of Pain\n(coming soon)",
-    "@dopGameTileTitle": {}
+    "@dopGameTileTitle": {},
+    "createWorkoutDialogTitle": "Create Workout",
+    "@createWorkoutDialogTitle": {}
   }
