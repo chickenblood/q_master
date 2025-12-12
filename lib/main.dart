@@ -7,6 +7,8 @@ import 'theme/theme.dart';
 import 'games/games_tab.dart';
 import 'l10n/l10n.dart';
 
+enum Tab { workouts, games, timer }
+
 void main() {
   runApp(const MainApp());
 }
@@ -19,13 +21,13 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  int _selectedTabIndex = 0;
+  Tab _sectedTab = Tab.workouts;
 
   final List<Widget> _tabPages = [WorkoutsTab(), GamesTab(), TimerTab()];
 
   void _itemChanged(int index) {
     setState(() {
-      _selectedTabIndex = index;
+      _sectedTab = Tab.values[index];
     });
   }
 
@@ -52,15 +54,16 @@ class _MainAppState extends State<MainApp> {
         appBar: PlatformAppBar(
           title: Text(L10n.of(context)!.appBarTitle),
           trailingActions: [
-            PlatformIconButton(
-              icon: Icon(PlatformIcons(context).add),
-              onPressed: () {},
-            ),
+            if (_sectedTab == Tab.workouts)
+              PlatformIconButton(
+                icon: Icon(PlatformIcons(context).add),
+                onPressed: () {},
+              ),
           ],
         ),
-        body: _tabPages[_selectedTabIndex],
+        body: _tabPages[_sectedTab.index],
         bottomNavBar: PlatformNavBar(
-          currentIndex: _selectedTabIndex,
+          currentIndex: _sectedTab.index,
           itemChanged: _itemChanged,
           items: [
             BottomNavigationBarItem(

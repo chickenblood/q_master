@@ -24,7 +24,7 @@ class GamesTab extends StatelessWidget {
             ),
             Transform.rotate(
               angle: _degToRad(-5.0),
-              child: _GameTile(title: L10n.of(context)!.dodGameTileTitle),
+              child: _GameTile(title: L10n.of(context)!.dopGameTileTitle),
             ),
           ],
         ),
