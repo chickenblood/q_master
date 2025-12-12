@@ -49,7 +49,15 @@ class _MainAppState extends State<MainApp> {
     ),
     home: Builder(
       builder: (context) => PlatformScaffold(
-        appBar: PlatformAppBar(title: Text(L10n.of(context)!.appBarTitle)),
+        appBar: PlatformAppBar(
+          title: Text(L10n.of(context)!.appBarTitle),
+          trailingActions: [
+            PlatformIconButton(
+              icon: Icon(PlatformIcons(context).add),
+              onPressed: () {},
+            ),
+          ],
+        ),
         body: _tabPages[_selectedTabIndex],
         bottomNavBar: PlatformNavBar(
           currentIndex: _selectedTabIndex,

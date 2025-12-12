@@ -1,6 +1,14 @@
-   {
-     "appBarTitle": "F3 Q Master",
-     "workoutsTabTitle": "Workouts",
-     "gamesTabTitle": "Games",
-     "timerTabTitle": "Timer"
-   }
+  {
+    "appBarTitle": "F3 Q Master",
+    "@appBarTitle": {},
+    "workoutsTabTitle": "Workouts",
+    "@workoutsTabTitle": {},
+    "gamesTabTitle": "Games",
+    "@gamesTabTitle": {},
+    "timerTabTitle": "Timer",
+    "@timerTabTitle": {},
+    "dodGameTileTitle": "Dodecahedron of Death\n(coming soon)",
+    "@dodGameTileTitle": {},
+    "dopGameTileTitle": "Deck of Pain\n(coming soon)",
+    "@dopGameTileTitle": {}
+  }

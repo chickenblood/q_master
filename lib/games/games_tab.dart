@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../l10n/l10n.dart';
 import '../utils/media_query.dart';
 
 class GamesTab extends StatelessWidget {
@@ -19,11 +20,11 @@ class GamesTab extends StatelessWidget {
           children: [
             Transform.rotate(
               angle: _degToRad(5.0),
-              child: _GameTile(title: 'Dodecahedron of Death\n(coming soon)'),
+              child: _GameTile(title: L10n.of(context)!.dodGameTileTitle),
             ),
             Transform.rotate(
               angle: _degToRad(-5.0),
-              child: _GameTile(title: 'F3 Deck of Pain\n(coming soon)'),
+              child: _GameTile(title: L10n.of(context)!.dodGameTileTitle),
             ),
           ],
         ),
@@ -43,8 +44,11 @@ class _GameTile extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     margin: const EdgeInsets.all(16.0),
     decoration: BoxDecoration(
-      color: Colors.grey,
       borderRadius: BorderRadius.circular(16.0),
+      border: Border.all(
+        color: Theme.of(context).colorScheme.onSurface,
+        width: 1.0,
+      ),
     ),
     child: AspectRatio(
       aspectRatio: 3 / 4,
