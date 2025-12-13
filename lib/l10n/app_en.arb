@@ -13,5 +13,15 @@
     "dopGameTileTitle": "Deck of Pain\n(coming soon)",
     "@dopGameTileTitle": {},
     "createWorkoutDialogTitle": "Create Workout",
-    "@createWorkoutDialogTitle": {}
+    "@createWorkoutDialogTitle": {},
+    "startWorkoutButtonText": "Start",
+    "@startWorkoutButtonText": {},
+    "workoutNameFieldLabel": "Name",
+    "@workoutNameFieldLabel": {},
+    "workoutWarmupFieldLabel": "Warmup",
+    "@workoutWarmupFieldLabel": {},
+    "workoutThangFieldLabel": "Thang",
+    "@workoutThangFieldLabel": {},
+    "workoutMaryFieldLabel": "Mary",
+    "@workoutMaryFieldLabel": {}
   }

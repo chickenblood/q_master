@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/utils/formatted_date.dart';
+import 'package:q_master/l10n/l10n.dart';
 
 class WorkoutsTab extends StatelessWidget {
   const WorkoutsTab({super.key});
@@ -14,6 +15,15 @@ class WorkoutsTab extends StatelessWidget {
           title: PlatformListTile(
             title: Text('Workout ${index + 1}'),
             subtitle: Text(formattedDateTime(DateTime.now())),
+            trailing: Row(
+              children: [
+                Text(L10n.of(context)!.startWorkoutButtonText),
+                PlatformIconButton(
+                  icon: Icon(PlatformIcons(context).playArrow),
+                  onPressed: () {},
+                ),
+              ],
+            ),
           ),
         ),
       ),

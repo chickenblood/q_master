@@ -6,6 +6,23 @@ import 'package:q_master/l10n/l10n.dart';
 class ComposeWorkoutModal extends StatelessWidget {
   const ComposeWorkoutModal({super.key});
 
+  Widget _content(BuildContext context) => ListView(
+    padding: const EdgeInsets.all(16.0),
+    children: [
+      Text(L10n.of(context)!.workoutNameFieldLabel),
+      PlatformTextField(minLines: 5, maxLines: 5),
+      const SizedBox(height: 16.0),
+      Text(L10n.of(context)!.workoutWarmupFieldLabel),
+      PlatformTextField(minLines: 5, maxLines: 5),
+      const SizedBox(height: 16.0),
+      Text(L10n.of(context)!.workoutThangFieldLabel),
+      PlatformTextField(minLines: 5, maxLines: 5),
+      const SizedBox(height: 16.0),
+      Text(L10n.of(context)!.workoutMaryFieldLabel),
+      PlatformTextField(minLines: 5, maxLines: 5),
+    ],
+  );
+
   @override
   Widget build(BuildContext context) => PlatformScaffold(
     appBar: PlatformAppBar(
@@ -25,6 +42,6 @@ class ComposeWorkoutModal extends StatelessWidget {
         ),
       ],
     ),
-    body: Center(child: Text('Workout composition UI goes here')),
+    body: SafeArea(child: _content(context)),
   );
 }

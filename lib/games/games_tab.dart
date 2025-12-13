@@ -20,7 +20,10 @@ class GamesTab extends StatelessWidget {
           children: [
             Transform.rotate(
               angle: _degToRad(5.0),
-              child: _GameTile(title: L10n.of(context)!.dodGameTileTitle),
+              child: _GameTile(
+                title: L10n.of(context)!.dodGameTileTitle,
+                imagePath: 'assets/images/DoD.png',
+              ),
             ),
             Transform.rotate(
               angle: _degToRad(-5.0),
@@ -37,14 +40,18 @@ double _degToRad(double degrees) => degrees * pi / 180.0;
 
 class _GameTile extends StatelessWidget {
   final String title;
+  final String? imagePath;
 
-  const _GameTile({required this.title});
+  const _GameTile({required this.title, this.imagePath});
 
   @override
   Widget build(BuildContext context) => Container(
     margin: const EdgeInsets.all(16.0),
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(16.0),
+      image: imagePath != null
+          ? DecorationImage(image: AssetImage(imagePath!), fit: BoxFit.cover)
+          : null,
       border: Border.all(
         color: Theme.of(context).colorScheme.onSurface,
         width: 1.0,
@@ -52,7 +59,15 @@ class _GameTile extends StatelessWidget {
     ),
     child: AspectRatio(
       aspectRatio: 3 / 4,
-      child: Center(child: Text(title, textAlign: TextAlign.center)),
+      child: Center(
+        child: Text(
+          title,
+          textAlign: TextAlign.center,
+          style: Theme.of(
+            context,
+          ).textTheme.headlineSmall!.copyWith(fontWeight: FontWeight.bold),
+        ),
+      ),
     ),
   );
 }

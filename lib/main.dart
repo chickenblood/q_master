@@ -34,10 +34,15 @@ class _MainAppState extends State<MainApp> {
   }
 
   void _showComposeWorkoutModal() {
-    assert(_navigatorKey.currentContext != null);
-    showPlatformModalSheet(
-      context: _navigatorKey.currentContext!,
-      builder: (context) => const ComposeWorkoutModal(),
+    final context = _navigatorKey.currentContext;
+    assert(context != null);
+    Navigator.push(
+      _navigatorKey.currentContext!,
+      platformPageRoute(
+        context: context!,
+        fullscreenDialog: true,
+        builder: (context) => const ComposeWorkoutModal(),
+      ),
     );
   }
 
