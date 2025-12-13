@@ -15,12 +15,17 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.9.0
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  build_runner: ^2.10.4
+  freezed: ^3.2.3
+  json_serializable: ^6.11.2
 
 flutter_launcher_icons:
   android: true

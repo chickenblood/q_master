@@ -63,7 +63,7 @@ class _MainAppState extends State<MainApp> {
     home: Builder(
       builder: (context) => PlatformScaffold(
         appBar: PlatformAppBar(
-          cupertino: (_, __) =>
+          cupertino: (_, _) =>
               CupertinoNavigationBarData(backgroundColor: Colors.transparent),
           title: Text(L10n.of(context)!.appBarTitle),
           trailingActions: [

@@ -21,8 +21,7 @@ class ComposeWorkoutModal extends StatelessWidget {
             // Handle save action
             Navigator.pop(context);
           },
-          materialIcon: Icon(Icons.check),
-          cupertinoIcon: Icon(CupertinoIcons.check_mark),
+          icon: Icon(PlatformIcons(context).checkMark),
         ),
       ],
     ),
