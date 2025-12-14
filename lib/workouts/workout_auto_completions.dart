@@ -30,8 +30,8 @@ class _WorkoutAutocompleteTextFieldState
   @override
   Widget build(BuildContext context) => Autocomplete<String>(
     textEditingController: widget.textEditingController,
-    displayStringForOption: (option) => _baseText + option,
     focusNode: FocusNode(),
+    displayStringForOption: (option) => _baseText + option,
     optionsBuilder: (TextEditingValue textEditingValue) {
       var currentComposedText = textEditingValue.text;
       // Get the last word typed by the user
