@@ -13,8 +13,8 @@ class WorkoutsTab extends StatelessWidget {
         itemCount: 10,
         itemBuilder: (context, index) => ListTile(
           title: PlatformListTile(
-            title: Text('Workout ${index + 1}'),
-            subtitle: Text(formattedDateTime(DateTime.now())),
+            title: PlatformText('Workout ${index + 1}'),
+            subtitle: PlatformText(formattedDateTime(DateTime.now())),
             trailing: Row(
               children: [
                 Text(L10n.of(context)!.startWorkoutButtonText),

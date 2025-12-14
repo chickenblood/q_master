@@ -1,0 +1,26 @@
+/// A list of possible workout token completion strings.
+const workoutCompletions = [
+  /*'10',
+  '20',
+  '30',
+  '40',
+  '50',
+  '100',*/
+  'American Hammers',
+  'Bonnie Blairs',
+  'burpees',
+  'Elizabeth Warrens',
+  'flutter kicks',
+  'Freddie Mercuries',
+  'lunge worm',
+  'lunges',
+  'McDucks',
+  'merkins',
+  'mountain climbers',
+  'navy seal burpees',
+  'side straddle hops',
+  'squats',
+  'squirrel splats',
+  'sumo squats',
+  'zombie walk',
+];

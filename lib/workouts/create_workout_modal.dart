@@ -2,41 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/l10n/l10n.dart';
+import 'workout_auto_completions.dart';
 
 class ComposeWorkoutModal extends StatelessWidget {
-  const ComposeWorkoutModal({super.key});
-  final verticalSpacing = const SizedBox(height: 16.0);
+  final _verticalSpacing = const SizedBox(height: 16.0);
+  final _warmupTextController = TextEditingController();
+  final _thangTextController = TextEditingController();
+  final _maryTextController = TextEditingController();
+
+  ComposeWorkoutModal({super.key});
 
   Widget _content(BuildContext context) => ListView(
     padding: const EdgeInsets.all(16.0),
     children: [
-      Text(L10n.of(context)!.workoutNameFieldLabel),
-      PlatformTextField(
-        minLines: null,
-        maxLines: null,
-        expands: true,
-        textCapitalization: .sentences,
-      ),
-      verticalSpacing,
-      Text(L10n.of(context)!.workoutWarmupFieldLabel),
-      PlatformTextField(
+      PlatformText(L10n.of(context)!.workoutNameFieldLabel),
+      PlatformTextField(expands: true, minLines: null, maxLines: null),
+      _verticalSpacing,
+      PlatformText(L10n.of(context)!.workoutWarmupFieldLabel),
+      WorkoutAutocompleteTextField(
+        textEditingController: _warmupTextController,
         minLines: 5,
         maxLines: 5,
-        textCapitalization: .sentences,
       ),
-      verticalSpacing,
-      Text(L10n.of(context)!.workoutThangFieldLabel),
-      PlatformTextField(
+      _verticalSpacing,
+      PlatformText(L10n.of(context)!.workoutThangFieldLabel),
+      WorkoutAutocompleteTextField(
+        textEditingController: _thangTextController,
         minLines: 5,
         maxLines: 5,
-        textCapitalization: .sentences,
       ),
-      verticalSpacing,
-      Text(L10n.of(context)!.workoutMaryFieldLabel),
-      PlatformTextField(
+      _verticalSpacing,
+      PlatformText(L10n.of(context)!.workoutMaryFieldLabel),
+      WorkoutAutocompleteTextField(
+        textEditingController: _maryTextController,
         minLines: 5,
         maxLines: 5,
-        textCapitalization: .sentences,
       ),
     ],
   );

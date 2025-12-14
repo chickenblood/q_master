@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import '../l10n/l10n.dart';
 import '../utils/media_query.dart';
@@ -60,7 +61,7 @@ class _GameTile extends StatelessWidget {
     child: AspectRatio(
       aspectRatio: 3 / 4,
       child: Center(
-        child: Text(
+        child: PlatformText(
           title,
           textAlign: TextAlign.center,
           style: Theme.of(

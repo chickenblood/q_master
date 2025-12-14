@@ -41,7 +41,7 @@ class _MainAppState extends State<MainApp> {
       platformPageRoute(
         context: context!,
         fullscreenDialog: true,
-        builder: (context) => const ComposeWorkoutModal(),
+        builder: (context) => ComposeWorkoutModal(),
       ),
     );
   }
