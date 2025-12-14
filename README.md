@@ -1,5 +1,3 @@
-# q_master
+# Q Master
 
-A new Flutter project.
-# q_master
-# q_master
+F3 Q Master. A map to manage your F3 workouts  (digital wienke)
