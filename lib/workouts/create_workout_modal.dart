@@ -5,21 +5,39 @@ import 'package:q_master/l10n/l10n.dart';
 
 class ComposeWorkoutModal extends StatelessWidget {
   const ComposeWorkoutModal({super.key});
+  final verticalSpacing = const SizedBox(height: 16.0);
 
   Widget _content(BuildContext context) => ListView(
     padding: const EdgeInsets.all(16.0),
     children: [
       Text(L10n.of(context)!.workoutNameFieldLabel),
-      PlatformTextField(minLines: 5, maxLines: 5),
-      const SizedBox(height: 16.0),
+      PlatformTextField(
+        minLines: null,
+        maxLines: null,
+        expands: true,
+        textCapitalization: .sentences,
+      ),
+      verticalSpacing,
       Text(L10n.of(context)!.workoutWarmupFieldLabel),
-      PlatformTextField(minLines: 5, maxLines: 5),
-      const SizedBox(height: 16.0),
+      PlatformTextField(
+        minLines: 5,
+        maxLines: 5,
+        textCapitalization: .sentences,
+      ),
+      verticalSpacing,
       Text(L10n.of(context)!.workoutThangFieldLabel),
-      PlatformTextField(minLines: 5, maxLines: 5),
-      const SizedBox(height: 16.0),
+      PlatformTextField(
+        minLines: 5,
+        maxLines: 5,
+        textCapitalization: .sentences,
+      ),
+      verticalSpacing,
       Text(L10n.of(context)!.workoutMaryFieldLabel),
-      PlatformTextField(minLines: 5, maxLines: 5),
+      PlatformTextField(
+        minLines: 5,
+        maxLines: 5,
+        textCapitalization: .sentences,
+      ),
     ],
   );
 

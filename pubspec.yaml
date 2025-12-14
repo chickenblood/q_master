@@ -1,10 +1,10 @@
 name: q_master
-description: "A new Flutter project."
+description: "Unofficial app of f3nation.com."
 publish_to: 'none'
 version: 0.1.0
 
 environment:
-  sdk: ^3.9.2
+  sdk: ^3.10.0
 
 dependencies:
   flutter:

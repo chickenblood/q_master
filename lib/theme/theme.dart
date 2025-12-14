@@ -6,9 +6,11 @@ final ThemeData lightTheme = ThemeData(
   // Define a simple ColorScheme that is essentially Black on White
   colorScheme: const ColorScheme(
     brightness: Brightness.light,
-    primary: Colors.black, // Used for primary app elements (e.g., AppBar background)
+    primary:
+        Colors.black, // Used for primary app elements (e.g., AppBar background)
     onPrimary: Colors.white, // Text/Icons on primary color
-    secondary: Colors.black, // Used for secondary elements (e.g., Floating Action Button)
+    secondary: Colors
+        .black, // Used for secondary elements (e.g., Floating Action Button)
     onSecondary: Colors.white, // Text/Icons on secondary color
     surface: Colors.white, // Background for cards, sheets, etc.
     onSurface: Colors.black, // Text/Icons on surface color
@@ -32,7 +34,6 @@ final ThemeData lightTheme = ThemeData(
     // ... all other text styles should also be customized for black text
   ),
 );
-
 
 // Dark Mode: White on Black (Inverse)
 final ThemeData darkTheme = ThemeData(
@@ -67,4 +68,3 @@ final ThemeData darkTheme = ThemeData(
     // ... all other text styles should also be customized for white text
   ),
 );
-
