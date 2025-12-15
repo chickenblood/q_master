@@ -12,19 +12,19 @@ class WorkoutsTab extends StatelessWidget {
   Widget build(BuildContext context) => SafeArea(
     child: Material(
       child: Consumer(
-        builder: (context, ref, child) {
-          final workoutList = ref.watch(workoutListProvider);
+        builder: (context, ref, _) {
           return FutureBuilder(
-            future: workoutList,
+            future: ref.watch(workoutListProvider),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return const Center(child: PlatformCircularProgressIndicator());
               }
+              final workoutList = snapshot.data!;
               return ListView.builder(
-                itemCount: snapshot.data!.workouts.length,
+                itemCount: workoutList.workouts.length,
                 itemBuilder: (context, index) => ListTile(
                   title: PlatformListTile(
-                    title: PlatformText(snapshot.data!.workouts[index].name),
+                    title: PlatformText(workoutList.workouts[index].name),
                     subtitle: PlatformText(formattedDateTime(DateTime.now())),
                     trailing: Row(
                       children: [

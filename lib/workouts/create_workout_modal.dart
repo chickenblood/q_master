@@ -5,51 +5,24 @@ import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/workout.dart';
 import 'workout_auto_completions.dart';
 
-final class ComposeWorkoutModal extends StatefulWidget {
-  const ComposeWorkoutModal({super.key});
-
-  @override
-  State<ComposeWorkoutModal> createState() => _ComposeWorkoutModalState();
-}
-
-final class _ComposeWorkoutModalState extends State<ComposeWorkoutModal> {
+class ComposeWorkoutModal extends StatelessWidget {
   final _verticalSpacing = const SizedBox(height: 16.0);
   final _nameTextController = TextEditingController();
   final _warmupTextController = TextEditingController();
   final _thangTextController = TextEditingController();
   final _maryTextController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _nameTextController.text = L10n.of(context)!.defaultWorkoutName;
-    });
-    _nameTextController.addListener(() => setState(() {}));
-    _warmupTextController.addListener(() => setState(() {}));
-    _thangTextController.addListener(() => setState(() {}));
-    _maryTextController.addListener(() => setState(() {}));
-  }
-
-  @override
-  void dispose() {
-    _nameTextController.dispose();
-    _warmupTextController.dispose();
-    _thangTextController.dispose();
-    _maryTextController.dispose();
-    super.dispose();
-  }
+  ComposeWorkoutModal({super.key});
 
   Widget _content(BuildContext context) => ListView(
+    shrinkWrap: true,
     physics: ClampingScrollPhysics(), // To allow drag-dismiss.
     padding: const EdgeInsets.all(16.0),
     children: [
       PlatformText(L10n.of(context)!.workoutNameFieldLabel),
       PlatformTextField(
         controller: _nameTextController,
-        expands: true,
-        minLines: null,
-        maxLines: null,
+        cupertino: (context, platform) => CupertinoTextFieldData(expands: true),
       ),
       _verticalSpacing,
       PlatformText(L10n.of(context)!.workoutWarmupFieldLabel),
@@ -103,25 +76,38 @@ final class _ComposeWorkoutModalState extends State<ComposeWorkoutModal> {
   }
 
   @override
-  Widget build(BuildContext context) => PlatformScaffold(
-    appBar: PlatformAppBar(
-      title: Text(L10n.of(context)!.createWorkoutDialogTitle),
-      cupertino: (_, _) =>
-          CupertinoNavigationBarData(backgroundColor: Colors.transparent),
-      leading: PlatformIconButton(
-        onPressed: () => Navigator.pop(context),
-        materialIcon: Icon(Icons.close),
-        cupertinoIcon: Icon(CupertinoIcons.xmark),
-      ),
-      trailingActions: [
-        PlatformIconButton(
-          onPressed: _workoutCreationEnabled
-              ? () => _createWorkout(context)
-              : null,
-          icon: Icon(PlatformIcons(context).checkMark),
+  Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _nameTextController.text = L10n.of(context)!.defaultWorkoutName;
+    });
+    return PlatformScaffold(
+      appBar: PlatformAppBar(
+        title: Text(L10n.of(context)!.createWorkoutDialogTitle),
+        cupertino: (_, _) =>
+            CupertinoNavigationBarData(backgroundColor: Colors.transparent),
+        leading: PlatformIconButton(
+          onPressed: () => Navigator.pop(context),
+          materialIcon: Icon(Icons.close),
+          cupertinoIcon: Icon(CupertinoIcons.xmark),
         ),
-      ],
-    ),
-    body: SafeArea(child: _content(context)),
-  );
+        trailingActions: [
+          ListenableBuilder(
+            listenable: Listenable.merge([
+              _nameTextController,
+              _warmupTextController,
+              _thangTextController,
+              _maryTextController,
+            ]),
+            builder: (_, _) => PlatformIconButton(
+              onPressed: _workoutCreationEnabled
+                  ? () => _createWorkout(context)
+                  : null,
+              icon: Icon(PlatformIcons(context).checkMark),
+            ),
+          ),
+        ],
+      ),
+      body: SafeArea(child: _content(context)),
+    );
+  }
 }
