@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -22,7 +24,11 @@ class ComposeWorkoutModal extends StatelessWidget {
       PlatformText(L10n.of(context)!.workoutNameFieldLabel),
       PlatformTextField(
         controller: _nameTextController,
-        cupertino: (context, platform) => CupertinoTextFieldData(expands: true),
+        minLines: null,
+        maxLines: null,
+        // For some reason, expands = true crashes on Android.
+        cupertino: (context, platform) =>
+            CupertinoTextFieldData(expands: true, minLines: null),
       ),
       _verticalSpacing,
       PlatformText(L10n.of(context)!.workoutWarmupFieldLabel),
