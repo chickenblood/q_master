@@ -1,27 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'timer/timer_tab.dart';
 import 'workouts/create_workout_modal.dart';
 import 'workouts/workouts_tab.dart';
 import 'icons/adaptive_icons.dart';
 import 'theme/theme.dart';
 import 'games/games_tab.dart';
+import 'model/workout.dart';
 import 'l10n/l10n.dart';
 
 enum Tab { workouts, games, timer }
 
 void main() {
-  runApp(const MainApp());
+  runApp(const ProviderScope(child: MainApp()));
 }
 
-class MainApp extends StatefulWidget {
+class MainApp extends ConsumerStatefulWidget {
   const MainApp({super.key});
 
   @override
-  State<MainApp> createState() => _MainAppState();
+  ConsumerState<MainApp> createState() => _MainAppState();
 }
 
-class _MainAppState extends State<MainApp> {
+class _MainAppState extends ConsumerState<MainApp> {
   final _navigatorKey = GlobalKey<NavigatorState>();
   Tab _sectedTab = Tab.workouts;
 
@@ -33,10 +35,10 @@ class _MainAppState extends State<MainApp> {
     });
   }
 
-  void _showComposeWorkoutModal() {
+  void _showComposeWorkoutModal() async {
     final context = _navigatorKey.currentContext;
     assert(context != null);
-    Navigator.push(
+    final workout = await Navigator.push(
       _navigatorKey.currentContext!,
       platformPageRoute(
         context: context!,
@@ -44,6 +46,10 @@ class _MainAppState extends State<MainApp> {
         builder: (context) => ComposeWorkoutModal(),
       ),
     );
+    if (workout != null) {
+      final workoutList = await ref.read(workoutListProvider);
+      workoutList.add(workout);
+    }
   }
 
   @override

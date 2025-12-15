@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/l10n/l10n.dart';
+import 'package:q_master/model/workout.dart';
 import 'workout_auto_completions.dart';
 
 class ComposeWorkoutModal extends StatelessWidget {
   final _verticalSpacing = const SizedBox(height: 16.0);
+  final _nameTextController = TextEditingController();
   final _warmupTextController = TextEditingController();
   final _thangTextController = TextEditingController();
   final _maryTextController = TextEditingController();
@@ -16,7 +18,12 @@ class ComposeWorkoutModal extends StatelessWidget {
     padding: const EdgeInsets.all(16.0),
     children: [
       PlatformText(L10n.of(context)!.workoutNameFieldLabel),
-      PlatformTextField(expands: true, minLines: null, maxLines: null),
+      PlatformTextField(
+        controller: _nameTextController,
+        expands: true,
+        minLines: null,
+        maxLines: null,
+      ),
       _verticalSpacing,
       PlatformText(L10n.of(context)!.workoutWarmupFieldLabel),
       WorkoutAutocompleteTextField(
@@ -41,6 +48,15 @@ class ComposeWorkoutModal extends StatelessWidget {
     ],
   );
 
+  List<Exercise> _convertTextToExerciseList(String text) {
+    return text
+        .split('\n')
+        .map((line) => line.trim())
+        .where((line) => line.isNotEmpty)
+        .map((line) => Exercise(name: line))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) => PlatformScaffold(
     appBar: PlatformAppBar(
@@ -53,8 +69,14 @@ class ComposeWorkoutModal extends StatelessWidget {
       trailingActions: [
         PlatformIconButton(
           onPressed: () {
-            // Handle save action
-            Navigator.pop(context);
+            final workout = Workout(
+              name: _nameTextController.text,
+              date: DateTime.now(),
+              warmup: _convertTextToExerciseList(_warmupTextController.text),
+              thang: _convertTextToExerciseList(_thangTextController.text),
+              mary: _convertTextToExerciseList(_maryTextController.text),
+            );
+            Navigator.pop(context, workout);
           },
           icon: Icon(PlatformIcons(context).checkMark),
         ),
