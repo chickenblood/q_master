@@ -5,16 +5,43 @@ import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/workout.dart';
 import 'workout_auto_completions.dart';
 
-class ComposeWorkoutModal extends StatelessWidget {
+final class ComposeWorkoutModal extends StatefulWidget {
+  const ComposeWorkoutModal({super.key});
+
+  @override
+  State<ComposeWorkoutModal> createState() => _ComposeWorkoutModalState();
+}
+
+final class _ComposeWorkoutModalState extends State<ComposeWorkoutModal> {
   final _verticalSpacing = const SizedBox(height: 16.0);
   final _nameTextController = TextEditingController();
   final _warmupTextController = TextEditingController();
   final _thangTextController = TextEditingController();
   final _maryTextController = TextEditingController();
 
-  ComposeWorkoutModal({super.key});
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _nameTextController.text = L10n.of(context)!.defaultWorkoutName;
+    });
+    _nameTextController.addListener(() => setState(() {}));
+    _warmupTextController.addListener(() => setState(() {}));
+    _thangTextController.addListener(() => setState(() {}));
+    _maryTextController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _nameTextController.dispose();
+    _warmupTextController.dispose();
+    _thangTextController.dispose();
+    _maryTextController.dispose();
+    super.dispose();
+  }
 
   Widget _content(BuildContext context) => ListView(
+    physics: ClampingScrollPhysics(), // To allow drag-dismiss.
     padding: const EdgeInsets.all(16.0),
     children: [
       PlatformText(L10n.of(context)!.workoutNameFieldLabel),
@@ -57,10 +84,30 @@ class ComposeWorkoutModal extends StatelessWidget {
         .toList();
   }
 
+  bool get _workoutCreationEnabled {
+    return _nameTextController.text.isNotEmpty &&
+        (_warmupTextController.text.isNotEmpty ||
+            _thangTextController.text.isNotEmpty ||
+            _maryTextController.text.isNotEmpty);
+  }
+
+  void _createWorkout(BuildContext context) {
+    final workout = Workout(
+      name: _nameTextController.text,
+      date: DateTime.now(),
+      warmup: _convertTextToExerciseList(_warmupTextController.text),
+      thang: _convertTextToExerciseList(_thangTextController.text),
+      mary: _convertTextToExerciseList(_maryTextController.text),
+    );
+    Navigator.pop(context, workout);
+  }
+
   @override
   Widget build(BuildContext context) => PlatformScaffold(
     appBar: PlatformAppBar(
       title: Text(L10n.of(context)!.createWorkoutDialogTitle),
+      cupertino: (_, _) =>
+          CupertinoNavigationBarData(backgroundColor: Colors.transparent),
       leading: PlatformIconButton(
         onPressed: () => Navigator.pop(context),
         materialIcon: Icon(Icons.close),
@@ -68,16 +115,9 @@ class ComposeWorkoutModal extends StatelessWidget {
       ),
       trailingActions: [
         PlatformIconButton(
-          onPressed: () {
-            final workout = Workout(
-              name: _nameTextController.text,
-              date: DateTime.now(),
-              warmup: _convertTextToExerciseList(_warmupTextController.text),
-              thang: _convertTextToExerciseList(_thangTextController.text),
-              mary: _convertTextToExerciseList(_maryTextController.text),
-            );
-            Navigator.pop(context, workout);
-          },
+          onPressed: _workoutCreationEnabled
+              ? () => _createWorkout(context)
+              : null,
           icon: Icon(PlatformIcons(context).checkMark),
         ),
       ],

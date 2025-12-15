@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,14 +39,22 @@ class _MainAppState extends ConsumerState<MainApp> {
   void _showComposeWorkoutModal() async {
     final context = _navigatorKey.currentContext;
     assert(context != null);
-    final workout = await Navigator.push(
-      _navigatorKey.currentContext!,
-      platformPageRoute(
-        context: context!,
-        fullscreenDialog: true,
+    Workout? workout;
+    if (Theme.of(context!).platform == TargetPlatform.iOS) {
+      workout = await showCupertinoSheet<Workout>(
+        context: _navigatorKey.currentContext!,
         builder: (context) => ComposeWorkoutModal(),
-      ),
-    );
+      );
+    } else {
+      workout = await Navigator.push(
+        _navigatorKey.currentContext!,
+        platformPageRoute(
+          context: context!,
+          fullscreenDialog: true,
+          builder: (context) => ComposeWorkoutModal(),
+        ),
+      );
+    }
     if (workout != null) {
       final workoutList = await ref.read(workoutListProvider);
       workoutList.add(workout);

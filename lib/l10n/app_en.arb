@@ -18,6 +18,8 @@
     "@startWorkoutButtonText": {},
     "workoutNameFieldLabel": "Name",
     "@workoutNameFieldLabel": {},
+    "defaultWorkoutName": "New workout",
+    "@defaultWorkoutName": {},
     "workoutWarmupFieldLabel": "Warm up",
     "@workoutWarmupFieldLabel": {},
     "workoutThangFieldLabel": "Thang",
