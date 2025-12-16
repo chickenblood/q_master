@@ -45,7 +45,7 @@ class _MainAppState extends ConsumerState<MainApp> {
     if (Theme.of(context!).platform == TargetPlatform.iOS) {
       workout = await showCupertinoSheet<Workout>(
         context: context,
-        builder: (context) => ComposeWorkoutModal(),
+        builder: (context) => CreateWorkoutModal(),
       );
     } else {
       workout = await Navigator.push(
@@ -53,7 +53,7 @@ class _MainAppState extends ConsumerState<MainApp> {
         platformPageRoute(
           context: context,
           fullscreenDialog: true,
-          builder: (context) => ComposeWorkoutModal(),
+          builder: (context) => CreateWorkoutModal(),
         ),
       );
     }

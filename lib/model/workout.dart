@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:path_provider/path_provider.dart';
@@ -29,14 +30,25 @@ final class WorkoutList {
     workouts.addAll(storedWorkouts);
   }
 
-  void add(Workout workout) {
-    // New items go to the front of the list.
-    workouts.insert(0, workout);
-
-    // Save updated list to disk.
+  void _save() {
     final file = File(filename)..createSync();
     final json = jsonEncode(workouts);
     file.writeAsStringSync(json);
+  }
+
+  void add(Workout workout) {
+    // New items go to the front of the list.
+    workouts.insert(0, workout);
+    // Save updated list to disk.
+    _save();
+  }
+
+  void remove(Workout workout) {
+    if (workouts.remove(workout)) {
+      _save();
+    } else {
+      debugPrint('Unable to remove workout');
+    }
   }
 }
 

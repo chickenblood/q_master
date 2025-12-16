@@ -5,14 +5,14 @@ import 'package:q_master/model/workout.dart';
 import 'workout_auto_completions.dart';
 import 'package:q_master/icons/adaptive_icons.dart';
 
-class ComposeWorkoutModal extends StatelessWidget {
+class CreateWorkoutModal extends StatelessWidget {
   final _verticalSpacing = const SizedBox(height: 16.0);
   final _nameTextController = TextEditingController();
   final _warmupTextController = TextEditingController();
   final _thangTextController = TextEditingController();
   final _maryTextController = TextEditingController();
 
-  ComposeWorkoutModal({super.key});
+  CreateWorkoutModal({super.key});
 
   Widget _content(BuildContext context) => ListView(
     physics: ClampingScrollPhysics(), // To allow drag-dismiss.
