@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -17,19 +15,11 @@ class ComposeWorkoutModal extends StatelessWidget {
   ComposeWorkoutModal({super.key});
 
   Widget _content(BuildContext context) => ListView(
-    shrinkWrap: true,
     physics: ClampingScrollPhysics(), // To allow drag-dismiss.
     padding: const EdgeInsets.all(16.0),
     children: [
       PlatformText(L10n.of(context)!.workoutNameFieldLabel),
-      PlatformTextField(
-        controller: _nameTextController,
-        minLines: null,
-        maxLines: null,
-        // For some reason, expands = true crashes on Android.
-        cupertino: (context, platform) =>
-            CupertinoTextFieldData(expands: true, minLines: null),
-      ),
+      PlatformTextField(controller: _nameTextController, maxLines: 2),
       _verticalSpacing,
       PlatformText(L10n.of(context)!.workoutWarmupFieldLabel),
       WorkoutAutocompleteTextField(

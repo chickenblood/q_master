@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:q_master/utils/formatted_date.dart';
-import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/workout.dart';
+import 'package:q_master/l10n/l10n.dart';
 
 class WorkoutsTab extends StatelessWidget {
   const WorkoutsTab({super.key});
@@ -22,19 +22,20 @@ class WorkoutsTab extends StatelessWidget {
               final workoutList = snapshot.data!;
               return ListView.builder(
                 itemCount: workoutList.workouts.length,
-                itemBuilder: (context, index) => ListTile(
-                  title: PlatformListTile(
-                    title: PlatformText(workoutList.workouts[index].name),
-                    subtitle: PlatformText(formattedDateTime(DateTime.now())),
-                    trailing: Row(
+                itemBuilder: (context, index) => PlatformListTile(
+                  title: PlatformText(workoutList.workouts[index].name),
+                  subtitle: PlatformText(
+                    formattedDateTime(workoutList.workouts[index].date),
+                  ),
+                  trailing: PlatformTextButton(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(L10n.of(context)!.startWorkoutButtonText),
-                        PlatformIconButton(
-                          icon: Icon(PlatformIcons(context).playArrow),
-                          onPressed: () {},
-                        ),
+                        PlatformText(L10n.of(context)!.startWorkoutButtonText),
+                        Icon(PlatformIcons(context).playArrow),
                       ],
                     ),
+                    onPressed: () {},
                   ),
                 ),
               );

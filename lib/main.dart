@@ -39,17 +39,19 @@ class _MainAppState extends ConsumerState<MainApp> {
   void _showComposeWorkoutModal() async {
     final context = _navigatorKey.currentContext;
     assert(context != null);
+    if (context == null) return;
+
     Workout? workout;
     if (Theme.of(context!).platform == TargetPlatform.iOS) {
       workout = await showCupertinoSheet<Workout>(
-        context: _navigatorKey.currentContext!,
+        context: context,
         builder: (context) => ComposeWorkoutModal(),
       );
     } else {
       workout = await Navigator.push(
         _navigatorKey.currentContext!,
         platformPageRoute(
-          context: context!,
+          context: context,
           fullscreenDialog: true,
           builder: (context) => ComposeWorkoutModal(),
         ),
