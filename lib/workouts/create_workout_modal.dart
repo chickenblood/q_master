@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/workout.dart';
 import 'workout_auto_completions.dart';
+import 'package:q_master/icons/adaptive_icons.dart';
 
 class ComposeWorkoutModal extends StatelessWidget {
   final _verticalSpacing = const SizedBox(height: 16.0);
@@ -83,8 +83,7 @@ class ComposeWorkoutModal extends StatelessWidget {
             CupertinoNavigationBarData(backgroundColor: Colors.transparent),
         leading: PlatformIconButton(
           onPressed: () => Navigator.pop(context),
-          materialIcon: Icon(Icons.close),
-          cupertinoIcon: Icon(CupertinoIcons.xmark),
+          icon: Icon(AdaptiveIcons.close),
         ),
         trailingActions: [
           ListenableBuilder(

@@ -25,5 +25,18 @@
     "workoutThangFieldLabel": "Thang",
     "@workoutThangFieldLabel": {},
     "workoutMaryFieldLabel": "Mary",
-    "@workoutMaryFieldLabel": {}
+    "@workoutMaryFieldLabel": {},
+    "beatdownBrowserTitle": "Beatdown",
+    "@beatdownBrowserTitle": {},
+    "workoutCompleteText": "All done!",
+    "@workoutCompleteText": {},
+    "workoutNextUpText": "Next up: {name} ➜",
+    "@workoutNextUpText": {
+      "placeholders": {
+        "name": {
+          "type": "String",
+          "example": "20 merkins"
+        }
+      }
+    }
   }
