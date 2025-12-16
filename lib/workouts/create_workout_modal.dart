@@ -19,7 +19,11 @@ class CreateWorkoutModal extends StatelessWidget {
     padding: const EdgeInsets.all(16.0),
     children: [
       PlatformText(L10n.of(context)!.workoutNameFieldLabel),
-      PlatformTextField(controller: _nameTextController, maxLines: 2),
+      PlatformTextField(
+        controller: _nameTextController,
+        textCapitalization: TextCapitalization.sentences,
+        maxLines: 2,
+      ),
       _verticalSpacing,
       PlatformText(L10n.of(context)!.workoutWarmupFieldLabel),
       WorkoutAutocompleteTextField(
