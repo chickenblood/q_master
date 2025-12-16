@@ -86,7 +86,9 @@ final class BeatdownBrowser extends StatelessWidget {
                       onPressed: () => _onNextPage(index, context),
                       child: PlatformText(
                         (index + 1) < exerciseCount
-                            ? L10n.of(context)!.workoutNextUpText(exercise.name)
+                            ? L10n.of(context)!.workoutNextUpText(
+                                _exerciseAtIndex(index + 1).name,
+                              )
                             : L10n.of(context)!.workoutCompleteText,
                         style: TextStyle(
                           fontSize: 16,
