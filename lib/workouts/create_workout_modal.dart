@@ -7,7 +7,7 @@ import 'package:q_master/icons/adaptive_icons.dart';
 
 class CreateWorkoutModal extends StatelessWidget {
   final _verticalSpacing = const SizedBox(height: 16.0);
-  final _nameTextController = TextEditingController();
+  final _nameTextController = TextEditingController(text: 'New workout');
   final _warmupTextController = TextEditingController();
   final _thangTextController = TextEditingController();
   final _maryTextController = TextEditingController();
@@ -73,9 +73,6 @@ class CreateWorkoutModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _nameTextController.text = L10n.of(context)!.defaultWorkoutName;
-    });
     return PlatformScaffold(
       appBar: PlatformAppBar(
         title: Text(L10n.of(context)!.createWorkoutDialogTitle),
