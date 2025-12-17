@@ -3,9 +3,9 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:q_master/utils/formatted_date.dart';
 import 'package:q_master/model/workout.dart';
-import 'package:q_master/l10n/l10n.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'beatdown_browser.dart';
+import 'package:q_master/icons/adaptive_icons.dart';
 
 class WorkoutsTab extends StatelessWidget {
   const WorkoutsTab({super.key});
@@ -23,6 +23,7 @@ class WorkoutsTab extends StatelessWidget {
               }
               final workoutList = snapshot.data!;
               return ListView.builder(
+                itemExtent: 100,
                 itemCount: workoutList.workouts.length,
                 itemBuilder: (context, index) => _WorkoutTile(
                   workout: workoutList.workouts[index],
@@ -67,27 +68,27 @@ final class _WorkoutTile extends StatelessWidget {
     onDismissed: (direction) {
       if (direction == .endToStart) onDelete(workout);
     },
-    child: PlatformListTile(
-      title: PlatformText(
-        workout.name,
-        style: TextTheme.of(
-          context,
-        ).headlineMedium!.copyWith(fontWeight: .bold),
-        overflow: .ellipsis,
+    child: Container(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: PlatformListTile(
+        title: PlatformText(
+          workout.name,
+          style: TextTheme.of(
+            context,
+          ).headlineLarge!.copyWith(fontWeight: .bold),
+          overflow: .ellipsis,
+        ),
+        subtitle: PlatformText(
+          formattedDateTime(workout.date),
+          style: TextTheme.of(context).bodyLarge,
+        ),
+        trailing: PlatformIconButton(
+          icon: Icon(AdaptiveIcons.more),
+          onPressed: () {},
+        ),
+
+        onTap: () => _showBeatdownBrowser(context, workout),
       ),
-      subtitle: PlatformText(
-        formattedDateTime(workout.date),
-        style: TextTheme.of(context).bodyLarge,
-      ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          PlatformText(L10n.of(context)!.startWorkoutButtonText),
-          SizedBox(width: 8),
-          Icon(PlatformIcons(context).playArrow),
-        ],
-      ),
-      onTap: () => _showBeatdownBrowser(context, workout),
     ),
   );
 }
