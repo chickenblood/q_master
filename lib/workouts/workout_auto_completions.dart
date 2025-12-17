@@ -4,14 +4,14 @@ import 'workout_constants.dart';
 
 /// A text field with autocomplete functionality for describing workouts.
 class WorkoutAutocompleteTextField extends StatefulWidget {
-  final TextEditingController? textEditingController;
+  final TextEditingController textEditingController;
   final int? _minLines;
   final int? _maxLines;
   final bool? expands;
 
   const WorkoutAutocompleteTextField({
     super.key,
-    this.textEditingController,
+    required this.textEditingController,
     int? minLines,
     int? maxLines,
     this.expands,
@@ -25,12 +25,13 @@ class WorkoutAutocompleteTextField extends StatefulWidget {
 
 class _WorkoutAutocompleteTextFieldState
     extends State<WorkoutAutocompleteTextField> {
+  final focusNode = FocusNode();
   var _baseText = '';
 
   @override
   Widget build(BuildContext context) => Autocomplete<String>(
     textEditingController: widget.textEditingController,
-    focusNode: FocusNode(),
+    focusNode: focusNode,
     displayStringForOption: (option) => _baseText + option,
     optionsBuilder: (TextEditingValue textEditingValue) {
       var currentComposedText = textEditingValue.text;

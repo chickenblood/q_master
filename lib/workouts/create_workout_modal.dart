@@ -5,14 +5,49 @@ import 'package:q_master/model/workout.dart';
 import 'workout_auto_completions.dart';
 import 'package:q_master/icons/adaptive_icons.dart';
 
-class CreateWorkoutModal extends StatelessWidget {
+class CreateWorkoutModal extends StatefulWidget {
+  const CreateWorkoutModal({super.key});
+
+  @override
+  State<CreateWorkoutModal> createState() => _CreateWorkoutModalState();
+}
+
+class _CreateWorkoutModalState extends State<CreateWorkoutModal> {
   final _verticalSpacing = const SizedBox(height: 16.0);
-  final _nameTextController = TextEditingController(text: 'New workout');
+  final focusNode = FocusNode();
+
+  final _nameTextController = TextEditingController();
   final _warmupTextController = TextEditingController();
   final _thangTextController = TextEditingController();
   final _maryTextController = TextEditingController();
 
-  CreateWorkoutModal({super.key});
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _nameTextController.text = L10n.of(context)!.defaultWorkoutName;
+      focusNode.requestFocus();
+      _selectNameText();
+    });
+  }
+
+  @override
+  void dispose() {
+    _nameTextController.dispose();
+    _warmupTextController.dispose();
+    _thangTextController.dispose();
+    _maryTextController.dispose();
+    super.dispose();
+  }
+
+  void _selectNameText() {
+    // Select all text on focus
+    _nameTextController.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: _nameTextController.value.text.length,
+    );
+  }
 
   Widget _content(BuildContext context) => ListView(
     physics: ClampingScrollPhysics(), // To allow drag-dismiss.
@@ -23,6 +58,7 @@ class CreateWorkoutModal extends StatelessWidget {
         controller: _nameTextController,
         textCapitalization: TextCapitalization.sentences,
         maxLines: 2,
+        focusNode: focusNode,
       ),
       _verticalSpacing,
       PlatformText(L10n.of(context)!.workoutWarmupFieldLabel),
