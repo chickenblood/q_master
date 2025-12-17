@@ -5,6 +5,7 @@ import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/icons/adaptive_icons.dart';
 
 final class BeatdownBrowser extends StatelessWidget {
+  final _pageIndex = ValueNotifier<int>(0);
   final _pageController = PageController();
   final Workout workout;
 
@@ -56,29 +57,32 @@ final class BeatdownBrowser extends StatelessWidget {
           icon: Icon(AdaptiveIcons.close),
           onPressed: () => Navigator.pop(context),
         ),
-        title: PlatformText(L10n.of(context)!.beatdownBrowserTitle),
+        title: ListenableBuilder(
+          listenable: _pageIndex,
+          builder: (_, _) =>
+              PlatformText(_exerciseTypeAtIndex(_pageIndex.value, context)),
+        ),
       ),
       body: SafeArea(
         minimum: EdgeInsets.all(16),
         child: PageView.builder(
           controller: _pageController,
           itemCount: exerciseCount,
+          onPageChanged: (index) => _pageIndex.value = index,
           itemBuilder: (context, index) {
             final exercise = _exerciseAtIndex(index);
-            final exerciseType = _exerciseTypeAtIndex(index, context);
             return Column(
               mainAxisSize: .max,
               mainAxisAlignment: .spaceBetween,
               crossAxisAlignment: .center,
               children: [
+                Spacer(),
                 PlatformText(
-                  exerciseType,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                PlatformText(
+                  textAlign: .center,
                   exercise.name,
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
                 ),
+                Spacer(),
                 Row(
                   mainAxisAlignment: .end,
                   children: [
