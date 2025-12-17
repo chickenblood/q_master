@@ -5,6 +5,7 @@ import 'workout_constants.dart';
 /// A text field with autocomplete functionality for describing workouts.
 class WorkoutAutocompleteTextField extends StatefulWidget {
   final TextEditingController textEditingController;
+  final OptionsViewOpenDirection optionsViewOpenDirection;
   final int? _minLines;
   final int? _maxLines;
   final bool? expands;
@@ -12,6 +13,7 @@ class WorkoutAutocompleteTextField extends StatefulWidget {
   const WorkoutAutocompleteTextField({
     super.key,
     required this.textEditingController,
+    this.optionsViewOpenDirection = .down,
     int? minLines,
     int? maxLines,
     this.expands,
@@ -77,6 +79,7 @@ class _WorkoutAutocompleteTextFieldState
                 onFieldSubmitted(), // Important for form submission
           );
         },
+    optionsViewOpenDirection: widget.optionsViewOpenDirection,
     optionsViewBuilder:
         (
           BuildContext context,

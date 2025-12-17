@@ -78,6 +78,7 @@ class _CreateWorkoutModalState extends State<CreateWorkoutModal> {
       PlatformText(L10n.of(context)!.workoutMaryFieldLabel),
       WorkoutAutocompleteTextField(
         textEditingController: _maryTextController,
+        optionsViewOpenDirection: .up,
         minLines: 5,
         maxLines: 5,
       ),
