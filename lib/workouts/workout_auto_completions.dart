@@ -85,7 +85,6 @@ class _WorkoutAutocompleteTextFieldState
         ) {
           // Builds the list of suggestions
           return Material(
-            elevation: 4.0,
             child: ListView.builder(
               shrinkWrap: true,
               itemCount: options.length,

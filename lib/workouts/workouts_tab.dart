@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:q_master/utils/formatted_date.dart';
 import 'package:q_master/model/workout.dart';
 import 'package:q_master/l10n/l10n.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'beatdown_browser.dart';
 
 class WorkoutsTab extends StatelessWidget {
@@ -42,8 +43,11 @@ final class _WorkoutTile extends StatelessWidget {
 
   const _WorkoutTile({required this.workout, required this.onDelete});
 
-  void _showBeatdownBrowser(BuildContext context, Workout workout) {
-    Navigator.push(
+  void _showBeatdownBrowser(BuildContext context, Workout workout) async {
+    // Stop the screen from sleeping while the beatdown browser is shown.
+    WakelockPlus.enable();
+
+    await Navigator.push(
       context,
       platformPageRoute(
         context: context,
@@ -51,6 +55,8 @@ final class _WorkoutTile extends StatelessWidget {
         builder: (context) => BeatdownBrowser(workout: workout),
       ),
     );
+
+    WakelockPlus.disable();
   }
 
   @override
