@@ -88,16 +88,19 @@ class _WorkoutAutocompleteTextFieldState
         ) {
           // Builds the list of suggestions
           return Material(
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: options.length,
-              itemBuilder: (BuildContext context, int index) {
-                final String option = options.elementAt(index);
-                return PlatformListTile(
-                  title: PlatformText(option),
-                  onTap: () => onSelected(option),
-                );
-              },
+            child: SafeArea(
+              child: ListView.builder(
+                shrinkWrap: true,
+                reverse: widget.optionsViewOpenDirection == .up,
+                itemCount: options.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final String option = options.elementAt(index);
+                  return PlatformListTile(
+                    title: PlatformText(option),
+                    onTap: () => onSelected(option),
+                  );
+                },
+              ),
             ),
           );
         },
