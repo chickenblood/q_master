@@ -62,18 +62,24 @@ final class _WorkoutTile extends StatelessWidget {
       if (direction == .endToStart) onDelete(workout);
     },
     child: PlatformListTile(
-      title: PlatformText(workout.name),
-      subtitle: PlatformText(formattedDateTime(workout.date)),
-      trailing: PlatformTextButton(
-        onPressed: () {},
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            PlatformText(L10n.of(context)!.startWorkoutButtonText),
-            SizedBox(width: 8),
-            Icon(PlatformIcons(context).playArrow),
-          ],
-        ),
+      title: PlatformText(
+        workout.name,
+        style: TextTheme.of(
+          context,
+        ).headlineMedium!.copyWith(fontWeight: .bold),
+        overflow: .ellipsis,
+      ),
+      subtitle: PlatformText(
+        formattedDateTime(workout.date),
+        style: TextTheme.of(context).bodyLarge,
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          PlatformText(L10n.of(context)!.startWorkoutButtonText),
+          SizedBox(width: 8),
+          Icon(PlatformIcons(context).playArrow),
+        ],
       ),
       onTap: () => _showBeatdownBrowser(context, workout),
     ),
