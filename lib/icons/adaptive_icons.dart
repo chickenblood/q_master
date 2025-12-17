@@ -16,5 +16,5 @@ final class AdaptiveIcons {
       Platform.isIOS ? CupertinoIcons.xmark : Icons.close;
 
   static IconData get more =>
-      Platform.isIOS ? CupertinoIcons.ellipsis : Icons.more;
+      Platform.isIOS ? CupertinoIcons.ellipsis : Icons.more_vert;
 }
