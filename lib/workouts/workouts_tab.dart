@@ -65,7 +65,7 @@ final class _WorkoutTile extends StatelessWidget {
       title: PlatformText(workout.name),
       subtitle: PlatformText(formattedDateTime(workout.date)),
       trailing: PlatformTextButton(
-        onPressed: () => _showBeatdownBrowser(context, workout),
+        onPressed: () {},
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -75,6 +75,7 @@ final class _WorkoutTile extends StatelessWidget {
           ],
         ),
       ),
+      onTap: () => _showBeatdownBrowser(context, workout),
     ),
   );
 }

@@ -42,7 +42,7 @@ class _MainAppState extends ConsumerState<MainApp> {
     if (context == null) return;
 
     Workout? workout;
-    if (Theme.of(context!).platform == TargetPlatform.iOS) {
+    if (Theme.of(context).platform == TargetPlatform.iOS) {
       workout = await showCupertinoSheet<Workout>(
         context: context,
         builder: (context) => CreateWorkoutModal(),
