@@ -78,8 +78,10 @@ final class BeatdownBrowser extends StatelessWidget {
               children: [
                 Spacer(),
                 PlatformText(
-                  textAlign: .center,
                   exercise.name,
+                  textAlign: .center,
+                  overflow: .fade,
+                  maxLines: 5,
                   style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
                 ),
                 Spacer(),
