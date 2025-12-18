@@ -7,10 +7,10 @@ final class AdaptiveIcons {
       Platform.isIOS ? CupertinoIcons.stopwatch : Icons.timer;
 
   static IconData get history =>
-      Platform.isIOS ? CupertinoIcons.speedometer : Icons.history;
+      /*Platform.isIOS ? CupertinoIcons.speedometer :*/ Icons.history;
 
   static IconData get sports =>
-      Platform.isIOS ? CupertinoIcons.sportscourt : Icons.sports_soccer;
+      /*Platform.isIOS ? CupertinoIcons.sportscourt :*/ Icons.sports_soccer;
 
   static IconData get close =>
       Platform.isIOS ? CupertinoIcons.xmark : Icons.close;

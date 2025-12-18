@@ -97,9 +97,11 @@ final class BeatdownBrowser extends StatelessWidget {
                               )
                             : L10n.of(context)!.workoutCompleteText,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
+                        overflow: .ellipsis,
+                        maxLines: 2,
                       ),
                     ),
                   ],
