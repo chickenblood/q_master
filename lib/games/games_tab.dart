@@ -28,7 +28,10 @@ class GamesTab extends StatelessWidget {
             ),
             Transform.rotate(
               angle: _degToRad(-5.0),
-              child: _GameTile(title: L10n.of(context)!.dopGameTileTitle),
+              child: _GameTile(
+                title: L10n.of(context)!.dopGameTileTitle,
+                imagePath: 'assets/images/DoP.png',
+              ),
             ),
           ],
         ),
@@ -51,7 +54,7 @@ class _GameTile extends StatelessWidget {
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(16.0),
       image: imagePath != null
-          ? DecorationImage(image: AssetImage(imagePath!), fit: BoxFit.cover)
+          ? DecorationImage(image: AssetImage(imagePath!), fit: .contain)
           : null,
       border: Border.all(
         color: Theme.of(context).colorScheme.onSurface,
@@ -60,7 +63,8 @@ class _GameTile extends StatelessWidget {
     ),
     child: AspectRatio(
       aspectRatio: 3 / 4,
-      child: Center(
+      child: Align(
+        alignment: .bottomCenter,
         child: PlatformText(
           title,
           textAlign: TextAlign.center,
