@@ -8,6 +8,7 @@ import 'package:q_master/model/formatted_workout.dart';
 import 'package:q_master/workouts/create_workout_modal.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'beatdown_browser.dart';
+import 'package:q_master/ui/adaptive_alert.dart';
 import 'package:q_master/ui/adaptive_icons.dart';
 import 'package:q_master/ui/adaptive_menu.dart';
 import 'package:q_master/l10n/l10n.dart';
@@ -34,7 +35,6 @@ class WorkoutsTab extends StatelessWidget {
                 itemBuilder: (context, index) => _WorkoutTile(
                   workoutList: workoutList,
                   workout: workoutList.workouts[index],
-                  onDelete: workoutList.remove,
                 ),
               );
             },
@@ -48,12 +48,10 @@ class WorkoutsTab extends StatelessWidget {
 final class _WorkoutTile extends StatelessWidget {
   final WorkoutList workoutList;
   final Workout workout;
-  final void Function(Workout workout) onDelete;
 
   const _WorkoutTile({
     required this.workoutList,
     required this.workout,
-    required this.onDelete,
   });
 
   void _showBeatdownBrowser(BuildContext context, Workout workout) async {
@@ -107,13 +105,50 @@ final class _WorkoutTile extends StatelessWidget {
     );
   }
 
+  Future<bool?> _confirmDelete(BuildContext context) => showAdaptiveDialog(
+        context: context,
+        builder: (BuildContext innerContext) => AlertDialog.adaptive(
+          title: PlatformText(L10n.of(context)!.deleteWorkoutAlertTitle),
+          content: PlatformText(L10n.of(context)!.deleteWorkoutAlertDescription),
+          actions: [
+            adaptiveAlertAction(
+              context: innerContext,
+              isDestructive: true,
+              onPressed: () => Navigator.pop(innerContext, true),
+              child: PlatformText(L10n.of(innerContext)!.deleteWorkoutConfirmAction),
+            ),
+            adaptiveAlertAction(
+              context: innerContext,
+              isDefault: true,
+              onPressed: () => Navigator.pop(innerContext, false),
+              child: PlatformText(L10n.of(innerContext)!.cancelAction),
+            ),
+          ],
+        ),
+    );
+
+  void _deleteWorkout(BuildContext context, Workout workout) async {
+    if (await _confirmDelete(context) == true) {
+      workoutList.remove(workout);
+    }
+  }
+
   @override
   Widget build(BuildContext context) => Dismissible(
     direction: .endToStart,
     key: ValueKey(workout),
     background: Container(color: Colors.red),
+    confirmDismiss: (direction) {
+      if (direction == .endToStart) return _confirmDelete(context);
+      return Future.value(false);
+    },
+    onUpdate: (DismissUpdateDetails details) => (){},
     onDismissed: (direction) {
-      if (direction == .endToStart) onDelete(workout);
+      if (direction == .endToStart) {
+        Future.delayed(
+          Duration(milliseconds: 500),
+          () => workoutList.remove(workout));
+      }
     },
     child: Container(
       padding: EdgeInsets.symmetric(vertical: 8),
@@ -132,8 +167,7 @@ final class _WorkoutTile extends StatelessWidget {
         trailing: _OverflowMenu(
           onEdit: () => _editWorkout(context, workout),
           onShare: (buttonContext) => _shareWorkout(buttonContext, workout),
-          // Needs a confirmation dialog.
-          onDelete: () => workoutList.remove(workout),
+          onDelete: () => _deleteWorkout(context, workout),
         ),
         onTap: () => _showBeatdownBrowser(context, workout),
       ),

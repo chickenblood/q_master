@@ -44,5 +44,13 @@
     "shareWorkoutText": "Share",
     "@shareWorkoutText": {},
     "deleteWorkoutText": "Delete",
-    "@deleteWorkoutText": {}
+    "@deleteWorkoutText": {},
+    "deleteWorkoutAlertTitle" : "Delete workout?",
+    "@deleteWorkoutAlertTitle" : {},
+    "deleteWorkoutAlertDescription" : "This will permanently remove the workout",
+    "@deleteWorkoutAlertDescription" : {},
+    "deleteWorkoutConfirmAction": "Delete",
+    "@deleteWorkoutConfirmAction": {},
+    "cancelAction": "Cancel",
+    "@cancelAction": {}
   }
