@@ -38,5 +38,7 @@
           "example": "20 merkins"
         }
       }
-    }
+    },
+    "editWorkoutText": "Edit",
+    "@editWorkoutText": {}
   }

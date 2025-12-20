@@ -1,54 +1,71 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:convert';
 
 part 'workout.freezed.dart';
 part 'workout.g.dart';
 
-final workoutListProvider = Provider((_) async {
+/// Provider for the WorkoutList
+final workoutListProvider = FutureProvider((ref) async {
   final directory = await getApplicationDocumentsDirectory();
   final filename = '${directory.path}/workouts.json';
-  return WorkoutList(filename: filename);
+  return WorkoutList(filename: filename, onUpdate: ref.invalidateSelf);
 });
 
 final class WorkoutList {
   final String filename;
   final workouts = <Workout>[];
+  final void Function() onUpdate;
 
-  WorkoutList({required this.filename}) {
+  WorkoutList({required this.filename, required this.onUpdate}) {
     final file = File(filename);
     if (!file.existsSync()) {
       return;
     }
     final json = file.readAsStringSync();
-    final storedWorkouts = (jsonDecode(json) as List)
+    final newWorkouts = (jsonDecode(json) as List)
         .map((e) => Workout.fromJson(e))
         .toList();
-    workouts.addAll(storedWorkouts);
+    workouts.addAll(newWorkouts);
   }
 
-  void _save() {
+  Future<void> _save({required List<Workout> updatedWorkouts}) async {
     final file = File(filename)..createSync();
-    final json = jsonEncode(workouts);
+    final json = jsonEncode(updatedWorkouts);
     file.writeAsStringSync(json);
+    onUpdate();
   }
 
   void add(Workout workout) {
+    final updatedWorkouts = workouts.toList();
     // New items go to the front of the list.
-    workouts.insert(0, workout);
+    updatedWorkouts.insert(0, workout);
     // Save updated list to disk.
-    _save();
+    _save(updatedWorkouts: updatedWorkouts);
   }
 
   void remove(Workout workout) {
-    if (workouts.remove(workout)) {
-      _save();
+    final updatedWorkouts = workouts.toList();
+    if (updatedWorkouts.remove(workout)) {
+      _save(updatedWorkouts: updatedWorkouts);
     } else {
       debugPrint('Unable to remove workout');
     }
+  }
+
+  void replace(Workout existingWorkout, Workout newWorkout) {
+    final index = workouts.indexOf(existingWorkout);
+    assert(index != -1);
+    if (index == -1) {
+      debugPrint('Unable to replace workout');
+      return;
+    }
+    final updatedWorkouts = workouts.toList();
+    updatedWorkouts[index] = newWorkout;
+    _save(updatedWorkouts: updatedWorkouts);
   }
 }
 

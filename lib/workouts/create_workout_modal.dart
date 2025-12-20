@@ -6,7 +6,9 @@ import 'workout_auto_completions.dart';
 import 'package:q_master/icons/adaptive_icons.dart';
 
 class CreateWorkoutModal extends StatefulWidget {
-  const CreateWorkoutModal({super.key});
+  final Workout? workout;
+
+  const CreateWorkoutModal({super.key, this.workout});
 
   @override
   State<CreateWorkoutModal> createState() => _CreateWorkoutModalState();
@@ -25,11 +27,19 @@ class _CreateWorkoutModalState extends State<CreateWorkoutModal> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _nameTextController.text = L10n.of(context)!.defaultWorkoutName;
-      focusNode.requestFocus();
-      _selectNameText();
-    });
+    final workout = widget.workout;
+    if (workout != null) {
+      _nameTextController.text = workout.name;
+      _warmupTextController.text = workout.warmup.map((e) => e.name).join('\n');
+      _thangTextController.text = workout.thang.map((e) => e.name).join('\n');
+      _maryTextController.text = workout.mary.map((e) => e.name).join('\n');
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _nameTextController.text = L10n.of(context)!.defaultWorkoutName;
+        focusNode.requestFocus();
+        _selectNameText();
+      });
+    }
   }
 
   @override
