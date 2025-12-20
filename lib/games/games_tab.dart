@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter/material.dart';
 import '../l10n/l10n.dart';
-import '../utils/media_query.dart';
+import '../ui/media_query.dart';
 
 class GamesTab extends StatelessWidget {
   const GamesTab({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:q_master/utils/formatted_date.dart';
+import 'package:q_master/utils/datetime_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:q_master/model/workout.dart';
 import 'package:q_master/model/formatted_workout.dart';
@@ -125,7 +125,7 @@ final class _WorkoutTile extends StatelessWidget {
           overflow: .ellipsis,
         ),
         subtitle: PlatformText(
-          formattedDate(workout.date),
+          workout.date.formattedForDisplay(),
           style: TextTheme.of(context).bodyLarge,
         ),
         trailing: _OverflowMenu(
