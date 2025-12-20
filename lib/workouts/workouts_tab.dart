@@ -69,14 +69,6 @@ final class _WorkoutTile extends StatelessWidget {
     WakelockPlus.disable();
   }
 
-  void _showOverflowMenu(BuildContext context, Workout workout) {
-    showModalBottomSheet(
-      context: context,
-      builder: (_) =>
-          _OverflowMenu(onEdit: () => _editWorkout(context, workout)),
-    );
-  }
-
   Future<void> _editWorkout(BuildContext context, Workout workout) async {
     Workout? updatedWorkout;
     if (Theme.of(context).platform == TargetPlatform.iOS) {
@@ -121,11 +113,12 @@ final class _WorkoutTile extends StatelessWidget {
           formattedDateTime(workout.date),
           style: TextTheme.of(context).bodyLarge,
         ),
-        trailing: PlatformIconButton(
-          icon: Icon(AdaptiveIcons.more),
-          onPressed: () => _showOverflowMenu(context, workout),
+        trailing: _OverflowMenu(
+          onEdit: () => _editWorkout(context, workout),
+          onShare: () {},
+          // Needs a confirmation dialog.
+          onDelete: () => workoutList.remove(workout),
         ),
-
         onTap: () => _showBeatdownBrowser(context, workout),
       ),
     ),
@@ -133,29 +126,56 @@ final class _WorkoutTile extends StatelessWidget {
 }
 
 final class _OverflowMenu extends StatelessWidget {
-  final Future<void> Function() onEdit;
+  final void Function() onEdit;
+  final void Function() onShare;
+  final void Function() onDelete;
 
-  const _OverflowMenu({required this.onEdit});
+  const _OverflowMenu({
+    required this.onEdit,
+    required this.onShare,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).canvasColor,
-      child: ListView(
-        shrinkWrap: true,
-        children: [
-          PlatformListTile(
-            title: Row(
-              mainAxisAlignment: .center,
-              children: [PlatformText(L10n.of(context)!.editWorkoutText)],
-            ),
-            onTap: () async {
-              final navigator = Navigator.of(context);
-              await onEdit();
-              navigator.pop();
-            },
+    return MenuAnchor(
+      consumeOutsideTap: true,
+      menuChildren: [
+        MenuItemButton(
+          onPressed: onEdit,
+          trailingIcon: Row(
+            children: [SizedBox(width: 20), Icon(context.platformIcons.edit)],
           ),
-        ],
+          child: PlatformText(
+            L10n.of(context)!.editWorkoutText,
+            style: TextTheme.of(context).titleLarge!,
+          ),
+        ),
+        MenuItemButton(
+          onPressed: onShare,
+          trailingIcon: Row(
+            children: [SizedBox(width: 20), Icon(context.platformIcons.share)],
+          ),
+          child: PlatformText(
+            L10n.of(context)!.shareWorkoutText,
+            style: TextTheme.of(context).titleLarge!,
+          ),
+        ),
+        MenuItemButton(
+          onPressed: onDelete,
+          trailingIcon: Row(
+            children: [SizedBox(width: 20), Icon(context.platformIcons.delete)],
+          ),
+          child: PlatformText(
+            L10n.of(context)!.deleteWorkoutText,
+            style: TextTheme.of(context).titleLarge!,
+          ),
+        ),
+      ],
+      builder: (context, controller, child) => PlatformIconButton(
+        icon: Icon(AdaptiveIcons.more),
+        onPressed: () =>
+            controller.isOpen ? controller.close() : controller.open(),
       ),
     );
   }
