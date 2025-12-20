@@ -4,11 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:q_master/utils/formatted_date.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:q_master/model/workout.dart';
+import 'package:q_master/model/formatted_workout.dart';
 import 'package:q_master/workouts/create_workout_modal.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'beatdown_browser.dart';
 import 'package:q_master/icons/adaptive_icons.dart';
 import 'package:q_master/l10n/l10n.dart';
+import 'package:share_plus/share_plus.dart';
 
 class WorkoutsTab extends StatelessWidget {
   const WorkoutsTab({super.key});
@@ -91,6 +93,22 @@ final class _WorkoutTile extends StatelessWidget {
     }
   }
 
+  void _shareWorkout(
+    BuildContext context,
+    Workout workou, {
+  }) {
+    // Get rect of button to present popovers from on iPad.
+    final box = context.findRenderObject() as RenderBox;
+    final sharePositionRect = box.localToGlobal(Offset.zero) & box.size;
+
+    SharePlus.instance.share(
+      ShareParams(
+        text: workout.formattedText(context),
+        sharePositionOrigin: sharePositionRect,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) => Dismissible(
     direction: .endToStart,
@@ -110,12 +128,12 @@ final class _WorkoutTile extends StatelessWidget {
           overflow: .ellipsis,
         ),
         subtitle: PlatformText(
-          formattedDateTime(workout.date),
+          formattedDate(workout.date),
           style: TextTheme.of(context).bodyLarge,
         ),
         trailing: _OverflowMenu(
           onEdit: () => _editWorkout(context, workout),
-          onShare: () {},
+          onShare: (buttonContext) => buttonContext(context, workout),
           // Needs a confirmation dialog.
           onDelete: () => workoutList.remove(workout),
         ),
@@ -127,7 +145,7 @@ final class _WorkoutTile extends StatelessWidget {
 
 final class _OverflowMenu extends StatelessWidget {
   final void Function() onEdit;
-  final void Function() onShare;
+  final void Function(BuildContext) onShare;
   final void Function() onDelete;
 
   const _OverflowMenu({
@@ -151,8 +169,8 @@ final class _OverflowMenu extends StatelessWidget {
             style: TextTheme.of(context).titleLarge!,
           ),
         ),
-        MenuItemButton(
-          onPressed: onShare,
+        Builder(builder: (menuContext) => MenuItemButton(
+          onPressed: () => onShare(menuContext),
           trailingIcon: Row(
             children: [SizedBox(width: 20), Icon(context.platformIcons.share)],
           ),
@@ -160,6 +178,7 @@ final class _OverflowMenu extends StatelessWidget {
             L10n.of(context)!.shareWorkoutText,
             style: TextTheme.of(context).titleLarge!,
           ),
+        ),
         ),
         MenuItemButton(
           onPressed: onDelete,
