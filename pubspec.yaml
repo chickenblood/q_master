@@ -23,6 +23,7 @@ dependencies:
   riverpod_annotation: ^3.0.3
   riverpod_generator: ^3.0.3
   share_plus: ^12.0.1
+  pull_down_button: ^0.10.2
 
 
 dev_dependencies:

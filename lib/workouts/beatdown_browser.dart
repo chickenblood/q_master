@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/model/workout.dart';
 import 'package:q_master/l10n/l10n.dart';
-import 'package:q_master/icons/adaptive_icons.dart';
+import 'package:q_master/ui/adaptive_icons.dart';
 
 final class BeatdownBrowser extends StatelessWidget {
   final _pageIndex = ValueNotifier<int>(0);

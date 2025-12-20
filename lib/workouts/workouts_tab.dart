@@ -8,7 +8,8 @@ import 'package:q_master/model/formatted_workout.dart';
 import 'package:q_master/workouts/create_workout_modal.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'beatdown_browser.dart';
-import 'package:q_master/icons/adaptive_icons.dart';
+import 'package:q_master/ui/adaptive_icons.dart';
+import 'package:q_master/ui/adaptive_menu.dart';
 import 'package:q_master/l10n/l10n.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -153,53 +154,26 @@ final class _OverflowMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Builder(
-      builder: (menuContext) => MenuAnchor(
-        consumeOutsideTap: true,
+    return Builder(builder: (menuContext) => AdaptiveMenu(
+        icon: Icon(AdaptiveIcons.more),
         menuChildren: [
-          MenuItemButton(
+          AdaptiveMenuItem(
             onPressed: onEdit,
-            trailingIcon: Row(
-              children: [SizedBox(width: 20), Icon(context.platformIcons.edit)],
-            ),
-            child: PlatformText(
-              L10n.of(context)!.editWorkoutText,
-              style: TextTheme.of(context).titleLarge!,
-            ),
+            icon: context.platformIcons.edit,
+            text: L10n.of(context)!.editWorkoutText,
           ),
-          MenuItemButton(
+          AdaptiveMenuItem(
             onPressed: () => onShare(menuContext),
-            trailingIcon: Row(
-              children: [
-                SizedBox(width: 20),
-                Icon(context.platformIcons.share),
-              ],
-            ),
-            child: PlatformText(
-              L10n.of(context)!.shareWorkoutText,
-              style: TextTheme.of(context).titleLarge!,
-            ),
+            icon: context.platformIcons.share,
+            text: L10n.of(context)!.shareWorkoutText,
           ),
-          MenuItemButton(
+          AdaptiveMenuItem(
             onPressed: onDelete,
-            trailingIcon: Row(
-              children: [
-                SizedBox(width: 20),
-                Icon(context.platformIcons.delete),
-              ],
-            ),
-            child: PlatformText(
-              L10n.of(context)!.deleteWorkoutText,
-              style: TextTheme.of(context).titleLarge!,
-            ),
+            icon: context.platformIcons.delete,
+            text: L10n.of(context)!.deleteWorkoutText,
           ),
         ],
-        builder: (context, controller, child) => PlatformIconButton(
-          icon: Icon(AdaptiveIcons.more),
-          onPressed: () =>
-              controller.isOpen ? controller.close() : controller.open(),
-        ),
-      ),
+    ),
     );
   }
 }

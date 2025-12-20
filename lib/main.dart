@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'timer/timer_tab.dart';
 import 'workouts/create_workout_modal.dart';
 import 'workouts/workouts_tab.dart';
-import 'icons/adaptive_icons.dart';
+import 'ui/adaptive_icons.dart';
 import 'theme/theme.dart';
 import 'games/games_tab.dart';
 import 'model/workout.dart';
