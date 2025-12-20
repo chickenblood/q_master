@@ -4,6 +4,7 @@ import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/utils/formatted_date.dart';
 
 extension FormatttedOutput on Workout {
+  /// Processes the workoout to share as plain text.
   String formattedText(BuildContext context) {
     final l10n = L10n.of(context)!;
     var result = StringBuffer();

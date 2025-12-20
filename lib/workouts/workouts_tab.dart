@@ -130,7 +130,7 @@ final class _WorkoutTile extends StatelessWidget {
         ),
         trailing: _OverflowMenu(
           onEdit: () => _editWorkout(context, workout),
-          onShare: (buttonContext) => _shareWorkout(context, workout),
+          onShare: (buttonContext) => _shareWorkout(buttonContext, workout),
           // Needs a confirmation dialog.
           onDelete: () => workoutList.remove(workout),
         ),
@@ -153,21 +153,21 @@ final class _OverflowMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MenuAnchor(
-      consumeOutsideTap: true,
-      menuChildren: [
-        MenuItemButton(
-          onPressed: onEdit,
-          trailingIcon: Row(
-            children: [SizedBox(width: 20), Icon(context.platformIcons.edit)],
+    return Builder(
+      builder: (menuContext) => MenuAnchor(
+        consumeOutsideTap: true,
+        menuChildren: [
+          MenuItemButton(
+            onPressed: onEdit,
+            trailingIcon: Row(
+              children: [SizedBox(width: 20), Icon(context.platformIcons.edit)],
+            ),
+            child: PlatformText(
+              L10n.of(context)!.editWorkoutText,
+              style: TextTheme.of(context).titleLarge!,
+            ),
           ),
-          child: PlatformText(
-            L10n.of(context)!.editWorkoutText,
-            style: TextTheme.of(context).titleLarge!,
-          ),
-        ),
-        Builder(
-          builder: (menuContext) => MenuItemButton(
+          MenuItemButton(
             onPressed: () => onShare(menuContext),
             trailingIcon: Row(
               children: [
@@ -180,22 +180,25 @@ final class _OverflowMenu extends StatelessWidget {
               style: TextTheme.of(context).titleLarge!,
             ),
           ),
-        ),
-        MenuItemButton(
-          onPressed: onDelete,
-          trailingIcon: Row(
-            children: [SizedBox(width: 20), Icon(context.platformIcons.delete)],
+          MenuItemButton(
+            onPressed: onDelete,
+            trailingIcon: Row(
+              children: [
+                SizedBox(width: 20),
+                Icon(context.platformIcons.delete),
+              ],
+            ),
+            child: PlatformText(
+              L10n.of(context)!.deleteWorkoutText,
+              style: TextTheme.of(context).titleLarge!,
+            ),
           ),
-          child: PlatformText(
-            L10n.of(context)!.deleteWorkoutText,
-            style: TextTheme.of(context).titleLarge!,
-          ),
+        ],
+        builder: (context, controller, child) => PlatformIconButton(
+          icon: Icon(AdaptiveIcons.more),
+          onPressed: () =>
+              controller.isOpen ? controller.close() : controller.open(),
         ),
-      ],
-      builder: (context, controller, child) => PlatformIconButton(
-        icon: Icon(AdaptiveIcons.more),
-        onPressed: () =>
-            controller.isOpen ? controller.close() : controller.open(),
       ),
     );
   }
