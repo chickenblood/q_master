@@ -50,7 +50,7 @@ class _GameTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    margin: const EdgeInsets.all(16.0),
+    margin: const EdgeInsets.symmetric(horizontal: 20.0),
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(16.0),
       image: imagePath != null
@@ -62,7 +62,7 @@ class _GameTile extends StatelessWidget {
       ),
     ),
     child: AspectRatio(
-      aspectRatio: 3 / 4,
+      aspectRatio: 2 / 3,
       child: Align(
         alignment: .bottomCenter,
         child: PlatformText(
