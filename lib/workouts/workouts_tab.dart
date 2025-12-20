@@ -93,10 +93,7 @@ final class _WorkoutTile extends StatelessWidget {
     }
   }
 
-  void _shareWorkout(
-    BuildContext context,
-    Workout workou, {
-  }) {
+  void _shareWorkout(BuildContext context, Workout workout) {
     // Get rect of button to present popovers from on iPad.
     final box = context.findRenderObject() as RenderBox;
     final sharePositionRect = box.localToGlobal(Offset.zero) & box.size;
@@ -133,7 +130,7 @@ final class _WorkoutTile extends StatelessWidget {
         ),
         trailing: _OverflowMenu(
           onEdit: () => _editWorkout(context, workout),
-          onShare: (buttonContext) => buttonContext(context, workout),
+          onShare: (buttonContext) => _shareWorkout(context, workout),
           // Needs a confirmation dialog.
           onDelete: () => workoutList.remove(workout),
         ),
@@ -169,16 +166,20 @@ final class _OverflowMenu extends StatelessWidget {
             style: TextTheme.of(context).titleLarge!,
           ),
         ),
-        Builder(builder: (menuContext) => MenuItemButton(
-          onPressed: () => onShare(menuContext),
-          trailingIcon: Row(
-            children: [SizedBox(width: 20), Icon(context.platformIcons.share)],
+        Builder(
+          builder: (menuContext) => MenuItemButton(
+            onPressed: () => onShare(menuContext),
+            trailingIcon: Row(
+              children: [
+                SizedBox(width: 20),
+                Icon(context.platformIcons.share),
+              ],
+            ),
+            child: PlatformText(
+              L10n.of(context)!.shareWorkoutText,
+              style: TextTheme.of(context).titleLarge!,
+            ),
           ),
-          child: PlatformText(
-            L10n.of(context)!.shareWorkoutText,
-            style: TextTheme.of(context).titleLarge!,
-          ),
-        ),
         ),
         MenuItemButton(
           onPressed: onDelete,
