@@ -9,7 +9,7 @@ part 'workout.freezed.dart';
 part 'workout.g.dart';
 
 /// Provider for the WorkoutList
-final workoutListProvider = FutureProvider((ref) async {
+final workoutListProvider = Provider((ref) async {
   final directory = await getApplicationDocumentsDirectory();
   final filename = '${directory.path}/workouts.json';
   return WorkoutList(filename: filename, onUpdate: ref.invalidateSelf);
@@ -40,7 +40,7 @@ final class WorkoutList {
   }
 
   void add(Workout workout) {
-    final updatedWorkouts = workouts.toList();
+    final updatedWorkouts = List.of(workouts);
     // New items go to the front of the list.
     updatedWorkouts.insert(0, workout);
     // Save updated list to disk.
@@ -48,7 +48,7 @@ final class WorkoutList {
   }
 
   void remove(Workout workout) {
-    final updatedWorkouts = workouts.toList();
+    final updatedWorkouts = List.of(workouts);
     if (updatedWorkouts.remove(workout)) {
       _save(updatedWorkouts: updatedWorkouts);
     } else {
@@ -63,7 +63,7 @@ final class WorkoutList {
       debugPrint('Unable to replace workout');
       return;
     }
-    final updatedWorkouts = workouts.toList();
+    final updatedWorkouts = List.of(workouts);
     updatedWorkouts[index] = newWorkout;
     _save(updatedWorkouts: updatedWorkouts);
   }

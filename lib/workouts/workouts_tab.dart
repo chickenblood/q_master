@@ -23,13 +23,14 @@ class WorkoutsTab extends StatelessWidget {
       child: Consumer(
         builder: (context, ref, _) {
           return FutureBuilder(
-            future: ref.watch(workoutListProvider.future),
+            future: ref.watch(workoutListProvider),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return const Center(child: PlatformCircularProgressIndicator());
               }
               final workoutList = snapshot.data!;
               return ListView.builder(
+                key: UniqueKey(), // Fixes weird issue with crashing when a workout gets deleted.
                 itemExtent: 100,
                 itemCount: workoutList.workouts.length,
                 itemBuilder: (context, index) => _WorkoutTile(
@@ -140,15 +141,10 @@ final class _WorkoutTile extends StatelessWidget {
     background: Container(color: Colors.red),
     confirmDismiss: (direction) {
       if (direction == .endToStart) return _confirmDelete(context);
-      return Future.value(false);
+      return Future.value(true);
     },
-    onUpdate: (DismissUpdateDetails details) => (){},
     onDismissed: (direction) {
-      if (direction == .endToStart) {
-        Future.delayed(
-          Duration(milliseconds: 500),
-          () => workoutList.remove(workout));
-      }
+      if (direction == .endToStart) workoutList.remove(workout);
     },
     child: Container(
       padding: EdgeInsets.symmetric(vertical: 8),

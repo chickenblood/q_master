@@ -58,7 +58,7 @@ class _MainAppState extends ConsumerState<MainApp> {
       );
     }
     if (workout != null) {
-      final workoutList = await ref.read(workoutListProvider.future);
+      final workoutList = await ref.read(workoutListProvider);
       workoutList.add(workout);
     }
   }
