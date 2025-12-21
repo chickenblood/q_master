@@ -14,29 +14,17 @@ import 'l10n/l10n.dart';
 enum Tab { workouts, games, timer }
 
 void main() {
-  runApp(const ProviderScope(child: MainApp()));
+  runApp(ProviderScope(child: MainApp()));
 }
 
-class MainApp extends ConsumerStatefulWidget {
-  const MainApp({super.key});
+class MainApp extends ConsumerWidget {
+  MainApp({super.key});
 
-  @override
-  ConsumerState<MainApp> createState() => _MainAppState();
-}
-
-class _MainAppState extends ConsumerState<MainApp> {
   final _navigatorKey = GlobalKey<NavigatorState>();
-  Tab _sectedTab = Tab.workouts;
-
+  final tabController = PlatformTabController(initialIndex: Tab.workouts.index);
   final List<Widget> _tabPages = [WorkoutsTab(), GamesTab(), TimerTab()];
 
-  void _itemChanged(int index) {
-    setState(() {
-      _sectedTab = Tab.values[index];
-    });
-  }
-
-  void _showComposeWorkoutModal() async {
+  void _showComposeWorkoutModal(WidgetRef ref) async {
     final context = _navigatorKey.currentContext;
     assert(context != null);
     if (context == null) return;
@@ -64,7 +52,7 @@ class _MainAppState extends ConsumerState<MainApp> {
   }
 
   @override
-  Widget build(BuildContext context) => PlatformApp(
+  Widget build(BuildContext context, WidgetRef ref) => PlatformApp(
     title: 'Q Master',
     localizationsDelegates: L10n.localizationsDelegates,
     supportedLocales: L10n.supportedLocales,
@@ -83,23 +71,21 @@ class _MainAppState extends ConsumerState<MainApp> {
       ),
     ),
     home: Builder(
-      builder: (context) => PlatformScaffold(
-        appBar: PlatformAppBar(
+      builder: (context) => PlatformTabScaffold(
+        appBarBuilder: (_, index) => PlatformAppBar(
           cupertino: (_, _) =>
               CupertinoNavigationBarData(backgroundColor: Colors.transparent),
           title: Text(L10n.of(context)!.appBarTitle),
           trailingActions: [
-            if (_sectedTab == Tab.workouts)
+            if (index == Tab.workouts.index)
               PlatformIconButton(
                 icon: Icon(PlatformIcons(context).add),
-                onPressed: _showComposeWorkoutModal,
+                onPressed: () => _showComposeWorkoutModal(ref),
               ),
           ],
         ),
-        body: _tabPages[_sectedTab.index],
-        bottomNavBar: PlatformNavBar(
-          currentIndex: _sectedTab.index,
-          itemChanged: _itemChanged,
+        tabController: tabController,
+        bodyBuilder: (_, index) =>  _tabPages[index],
           items: [
             BottomNavigationBarItem(
               icon: Icon(AdaptiveIcons.history),
@@ -115,7 +101,6 @@ class _MainAppState extends ConsumerState<MainApp> {
             ),
           ],
         ),
-      ),
     ),
   );
 }
