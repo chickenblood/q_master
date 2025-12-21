@@ -155,7 +155,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                 CupertinoSliverAppBarData(
             trailing: _rightAppBarButtonAction(),
                 ),
-            material: (context, platform) => MaterialSliverAppBarData(
+            material: (_, _) => MaterialSliverAppBarData(
               actions: [
                 _rightAppBarButtonAction()
               ]
