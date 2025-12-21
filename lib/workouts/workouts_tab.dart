@@ -5,7 +5,7 @@ import 'package:q_master/utils/datetime_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:q_master/model/workout.dart';
 import 'package:q_master/model/formatted_workout.dart';
-import 'package:q_master/workouts/create_workout_modal.dart';
+import 'package:q_master/workouts/create_workout_sheet.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'beatdown_browser.dart';
 import 'package:q_master/ui/adaptive_alert.dart';
@@ -76,7 +76,7 @@ final class _WorkoutTile extends StatelessWidget {
     if (Theme.of(context).platform == TargetPlatform.iOS) {
       updatedWorkout = await showCupertinoSheet<Workout>(
         context: context,
-        builder: (context) => CreateWorkoutModal(workout: workout),
+        builder: (context) => CreateWorkoutSheet(workout: workout),
       );
     } else {
       updatedWorkout = await Navigator.push(
@@ -84,7 +84,7 @@ final class _WorkoutTile extends StatelessWidget {
         platformPageRoute(
           context: context,
           fullscreenDialog: true,
-          builder: (context) => CreateWorkoutModal(workout: workout),
+          builder: (context) => CreateWorkoutSheet(workout: workout),
         ),
       );
     }

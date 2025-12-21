@@ -2,19 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/workout.dart';
-import 'workout_auto_completions.dart';
 import 'package:q_master/ui/adaptive_icons.dart';
 
-class CreateWorkoutModal extends StatefulWidget {
+import 'workout_auto_completions.dart';
+
+class CreateWorkoutSheet extends StatefulWidget {
   final Workout? workout;
 
-  const CreateWorkoutModal({super.key, this.workout});
+  const CreateWorkoutSheet({super.key, this.workout});
 
   @override
-  State<CreateWorkoutModal> createState() => _CreateWorkoutModalState();
+  State<CreateWorkoutSheet> createState() => _CreateWorkoutSheetState();
 }
 
-class _CreateWorkoutModalState extends State<CreateWorkoutModal> {
+class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   final _verticalSpacing = const SizedBox(height: 16.0);
   final focusNode = FocusNode();
 
@@ -59,10 +60,10 @@ class _CreateWorkoutModalState extends State<CreateWorkoutModal> {
     );
   }
 
-  Widget _content(BuildContext context) => ListView(
-    shrinkWrap: true,
-    physics: ClampingScrollPhysics(), // To allow drag-dismiss.
-    padding: const EdgeInsets.all(16.0),
+  Widget _content(BuildContext context) => SafeArea(
+    minimum: const EdgeInsets.all(16.0),
+    child: Column(
+    crossAxisAlignment: .stretch,
     children: [
       PlatformText(L10n.of(context)!.workoutNameFieldLabel),
       PlatformTextField(
@@ -94,6 +95,7 @@ class _CreateWorkoutModalState extends State<CreateWorkoutModal> {
         maxLines: 5,
       ),
     ],
+    ),
   );
 
   List<Exercise> _convertTextToExerciseList(String text) {

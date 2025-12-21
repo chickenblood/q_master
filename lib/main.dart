@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'timer/timer_tab.dart';
-import 'workouts/create_workout_modal.dart';
+import 'workouts/create_workout_sheet.dart';
 import 'workouts/workouts_tab.dart';
 import 'ui/adaptive_icons.dart';
 import 'theme/theme.dart';
@@ -45,7 +45,7 @@ class _MainAppState extends ConsumerState<MainApp> {
     if (Theme.of(context).platform == TargetPlatform.iOS) {
       workout = await showCupertinoSheet<Workout>(
         context: context,
-        builder: (context) => CreateWorkoutModal(),
+        builder: (context) => CreateWorkoutSheet(),
       );
     } else {
       workout = await Navigator.push(
@@ -53,7 +53,7 @@ class _MainAppState extends ConsumerState<MainApp> {
         platformPageRoute(
           context: context,
           fullscreenDialog: true,
-          builder: (context) => CreateWorkoutModal(),
+          builder: (context) => CreateWorkoutSheet(),
         ),
       );
     }
