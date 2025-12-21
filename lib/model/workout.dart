@@ -4,9 +4,9 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:convert';
-
 part 'workout.freezed.dart';
-part 'workout.g.dart';
+part 'workout.g.dart'; 
+
 
 /// Provider for the WorkoutList
 final workoutListProvider = Provider((ref) async {
@@ -75,7 +75,11 @@ abstract class Exercise with _$Exercise {
 
   factory Exercise.fromJson(Map<String, Object?> json) =>
       _$ExerciseFromJson(json);
+
+String get name;
+
 }
+
 
 /// Model class representing a workout.
 @freezed
@@ -88,6 +92,12 @@ abstract class Workout with _$Workout {
     required List<Exercise> mary,
   }) = _Workout;
 
+  String get name;
+  DateTime get date;
+  List<Exercise> get warmup;
+  List<Exercise> get thang;
+  List<Exercise> get mary;
+  
   factory Workout.fromJson(Map<String, Object?> json) =>
       _$WorkoutFromJson(json);
 }
