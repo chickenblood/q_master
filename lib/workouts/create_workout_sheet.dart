@@ -63,38 +63,38 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   Widget _content(BuildContext context) => SafeArea(
     minimum: const EdgeInsets.all(16.0),
     child: Column(
-    crossAxisAlignment: .stretch,
-    children: [
-      PlatformText(L10n.of(context)!.workoutNameFieldLabel),
-      PlatformTextField(
-        controller: _nameTextController,
-        textCapitalization: TextCapitalization.sentences,
-        maxLines: 2,
-        focusNode: focusNode,
-      ),
-      _verticalSpacing,
-      PlatformText(L10n.of(context)!.workoutWarmupFieldLabel),
-      WorkoutAutocompleteTextField(
-        textEditingController: _warmupTextController,
-        minLines: 5,
-        maxLines: 5,
-      ),
-      _verticalSpacing,
-      PlatformText(L10n.of(context)!.workoutThangFieldLabel),
-      WorkoutAutocompleteTextField(
-        textEditingController: _thangTextController,
-        minLines: 5,
-        maxLines: 5,
-      ),
-      _verticalSpacing,
-      PlatformText(L10n.of(context)!.workoutMaryFieldLabel),
-      WorkoutAutocompleteTextField(
-        textEditingController: _maryTextController,
-        optionsViewOpenDirection: .up,
-        minLines: 5,
-        maxLines: 5,
-      ),
-    ],
+      crossAxisAlignment: .stretch,
+      children: [
+        PlatformText(L10n.of(context)!.workoutNameFieldLabel),
+        PlatformTextField(
+          controller: _nameTextController,
+          textCapitalization: TextCapitalization.sentences,
+          maxLines: 2,
+          focusNode: focusNode,
+        ),
+        _verticalSpacing,
+        PlatformText(L10n.of(context)!.workoutWarmupFieldLabel),
+        WorkoutAutocompleteTextField(
+          textEditingController: _warmupTextController,
+          minLines: 5,
+          maxLines: 5,
+        ),
+        _verticalSpacing,
+        PlatformText(L10n.of(context)!.workoutThangFieldLabel),
+        WorkoutAutocompleteTextField(
+          textEditingController: _thangTextController,
+          minLines: 5,
+          maxLines: 5,
+        ),
+        _verticalSpacing,
+        PlatformText(L10n.of(context)!.workoutMaryFieldLabel),
+        WorkoutAutocompleteTextField(
+          textEditingController: _maryTextController,
+          optionsViewOpenDirection: .up,
+          minLines: 5,
+          maxLines: 5,
+        ),
+      ],
     ),
   );
 
@@ -126,43 +126,37 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   }
 
   Widget _rightAppBarButtonAction() => ListenableBuilder(
-                listenable: Listenable.merge([
-                  _nameTextController,
-                  _warmupTextController,
-                  _thangTextController,
-                  _maryTextController,
-                ]),
-                builder: (_, _) => PlatformIconButton(
-                  onPressed: _workoutCreationEnabled
-                      ? () => _createWorkout(context)
-                      : null,
-                  icon: Icon(PlatformIcons(context).checkMark),
-                ),
-              );
+    listenable: Listenable.merge([
+      _nameTextController,
+      _warmupTextController,
+      _thangTextController,
+      _maryTextController,
+    ]),
+    builder: (_, _) => PlatformIconButton(
+      onPressed: _workoutCreationEnabled ? () => _createWorkout(context) : null,
+      icon: Icon(PlatformIcons(context).checkMark),
+    ),
+  );
 
   @override
-  Widget build(BuildContext context) => Material(child: CustomScrollView(
+  Widget build(BuildContext context) => Material(
+    child: CustomScrollView(
       physics: ClampingScrollPhysics(),
-        slivers: [ 
-          PlatformSliverAppBar(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            leading: PlatformIconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: Icon(AdaptiveIcons.close),
-            ),
-            title: Text(L10n.of(context)!.createWorkoutDialogTitle),
-            cupertino: (_, _) =>
-                CupertinoSliverAppBarData(
-            trailing: _rightAppBarButtonAction(),
-                ),
-            material: (_, _) => MaterialSliverAppBarData(
-              actions: [
-                _rightAppBarButtonAction()
-              ]
-            ),
+      slivers: [
+        PlatformSliverAppBar(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          leading: PlatformIconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: Icon(AdaptiveIcons.close),
           ),
-          SliverToBoxAdapter(child: _content(context)),
-        ],
-  ),
-    );
+          title: Text(L10n.of(context)!.createWorkoutDialogTitle),
+          cupertino: (_, _) =>
+              CupertinoSliverAppBarData(trailing: _rightAppBarButtonAction()),
+          material: (_, _) =>
+              MaterialSliverAppBarData(actions: [_rightAppBarButtonAction()]),
+        ),
+        SliverToBoxAdapter(child: _content(context)),
+      ],
+    ),
+  );
 }

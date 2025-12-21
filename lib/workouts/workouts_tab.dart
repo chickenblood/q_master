@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:q_master/utils/datetime_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:q_master/model/workout.dart';
+import 'package:q_master/model/workout_list.dart';
 import 'package:q_master/model/formatted_workout.dart';
 import 'package:q_master/workouts/create_workout_sheet.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';

@@ -9,6 +9,7 @@ import 'ui/adaptive_icons.dart';
 import 'theme/theme.dart';
 import 'games/games_tab.dart';
 import 'model/workout.dart';
+import 'model/workout_list.dart';
 import 'l10n/l10n.dart';
 
 enum Tab { workouts, games, timer }
@@ -85,22 +86,22 @@ class MainApp extends ConsumerWidget {
           ],
         ),
         tabController: tabController,
-        bodyBuilder: (_, index) =>  _tabPages[index],
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(AdaptiveIcons.history),
-              label: L10n.of(context)!.workoutsTabTitle,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(AdaptiveIcons.sports),
-              label: L10n.of(context)!.gamesTabTitle,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(AdaptiveIcons.timer),
-              label: L10n.of(context)!.timerTabTitle,
-            ),
-          ],
-        ),
+        bodyBuilder: (_, index) => _tabPages[index],
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(AdaptiveIcons.history),
+            label: L10n.of(context)!.workoutsTabTitle,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(AdaptiveIcons.sports),
+            label: L10n.of(context)!.gamesTabTitle,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(AdaptiveIcons.timer),
+            label: L10n.of(context)!.timerTabTitle,
+          ),
+        ],
+      ),
     ),
   );
 }
