@@ -30,7 +30,8 @@ class WorkoutsTab extends StatelessWidget {
               }
               final workoutList = snapshot.data!;
               return ListView.builder(
-                key: UniqueKey(), // Fixes weird issue with crashing when a workout gets deleted.
+                key:
+                    UniqueKey(), // Fixes weird issue with crashing when a workout gets deleted.
                 itemExtent: 100,
                 itemCount: workoutList.workouts.length,
                 itemBuilder: (context, index) => _WorkoutTile(
@@ -50,12 +51,12 @@ final class _WorkoutTile extends StatelessWidget {
   final WorkoutList workoutList;
   final Workout workout;
 
-  const _WorkoutTile({
-    required this.workoutList,
-    required this.workout,
-  });
+  const _WorkoutTile({required this.workoutList, required this.workout});
 
-  Future<void> _showBeatdownBrowser(BuildContext context, Workout workout) async {
+  Future<void> _showBeatdownBrowser(
+    BuildContext context,
+    Workout workout,
+  ) async {
     // Stop the screen from sleeping while the beatdown browser is shown.
     WakelockPlus.enable();
 
@@ -107,26 +108,28 @@ final class _WorkoutTile extends StatelessWidget {
   }
 
   Future<bool?> _confirmDelete(BuildContext context) => showAdaptiveDialog(
-        context: context,
-        builder: (BuildContext innerContext) => AlertDialog.adaptive(
-          title: PlatformText(L10n.of(context)!.deleteWorkoutAlertTitle),
-          content: PlatformText(L10n.of(context)!.deleteWorkoutAlertDescription),
-          actions: [
-            adaptiveAlertAction(
-              context: innerContext,
-              isDestructive: true,
-              onPressed: () => Navigator.pop(innerContext, true),
-              child: PlatformText(L10n.of(innerContext)!.deleteWorkoutConfirmAction),
-            ),
-            adaptiveAlertAction(
-              context: innerContext,
-              isDefault: true,
-              onPressed: () => Navigator.pop(innerContext, false),
-              child: PlatformText(L10n.of(innerContext)!.cancelAction),
-            ),
-          ],
+    context: context,
+    builder: (BuildContext innerContext) => AlertDialog.adaptive(
+      title: PlatformText(L10n.of(context)!.deleteWorkoutAlertTitle),
+      content: PlatformText(L10n.of(context)!.deleteWorkoutAlertDescription),
+      actions: [
+        adaptiveAlertAction(
+          context: innerContext,
+          isDestructive: true,
+          onPressed: () => Navigator.pop(innerContext, true),
+          child: PlatformText(
+            L10n.of(innerContext)!.deleteWorkoutConfirmAction,
+          ),
         ),
-    );
+        adaptiveAlertAction(
+          context: innerContext,
+          isDefault: true,
+          onPressed: () => Navigator.pop(innerContext, false),
+          child: PlatformText(L10n.of(innerContext)!.cancelAction),
+        ),
+      ],
+    ),
+  );
 
   void _deleteWorkout(BuildContext context, Workout workout) async {
     if (await _confirmDelete(context) == true) {
@@ -184,7 +187,8 @@ final class _OverflowMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Builder(builder: (menuContext) => AdaptiveMenu(
+    return Builder(
+      builder: (menuContext) => AdaptiveMenu(
         icon: Icon(AdaptiveIcons.more),
         menuChildren: [
           AdaptiveMenuItem(
@@ -201,9 +205,10 @@ final class _OverflowMenu extends StatelessWidget {
             onPressed: onDelete,
             icon: context.platformIcons.delete,
             text: L10n.of(context)!.deleteWorkoutText,
+            isDestructive: true,
           ),
         ],
-    ),
+      ),
     );
   }
 }
