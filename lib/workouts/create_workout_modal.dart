@@ -60,6 +60,7 @@ class _CreateWorkoutModalState extends State<CreateWorkoutModal> {
   }
 
   Widget _content(BuildContext context) => ListView(
+    shrinkWrap: true,
     physics: ClampingScrollPhysics(), // To allow drag-dismiss.
     padding: const EdgeInsets.all(16.0),
     children: [
@@ -122,35 +123,44 @@ class _CreateWorkoutModalState extends State<CreateWorkoutModal> {
     Navigator.pop(context, workout);
   }
 
+  Widget _rightAppBarButtonAction() => ListenableBuilder(
+                listenable: Listenable.merge([
+                  _nameTextController,
+                  _warmupTextController,
+                  _thangTextController,
+                  _maryTextController,
+                ]),
+                builder: (_, _) => PlatformIconButton(
+                  onPressed: _workoutCreationEnabled
+                      ? () => _createWorkout(context)
+                      : null,
+                  icon: Icon(PlatformIcons(context).checkMark),
+                ),
+              );
+
   @override
-  Widget build(BuildContext context) {
-    return PlatformScaffold(
-      appBar: PlatformAppBar(
-        title: Text(L10n.of(context)!.createWorkoutDialogTitle),
-        cupertino: (_, _) =>
-            CupertinoNavigationBarData(backgroundColor: Colors.transparent),
-        leading: PlatformIconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(AdaptiveIcons.close),
-        ),
-        trailingActions: [
-          ListenableBuilder(
-            listenable: Listenable.merge([
-              _nameTextController,
-              _warmupTextController,
-              _thangTextController,
-              _maryTextController,
-            ]),
-            builder: (_, _) => PlatformIconButton(
-              onPressed: _workoutCreationEnabled
-                  ? () => _createWorkout(context)
-                  : null,
-              icon: Icon(PlatformIcons(context).checkMark),
+  Widget build(BuildContext context) => Material(child: CustomScrollView(
+      physics: ClampingScrollPhysics(),
+        slivers: [ 
+          PlatformSliverAppBar(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            leading: PlatformIconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: Icon(AdaptiveIcons.close),
+            ),
+            title: Text(L10n.of(context)!.createWorkoutDialogTitle),
+            cupertino: (_, _) =>
+                CupertinoSliverAppBarData(
+            trailing: _rightAppBarButtonAction(),
+                ),
+            material: (context, platform) => MaterialSliverAppBarData(
+              actions: [
+                _rightAppBarButtonAction()
+              ]
             ),
           ),
+          SliverToBoxAdapter(child: _content(context)),
         ],
-      ),
-      body: SafeArea(child: _content(context)),
+  ),
     );
-  }
 }

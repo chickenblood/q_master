@@ -55,7 +55,7 @@ final class _WorkoutTile extends StatelessWidget {
     required this.workout,
   });
 
-  void _showBeatdownBrowser(BuildContext context, Workout workout) async {
+  Future<void> _showBeatdownBrowser(BuildContext context, Workout workout) async {
     // Stop the screen from sleeping while the beatdown browser is shown.
     WakelockPlus.enable();
 
