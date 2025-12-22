@@ -94,6 +94,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
           minLines: 5,
           maxLines: 5,
         ),
+        SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
       ],
     ),
   );
