@@ -1,19 +1,20 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:q_master/utils/datetime_utils.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:q_master/l10n/l10n.dart';
+import 'package:q_master/model/formatted_workout.dart';
 import 'package:q_master/model/workout.dart';
 import 'package:q_master/model/workout_list.dart';
-import 'package:q_master/model/formatted_workout.dart';
-import 'package:q_master/workouts/create_workout_sheet.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
-import 'beatdown_browser.dart';
 import 'package:q_master/ui/adaptive_alert.dart';
 import 'package:q_master/ui/adaptive_icons.dart';
 import 'package:q_master/ui/adaptive_menu.dart';
-import 'package:q_master/l10n/l10n.dart';
+import 'package:q_master/utils/datetime_utils.dart';
+import 'package:q_master/workouts/create_workout_sheet.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
+
+import 'beatdown_browser.dart';
 
 class WorkoutsTab extends StatelessWidget {
   const WorkoutsTab({super.key});
@@ -132,6 +133,10 @@ final class _WorkoutTile extends StatelessWidget {
     ),
   );
 
+  void _duplicateWorkout(Workout workout) async {
+    workoutList.duplicate(workout);
+  }
+
   void _deleteWorkout(BuildContext context, Workout workout) async {
     if (await _confirmDelete(context) == true) {
       workoutList.remove(workout);
@@ -166,6 +171,7 @@ final class _WorkoutTile extends StatelessWidget {
         ),
         trailing: _OverflowMenu(
           onEdit: () => _editWorkout(context, workout),
+          onDuplicate: () => _duplicateWorkout(workout),
           onShare: (buttonContext) => _shareWorkout(buttonContext, workout),
           onDelete: () => _deleteWorkout(context, workout),
         ),
@@ -177,11 +183,13 @@ final class _WorkoutTile extends StatelessWidget {
 
 final class _OverflowMenu extends StatelessWidget {
   final void Function() onEdit;
+  final void Function() onDuplicate;
   final void Function(BuildContext) onShare;
   final void Function() onDelete;
 
   const _OverflowMenu({
     required this.onEdit,
+    required this.onDuplicate,
     required this.onShare,
     required this.onDelete,
   });
@@ -196,6 +204,11 @@ final class _OverflowMenu extends StatelessWidget {
             onPressed: onEdit,
             icon: context.platformIcons.edit,
             text: L10n.of(context)!.editWorkoutText,
+          ),
+          AdaptiveMenuItem(
+            onPressed: () => onDuplicate(),
+            icon: Icons.copy,
+            text: L10n.of(context)!.duplicateWorkoutText,
           ),
           AdaptiveMenuItem(
             onPressed: () => onShare(menuContext),

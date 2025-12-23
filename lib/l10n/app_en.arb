@@ -41,6 +41,8 @@
     },
     "editWorkoutText": "Edit",
     "@editWorkoutText": {},
+    "duplicateWorkoutText": "Duplicate",
+    "@duplicateWorkoutText": {},
     "shareWorkoutText": "Share",
     "@shareWorkoutText": {},
     "deleteWorkoutText": "Delete",

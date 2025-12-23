@@ -1,8 +1,9 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'workout.dart';
 
@@ -63,6 +64,14 @@ final class WorkoutList {
     }
     final updatedWorkouts = List.of(workouts);
     updatedWorkouts[index] = newWorkout;
+    _save(updatedWorkouts: updatedWorkouts);
+  }
+
+  void duplicate(Workout workout) {
+    final updatedWorkouts = List.of(workouts);
+    // Copy workout, but give the copy the current time and date.
+    final newWorkout = workout.copyWith(date: DateTime.now());
+    updatedWorkouts.insert(0, newWorkout);
     _save(updatedWorkouts: updatedWorkouts);
   }
 }
