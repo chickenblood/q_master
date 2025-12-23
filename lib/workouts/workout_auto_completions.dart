@@ -42,14 +42,12 @@ class _WorkoutAutocompleteTextFieldState
               .text
         : '',
     optionsBuilder: (textEditingValue) {
-      var (precedingText, replacementRange) = textEditingValue
+      final (precedingText, replacementRange) = textEditingValue
           .currentComposedWord();
       _replacementRange = replacementRange;
 
       // If the field is empty, show no options
-      if (precedingText == '') {
-        return [];
-      }
+      if (precedingText == '') return [];
 
       // Otherwise, filter options based on user input
       return workoutCompletions.where((String option) {
