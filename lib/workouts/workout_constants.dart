@@ -14,6 +14,7 @@ const workoutCompletions = [
   'Cocaine bear crawl',
   'Derkins',
   'Earl Fonda',
+  'Edisons',
   'Energizer bunnies',
   'Elizabeth Warrens',
   'Flamingo merkins',

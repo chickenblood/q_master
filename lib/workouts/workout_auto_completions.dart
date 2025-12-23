@@ -1,7 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:q_master/utils/text_editing_value_utils.dart';
 
 import 'workout_constants.dart';
 
@@ -37,47 +36,15 @@ class _WorkoutAutocompleteTextFieldState
   Widget build(BuildContext context) => Autocomplete<String>(
     textEditingController: widget.textEditingController,
     focusNode: focusNode,
-    displayStringForOption: (option) => (_replacementRange.isValid)
+    displayStringForOption: (option) => _replacementRange.isValid
         ? widget.textEditingController.value
               .replaced(_replacementRange, option)
               .text
         : '',
     optionsBuilder: (textEditingValue) {
-      _replacementRange = TextRange.collapsed(-1);
-      final currentComposedText = textEditingValue.text;
-      // Do not perform completions if there is a selection.
-      if (!textEditingValue.selection.isCollapsed) return [];
-      // Get the current word being typed by the user and see if it can be
-      // expanded to a suggestion.
-      final caretIndex = textEditingValue.selection.baseOffset;
-      // Find whitespace or beginning of line.
-      var wordStart =
-          currentComposedText.lastIndexOf(
-            RegExp(r'(^|\s)', multiLine: true),
-            max(caretIndex - 1, 0),
-          ) +
-          1;
-      if (wordStart > caretIndex) return [];
-      // Find whitespace or end of line.
-      var wordEnd = currentComposedText.indexOf(
-        RegExp(r'(\$|\n|\s)', multiLine: true),
-        caretIndex,
-      );
-      if (wordEnd == -1) wordEnd = currentComposedText.length;
-      final precedingText = currentComposedText.substring(
-        wordStart,
-        caretIndex,
-      );
-      if (wordStart != wordEnd && caretIndex == wordEnd) {
-        _replacementRange = TextRange(start: wordStart, end: caretIndex);
-      }
-      debugPrint(
-        'wordStart: $wordStart, wordEnd: $wordEnd, '
-        'caret index: $caretIndex, '
-        'replacementRange: $_replacementRange, '
-        'currentComposedText: $currentComposedText '
-        'precedingText: $precedingText',
-      );
+      var (precedingText, replacementRange) = textEditingValue
+          .currentComposedWord();
+      _replacementRange = replacementRange;
 
       // If the field is empty, show no options
       if (precedingText == '') {
