@@ -85,26 +85,19 @@ final class BeatdownBrowser extends StatelessWidget {
                   style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
                 ),
                 Spacer(),
-                Row(
-                  mainAxisAlignment: .end,
-                  children: [
-                    PlatformTextButton(
-                      onPressed: () => _onNextPage(index, context),
-                      child: PlatformText(
-                        (index + 1) < exerciseCount
-                            ? L10n.of(context)!.workoutNextUpText(
-                                _exerciseAtIndex(index + 1).name,
-                              )
-                            : L10n.of(context)!.workoutCompleteText,
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        overflow: .ellipsis,
-                        maxLines: 2,
-                      ),
-                    ),
-                  ],
+                PlatformTextButton(
+                  onPressed: () => _onNextPage(index, context),
+                  child: PlatformText(
+                    (index + 1) < exerciseCount
+                        ? L10n.of(
+                            context,
+                          )!.workoutNextUpText(_exerciseAtIndex(index + 1).name)
+                        : L10n.of(context)!.workoutCompleteText,
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    textAlign: .end,
+                    overflow: .ellipsis,
+                    maxLines: 2,
+                  ),
                 ),
               ],
             );
