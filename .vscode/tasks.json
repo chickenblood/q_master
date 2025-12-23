@@ -1,0 +1,98 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Runner Watch",
+            "type": "shell",
+            "command": "dart",
+            "args": ["run", "build_runner", "watch", "--delete-conflicting-outputs"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "isBackground": true,
+            "problemMatcher": {
+                "owner": "build_runner",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+): (Error|Warning): (.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^\\[INFO\\] (Generating|Building).*",
+                    "endsPattern": "^\\[INFO\\] (Succeeded|Failed) after.*"
+                }
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": false
+            }
+        },
+        {
+            "label": "Build Runner Build",
+            "type": "shell",
+            "command": "dart",
+            "args": ["run", "build_runner", "build", "--delete-conflicting-outputs"],
+            "group": "build",
+            "problemMatcher": "$dart-build_runner",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Flutter Analyze",
+            "type": "shell",
+            "command": "flutter",
+            "args": ["analyze", "--no-fatal-infos"],
+            "group": "test",
+            "problemMatcher": "$dart-analysis",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Flutter Test",
+            "type": "shell",
+            "command": "flutter",
+            "args": ["test", "--reporter=compact"],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": "$dart-test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Pre-Launch Check",
+            "dependsOn": ["Flutter Analyze"],
+            "dependsOrder": "sequence",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "silent"
+            }
+        },
+        {
+            "label": "Dev Setup",
+            "dependsOn": ["Build Runner Watch"],
+            "dependsOrder": "parallel",
+            "problemMatcher": [],
+            "runOptions": {
+                "runOn": "folderOpen"
+            }
+        }
+    ]
+}
