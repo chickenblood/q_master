@@ -60,11 +60,10 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     );
   }
 
-  Widget _content(BuildContext context) => SafeArea(
+  Widget _content(BuildContext context) => SliverSafeArea(
     minimum: const EdgeInsets.all(16.0),
-    child: Column(
-      crossAxisAlignment: .stretch,
-      children: [
+    sliver: SliverList(
+      delegate: SliverChildListDelegate([
         PlatformText(L10n.of(context)!.workoutNameFieldLabel),
         PlatformTextField(
           controller: _nameTextController,
@@ -95,7 +94,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
           maxLines: 5,
         ),
         SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
-      ],
+      ]),
     ),
   );
 
@@ -156,7 +155,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
           material: (_, _) =>
               MaterialSliverAppBarData(actions: [_rightAppBarButtonAction()]),
         ),
-        SliverToBoxAdapter(child: _content(context)),
+        _content(context),
       ],
     ),
   );
