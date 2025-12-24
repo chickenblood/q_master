@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +8,7 @@ import 'package:q_master/model/workout_list.dart';
 import 'package:q_master/ui/adaptive_alert.dart';
 import 'package:q_master/ui/adaptive_icons.dart';
 import 'package:q_master/ui/adaptive_menu.dart';
+import 'package:q_master/ui/adaptive_modal_sheet.dart';
 import 'package:q_master/utils/datetime_utils.dart';
 import 'package:q_master/workouts/create_workout_sheet.dart';
 import 'package:share_plus/share_plus.dart';
@@ -75,22 +75,10 @@ final class _WorkoutTile extends StatelessWidget {
   }
 
   Future<void> _editWorkout(BuildContext context, Workout workout) async {
-    Workout? updatedWorkout;
-    if (Theme.of(context).platform == TargetPlatform.iOS) {
-      updatedWorkout = await showCupertinoSheet<Workout>(
-        context: context,
-        builder: (context) => CreateWorkoutSheet(workout: workout),
-      );
-    } else {
-      updatedWorkout = await Navigator.push(
-        context,
-        platformPageRoute(
-          context: context,
-          fullscreenDialog: true,
-          builder: (context) => CreateWorkoutSheet(workout: workout),
-        ),
-      );
-    }
+    Workout? updatedWorkout = await showAdaptiveModalSheet(
+      context: context,
+      child: CreateWorkoutSheet(workout: workout),
+    );
     if (updatedWorkout != null) {
       workoutList.replace(workout, updatedWorkout);
     }
