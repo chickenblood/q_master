@@ -16,6 +16,8 @@ class CreateWorkoutSheet extends StatefulWidget {
 }
 
 class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
+  static const _focusScrollDuration = Duration(milliseconds: 100);
+
   final _verticalSpacing = const SizedBox(height: 16.0);
   final focusNode = FocusNode();
 
@@ -23,6 +25,10 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   final _warmupTextController = TextEditingController();
   final _thangTextController = TextEditingController();
   final _maryTextController = TextEditingController();
+
+  final _warmupTextKey = GlobalKey();
+  final _thangTextKey = GlobalKey();
+  final _maryTextKey = GlobalKey();
 
   @override
   void initState() {
@@ -74,6 +80,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
         _verticalSpacing,
         PlatformText(L10n.of(context)!.workoutWarmupFieldLabel),
         WorkoutAutocompleteTextField(
+          key: _warmupTextKey,
           textEditingController: _warmupTextController,
           minLines: 5,
           maxLines: 5,
@@ -81,17 +88,27 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
         _verticalSpacing,
         PlatformText(L10n.of(context)!.workoutThangFieldLabel),
         WorkoutAutocompleteTextField(
+          key: _thangTextKey,
           textEditingController: _thangTextController,
           minLines: 5,
           maxLines: 5,
+          onTap: () => Scrollable.ensureVisible(
+            _thangTextKey.currentContext!,
+            duration: _focusScrollDuration,
+          ),
         ),
         _verticalSpacing,
         PlatformText(L10n.of(context)!.workoutMaryFieldLabel),
         WorkoutAutocompleteTextField(
+          key: _maryTextKey,
           textEditingController: _maryTextController,
           optionsViewOpenDirection: .up,
           minLines: 5,
           maxLines: 5,
+          onTap: () => Scrollable.ensureVisible(
+            _maryTextKey.currentContext!,
+            duration: _focusScrollDuration,
+          ),
         ),
         SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
       ]),

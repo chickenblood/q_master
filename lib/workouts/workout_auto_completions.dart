@@ -11,6 +11,7 @@ class WorkoutAutocompleteTextField extends StatefulWidget {
   final int? _minLines;
   final int? _maxLines;
   final bool? expands;
+  final VoidCallback? onTap;
 
   const WorkoutAutocompleteTextField({
     super.key,
@@ -19,6 +20,7 @@ class WorkoutAutocompleteTextField extends StatefulWidget {
     int? minLines,
     int? maxLines,
     this.expands,
+    this.onTap,
   }) : _minLines = expands == true ? null : (minLines ?? 1),
        _maxLines = expands == true ? null : (maxLines ?? 1);
 
@@ -73,6 +75,7 @@ class _WorkoutAutocompleteTextFieldState
             textCapitalization: TextCapitalization.sentences,
             controller: textEditingController,
             focusNode: focusNode,
+            onTap: widget.onTap,
             onSubmitted: (String value) =>
                 onFieldSubmitted(), // Important for form submission
           );
