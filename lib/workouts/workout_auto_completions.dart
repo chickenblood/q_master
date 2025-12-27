@@ -34,6 +34,23 @@ class _WorkoutAutocompleteTextFieldState
   final focusNode = FocusNode();
   var _replacementRange = TextRange.collapsed(-1);
 
+  // Adjusts the caret to be placed after the newly-inserted text.
+  void _updateCaretForOptionText(String text) {
+    if (_replacementRange.isValid) {
+      // Hack to ensure the caret is placed at the correct point after the
+      // replacement.
+      final selection = TextSelection.collapsed(
+        offset: _replacementRange.start + text.length,
+      );
+      final entireText = widget.textEditingController.text;
+
+      widget.textEditingController.value = TextEditingValue(
+        text: entireText,
+        selection: selection,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) => Autocomplete<String>(
     textEditingController: widget.textEditingController,
@@ -46,19 +63,20 @@ class _WorkoutAutocompleteTextFieldState
     optionsBuilder: (textEditingValue) {
       final (precedingText, replacementRange) = textEditingValue
           .currentComposedWord();
-      _replacementRange = replacementRange;
 
       // If the field is empty, show no options
-      if (precedingText == '') return [];
+      if (precedingText.isEmpty) return [];
 
       // Otherwise, filter options based on user input
-      return workoutCompletions.where((String option) {
+      final completions = workoutCompletions.where((String option) {
         return option.toLowerCase().startsWith(precedingText.toLowerCase());
       });
+      if (precedingText.isNotEmpty && completions.isNotEmpty) {
+        _replacementRange = replacementRange;
+      }
+      return completions;
     },
-    onSelected: (String selection) {
-      debugPrint('Suggestion selected $selection');
-    },
+    onSelected: _updateCaretForOptionText,
     fieldViewBuilder:
         (
           BuildContext context,
