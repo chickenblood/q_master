@@ -15,13 +15,11 @@ extension Utils on TextEditingValue {
     // Get the current word being typed by the user.
     final caretIndex = selection.baseOffset;
 
-    // Find whitespace or beginning of line.
-    var wordStart =
-        text.lastIndexOf(
-          RegExp(r'(^|\s)', multiLine: true),
-          max(caretIndex - 1, 0),
-        ) +
-        1;
+    // Find whitespace or beginning of line to locate where the current word
+    // starts. Starting search at caretIndex -1 means we start at the
+    // character before the caret.
+    final wordStart =
+        text.lastIndexOf(RegExp(r'\s'), max(caretIndex - 1, 0)) + 1;
     if (wordStart > caretIndex) return _emptyResult;
 
     // Find whitespace or end of line.
@@ -31,8 +29,8 @@ extension Utils on TextEditingValue {
     );
     if (wordEnd == -1) wordEnd = text.length;
 
-    final precedingText = text.substring(wordStart, caretIndex);
     if (wordStart != wordEnd && caretIndex == wordEnd) {
+      final precedingText = text.substring(wordStart, caretIndex);
       final replacementRange = TextRange(start: wordStart, end: caretIndex);
       debugPrint(
         'wordStart: $wordStart, wordEnd: $wordEnd, '
