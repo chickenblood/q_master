@@ -46,7 +46,7 @@ ThemeData lightTheme() => ThemeData(
   ),
 );
 
-// Dark Mode: Black on Yellow
+// Dark Mode: White on Black
 ThemeData darkTheme() => ThemeData(
   brightness: Brightness.dark,
   // Define a simple ColorScheme that is essentially White on Black
