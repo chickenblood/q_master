@@ -49,16 +49,16 @@ class MainApp extends ConsumerWidget {
     supportedLocales: L10n.supportedLocales,
     navigatorKey: _navigatorKey,
     material: (_, _) => MaterialAppData(
-      theme: lightTheme,
-      darkTheme: darkTheme,
+      theme: lightTheme(),
+      darkTheme: darkTheme(),
       themeMode: ThemeMode.system,
     ),
     cupertino: (context, _) => CupertinoAppData(
       theme: MaterialBasedCupertinoThemeData(
         materialTheme:
             MediaQuery.platformBrightnessOf(context) == Brightness.light
-            ? lightTheme
-            : darkTheme,
+            ? lightTheme()
+            : darkTheme(),
       ),
     ),
     home: Builder(

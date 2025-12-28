@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Light Mode: Black on White
-final ThemeData lightTheme = ThemeData(
+ThemeData lightTheme() => ThemeData(
   brightness: Brightness.light,
   // Define a simple ColorScheme that is essentially Black on White
   colorScheme: const ColorScheme(
@@ -35,8 +35,8 @@ final ThemeData lightTheme = ThemeData(
   ),
 );
 
-// Dark Mode: White on Black (Inverse)
-final ThemeData darkTheme = ThemeData(
+// Dark Mode: Black on Yellow
+ThemeData darkTheme() => ThemeData(
   brightness: Brightness.dark,
   // Define a simple ColorScheme that is essentially White on Black
   colorScheme: const ColorScheme(
