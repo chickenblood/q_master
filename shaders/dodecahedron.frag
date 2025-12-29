@@ -188,6 +188,10 @@ void main() {
     float labelScale = 1.3;
     vec2 local = vec2(localX, localY) / labelScale;
 
+    // aspect correction: scale y by screen aspect so label is not stretched
+    float aspect = u_resolution.x / u_resolution.y;
+    local.y /= aspect;
+
     // map local (-0.5..0.5) to atlas cell
     float colIdx = float(faceIdx % LABEL_COLS);
     float rowIdx = float(faceIdx / LABEL_COLS);

@@ -29,11 +29,11 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   // angular velocities (radians/sec)
   var _vx = 0.0, _vy = 0.0, _vz = 0.0;
   // damping (per second) and thresholds (editable)
-  var _damping = 0.8; // larger = faster slow-down
+  var _damping = 1.0; // larger = faster slow-down
   static const double _velocityEpsilon = 0.001;
 
   // user-tunable controls
-  var _impulseStrength = 1.0; // multiplier for tap impulse
+  var _impulseStrength = 2.0; // multiplier for tap impulse
   var _showControls = false; // only show on double-tap by default
   // when angular speed (rad/s) falls below this, we consider spinning stopped and snap
   var _snapVelocityThreshold = 0.001;
