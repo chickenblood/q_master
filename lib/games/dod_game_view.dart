@@ -14,9 +14,10 @@ final class DodGameView extends StatelessWidget {
     return Hero(
       tag: heroTag,
       child: PlatformScaffold(
+        backgroundColor: Colors.black,
         appBar: PlatformAppBar(
           leading: PlatformIconButton(
-            icon: Icon(AdaptiveIcons.close),
+            icon: Icon(AdaptiveIcons.close, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
         ),

@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/utils/shared_preferences_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,14 +19,14 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
     with SingleTickerProviderStateMixin {
   ui.FragmentProgram? _program;
   late final Ticker _ticker;
-  double _time = 0.0;
+  var _time = 0.0;
 
   // rotation state (radians)
-  double _ax = 0.0, _ay = 0.0, _az = 0.0;
+  var _ax = 0.0, _ay = 0.0, _az = 0.0;
   // angular velocities (radians/sec)
-  double _vx = 0.0, _vy = 0.0, _vz = 0.0;
+  var _vx = 0.0, _vy = 0.0, _vz = 0.0;
   // damping (per second) and thresholds (editable)
-  double _damping = 0.8; // larger = faster slow-down
+  var _damping = 0.8; // larger = faster slow-down
   static const double _velocityEpsilon = 0.001;
 
   // user-tunable controls
@@ -33,23 +34,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   bool _showControls = false; // only show on double-tap by default
   // when angular speed (rad/s) falls below this, we consider spinning stopped and snap
   double _snapVelocityThreshold = 0.001;
-
-  // dodecahedron face normals (same basis as shader)
-  static const double _phi = 1.61803398875;
-  final List<List<double>> _faces = const [
-    [0.0, 1.0, _phi],
-    [0.0, -1.0, _phi],
-    [0.0, 1.0, -_phi],
-    [0.0, -1.0, -_phi],
-    [1.0, _phi, 0.0],
-    [-1.0, _phi, 0.0],
-    [1.0, -_phi, 0.0],
-    [-1.0, -_phi, 0.0],
-    [_phi, 0.0, 1.0],
-    [-_phi, 0.0, 1.0],
-    [_phi, 0.0, -1.0],
-    [-_phi, 0.0, -1.0],
-  ];
 
   // snapping removed: the object will now simply stop without auto-aligning
 
@@ -68,6 +52,9 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _centerLabel = L10n.of(context)!.dodTapToStartMessage;
+    });
     ui.FragmentProgram.fromAsset('shaders/dodecahedron.frag').then((p) {
       setState(() => _program = p);
     });
@@ -132,91 +119,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   void dispose() {
     _ticker.dispose();
     super.dispose();
-  }
-
-  // --- math helpers --------------------------------------------------------
-  double _lerp(double a, double b, double t) => a + (b - a) * t;
-
-  List<double> _normalize(List<double> v) {
-    final len = math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-    if (len == 0.0) return [0.0, 0.0, 0.0];
-    return [v[0] / len, v[1] / len, v[2] / len];
-  }
-
-  double _dot(List<double> a, List<double> b) =>
-      a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-
-  List<double> _cross(List<double> a, List<double> b) => [
-    a[1] * b[2] - a[2] * b[1],
-    a[2] * b[0] - a[0] * b[2],
-    a[0] * b[1] - a[1] * b[0],
-  ];
-
-  // quaternions represented as List<double> [w, x, y, z]
-  List<double> _quatFromEuler(double ax, double ay, double az) {
-    final c1 = math.cos(ax * 0.5);
-    final s1 = math.sin(ax * 0.5);
-    final c2 = math.cos(ay * 0.5);
-    final s2 = math.sin(ay * 0.5);
-    final c3 = math.cos(az * 0.5);
-    final s3 = math.sin(az * 0.5);
-
-    // qx
-    final qx = [c1, s1, 0.0, 0.0];
-    // qy
-    final qy = [c2, 0.0, s2, 0.0];
-    // qz
-    final qz = [c3, 0.0, 0.0, s3];
-
-    return _quatMultiply(_quatMultiply(qz, qy), qx);
-  }
-
-  List<double> _quatMultiply(List<double> a, List<double> b) {
-    final w1 = a[0], x1 = a[1], y1 = a[2], z1 = a[3];
-    final w2 = b[0], x2 = b[1], y2 = b[2], z2 = b[3];
-    final w = w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2;
-    final x = w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2;
-    final y = w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2;
-    final z = w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2;
-    return [w, x, y, z];
-  }
-
-  List<double> _quatFromAxisAngle(List<double> axis, double angle) {
-    final na = _normalize(axis);
-    final s = math.sin(angle * 0.5);
-    final w = math.cos(angle * 0.5);
-    return [w, na[0] * s, na[1] * s, na[2] * s];
-  }
-
-  // rotate vector v by quaternion q
-  List<double> _quatRotateVector(List<double> q, List<double> v) {
-    final qx = q[1], qy = q[2], qz = q[3], qw = q[0];
-    final t = _cross([qx, qy, qz], v);
-    final tt = [2 * t[0], 2 * t[1], 2 * t[2]];
-    final t2 = _cross([qx, qy, qz], tt);
-    return [
-      v[0] + qw * tt[0] + t2[0],
-      v[1] + qw * tt[1] + t2[1],
-      v[2] + qw * tt[2] + t2[2],
-    ];
-  }
-
-  List<double> _quatToEuler(List<double> q) {
-    final w = q[0], x = q[1], y = q[2], z = q[3];
-    final t0 = 2 * (w * x + y * z);
-    final t1 = 1 - 2 * (x * x + y * y);
-    final X = math.atan2(t0, t1);
-
-    var t2 = 2 * (w * y - z * x);
-    if (t2 > 1.0) t2 = 1.0;
-    if (t2 < -1.0) t2 = -1.0;
-    final Y = math.asin(t2);
-
-    final t3 = 2 * (w * z + x * y);
-    final t4 = 1 - 2 * (y * y + z * z);
-    final Z = math.atan2(t3, t4);
-
-    return [X, Y, Z];
   }
 
   @override
@@ -472,52 +374,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                             ],
                           ),
                         ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              // centered overlay label (stacked on top of shader, centered)
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 200),
-                    opacity: _centerLabel != null ? 1.0 : 0.0,
-                    child: Center(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 28 * _labelSizeMultiplier,
-                          vertical: 14 * _labelSizeMultiplier,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(0, 0, 0, 0.92),
-                          borderRadius: BorderRadius.circular(
-                            8 * _labelSizeMultiplier,
-                          ),
-                        ),
-                        child: DefaultTextStyle(
-                          style:
-                              Theme.of(
-                                context,
-                              ).textTheme.headlineLarge?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                shadows: const [
-                                  Shadow(
-                                    blurRadius: 8,
-                                    color: Colors.black54,
-                                    offset: Offset(0, 2),
-                                  ),
-                                ],
-                              ) ??
-                              const TextStyle(
-                                color: Colors.white,
-                                fontSize: 44,
-                                fontWeight: FontWeight.bold,
-                              ),
-                          child: Text(_centerLabel ?? ''),
-                        ),
                       ),
                     ),
                   ),

@@ -44,6 +44,7 @@ class GamesTab extends StatelessWidget {
                 angle: _degToRad(5.0),
                 child: _GameTile(
                   title: L10n.of(context)!.dodGameTileTitle,
+                  subtitle: 'Kermit‘s',
                   imagePath: 'assets/images/DoD.png',
                   onTap: (tag) => _showDodGame(context, tag),
                 ),
@@ -67,38 +68,66 @@ double _degToRad(double degrees) => degrees * pi / 180.0;
 
 class _GameTile extends StatelessWidget {
   final String title;
+  final String? subtitle;
   final String? imagePath;
   final Function(String)? onTap;
 
-  const _GameTile({required this.title, this.imagePath, this.onTap});
+  const _GameTile({
+    required this.title,
+    this.subtitle,
+    this.imagePath,
+    this.onTap,
+  });
 
   @override
-  Widget build(BuildContext context) => Container(
-    margin: const EdgeInsets.symmetric(horizontal: 20.0),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(16.0),
-      image: imagePath != null
-          ? DecorationImage(image: AssetImage(imagePath!), fit: .contain)
-          : null,
-      border: Border.all(
-        color: Theme.of(context).colorScheme.onSurface,
-        width: 1.0,
-      ),
-    ),
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 20.0),
     child: InkWell(
       onTap: () => onTap?.call(title),
-      child: AspectRatio(
-        aspectRatio: 2 / 3,
-        child: Align(
-          alignment: .bottomCenter,
-          child: PlatformText(
-            title,
-            textAlign: TextAlign.center,
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall!.copyWith(fontWeight: FontWeight.bold),
+      borderRadius: BorderRadius.circular(16.0),
+      child: Stack(
+        children: [
+          if (subtitle != null)
+            Positioned(
+              top: 8.0,
+              left: 8.0,
+              child: PlatformText(
+                subtitle!,
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16.0),
+              image: imagePath != null
+                  ? DecorationImage(
+                      image: AssetImage(imagePath!),
+                      fit: .contain,
+                    )
+                  : null,
+              border: Border.all(
+                color: Theme.of(context).colorScheme.onSurface,
+                width: 1.0,
+              ),
+            ),
+            child: AspectRatio(aspectRatio: 2 / 3),
           ),
-        ),
+          Positioned(
+            bottom: 0,
+            left: 4,
+            right: 4,
+            child: PlatformText(
+              title,
+              textAlign: TextAlign.center,
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall!.copyWith(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
       ),
     ),
   );

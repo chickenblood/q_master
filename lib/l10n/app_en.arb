@@ -8,7 +8,7 @@
     "@gamesTabTitle": {},
     "timerTabTitle": "Timer",
     "@timerTabTitle": {},
-    "dodGameTileTitle": "Kermit's\nDodecahedron of Death",
+    "dodGameTileTitle": "Dodecahedron of Death",
     "@dodGameTileTitle": {},
     "dopGameTileTitle": "Deck of Pain\n(coming soon)",
     "@dopGameTileTitle": {},
@@ -54,5 +54,7 @@
     "deleteWorkoutConfirmAction": "Delete",
     "@deleteWorkoutConfirmAction": {},
     "cancelAction": "Cancel",
-    "@cancelAction": {}
+    "@cancelAction": {},
+    "dodTapToStartMessage": "Tap to roll",
+    "@dodTapToStartMessage": {}
   }

@@ -8,7 +8,7 @@ const dodFaceExercises = [
   '15 Mountain Climbers',
   '15 Jumping Jacks',
   '15 High Knees',
-  '10 Pushups',
+  '10 Merkins',
   '1 Minute Wall Sits',
   '10 Burpees',
   '2 Minute Run',
