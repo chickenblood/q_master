@@ -104,6 +104,16 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
       setState(() {
         _time = t;
       });
+
+      // If we've come to rest (no angular velocity) and any center-label fade-in
+      // has completed (or none exists), stop the ticker to save CPU.
+      final noVelocities = _vx == 0.0 && _vy == 0.0 && _vz == 0.0;
+      final fadeInPending =
+          _centerLabel != null &&
+          ((t - _centerLabelStart) < _centerLabelFadeDuration);
+      if (noVelocities && !fadeInPending && _ticker.isActive) {
+        _ticker.stop();
+      }
     })..start();
 
     // load any saved slider defaults for this control
@@ -150,6 +160,10 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
               _vy += -4.3 * _impulseStrength;
               _vz += 3.2 * _impulseStrength;
             });
+
+            // reset tick bookkeeping and ensure the ticker is running so animation resumes
+            _lastTick = 0.0;
+            if (!_ticker.isActive) _ticker.start();
           },
 
           // double-tap toggles the controls overlay
@@ -365,6 +379,8 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                                         prefs.dodecahedronImpulse ?? 1.0;
                                     _damping = prefs.dodecahedronDamping ?? 0.8;
                                   });
+                                  // stop the ticker since there's no motion or label to animate
+                                  if (_ticker.isActive) _ticker.stop();
                                 },
                                 child: const Text(
                                   'Reset',
