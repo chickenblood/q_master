@@ -9,6 +9,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'faces_constants.dart';
 
+// Golden ratio (matches shader)
+const double phi = 1.61803398875;
+
 class DodecahedronShader extends StatefulWidget {
   const DodecahedronShader({super.key});
   @override
@@ -30,23 +33,26 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   static const double _velocityEpsilon = 0.001;
 
   // user-tunable controls
-  double _impulseStrength = 1.0; // multiplier for tap impulse
-  bool _showControls = false; // only show on double-tap by default
+  var _impulseStrength = 1.0; // multiplier for tap impulse
+  var _showControls = false; // only show on double-tap by default
   // when angular speed (rad/s) falls below this, we consider spinning stopped and snap
-  double _snapVelocityThreshold = 0.001;
+  var _snapVelocityThreshold = 0.001;
 
   // snapping removed: the object will now simply stop without auto-aligning
 
   // bookkeeping for per-tick dt
-  double _lastTick = 0.0;
+  var _lastTick = 0.0;
 
   // center label shown when snapping finishes (persists until next tap)
   String? _centerLabel;
-  double _centerLabelStart = 0.0;
+  var _centerLabelStart = 0.0;
   final double _centerLabelFadeDuration = 0.18; // fade-in duration
 
+  // label atlas used by shader (rendered once from strings)
+  ui.Image? _labelAtlas;
+
   // spinning state
-  bool _isSpinning = false; // tracks if we were recently spinning
+  var _isSpinning = false; // tracks if we were recently spinning
   // global label size multiplier (3x requested)
   final double _labelSizeMultiplier = 3.0;
   @override
@@ -55,8 +61,13 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _centerLabel = L10n.of(context)!.dodTapToStartMessage;
     });
-    ui.FragmentProgram.fromAsset('shaders/dodecahedron.frag').then((p) {
-      setState(() => _program = p);
+    ui.FragmentProgram.fromAsset('shaders/dodecahedron.frag').then((p) async {
+      // build a label atlas once the program is loaded
+      final atlas = await _buildLabelAtlas(dodFaceExercises);
+      setState(() {
+        _program = p;
+        _labelAtlas = atlas;
+      });
     });
     _ticker = createTicker((d) {
       final t = d.inMilliseconds / 1000.0;
@@ -128,7 +139,92 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   @override
   void dispose() {
     _ticker.dispose();
+    _labelAtlas?.dispose();
     super.dispose();
+  }
+
+  // build a label atlas texture containing each label rendered into a grid cell
+  Future<ui.Image> _buildLabelAtlas(List<String> labels) async {
+    const cols = 4;
+    const rows = 3;
+    const int atlasScale = 3; // higher = higher DPI atlas -> crisper text
+    const baseCellW = 320; // logical pixels per cell at scale=1
+    const baseCellH = 96;
+    final cellW = baseCellW * atlasScale;
+    final cellH = baseCellH * atlasScale;
+    final width = cols * cellW;
+    final height = rows * cellH;
+
+    final recorder = ui.PictureRecorder();
+    final c = Canvas(recorder);
+
+    // clear
+    final bgPaint = Paint()..color = const Color(0x00000000);
+    c.drawRect(
+      Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()),
+      bgPaint,
+    );
+
+    final fontSize =
+        14 * atlasScale; // keep visible size but render at higher DPI
+
+    // stroke paint for crisp outline
+    final strokePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = (atlasScale * 1.2)
+      ..color = Colors.black;
+
+    final fillStyle = TextStyle(
+      color: Colors.white,
+      fontSize: fontSize.toDouble(),
+      fontWeight: FontWeight.bold,
+    );
+
+    final strokeStyle = TextStyle(
+      foreground: strokePaint,
+      fontSize: fontSize.toDouble(),
+      fontWeight: FontWeight.bold,
+    );
+
+    for (var i = 0; i < labels.length && i < cols * rows; i++) {
+      final col = i % cols;
+      final row = i ~/ cols;
+      final dx = (col * cellW).toDouble();
+      final dy = (row * cellH).toDouble();
+
+      // draw stroke first for crisp edges
+      final strokeTp = TextPainter(
+        text: TextSpan(text: labels[i], style: strokeStyle),
+        textDirection: TextDirection.ltr,
+        textAlign: TextAlign.center,
+      );
+      strokeTp.layout(maxWidth: cellW - 28.0);
+      strokeTp.paint(
+        c,
+        Offset(
+          dx + (cellW - strokeTp.width) / 2,
+          dy + (cellH - strokeTp.height) / 2,
+        ),
+      );
+
+      final fillTp = TextPainter(
+        text: TextSpan(text: labels[i], style: fillStyle),
+        textDirection: TextDirection.ltr,
+        textAlign: TextAlign.center,
+      );
+      fillTp.layout(maxWidth: cellW - 28.0);
+      fillTp.paint(
+        c,
+        Offset(
+          dx + (cellW - fillTp.width) / 2,
+          dy + (cellH - fillTp.height) / 2,
+        ),
+      );
+    }
+
+    final pic = recorder.endRecording();
+    final img = await pic.toImage(width, height);
+    return img;
   }
 
   @override
@@ -182,10 +278,13 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                         _ax,
                         _ay,
                         _az,
+                        dodFaceExercises,
+                        _labelSizeMultiplier,
+                        _labelAtlas,
                       ),
               ),
 
-              // centered overlay label (shown when a face is selected)
+              // centered overlay label (shown when a face is selected). Keep this in addition to the on-surface labels.
               if (_centerLabel != null)
                 Center(
                   child: IgnorePointer(
@@ -429,7 +528,72 @@ class _ShaderPainter extends CustomPainter {
   final double time;
   final double dpr;
   final double ax, ay, az;
-  _ShaderPainter(this.program, this.time, this.dpr, this.ax, this.ay, this.az);
+  final List<String> faceLabels;
+  final double labelSizeMultiplier;
+  final ui.Image? labelAtlas; // rendered atlas image containing all labels
+
+  _ShaderPainter(
+    this.program,
+    this.time,
+    this.dpr,
+    this.ax,
+    this.ay,
+    this.az,
+    this.faceLabels,
+    this.labelSizeMultiplier,
+    this.labelAtlas,
+  );
+
+  // Rotation helpers (match shader order: Z * Y * X)
+  List<double> _rotX(double a) {
+    final c = math.cos(a), s = math.sin(a);
+    return [1.0, 0.0, 0.0, 0.0, c, -s, 0.0, s, c];
+  }
+
+  List<double> _rotY(double a) {
+    final c = math.cos(a), s = math.sin(a);
+    return [c, 0.0, s, 0.0, 1.0, 0.0, -s, 0.0, c];
+  }
+
+  List<double> _rotZ(double a) {
+    final c = math.cos(a), s = math.sin(a);
+    return [c, -s, 0.0, s, c, 0.0, 0.0, 0.0, 1.0];
+  }
+
+  // multiply 3x3 matrix (as flat list) by a vec3
+  List<double> _mulMatVec(List<double> m, List<double> v) {
+    return [
+      m[0] * v[0] + m[1] * v[1] + m[2] * v[2],
+      m[3] * v[0] + m[4] * v[1] + m[5] * v[2],
+      m[6] * v[0] + m[7] * v[1] + m[8] * v[2],
+    ];
+  }
+
+  // multiply two 3x3 matrices
+  List<double> _mulMatMat(List<double> a, List<double> b) {
+    return [
+      a[0] * b[0] + a[1] * b[3] + a[2] * b[6],
+      a[0] * b[1] + a[1] * b[4] + a[2] * b[7],
+      a[0] * b[2] + a[1] * b[5] + a[2] * b[8],
+
+      a[3] * b[0] + a[4] * b[3] + a[5] * b[6],
+      a[3] * b[1] + a[4] * b[4] + a[5] * b[7],
+      a[3] * b[2] + a[4] * b[5] + a[5] * b[8],
+
+      a[6] * b[0] + a[7] * b[3] + a[8] * b[6],
+      a[6] * b[1] + a[7] * b[4] + a[8] * b[7],
+      a[6] * b[2] + a[7] * b[5] + a[8] * b[8],
+    ];
+  }
+
+  double _dot(List<double> a, List<double> b) =>
+      a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+
+  List<double> _normalize(List<double> v) {
+    final len = math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    if (len == 0) return [0.0, 0.0, 0.0];
+    return [v[0] / len, v[1] / len, v[2] / len];
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -442,11 +606,187 @@ class _ShaderPainter extends CustomPainter {
     shader.setFloat(4, ay); // u_angles.y
     shader.setFloat(5, az); // u_angles.z
 
+    // set label atlas sampler if available (sampler index 0)
+    if (labelAtlas != null) {
+      shader.setImageSampler(0, labelAtlas!);
+    }
+
     final paint = Paint()..shader = shader;
     canvas.drawRect(Offset.zero & size, paint);
+
+    // Now overlay face labels by computing the screen-space centers of each face
+    final resPxX = size.width * dpr;
+    final resPxY = size.height * dpr;
+    final minResPx = math.min(resPxX, resPxY);
+
+    // build rotation matrix that matches the shader (rotZ * rotY * rotX)
+    final rX = _rotX(ax);
+    final rY = _rotY(ay);
+    final rZ = _rotZ(az);
+    final rZY = _mulMatMat(rZ, rY);
+    final rot = _mulMatMat(rZY, rX);
+
+    // Dodecahedron face normals (same order as shader)
+    final faces = [
+      [0.0, 1.0, phi],
+      [0.0, -1.0, phi],
+      [0.0, 1.0, -phi],
+      [0.0, -1.0, -phi],
+      [1.0, phi, 0.0],
+      [-1.0, phi, 0.0],
+      [1.0, -phi, 0.0],
+      [-1.0, -phi, 0.0],
+      [phi, 0.0, 1.0],
+      [-phi, 0.0, 1.0],
+      [phi, 0.0, -1.0],
+      [-phi, 0.0, -1.0],
+    ];
+
+    // Camera origin in shader space
+    final ro = [0.0, 0.0, 4.0];
+
+    // helper: SDF and map to perform a short ray-march for occlusion testing
+    double sdDodecahedronPoint(List<double> p) {
+      var md = -1e9;
+      for (var f in faces) {
+        final ni = _normalize(f);
+        md = math.max(md, _dot(ni, p));
+      }
+      return md - 1.0;
+    }
+
+    double mapPoint(List<double> p) {
+      // apply Euler rotation (rot) then small nodding in X like shader
+      var rp = _mulMatVec(rot, p);
+      final nodAngle = 0.12 * math.sin(time * 0.9);
+      final nod = _rotX(nodAngle);
+      rp = _mulMatVec(nod, rp);
+      return sdDodecahedronPoint(rp) * 0.9;
+    }
+
+    // simple ray-march along rd, limited to maxT; returns hit t or double.infinity if none
+    double rayMarch(List<double> rop, List<double> rd, double maxT) {
+      double t = 0.0;
+      for (var s = 0; s < 96; s++) {
+        final p = [rop[0] + rd[0] * t, rop[1] + rd[1] * t, rop[2] + rd[2] * t];
+        final d = mapPoint(p);
+        if (d < 0.001) return t;
+        t += d * 0.7;
+        if (t > maxT) break;
+      }
+      return double.infinity;
+    }
+
+    for (var i = 0; i < faces.length && i < faceLabels.length; i++) {
+      final n = _normalize(faces[i]); // normalized face normal == face center
+      // rotate into world/camera space
+      final pWorld = _mulMatVec(rot, n);
+
+      // visibility: face toward camera?
+      final camVec = [ro[0] - pWorld[0], ro[1] - pWorld[1], ro[2] - pWorld[2]];
+      final camLen = math.sqrt(
+        camVec[0] * camVec[0] + camVec[1] * camVec[1] + camVec[2] * camVec[2],
+      );
+      if (camLen <= 0.0) continue;
+      final camDir = [
+        camVec[0] / camLen,
+        camVec[1] / camLen,
+        camVec[2] / camLen,
+      ];
+      final facingDot = _dot(n, camDir);
+      if (facingDot <= 0.0) {
+        continue; // skip back faces
+      }
+
+      // label position slightly inset on the face surface
+      final labelOffset = 0.02; // shader units
+      final labelPoint = [
+        pWorld[0] - n[0] * labelOffset,
+        pWorld[1] - n[1] * labelOffset,
+        pWorld[2] - n[2] * labelOffset,
+      ];
+
+      // ray to the label point and occlusion test
+      final rdVec = [
+        labelPoint[0] - ro[0],
+        labelPoint[1] - ro[1],
+        labelPoint[2] - ro[2],
+      ];
+      final dist = math.sqrt(_dot(rdVec, rdVec));
+      if (dist == 0.0) continue;
+      final rd = [rdVec[0] / dist, rdVec[1] / dist, rdVec[2] / dist];
+      final hitT = rayMarch(ro, rd, dist + 0.01);
+      if (hitT.isFinite && hitT < dist - 0.01) continue; // occluded
+
+      // projection math matching shader using label point
+      final vz = labelPoint[2] - ro[2];
+      if (vz.abs() < 1e-6) continue;
+      final k = -1.8 / vz;
+      final uvx = k * (labelPoint[0] - ro[0]);
+      final uvy = k * (labelPoint[1] - ro[1]);
+
+      // convert to Flutter logical pixels (shader uses pixel coordinates with origin bottom-left)
+      final px = (resPxX / 2.0 + uvx * minResPx) / dpr;
+      final py =
+          (resPxY / 2.0 - uvy * minResPx) /
+          dpr; // invert Y to match Canvas top-left
+
+      // skip if offscreen
+      if (px < -50 ||
+          px > size.width + 50 ||
+          py < -50 ||
+          py > size.height + 50) {
+        continue;
+      }
+
+      // scale font and opacity based on distance and facing angle
+      final baseFont = 10.0 * labelSizeMultiplier; // logical pixels
+      final distanceScale = 1.0 / (1.0 + dist * 0.25); // farther -> smaller
+      final angleScale = (0.5 + 0.5 * facingDot).clamp(
+        0.5,
+        1.0,
+      ); // glancing angles smaller
+      final fontSize = (baseFont * angleScale * distanceScale).clamp(6.0, 48.0);
+      final opacity = (facingDot.clamp(0.0, 1.0) * 1.2 * distanceScale).clamp(
+        0.0,
+        1.0,
+      );
+
+      final text = faceLabels[i];
+      final style = TextStyle(
+        color: Color.fromARGB(
+          ((opacity * 255).round()).clamp(0, 255),
+          255,
+          255,
+          255,
+        ),
+        fontSize: fontSize,
+        fontWeight: FontWeight.bold,
+        shadows: const [
+          Shadow(blurRadius: 4, color: Colors.black54, offset: Offset(0, 2)),
+        ],
+      );
+
+      final tp = TextPainter(
+        text: TextSpan(text: text, style: style),
+        textDirection: TextDirection.ltr,
+        textAlign: TextAlign.center,
+      );
+      tp.layout(
+        maxWidth: size.width * 0.25,
+      ); // limit width a bit for long labels
+
+      // center on surface point
+      tp.paint(canvas, Offset(px - tp.width / 2, py - tp.height / 2));
+    }
   }
 
   @override
   bool shouldRepaint(covariant _ShaderPainter old) =>
-      old.time != time || old.ax != ax || old.ay != ay || old.az != az;
+      old.time != time ||
+      old.ax != ax ||
+      old.ay != ay ||
+      old.az != az ||
+      old.faceLabels != faceLabels ||
+      old.labelSizeMultiplier != labelSizeMultiplier;
 }
