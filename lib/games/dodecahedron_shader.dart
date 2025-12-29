@@ -31,6 +31,8 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   // user-tunable controls
   double _impulseStrength = 1.0; // multiplier for tap impulse
   bool _showControls = false; // only show on double-tap by default
+  // when angular speed (rad/s) falls below this, we consider spinning stopped and snap
+  double _snapVelocityThreshold = 0.001;
 
   // dodecahedron face normals (same basis as shader)
   static const double _phi = 1.61803398875;
@@ -54,21 +56,13 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   // bookkeeping for per-tick dt
   double _lastTick = 0.0;
 
-  // selected face index and snap target
-  int? _selectedFaceIdx;
-
   // center label shown when snapping finishes (persists until next tap)
   String? _centerLabel;
   double _centerLabelStart = 0.0;
   final double _centerLabelFadeDuration = 0.18; // fade-in duration
 
-  // snapping state
+  // spinning state
   bool _isSpinning = false; // tracks if we were recently spinning
-  bool _isSnapping = false;
-  double _snapStartTime = 0.0;
-  final double _snapDuration = 0.01; // 10 ms
-  List<double>? _snapStartQuat;
-  List<double>? _snapTargetQuat;
   // global label size multiplier (3x requested)
   final double _labelSizeMultiplier = 3.0;
   @override
@@ -89,55 +83,34 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
         _vy *= decay;
         _vz *= decay;
 
-        // if currently snapping, we override angles later using slerp
-        if (!_isSnapping) {
+        // clamp small velocities to zero to avoid floating drift
+        if (_vx.abs() < _snapVelocityThreshold) _vx = 0.0;
+        if (_vy.abs() < _snapVelocityThreshold) _vy = 0.0;
+        if (_vz.abs() < _snapVelocityThreshold) _vz = 0.0;
+
+        // update angles when there's meaningful motion
+        final hasMotion = _vx != 0.0 || _vy != 0.0 || _vz != 0.0;
+        if (hasMotion) {
           _ax += _vx * dt;
           _ay += _vy * dt;
           _az += _vz * dt;
         }
 
-        final vxWasZero = _vx.abs() < _velocityEpsilon;
-        final vyWasZero = _vy.abs() < _velocityEpsilon;
-        final vzWasZero = _vz.abs() < _velocityEpsilon;
-        if (vxWasZero) {
-          _vx = 0.0;
-        }
-        if (vyWasZero) {
-          _vy = 0.0;
-        }
-        if (vzWasZero) {
-          _vz = 0.0;
-        }
-
-        // detect spinning -> stopped transition and kick off a short snap
-        final currentlySpinning =
-            _vx.abs() > 0.0 || _vy.abs() > 0.0 || _vz.abs() > 0.0;
+        // detect spinning -> slowed below threshold: settle and show a label once
+        final currentSpeed = math.max(
+          _vx.abs(),
+          math.max(_vy.abs(), _vz.abs()),
+        );
+        final currentlySpinning = currentSpeed > _snapVelocityThreshold;
         if (currentlySpinning) {
           _isSpinning = true;
-        } else if (_isSpinning && !_isSnapping) {
-          // we were spinning but now stopped -> start snap to nearest face
-          _startSnap(t);
-          _isSpinning = false;
-        }
-      }
-
-      // advance snap animation if active
-      if (_isSnapping && _snapStartQuat != null && _snapTargetQuat != null) {
-        final progress = ((t - _snapStartTime) / _snapDuration).clamp(0.0, 1.0);
-        final q = _quatSlerp(_snapStartQuat!, _snapTargetQuat!, progress);
-        final e = _quatToEuler(q);
-        _ax = e[0];
-        _ay = e[1];
-        _az = e[2];
-
-        if (progress >= 1.0) {
-          // finalize snap: stop motion and show a random exercise label
-          _isSnapping = false;
+        } else if (_isSpinning) {
+          // we were spinning but now slowed below threshold -> stop motion and show label
           _vx = _vy = _vz = 0.0;
-          // pick a random exercise to display in the center
           final idx = math.Random().nextInt(dodFaceExercises.length);
           _centerLabel = dodFaceExercises[idx];
           _centerLabelStart = t;
+          _isSpinning = false;
         }
       }
 
@@ -215,59 +188,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
     return [w, na[0] * s, na[1] * s, na[2] * s];
   }
 
-  void _startSnap(double t) {
-    // compute current orientation quaternion
-    final q = _quatFromEuler(_ax, _ay, _az);
-
-    // world screen normal
-    const screen = [0.0, 0.0, 1.0];
-
-    // find face whose world-space normal is closest to the screen
-    double bestDot = -1.0;
-    int bestIdx = -1;
-    List<double>? bestWorldNormal;
-    for (var i = 0; i < _faces.length; i++) {
-      final f = _faces[i];
-      final world = _quatRotateVector(q, f);
-      final ndot = _dot(_normalize(world), screen);
-      if (ndot > bestDot) {
-        bestDot = ndot;
-        bestIdx = i;
-        bestWorldNormal = world;
-      }
-    }
-
-    if (bestIdx < 0 || bestWorldNormal == null) return;
-
-    // compute rotation that brings bestWorldNormal -> screen
-    final v = _normalize(bestWorldNormal);
-    var dot = _dot(v, screen).clamp(-1.0, 1.0);
-    var angle = math.acos(dot);
-
-    List<double> targetQ;
-    if (angle.abs() < 1e-6) {
-      // already aligned
-      targetQ = q;
-    } else {
-      var axis = _cross(v, screen);
-      final axisLen = math.sqrt(
-        axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2],
-      );
-      if (axisLen < 1e-6) {
-        // v is opposite to screen; pick an arbitrary orthogonal axis
-        axis = _cross(v, [1.0, 0.0, 0.0]);
-        if (_dot(axis, axis) < 1e-6) axis = _cross(v, [0.0, 1.0, 0.0]);
-      }
-      targetQ = _quatMultiply(_quatFromAxisAngle(axis, angle), q);
-    }
-
-    _snapStartQuat = q;
-    _snapTargetQuat = targetQ;
-    _snapStartTime = t;
-    _isSnapping = true;
-    _selectedFaceIdx = bestIdx;
-  }
-
   // rotate vector v by quaternion q
   List<double> _quatRotateVector(List<double> q, List<double> v) {
     final qx = q[1], qy = q[2], qz = q[3], qw = q[0];
@@ -299,49 +219,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
     return [X, Y, Z];
   }
 
-  // spherical linear interpolation for quaternions
-  List<double> _quatSlerp(List<double> a, List<double> b, double t) {
-    var cosOmega = a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3];
-    var b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
-
-    // if dot < 0, negate b to take shortest path
-    if (cosOmega < 0.0) {
-      cosOmega = -cosOmega;
-      b0 = -b0;
-      b1 = -b1;
-      b2 = -b2;
-      b3 = -b3;
-    }
-
-    const double kThreshold = 0.9995;
-    if (cosOmega > kThreshold) {
-      // linear interpolation for very close orientations
-      final res = [
-        _lerp(a[0], b0, t),
-        _lerp(a[1], b1, t),
-        _lerp(a[2], b2, t),
-        _lerp(a[3], b3, t),
-      ];
-      final len = math.sqrt(
-        res[0] * res[0] + res[1] * res[1] + res[2] * res[2] + res[3] * res[3],
-      );
-      return [res[0] / len, res[1] / len, res[2] / len, res[3] / len];
-    }
-
-    final omega = math.acos(cosOmega);
-    final sinOmega = math.sin(omega);
-    final s0 = math.sin((1 - t) * omega) / sinOmega;
-    final s1 = math.sin(t * omega) / sinOmega;
-
-    final res = [
-      a[0] * s0 + b0 * s1,
-      a[1] * s0 + b1 * s1,
-      a[2] * s0 + b2 * s1,
-      a[3] * s0 + b3 * s1,
-    ];
-    return res;
-  }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -353,7 +230,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
             if (_centerLabel != null) {
               setState(() {
                 _centerLabel = null;
-                _selectedFaceIdx = null;
               });
             }
 
@@ -367,7 +243,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
             // add an impulse to angular velocity to kick off a spin scaled by user control
             setState(() {
               // clear any previous selection when we start a new spin
-              _selectedFaceIdx = null;
               _centerLabel = null;
               _vx += 6.5 * _impulseStrength;
               _vy += -4.3 * _impulseStrength;
@@ -392,12 +267,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                         _ay,
                         _az,
                       ),
-              ),
-
-              // face labels rendered as Flutter widgets for better contrast
-              ..._buildFaceLabels(
-                constraints.biggest,
-                MediaQuery.of(context).devicePixelRatio,
               ),
 
               // centered overlay label (shown when a face is selected)
@@ -532,14 +401,43 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                             ],
                           ),
 
+                          // snap threshold control
+                          Row(
+                            children: [
+                              const Expanded(
+                                child: Text(
+                                  'Snap threshold',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 120,
+                                child: Slider(
+                                  value: _snapVelocityThreshold,
+                                  min: 0.0001,
+                                  max: 0.01,
+                                  divisions: 99,
+                                  label: _snapVelocityThreshold.toStringAsFixed(
+                                    4,
+                                  ),
+                                  onChanged: (v) => setState(
+                                    () => _snapVelocityThreshold = v,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                _snapVelocityThreshold.toStringAsFixed(4),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               TextButton(
                                 onPressed: () async {
-                                  final messenger = ScaffoldMessenger.of(
-                                    context,
-                                  );
                                   final prefs =
                                       await SharedPreferences.getInstance();
                                   await prefs.setDodecahedronImpulse(
@@ -547,11 +445,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                                   );
                                   await prefs.setDodecahedronDamping(_damping);
                                   if (!mounted) return;
-                                  messenger.showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Defaults saved'),
-                                    ),
-                                  );
                                 },
                                 child: const Text(
                                   'Save Defaults',
@@ -565,7 +458,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                                   setState(() {
                                     _ax = _ay = _az = 0.0;
                                     _vx = _vy = _vz = 0.0;
-                                    _selectedFaceIdx = null;
                                     _centerLabel = null;
                                     _impulseStrength =
                                         prefs.dodecahedronImpulse ?? 1.0;
@@ -636,88 +528,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
         );
       },
     );
-  }
-
-  // Build positioned face label widgets (one per face). Shows if face is somewhat facing camera
-  List<Widget> _buildFaceLabels(Size size, double dpr) {
-    final widgets = <Widget>[];
-    final resW = size.width * dpr;
-    final resH = size.height * dpr;
-    final minRes = math.min(resW, resH);
-
-    // camera and projection constants used by shader
-    final ro = [0.0, 0.0, 4.0];
-    const double focalZ = -1.8; // shader uses vec3(uv, -1.8)
-
-    final q = _quatFromEuler(_ax, _ay, _az);
-
-    // Show only the selected face label (persist until next spin). If none selected, return empty
-    if (_selectedFaceIdx == null) return widgets;
-    final i = _selectedFaceIdx!;
-
-    final fn = _normalize(_faces[i]);
-    final world = _quatRotateVector(q, fn);
-    final p = [world[0], world[1], world[2]];
-
-    final vx = p[0] - ro[0];
-    final vy = p[1] - ro[1];
-    final vz = p[2] - ro[2];
-    if (vz >= -0.001) return widgets;
-
-    final ux = vx * (focalZ / vz);
-    final uy = vy * (focalZ / vz);
-
-    final deviceX = ux * minRes + 0.5 * resW;
-    final deviceY = uy * minRes + 0.5 * resH;
-
-    final logicalX = deviceX / dpr;
-    final logicalY = deviceY / dpr;
-
-    final facing = world[2];
-    final scale = 0.9 + 0.4 * facing.clamp(0.0, 1.0);
-    final fontSize = (16.0 * scale * _labelSizeMultiplier).clamp(
-      12.0,
-      36.0 * _labelSizeMultiplier,
-    );
-
-    widgets.add(
-      Positioned(
-        left: logicalX - 70 * scale * _labelSizeMultiplier,
-        top: logicalY - 18 * scale * _labelSizeMultiplier,
-        child: Opacity(
-          opacity: 1.0,
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: 8 * scale * _labelSizeMultiplier,
-              vertical: 6 * scale * _labelSizeMultiplier,
-            ),
-            decoration: BoxDecoration(
-              color: Color.fromRGBO(0, 0, 0, 0.95),
-              borderRadius: BorderRadius.circular(
-                8 * scale * _labelSizeMultiplier,
-              ),
-              border: Border.all(color: Color.fromRGBO(255, 255, 255, 0.12)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black45,
-                  blurRadius: 6 * _labelSizeMultiplier,
-                ),
-              ],
-            ),
-            child: Text(
-              dodFaceExercises[i],
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: fontSize,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    return widgets;
   }
 }
 
