@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -145,7 +146,7 @@ final class _WorkoutTile extends StatelessWidget {
     child: Container(
       padding: EdgeInsets.symmetric(vertical: 8),
       child: PlatformListTile(
-        title: PlatformText(
+        title: AutoSizeText(
           workout.name,
           style: TextTheme.of(
             context,

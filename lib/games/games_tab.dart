@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/l10n/l10n.dart';
@@ -81,53 +82,56 @@ class _GameTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 20.0),
-    child: Material(
-      child: InkWell(
-        onTap: () => onTap?.call(title),
-        borderRadius: BorderRadius.circular(16.0),
-        child: Stack(
-          children: [
-            if (subtitle != null)
+    child: Hero(
+      tag: title,
+      child: Material(
+        child: InkWell(
+          onTap: () => onTap?.call(title),
+          borderRadius: BorderRadius.circular(16.0),
+          child: Stack(
+            children: [
+              if (subtitle != null)
+                Positioned(
+                  top: 8.0,
+                  left: 8.0,
+                  child: AutoSizeText(
+                    subtitle!,
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16.0),
+                  image: imagePath != null
+                      ? DecorationImage(
+                          image: AssetImage(imagePath!),
+                          fit: .contain,
+                        )
+                      : null,
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    width: 1.0,
+                  ),
+                ),
+                child: AspectRatio(aspectRatio: 2 / 3),
+              ),
               Positioned(
-                top: 8.0,
-                left: 8.0,
-                child: PlatformText(
-                  subtitle!,
-                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    fontStyle: FontStyle.italic,
+                bottom: 0,
+                left: 4,
+                right: 4,
+                child: AutoSizeText(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16.0),
-                image: imagePath != null
-                    ? DecorationImage(
-                        image: AssetImage(imagePath!),
-                        fit: .contain,
-                      )
-                    : null,
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  width: 1.0,
-                ),
-              ),
-              child: AspectRatio(aspectRatio: 2 / 3),
-            ),
-            Positioned(
-              bottom: 0,
-              left: 4,
-              right: 4,
-              child: PlatformText(
-                title,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     ),
