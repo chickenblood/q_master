@@ -156,8 +156,8 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   );
 
   @override
-  Widget build(BuildContext context) => Material(
-    child: CustomScrollView(
+  Widget build(BuildContext context) => PlatformScaffold(
+    body: CustomScrollView(
       physics: ClampingScrollPhysics(),
       slivers: [
         PlatformSliverAppBar(
