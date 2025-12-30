@@ -25,36 +25,40 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   var _time = 0.0;
 
   // rotation state (radians)
-  var _ax = 0.0, _ay = 0.0, _az = 0.0;
+  // Initial rotation aligns face 0's normal [0, 1, phi] with camera direction [0, 0, 1]
+  var _ax = -math.atan(1 / phi), _ay = 0.0, _az = 0.0;
+  // view offset angles (animated during snap to align face)
+  var _viewAx = 0.0, _viewAy = 0.0, _viewAz = 0.0;
   // angular velocities (radians/sec)
   var _vx = 0.0, _vy = 0.0, _vz = 0.0;
   // damping (per second) and thresholds (editable)
-  var _damping = 1.0; // larger = faster slow-down
+  var _damping = 1.0;
   static const double _velocityEpsilon = 0.001;
 
   // user-tunable controls
-  var _impulseStrength = 2.0; // multiplier for tap impulse
-  var _showControls = false; // only show on double-tap by default
-  // when angular speed (rad/s) falls below this, we consider spinning stopped and snap
-  var _snapVelocityThreshold = 0.001;
-
-  // snapping removed: the object will now simply stop without auto-aligning
+  var _impulseStrength = 2.0;
+  var _showControls = false;
+  var _snapVelocityThreshold = 0.01;
 
   // bookkeeping for per-tick dt
   var _lastTick = 0.0;
 
-  // center label shown when snapping finishes (persists until next tap)
+  // center label shown when face is selected (persists until next tap)
   String? _centerLabel;
   var _centerLabelStart = 0.0;
-  final double _centerLabelFadeDuration = 0.18; // fade-in duration
+  final double _centerLabelFadeDuration = 0.18;
 
   // label atlas used by shader (rendered once from strings)
   ui.Image? _labelAtlas;
 
   // spinning state
-  var _isSpinning = false; // tracks if we were recently spinning
-  // global label size multiplier (3x requested)
+  var _isSpinning = false;
   final double _labelSizeMultiplier = 3.0;
+
+  // snap animation state
+  final bool _isSnapping = false;
+  int _snapFaceIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -75,7 +79,7 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
       _lastTick = t;
 
       // integrate velocities -> angles with exponential damping
-      if (dt > 0) {
+      if (dt > 0 && !_isSnapping) {
         final decay = math.exp(-_damping * dt);
         _vx *= decay;
         _vy *= decay;
@@ -94,7 +98,7 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
           _az += _vz * dt;
         }
 
-        // detect spinning -> slowed below threshold: settle and show a label once
+        // detect spinning -> slowed below threshold: show label for aligned face
         final currentSpeed = math.max(
           _vx.abs(),
           math.max(_vy.abs(), _vz.abs()),
@@ -103,12 +107,16 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
         if (currentlySpinning) {
           _isSpinning = true;
         } else if (_isSpinning) {
-          // we were spinning but now slowed below threshold -> stop motion and show label
+          // we were spinning but now slowed below threshold
+          // Clear all inertia
           _vx = _vy = _vz = 0.0;
-          final idx = math.Random().nextInt(dodFaceExercises.length);
-          _centerLabel = dodFaceExercises[idx];
-          _centerLabelStart = t;
           _isSpinning = false;
+
+          // Calculate which face is most aligned and show its label
+          final snapResult = _calculateSnapTarget();
+          _snapFaceIndex = snapResult.faceIndex;
+          _centerLabel = dodFaceExercises[_snapFaceIndex];
+          _centerLabelStart = t;
         }
       }
 
@@ -116,13 +124,13 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
         _time = t;
       });
 
-      // If we've come to rest (no angular velocity) and any center-label fade-in
+      // If we've come to rest (no angular velocity, not snapping) and any center-label fade-in
       // has completed (or none exists), stop the ticker to save CPU.
       final noVelocities = _vx == 0.0 && _vy == 0.0 && _vz == 0.0;
       final fadeInPending =
           _centerLabel != null &&
           ((t - _centerLabelStart) < _centerLabelFadeDuration);
-      if (noVelocities && !fadeInPending && _ticker.isActive) {
+      if (noVelocities && !_isSnapping && !fadeInPending && _ticker.isActive) {
         _ticker.stop();
       }
     })..start();
@@ -141,6 +149,206 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
     _ticker.dispose();
     _labelAtlas?.dispose();
     super.dispose();
+  }
+
+  // Dodecahedron face normals (same as in shader)
+  static final List<List<double>> _faceNormals = [
+    [0.0, 1.0, phi],
+    [0.0, -1.0, phi],
+    [0.0, 1.0, -phi],
+    [0.0, -1.0, -phi],
+    [1.0, phi, 0.0],
+    [-1.0, phi, 0.0],
+    [1.0, -phi, 0.0],
+    [-1.0, -phi, 0.0],
+    [phi, 0.0, 1.0],
+    [-phi, 0.0, 1.0],
+    [phi, 0.0, -1.0],
+    [-phi, 0.0, -1.0],
+  ];
+
+  // Helper to normalize a 3D vector
+  List<double> _normalize(List<double> v) {
+    final len = math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    if (len == 0) return [0.0, 0.0, 0.0];
+    return [v[0] / len, v[1] / len, v[2] / len];
+  }
+
+  // 3x3 rotation matrix builders
+  // GLSL mat3(a,b,c,d,e,f,g,h,i) fills column-by-column: col0=(a,b,c), col1=(d,e,f), col2=(g,h,i)
+  // We store row-major, so we need to transpose the GLSL definition.
+  // GLSL rotX: mat3(1,0,0, 0,c,-s, 0,s,c) -> cols: (1,0,0), (0,c,-s), (0,s,c)
+  // As row-major: rows are (1,0,0), (0,c,s), (0,-s,c)
+  List<double> _rotX(double a) {
+    final c = math.cos(a), s = math.sin(a);
+    return [1.0, 0.0, 0.0, 0.0, c, s, 0.0, -s, c];
+  }
+
+  // GLSL rotY: mat3(c,0,s, 0,1,0, -s,0,c) -> cols: (c,0,s), (0,1,0), (-s,0,c)
+  // As row-major: rows are (c,0,-s), (0,1,0), (s,0,c)
+  List<double> _rotY(double a) {
+    final c = math.cos(a), s = math.sin(a);
+    return [c, 0.0, -s, 0.0, 1.0, 0.0, s, 0.0, c];
+  }
+
+  // GLSL rotZ: mat3(c,-s,0, s,c,0, 0,0,1) -> cols: (c,-s,0), (s,c,0), (0,0,1)
+  // As row-major: rows are (c,s,0), (-s,c,0), (0,0,1)
+  List<double> _rotZ(double a) {
+    final c = math.cos(a), s = math.sin(a);
+    return [c, s, 0.0, -s, c, 0.0, 0.0, 0.0, 1.0];
+  }
+
+  // Multiply 3x3 matrices
+  List<double> _mulMatMat(List<double> a, List<double> b) {
+    return [
+      a[0] * b[0] + a[1] * b[3] + a[2] * b[6],
+      a[0] * b[1] + a[1] * b[4] + a[2] * b[7],
+      a[0] * b[2] + a[1] * b[5] + a[2] * b[8],
+      a[3] * b[0] + a[4] * b[3] + a[5] * b[6],
+      a[3] * b[1] + a[4] * b[4] + a[5] * b[7],
+      a[3] * b[2] + a[4] * b[5] + a[5] * b[8],
+      a[6] * b[0] + a[7] * b[3] + a[8] * b[6],
+      a[6] * b[1] + a[7] * b[4] + a[8] * b[7],
+      a[6] * b[2] + a[7] * b[5] + a[8] * b[8],
+    ];
+  }
+
+  // Multiply 3x3 matrix by vec3
+  List<double> _mulMatVec(List<double> m, List<double> v) {
+    return [
+      m[0] * v[0] + m[1] * v[1] + m[2] * v[2],
+      m[3] * v[0] + m[4] * v[1] + m[5] * v[2],
+      m[6] * v[0] + m[7] * v[1] + m[8] * v[2],
+    ];
+  }
+
+  // Dot product
+  double _dot(List<double> a, List<double> b) =>
+      a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+
+  // Cross product
+  List<double> _cross(List<double> a, List<double> b) => [
+    a[1] * b[2] - a[2] * b[1],
+    a[2] * b[0] - a[0] * b[2],
+    a[0] * b[1] - a[1] * b[0],
+  ];
+
+  // Calculate snap target: find the face most aligned with camera and snap to it
+  ({int faceIndex, double deltaAx, double deltaAy, double deltaAz})
+  _calculateSnapTarget() {
+    // The shader does: pRot = R * p, then finds argmax_i dot(n_i, pRot)
+    // For center of screen, p ≈ [0, 0, 1] (front surface point)
+    // So face at center = argmax_i dot(n_i, R * [0,0,1])
+    const frontPoint = [0.0, 0.0, 1.0];
+
+    final combinedAx = _ax + _viewAx;
+    final combinedAy = _ay + _viewAy;
+    final combinedAz = _az + _viewAz;
+
+    final rX = _rotX(combinedAx);
+    final rY = _rotY(combinedAy);
+    final rZ = _rotZ(combinedAz);
+    final rZY = _mulMatMat(rZ, rY);
+    final rot = _mulMatMat(rZY, rX);
+
+    final rotatedFrontPoint = _mulMatVec(rot, frontPoint);
+
+    // Find face most aligned with the rotated front point (same as shader)
+    int bestFaceIndex = 0;
+    double bestDot = -2.0;
+    for (int i = 0; i < _faceNormals.length; i++) {
+      final normal = _normalize(_faceNormals[i]);
+      final d = _dot(normal, rotatedFrontPoint);
+      if (d > bestDot) {
+        bestDot = d;
+        bestFaceIndex = i;
+      }
+    }
+
+    // Now compute the rotation to perfectly align this face
+    // We want: n_bestFace = R_new * [0,0,1]
+    // Currently: n_bestFace ≈ R * [0,0,1] (approximately)
+    // We need to find additional rotation to make it exact
+
+    final targetNormal = _normalize(_faceNormals[bestFaceIndex]);
+
+    // Compute rotation from rotatedFrontPoint to targetNormal
+    final axis = _cross(rotatedFrontPoint, targetNormal);
+    final axisLen = math.sqrt(_dot(axis, axis));
+    final cosAngle = _dot(rotatedFrontPoint, targetNormal).clamp(-1.0, 1.0);
+    final angle = math.acos(cosAngle);
+
+    if (axisLen < 1e-6 || angle < 1e-6) {
+      // Already aligned
+      return (
+        faceIndex: bestFaceIndex,
+        deltaAx: 0.0,
+        deltaAy: 0.0,
+        deltaAz: 0.0,
+      );
+    }
+
+    // Build Rodrigues rotation matrix
+    final k = [axis[0] / axisLen, axis[1] / axisLen, axis[2] / axisLen];
+    final c = math.cos(angle);
+    final s = math.sin(angle);
+    final t = 1.0 - c;
+
+    final alignRot = [
+      c + k[0] * k[0] * t,
+      k[0] * k[1] * t - k[2] * s,
+      k[0] * k[2] * t + k[1] * s,
+      k[1] * k[0] * t + k[2] * s,
+      c + k[1] * k[1] * t,
+      k[1] * k[2] * t - k[0] * s,
+      k[2] * k[0] * t - k[1] * s,
+      k[2] * k[1] * t + k[0] * s,
+      c + k[2] * k[2] * t,
+    ];
+
+    // New rotation = alignRot * rot
+    final targetRot = _mulMatMat(alignRot, rot);
+
+    // Extract Euler angles from targetRot
+    final sinAy = (-targetRot[6]).clamp(-1.0, 1.0);
+    var ay = math.asin(sinAy);
+    final cosAy = math.cos(ay);
+
+    double ax, az;
+    if (cosAy.abs() > 1e-6) {
+      ax = math.atan2(targetRot[7], targetRot[8]);
+      az = math.atan2(targetRot[3], targetRot[0]);
+    } else {
+      az = 0.0;
+      ax = math.atan2(-targetRot[5], targetRot[4]);
+    }
+
+    // Normalize to be close to current angles
+    while (ax - combinedAx > math.pi) {
+      ax -= 2 * math.pi;
+    }
+    while (ax - combinedAx < -math.pi) {
+      ax += 2 * math.pi;
+    }
+    while (ay - combinedAy > math.pi) {
+      ay -= 2 * math.pi;
+    }
+    while (ay - combinedAy < -math.pi) {
+      ay += 2 * math.pi;
+    }
+    while (az - combinedAz > math.pi) {
+      az -= 2 * math.pi;
+    }
+    while (az - combinedAz < -math.pi) {
+      az += 2 * math.pi;
+    }
+
+    return (
+      faceIndex: bestFaceIndex,
+      deltaAx: ax - combinedAx,
+      deltaAy: ay - combinedAy,
+      deltaAz: az - combinedAz,
+    );
   }
 
   // build a label atlas texture containing each label rendered into a grid cell
@@ -235,11 +443,9 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
           behavior: HitTestBehavior.opaque,
           onTap: () {
             // If a center label is shown, clear it and continue to start a spin.
-            if (_centerLabel != null) {
-              setState(() {
-                _centerLabel = null;
-              });
-            }
+            setState(() {
+              _centerLabel = null;
+            });
 
             // ignore taps while spinning
             if (_vx.abs() > _velocityEpsilon ||
@@ -252,9 +458,22 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
             setState(() {
               // clear any previous selection when we start a new spin
               _centerLabel = null;
-              _vx += 6.5 * _impulseStrength;
-              _vy += -4.3 * _impulseStrength;
-              _vz += 3.2 * _impulseStrength;
+              // Fold view offset into object rotation before starting new spin
+              _ax += _viewAx;
+              _ay += _viewAy;
+              _az += _viewAz;
+              _viewAx = _viewAy = _viewAz = 0.0;
+              // Randomize impulse direction for varied results
+              final rng = math.Random();
+              final baseX = 5.5 + rng.nextDouble() * 2.0; // 5.5 to 7.5
+              final baseY = 3.5 + rng.nextDouble() * 2.0; // 3.5 to 5.5
+              final baseZ = 2.5 + rng.nextDouble() * 2.0; // 2.5 to 4.5
+              final signX = rng.nextBool() ? 1.0 : -1.0;
+              final signY = rng.nextBool() ? 1.0 : -1.0;
+              final signZ = rng.nextBool() ? 1.0 : -1.0;
+              _vx += signX * baseX * _impulseStrength;
+              _vy += signY * baseY * _impulseStrength;
+              _vz += signZ * baseZ * _impulseStrength;
             });
 
             // reset tick bookkeeping and ensure the ticker is running so animation resumes
@@ -275,10 +494,9 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                         _program!,
                         _time,
                         MediaQuery.of(context).devicePixelRatio,
-                        _ax,
-                        _ay,
-                        _az,
-                        dodFaceExercises,
+                        _ax + _viewAx,
+                        _ay + _viewAy,
+                        _az + _viewAz,
                         _labelSizeMultiplier,
                         _labelAtlas,
                       ),
@@ -325,7 +543,7 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                                 fontSize: 44,
                                 fontWeight: FontWeight.bold,
                               ),
-                          child: Text(_centerLabel!),
+                          child: Text(_centerLabel!, textAlign: .center),
                         ),
                       ),
                     ),
@@ -472,6 +690,7 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                                       await SharedPreferences.getInstance();
                                   setState(() {
                                     _ax = _ay = _az = 0.0;
+                                    _viewAx = _viewAy = _viewAz = 0.0;
                                     _vx = _vy = _vz = 0.0;
                                     _centerLabel = null;
                                     _impulseStrength =
@@ -528,7 +747,6 @@ class _ShaderPainter extends CustomPainter {
   final double time;
   final double dpr;
   final double ax, ay, az;
-  final List<String> faceLabels;
   final double labelSizeMultiplier;
   final ui.Image? labelAtlas; // rendered atlas image containing all labels
 
@@ -539,61 +757,9 @@ class _ShaderPainter extends CustomPainter {
     this.ax,
     this.ay,
     this.az,
-    this.faceLabels,
     this.labelSizeMultiplier,
     this.labelAtlas,
   );
-
-  // Rotation helpers (match shader order: Z * Y * X)
-  List<double> _rotX(double a) {
-    final c = math.cos(a), s = math.sin(a);
-    return [1.0, 0.0, 0.0, 0.0, c, -s, 0.0, s, c];
-  }
-
-  List<double> _rotY(double a) {
-    final c = math.cos(a), s = math.sin(a);
-    return [c, 0.0, s, 0.0, 1.0, 0.0, -s, 0.0, c];
-  }
-
-  List<double> _rotZ(double a) {
-    final c = math.cos(a), s = math.sin(a);
-    return [c, -s, 0.0, s, c, 0.0, 0.0, 0.0, 1.0];
-  }
-
-  // multiply 3x3 matrix (as flat list) by a vec3
-  List<double> _mulMatVec(List<double> m, List<double> v) {
-    return [
-      m[0] * v[0] + m[1] * v[1] + m[2] * v[2],
-      m[3] * v[0] + m[4] * v[1] + m[5] * v[2],
-      m[6] * v[0] + m[7] * v[1] + m[8] * v[2],
-    ];
-  }
-
-  // multiply two 3x3 matrices
-  List<double> _mulMatMat(List<double> a, List<double> b) {
-    return [
-      a[0] * b[0] + a[1] * b[3] + a[2] * b[6],
-      a[0] * b[1] + a[1] * b[4] + a[2] * b[7],
-      a[0] * b[2] + a[1] * b[5] + a[2] * b[8],
-
-      a[3] * b[0] + a[4] * b[3] + a[5] * b[6],
-      a[3] * b[1] + a[4] * b[4] + a[5] * b[7],
-      a[3] * b[2] + a[4] * b[5] + a[5] * b[8],
-
-      a[6] * b[0] + a[7] * b[3] + a[8] * b[6],
-      a[6] * b[1] + a[7] * b[4] + a[8] * b[7],
-      a[6] * b[2] + a[7] * b[5] + a[8] * b[8],
-    ];
-  }
-
-  double _dot(List<double> a, List<double> b) =>
-      a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-
-  List<double> _normalize(List<double> v) {
-    final len = math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-    if (len == 0) return [0.0, 0.0, 0.0];
-    return [v[0] / len, v[1] / len, v[2] / len];
-  }
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -613,172 +779,6 @@ class _ShaderPainter extends CustomPainter {
 
     final paint = Paint()..shader = shader;
     canvas.drawRect(Offset.zero & size, paint);
-
-    // Now overlay face labels by computing the screen-space centers of each face
-    final resPxX = size.width * dpr;
-    final resPxY = size.height * dpr;
-    final minResPx = math.min(resPxX, resPxY);
-
-    // build rotation matrix that matches the shader (rotZ * rotY * rotX)
-    final rX = _rotX(ax);
-    final rY = _rotY(ay);
-    final rZ = _rotZ(az);
-    final rZY = _mulMatMat(rZ, rY);
-    final rot = _mulMatMat(rZY, rX);
-
-    // Dodecahedron face normals (same order as shader)
-    final faces = [
-      [0.0, 1.0, phi],
-      [0.0, -1.0, phi],
-      [0.0, 1.0, -phi],
-      [0.0, -1.0, -phi],
-      [1.0, phi, 0.0],
-      [-1.0, phi, 0.0],
-      [1.0, -phi, 0.0],
-      [-1.0, -phi, 0.0],
-      [phi, 0.0, 1.0],
-      [-phi, 0.0, 1.0],
-      [phi, 0.0, -1.0],
-      [-phi, 0.0, -1.0],
-    ];
-
-    // Camera origin in shader space
-    final ro = [0.0, 0.0, 4.0];
-
-    // helper: SDF and map to perform a short ray-march for occlusion testing
-    double sdDodecahedronPoint(List<double> p) {
-      var md = -1e9;
-      for (var f in faces) {
-        final ni = _normalize(f);
-        md = math.max(md, _dot(ni, p));
-      }
-      return md - 1.0;
-    }
-
-    double mapPoint(List<double> p) {
-      // apply Euler rotation (rot) then small nodding in X like shader
-      var rp = _mulMatVec(rot, p);
-      final nodAngle = 0.12 * math.sin(time * 0.9);
-      final nod = _rotX(nodAngle);
-      rp = _mulMatVec(nod, rp);
-      return sdDodecahedronPoint(rp) * 0.9;
-    }
-
-    // simple ray-march along rd, limited to maxT; returns hit t or double.infinity if none
-    double rayMarch(List<double> rop, List<double> rd, double maxT) {
-      double t = 0.0;
-      for (var s = 0; s < 96; s++) {
-        final p = [rop[0] + rd[0] * t, rop[1] + rd[1] * t, rop[2] + rd[2] * t];
-        final d = mapPoint(p);
-        if (d < 0.001) return t;
-        t += d * 0.7;
-        if (t > maxT) break;
-      }
-      return double.infinity;
-    }
-
-    for (var i = 0; i < faces.length && i < faceLabels.length; i++) {
-      final n = _normalize(faces[i]); // normalized face normal == face center
-      // rotate into world/camera space
-      final pWorld = _mulMatVec(rot, n);
-
-      // visibility: face toward camera?
-      final camVec = [ro[0] - pWorld[0], ro[1] - pWorld[1], ro[2] - pWorld[2]];
-      final camLen = math.sqrt(
-        camVec[0] * camVec[0] + camVec[1] * camVec[1] + camVec[2] * camVec[2],
-      );
-      if (camLen <= 0.0) continue;
-      final camDir = [
-        camVec[0] / camLen,
-        camVec[1] / camLen,
-        camVec[2] / camLen,
-      ];
-      final facingDot = _dot(n, camDir);
-      if (facingDot <= 0.0) {
-        continue; // skip back faces
-      }
-
-      // label position slightly inset on the face surface
-      final labelOffset = 0.02; // shader units
-      final labelPoint = [
-        pWorld[0] - n[0] * labelOffset,
-        pWorld[1] - n[1] * labelOffset,
-        pWorld[2] - n[2] * labelOffset,
-      ];
-
-      // ray to the label point and occlusion test
-      final rdVec = [
-        labelPoint[0] - ro[0],
-        labelPoint[1] - ro[1],
-        labelPoint[2] - ro[2],
-      ];
-      final dist = math.sqrt(_dot(rdVec, rdVec));
-      if (dist == 0.0) continue;
-      final rd = [rdVec[0] / dist, rdVec[1] / dist, rdVec[2] / dist];
-      final hitT = rayMarch(ro, rd, dist + 0.01);
-      if (hitT.isFinite && hitT < dist - 0.01) continue; // occluded
-
-      // projection math matching shader using label point
-      final vz = labelPoint[2] - ro[2];
-      if (vz.abs() < 1e-6) continue;
-      final k = -1.8 / vz;
-      final uvx = k * (labelPoint[0] - ro[0]);
-      final uvy = k * (labelPoint[1] - ro[1]);
-
-      // convert to Flutter logical pixels (shader uses pixel coordinates with origin bottom-left)
-      final px = (resPxX / 2.0 + uvx * minResPx) / dpr;
-      final py =
-          (resPxY / 2.0 - uvy * minResPx) /
-          dpr; // invert Y to match Canvas top-left
-
-      // skip if offscreen
-      if (px < -50 ||
-          px > size.width + 50 ||
-          py < -50 ||
-          py > size.height + 50) {
-        continue;
-      }
-
-      // scale font and opacity based on distance and facing angle
-      final baseFont = 10.0 * labelSizeMultiplier; // logical pixels
-      final distanceScale = 1.0 / (1.0 + dist * 0.25); // farther -> smaller
-      final angleScale = (0.5 + 0.5 * facingDot).clamp(
-        0.5,
-        1.0,
-      ); // glancing angles smaller
-      final fontSize = (baseFont * angleScale * distanceScale).clamp(6.0, 48.0);
-      final opacity = (facingDot.clamp(0.0, 1.0) * 1.2 * distanceScale).clamp(
-        0.0,
-        1.0,
-      );
-
-      final text = faceLabels[i];
-      final style = TextStyle(
-        color: Color.fromARGB(
-          ((opacity * 255).round()).clamp(0, 255),
-          255,
-          255,
-          255,
-        ),
-        fontSize: fontSize,
-        fontWeight: FontWeight.bold,
-        shadows: const [
-          Shadow(blurRadius: 4, color: Colors.black54, offset: Offset(0, 2)),
-        ],
-      );
-
-      final tp = TextPainter(
-        text: TextSpan(text: text, style: style),
-        textDirection: TextDirection.ltr,
-        textAlign: TextAlign.center,
-      );
-      tp.layout(
-        maxWidth: size.width * 0.25,
-      ); // limit width a bit for long labels
-
-      // center on surface point
-      tp.paint(canvas, Offset(px - tp.width / 2, py - tp.height / 2));
-    }
   }
 
   @override
@@ -787,6 +787,5 @@ class _ShaderPainter extends CustomPainter {
       old.ax != ax ||
       old.ay != ay ||
       old.az != az ||
-      old.faceLabels != faceLabels ||
       old.labelSizeMultiplier != labelSizeMultiplier;
 }

@@ -1,7 +1,7 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 0.1.0+94
+version: 0.1.0+97
 
 environment:
   sdk: ^3.10.0
@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  vector_math: ^2.2.0
   cupertino_icons: ^1.0.2
   flutter_launcher_icons: ^0.14.4
   flutter_platform_widgets: ^9.0.0

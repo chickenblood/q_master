@@ -60,8 +60,6 @@ float sdDodecahedron(vec3 p) {
 float map(vec3 p) {
   // apply rotation angles supplied by the host (radians)
   p = rotateEuler(u_angles) * p;
-  // small nodding still controlled by time for subtle motion
-  p = rotX(0.12 * sin(u_time * 0.9)) * p;
   return sdDodecahedron(p) * 0.9; // scale
 }
 
@@ -125,6 +123,13 @@ void main() {
   if (found > 0.0) {
     vec3 p = ro + rd * found;
     vec3 n = estimateNormal(p);
+
+    // Back-face culling: skip rendering if normal points away from viewer
+    if (dot(n, -rd) < 0.0) {
+      FragColor = vec4(col, 1.0);
+      return;
+    }
+
     vec3 lightDir = normalize(vec3(0.5, 0.6, -0.7));
     vec3 lightColor = vec3(1.0, 0.95, 0.9);
 
@@ -149,7 +154,6 @@ void main() {
     // label projection & sampling: determine the face index by argmax of plane dot with rotated point
     // rotate the surface point into the same space used by the SDF
     vec3 pRot = rotateEuler(u_angles) * p;
-    pRot = rotX(0.12 * sin(u_time * 0.9)) * pRot;
 
     int faceIdx = 0;
     float bestDot = -2.0;
