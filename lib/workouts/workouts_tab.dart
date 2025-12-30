@@ -21,8 +21,8 @@ class WorkoutsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SafeArea(
-    child: Material(
-      child: Consumer(
+    child: PlatformScaffold(
+      body: Consumer(
         builder: (context, ref, _) {
           return FutureBuilder(
             future: ref.watch(workoutListProvider),
@@ -62,8 +62,7 @@ final class _WorkoutTile extends StatelessWidget {
     // Stop the screen from sleeping while the beatdown browser is shown.
     WakelockPlus.enable();
 
-    await Navigator.push(
-      context,
+    await Navigator.of(context, rootNavigator: true).push(
       platformPageRoute(
         context: context,
         fullscreenDialog: true,

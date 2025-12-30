@@ -15,8 +15,7 @@ class GamesTab extends StatelessWidget {
     // Stop the screen from sleeping while the beatdown browser is shown.
     WakelockPlus.enable();
 
-    await Navigator.push(
-      context,
+    await Navigator.of(context, rootNavigator: true).push(
       platformPageRoute(
         context: context,
         fullscreenDialog: true,
@@ -30,8 +29,8 @@ class GamesTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLandscape = MediaQuery.of(context).isLandscape;
-    return Material(
-      child: SafeArea(
+    return PlatformScaffold(
+      body: SafeArea(
         child: Padding(
           padding: isLandscape
               ? const EdgeInsets.all(16.0)
@@ -82,52 +81,54 @@ class _GameTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 20.0),
-    child: InkWell(
-      onTap: () => onTap?.call(title),
-      borderRadius: BorderRadius.circular(16.0),
-      child: Stack(
-        children: [
-          if (subtitle != null)
+    child: Material(
+      child: InkWell(
+        onTap: () => onTap?.call(title),
+        borderRadius: BorderRadius.circular(16.0),
+        child: Stack(
+          children: [
+            if (subtitle != null)
+              Positioned(
+                top: 8.0,
+                left: 8.0,
+                child: PlatformText(
+                  subtitle!,
+                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16.0),
+                image: imagePath != null
+                    ? DecorationImage(
+                        image: AssetImage(imagePath!),
+                        fit: .contain,
+                      )
+                    : null,
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  width: 1.0,
+                ),
+              ),
+              child: AspectRatio(aspectRatio: 2 / 3),
+            ),
             Positioned(
-              top: 8.0,
-              left: 8.0,
+              bottom: 0,
+              left: 4,
+              right: 4,
               child: PlatformText(
-                subtitle!,
-                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  fontStyle: FontStyle.italic,
+                title,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16.0),
-              image: imagePath != null
-                  ? DecorationImage(
-                      image: AssetImage(imagePath!),
-                      fit: .contain,
-                    )
-                  : null,
-              border: Border.all(
-                color: Theme.of(context).colorScheme.onSurface,
-                width: 1.0,
-              ),
-            ),
-            child: AspectRatio(aspectRatio: 2 / 3),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 4,
-            right: 4,
-            child: PlatformText(
-              title,
-              textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall!.copyWith(fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     ),
   );
