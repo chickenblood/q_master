@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'games/games_tab.dart';
 import 'l10n/l10n.dart';
 import 'model/workout_list.dart';
+import 'near_me/near_me_tab.dart';
 import 'theme/theme.dart';
 import 'timer/timer_tab.dart';
 import 'ui/adaptive_icons.dart';
@@ -12,7 +13,7 @@ import 'ui/adaptive_modal_sheet.dart';
 import 'workouts/create_workout_sheet.dart';
 import 'workouts/workouts_tab.dart';
 
-enum Tab { workouts, games, timer }
+enum Tab { workouts, games, timer, location }
 
 void main() {
   runApp(ProviderScope(child: MainApp()));
@@ -25,7 +26,12 @@ class MainApp extends ConsumerWidget {
   final _tabController = PlatformTabController(
     initialIndex: Tab.workouts.index,
   );
-  final List<Widget> _tabPages = [WorkoutsTab(), GamesTab(), TimerTab()];
+  final List<Widget> _tabPages = [
+    WorkoutsTab(),
+    GamesTab(),
+    TimerTab(),
+    NearMeTab(),
+  ];
 
   void _showComposeWorkoutModal(WidgetRef ref) async {
     final context = _navigatorKey.currentContext;
@@ -75,6 +81,8 @@ class MainApp extends ConsumerWidget {
               ),
           ],
         ),
+        cupertino: (context, platform) =>
+            CupertinoTabScaffoldData(resizeToAvoidBottomInset: true),
         tabController: _tabController,
         bodyBuilder: (_, index) => _tabPages[index],
         items: [
@@ -89,6 +97,10 @@ class MainApp extends ConsumerWidget {
           BottomNavigationBarItem(
             icon: Icon(AdaptiveIcons.timer),
             label: L10n.of(context)!.timerTabTitle,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(AdaptiveIcons.location),
+            label: L10n.of(context)!.nearMeTabTitle,
           ),
         ],
       ),

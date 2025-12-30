@@ -1,6 +1,7 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:io' show Platform;
 
 final class AdaptiveIcons {
   static IconData get timer =>
@@ -17,4 +18,7 @@ final class AdaptiveIcons {
 
   static IconData get more =>
       Platform.isIOS ? CupertinoIcons.ellipsis : Icons.more_vert;
+
+  static IconData get location =>
+      Platform.isIOS ? CupertinoIcons.compass : Icons.location_on;
 }

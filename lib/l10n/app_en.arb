@@ -8,6 +8,8 @@
     "@gamesTabTitle": {},
     "timerTabTitle": "Timer",
     "@timerTabTitle": {},
+    "nearMeTabTitle": "Near me",
+    "@nearMeTabTitle": {},
     "dodGameTileTitle": "Dodecahedron of Death",
     "@dodGameTileTitle": {},
     "dopGameTileTitle": "Deck of Pain\n(coming soon)",
