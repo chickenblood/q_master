@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 class NearMeTab extends StatelessWidget {
-  NearMeTab({super.key});
-
   final controller = WebViewController()
     ..setJavaScriptMode(.unrestricted)
     ..setNavigationDelegate(
@@ -26,6 +25,20 @@ class NearMeTab extends StatelessWidget {
       ),
     )
     ..loadRequest(Uri.parse('https://f3near.me'));
+
+  NearMeTab({super.key}) {
+    if (controller.platform is AndroidWebViewController) {
+      (controller.platform as AndroidWebViewController)
+          .setGeolocationPermissionsPromptCallbacks(
+            onShowPrompt: (GeolocationPermissionsRequestParams request) async {
+              return const GeolocationPermissionsResponse(
+                allow: true,
+                retain: true,
+              );
+            },
+          );
+    }
+  }
 
   @override
   Widget build(BuildContext context) => PlatformScaffold(
