@@ -1,9 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'pain_card.freezed.dart';
-part 'pain_card.g.dart';
 
 enum Suit {
+  // TODO: Locaalize
   hearts('Hearts'),
   diamonds('Diamonds'),
   clubs('Clubs'),
@@ -24,6 +24,8 @@ abstract class PainCard with _$PainCard {
 
   const PainCard._();
 
+  /// The display name of the card.
+  // TODO: Locaalize
   String get displayName {
     final valueName = switch (value) {
       1 => 'Ace',

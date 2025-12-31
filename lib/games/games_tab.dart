@@ -7,12 +7,19 @@ import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/ui/media_query.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import 'deck_of_pain_game_view.dart';
 import 'dod_game_view.dart';
 
 class GamesTab extends StatelessWidget {
   const GamesTab({super.key});
 
-  Future<void> _showDodGame(BuildContext context, String tag) async {
+  void _showDodGame(BuildContext context, String tag) =>
+      _presentModalSheet(context, DodGameView(heroTag: tag));
+
+  void _showDeckOfPainGame(BuildContext context, String tag) =>
+      _presentModalSheet(context, DeckOfPainGameView(heroTag: tag));
+
+  Future<void> _presentModalSheet(BuildContext context, Widget child) async {
     // Stop the screen from sleeping while the beatdown browser is shown.
     WakelockPlus.enable();
 
@@ -20,7 +27,7 @@ class GamesTab extends StatelessWidget {
       platformPageRoute(
         context: context,
         fullscreenDialog: true,
-        builder: (context) => DodGameView(heroTag: tag),
+        builder: (context) => child,
       ),
     );
 
@@ -54,6 +61,7 @@ class GamesTab extends StatelessWidget {
                 child: _GameTile(
                   title: L10n.of(context)!.dopGameTileTitle,
                   imagePath: 'assets/images/DoP.png',
+                  onTap: (tag) => _showDeckOfPainGame(context, tag),
                 ),
               ),
             ],

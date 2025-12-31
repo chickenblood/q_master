@@ -1,11 +1,31 @@
 import 'package:q_master/model/pain_card.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-@riverpod
-final class DeckOfPain {
-  final _deck = <PainCard>[];
+part 'deck_of_pain.g.dart';
 
-  DeckOfPain() {
+@riverpod
+final class DeckOfPain extends _$DeckOfPain {
+  /// Returns the top card and removes it from the deck.
+  PainCard? drawCard() {
+    if (state.isNotEmpty) {
+      final result = currentCard();
+      if (state.length > 1) {
+        state = state.sublist(1);
+      } else {
+        state = [];
+      }
+      return result;
+    }
+    return null;
+  }
+
+  /// Returns the top card from the deck.
+  PainCard? currentCard() => state.isNotEmpty ? state[0] : null;
+
+  @override
+  List<PainCard> build() {
+    final deck = <PainCard>[];
+
     // Initialize the deck with some PainCards
     for (var suit in Suit.values) {
       for (var i = 1; i <= 13; i++) {
@@ -15,18 +35,12 @@ final class DeckOfPain {
           1 => 50,
           _ => i,
         };
-        _deck.add(
+        deck.add(
           PainCard(suit: suit, value: value, exercise: 'Side straddle hops'),
         );
       }
     }
-    _deck.shuffle();
-  }
-
-  /// Returns the top card from the deck.
-  PainCard? nextCard() => _deck.isNotEmpty ? _deck.removeAt(0) : null;
-
-  List<PainCard> build() {
-    return _deck;
+    deck.shuffle();
+    return deck;
   }
 }

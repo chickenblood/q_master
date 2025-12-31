@@ -12,7 +12,7 @@ final class DodGameView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Hero(
-      tag: heroTag,
+      tag: Object() /* ignore heroTag for now */,
       child: PlatformScaffold(
         backgroundColor: Colors.black,
         appBar: PlatformAppBar(
