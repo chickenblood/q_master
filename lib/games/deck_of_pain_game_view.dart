@@ -20,8 +20,8 @@ final class DeckOfPainGameView extends StatelessWidget {
       tag: Object() /* ignore heroTag for now */,
       child: PlatformScaffold(
         backgroundColor: Colors.black,
-        iosContentPadding: true,
         appBar: PlatformAppBar(
+          backgroundColor: Colors.transparent,
           leading: PlatformIconButton(
             icon: Icon(AdaptiveIcons.close, color: Colors.white),
             onPressed: () => Navigator.pop(context),

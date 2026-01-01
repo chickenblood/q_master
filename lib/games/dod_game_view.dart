@@ -16,7 +16,7 @@ final class DodGameView extends StatelessWidget {
       child: PlatformScaffold(
         backgroundColor: Colors.black,
         appBar: PlatformAppBar(
-          backgroundColor: Colors.black,
+          backgroundColor: Colors.transparent,
           leading: PlatformIconButton(
             icon: Icon(AdaptiveIcons.close, color: Colors.white),
             onPressed: () => Navigator.pop(context),
