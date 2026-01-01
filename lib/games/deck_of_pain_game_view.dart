@@ -106,7 +106,10 @@ class _FrontCardView extends StatelessWidget {
                 textAlign: TextAlign.center,
                 overflow: .fade,
                 maxLines: 5,
-                style: textStyle.copyWith(fontWeight: FontWeight.bold),
+                style: textStyle.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: painCard.suit.color,
+                ),
               ),
             ),
             // Top left decoration
