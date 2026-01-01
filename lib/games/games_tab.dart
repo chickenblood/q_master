@@ -36,7 +36,7 @@ class GamesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLandscape = MediaQuery.of(context).isLandscape;
+    final isLandscape = MediaUtils.isLandscape(context);
     return PlatformScaffold(
       body: SafeArea(
         child: Padding(

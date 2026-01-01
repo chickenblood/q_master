@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
-extension Utils on MediaQueryData {
-  bool get isTablet => size.shortestSide >= 800;
+extension MediaUtils on MediaQueryData {
+  static bool isTablet(BuildContext context) =>
+      MediaQuery.sizeOf(context).shortestSide >= 800;
 
-  bool get isLandscape => size.width > size.height;
+  static bool isLandscape(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    return size.width > size.height;
+  }
 }

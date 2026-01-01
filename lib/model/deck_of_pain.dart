@@ -1,6 +1,8 @@
 import 'package:q_master/model/pain_card.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'pain_exercise_constants.dart';
+
 part 'deck_of_pain.g.dart';
 
 @riverpod
@@ -28,15 +30,13 @@ final class DeckOfPain extends _$DeckOfPain {
 
     // Initialize the deck with some PainCards
     for (var suit in Suit.values) {
-      for (var i = 1; i <= 13; i++) {
-        // Face cards are worth 25. Ace is 50.
-        final value = switch (i) {
-          11 || 12 || 13 => 25,
-          1 => 50,
-          _ => i,
-        };
+      for (var i = 0; i <= 12; i++) {
         deck.add(
-          PainCard(suit: suit, value: value, exercise: 'Side straddle hops'),
+          PainCard(
+            suit: suit,
+            value: i + 1,
+            exercise: painExercises[i % painExercises.length],
+          ),
         );
       }
     }
