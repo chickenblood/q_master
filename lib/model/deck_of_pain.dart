@@ -30,15 +30,19 @@ final class DeckOfPain extends _$DeckOfPain {
   List<PainCard> build() {
     final deck = <PainCard>[];
 
-    final exercises = List.of(painExercises);
+    final exercises = <String>[];
     final random = Random();
 
     // Initialize the deck with some PainCards
     for (var suit in Suit.values) {
-      for (var i = 0; i <= 12; i++) {
+      for (var i = 1; i <= 13; i++) {
+        if (exercises.isEmpty) {
+          // Temporary, until we have at least 52 exercises.
+          exercises.addAll(painExercises);
+        }
         final removalIndex = random.nextInt(exercises.length);
         deck.add(
-          PainCard(suit: suit, value: i + 1, exercise: exercises[removalIndex]),
+          PainCard(suit: suit, value: i, exercise: exercises[removalIndex]),
         );
         exercises.removeAt(removalIndex);
       }
