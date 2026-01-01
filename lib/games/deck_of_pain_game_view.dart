@@ -26,7 +26,10 @@ final class DeckOfPainGameView extends StatelessWidget {
             icon: Icon(AdaptiveIcons.close, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
-          title: PlatformText(L10n.of(context)!.dopGameScreenTitle),
+          title: PlatformText(
+            L10n.of(context)!.dopGameScreenTitle,
+            style: TextStyle(color: Colors.white),
+          ),
         ),
         body: Center(child: _Deck()),
       ),
