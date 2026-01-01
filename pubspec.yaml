@@ -1,7 +1,7 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 0.1.1+116
+version: 0.1.1+117
 
 environment:
   sdk: ^3.10.0
@@ -21,8 +21,8 @@ dependencies:
   flutter_riverpod: ^3.0.3
   path_provider: ^2.1.5
   wakelock_plus: ^1.4.0
-  riverpod_annotation: ^3.0.3
-  riverpod_generator: ^3.0.3
+  riverpod_annotation: ^4.0.0
+  riverpod_generator: ^4.0.0+1
   share_plus: ^12.0.1
   pull_down_button: ^0.10.2
   rename: ^3.1.0
