@@ -110,7 +110,6 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
             duration: _focusScrollDuration,
           ),
         ),
-        SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
       ]),
     ),
   );
