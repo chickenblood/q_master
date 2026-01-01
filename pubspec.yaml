@@ -1,7 +1,7 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 0.1.1+119
+version: 0.1.1+120
 
 environment:
   sdk: ^3.10.0
@@ -31,6 +31,7 @@ dependencies:
   url_launcher: ^6.3.2
   webview_flutter_android: ^4.10.11
   auto_size_text: ^3.0.0
+  package_info_plus: ^9.0.0
 
 
 dev_dependencies:
@@ -56,6 +57,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/icon/
   shaders:
     - shaders/dodecahedron.frag
 

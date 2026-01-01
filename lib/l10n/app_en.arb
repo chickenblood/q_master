@@ -18,6 +18,9 @@
     "@dopGameScreenTitle": {},
     "settingsDialogTitle": "Settings",
     "@settingsDialogTitle": {},
+    "settingsAboutDialogDescription":
+    "Developed by Vevo with help from the Pax of F3 Hangar 1.\n\nCredit to Smokey and F3 Greensboro for the original Deck of Pain.",
+    "@settingsAboutDialogDescription": {},
     "createWorkoutDialogTitle": "Create Workout",
     "@createWorkoutDialogTitle": {},
     "startWorkoutButtonText": "Start",
