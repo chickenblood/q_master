@@ -6,6 +6,7 @@ import 'games/games_tab.dart';
 import 'l10n/l10n.dart';
 import 'model/workout_list.dart';
 import 'near_me/near_me_tab.dart';
+import 'settings/settings_sheet.dart';
 import 'theme/theme.dart';
 import 'timer/timer_tab.dart';
 import 'ui/adaptive_icons.dart';
@@ -33,7 +34,7 @@ class MainApp extends ConsumerWidget {
     NearMeTab(),
   ];
 
-  void _showComposeWorkoutModal(WidgetRef ref) async {
+  Future<void> _showComposeWorkoutModal(WidgetRef ref) async {
     final context = _navigatorKey.currentContext;
     assert(context != null);
     if (context == null) return;
@@ -46,6 +47,17 @@ class MainApp extends ConsumerWidget {
       final workoutList = await ref.read(workoutListProvider);
       workoutList.add(workout);
     }
+  }
+
+  Future<void> _showSettingsModal() async {
+    final context = _navigatorKey.currentContext;
+    assert(context != null);
+    if (context == null) return;
+
+    await showAdaptiveModalSheet(
+      context: _navigatorKey.currentContext!,
+      child: SettingsSheet(),
+    );
   }
 
   @override
@@ -73,12 +85,18 @@ class MainApp extends ConsumerWidget {
           cupertino: (_, _) =>
               CupertinoNavigationBarData(backgroundColor: Colors.transparent),
           title: Text(L10n.of(context)!.appBarTitle),
+          leading: PlatformIconButton(
+            icon: Icon(context.platformIcons.gearSolid),
+            onPressed: _showSettingsModal,
+          ),
           trailingActions: [
-            if (index == Tab.workouts.index)
-              PlatformIconButton(
+            switch (Tab.values[index]) {
+              .workouts => PlatformIconButton(
                 icon: Icon(PlatformIcons(context).add),
                 onPressed: () => _showComposeWorkoutModal(ref),
               ),
+              _ => SizedBox.shrink(),
+            },
           ],
         ),
         tabController: _tabController,

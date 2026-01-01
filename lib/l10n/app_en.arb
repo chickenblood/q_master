@@ -16,6 +16,8 @@
     "@dopGameTileTitle": {},
     "dopGameScreenTitle": "Tap to draw a new card",
     "@dopGameScreenTitle": {},
+    "settingsDialogTitle": "Settings",
+    "@settingsDialogTitle": {},
     "createWorkoutDialogTitle": "Create Workout",
     "@createWorkoutDialogTitle": {},
     "startWorkoutButtonText": "Start",
