@@ -81,8 +81,6 @@ class MainApp extends ConsumerWidget {
               ),
           ],
         ),
-        cupertino: (context, platform) =>
-            CupertinoTabScaffoldData(resizeToAvoidBottomInset: true),
         tabController: _tabController,
         bodyBuilder: (_, index) => _tabPages[index],
         items: [
