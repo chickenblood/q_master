@@ -19,6 +19,7 @@ final class DeckOfPainGameView extends StatelessWidget {
     return Hero(
       tag: Object() /* ignore heroTag for now */,
       child: PlatformScaffold(
+        iosContentPadding: true, // Fixes app bar underlap for landscape.
         backgroundColor: Colors.black,
         appBar: PlatformAppBar(
           backgroundColor: Colors.transparent,
@@ -79,13 +80,10 @@ class _FrontCardView extends StatelessWidget {
     required TextStyle style,
     required Color color,
   }) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
-      child: PlatformText(
-        text,
-        textAlign: .center,
-        style: style.copyWith(fontWeight: FontWeight.bold, color: color),
-      ),
+    return PlatformText(
+      text,
+      textAlign: .center,
+      style: style.copyWith(fontWeight: FontWeight.bold, color: color),
     );
   }
 
@@ -99,48 +97,27 @@ class _FrontCardView extends StatelessWidget {
       color: Colors.white,
       child: AspectRatio(
         aspectRatio: 2 / 3,
-        child: Stack(
-          fit: .expand,
-          children: [
-            Align(
-              alignment: Alignment.center,
-              child: PlatformText(
-                painCard.description,
-                textAlign: TextAlign.center,
-                overflow: .fade,
-                maxLines: 5,
-                style: textStyle.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: painCard.suit.color,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Stack(
+            fit: .expand,
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: PlatformText(
+                  painCard.description,
+                  textAlign: TextAlign.center,
+                  overflow: .fade,
+                  maxLines: 5,
+                  style: textStyle.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: painCard.suit.color,
+                  ),
                 ),
               ),
-            ),
-            // Top left decoration
-            Align(
-              alignment: Alignment.topLeft,
-              child: Column(
-                mainAxisSize: .min,
-                children: [
-                  _buildText(
-                    context,
-                    text: painCard.displayName,
-                    style: textStyle,
-                    color: painCard.suit.color,
-                  ),
-                  _buildText(
-                    context,
-                    text: painCard.suit.symbol,
-                    style: textStyle,
-                    color: painCard.suit.color,
-                  ),
-                ],
-              ),
-            ),
-            // Bottom right decoration
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Transform.rotate(
-                angle: pi, // Rotate 180 degrees
+              // Top left decoration
+              Align(
+                alignment: Alignment.topLeft,
                 child: Column(
                   mainAxisSize: .min,
                   children: [
@@ -159,8 +136,32 @@ class _FrontCardView extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-          ],
+              // Bottom right decoration
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Transform.rotate(
+                  angle: pi, // Rotate 180 degrees
+                  child: Column(
+                    mainAxisSize: .min,
+                    children: [
+                      _buildText(
+                        context,
+                        text: painCard.displayName,
+                        style: textStyle,
+                        color: painCard.suit.color,
+                      ),
+                      _buildText(
+                        context,
+                        text: painCard.suit.symbol,
+                        style: textStyle,
+                        color: painCard.suit.color,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
