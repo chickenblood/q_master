@@ -13,4 +13,10 @@ extension Utils on SharedPreferences {
   double? get dodecahedronDamping => getDouble(_kDodecahedronDampingKey);
   Future<bool> setDodecahedronDamping(double value) =>
       setDouble(_kDodecahedronDampingKey, value);
+
+  /// Exercises per page in the beatdown browser
+  /// (defaults to 1 if not set)
+  int get exercisesPerPage => getInt('exercises_per_page') ?? 1;
+  Future<bool> setExercisesPerPage(int value) =>
+      setInt('exercises_per_page', value);
 }

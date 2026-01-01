@@ -18,6 +18,8 @@
     "@dopGameScreenTitle": {},
     "settingsDialogTitle": "Settings",
     "@settingsDialogTitle": {},
+    "exercisesPerPageSettingsLabel": "Exercises per page",
+    "@exercisesPerPageSettingsLabel": {},
     "settingsAboutDialogDescription":
     "Developed by Vevo with help from the Pax of F3 Hangar 1.\n\nCredit to Smokey and F3 Greensboro for the original Deck of Pain.",
     "@settingsAboutDialogDescription": {},
