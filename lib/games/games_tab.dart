@@ -93,6 +93,8 @@ class _GameTile extends StatelessWidget {
     child: Hero(
       tag: title,
       child: Material(
+        color: Colors.transparent,
+        clipBehavior: .hardEdge,
         child: InkWell(
           onTap: () => onTap?.call(title),
           borderRadius: BorderRadius.circular(16.0),

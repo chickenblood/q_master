@@ -92,47 +92,26 @@ class _FrontCardView extends StatelessWidget {
     final textStyle = isLandscape
         ? TextTheme.of(context).displaySmall!
         : TextTheme.of(context).displayLarge!;
-    return AspectRatio(
-      aspectRatio: 2 / 3,
-      child: Stack(
-        fit: .expand,
-        children: [
-          Align(
-            alignment: Alignment.center,
-            child: PlatformText(
-              painCard.description,
-              textAlign: TextAlign.center,
-              overflow: .fade,
-              maxLines: 5,
-              style: textStyle.copyWith(fontWeight: FontWeight.bold),
+    return Container(
+      color: Colors.white,
+      child: AspectRatio(
+        aspectRatio: 2 / 3,
+        child: Stack(
+          fit: .expand,
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: PlatformText(
+                painCard.description,
+                textAlign: TextAlign.center,
+                overflow: .fade,
+                maxLines: 5,
+                style: textStyle.copyWith(fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-          // Top left decoration
-          Align(
-            alignment: Alignment.topLeft,
-            child: Column(
-              mainAxisSize: .min,
-              children: [
-                _buildText(
-                  context,
-                  text: painCard.displayName,
-                  style: textStyle,
-                  color: painCard.suit.color,
-                ),
-                _buildText(
-                  context,
-                  text: painCard.suit.symbol,
-                  style: textStyle,
-                  color: painCard.suit.color,
-                ),
-              ],
-            ),
-          ),
-          // Bottom right decoration
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Transform.rotate(
-              angle: pi, // Rotate 180 degrees
+            // Top left decoration
+            Align(
+              alignment: Alignment.topLeft,
               child: Column(
                 mainAxisSize: .min,
                 children: [
@@ -151,8 +130,32 @@ class _FrontCardView extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-        ],
+            // Bottom right decoration
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Transform.rotate(
+                angle: pi, // Rotate 180 degrees
+                child: Column(
+                  mainAxisSize: .min,
+                  children: [
+                    _buildText(
+                      context,
+                      text: painCard.displayName,
+                      style: textStyle,
+                      color: painCard.suit.color,
+                    ),
+                    _buildText(
+                      context,
+                      text: painCard.suit.symbol,
+                      style: textStyle,
+                      color: painCard.suit.color,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
