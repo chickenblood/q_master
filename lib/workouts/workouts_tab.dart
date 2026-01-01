@@ -132,20 +132,24 @@ final class _WorkoutTile extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => Dismissible(
-    direction: .endToStart,
-    key: ValueKey(workout),
-    background: Container(color: Colors.red),
-    confirmDismiss: (direction) {
-      if (direction == .endToStart) return _confirmDelete(context);
-      return Future.value(true);
-    },
-    onDismissed: (direction) {
-      if (direction == .endToStart) workoutList.remove(workout);
-    },
-    child: Container(
-      padding: EdgeInsets.symmetric(vertical: 8),
+  Widget build(BuildContext context) {
+    const padding = EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0);
+    return Dismissible(
+      direction: .endToStart,
+      key: ValueKey(workout),
+      background: Container(color: Colors.red),
+      confirmDismiss: (direction) {
+        if (direction == .endToStart) return _confirmDelete(context);
+        return Future.value(true);
+      },
+      onDismissed: (direction) {
+        if (direction == .endToStart) workoutList.remove(workout);
+      },
       child: PlatformListTile(
+        material: (context, platform) =>
+            MaterialListTileData(contentPadding: padding),
+        cupertino: (context, platform) =>
+            CupertinoListTileData(padding: padding),
         title: AutoSizeText(
           workout.name,
           style: TextTheme.of(
@@ -165,8 +169,8 @@ final class _WorkoutTile extends StatelessWidget {
         ),
         onTap: () => _showBeatdownBrowser(context, workout),
       ),
-    ),
-  );
+    );
+  }
 }
 
 final class _OverflowMenu extends StatelessWidget {
