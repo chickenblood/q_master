@@ -18,12 +18,12 @@ Since I'm a UX purist, I prefer to have the UI look native to the platform where
 * Adaptive icons, i.e. Icons.adaptive.more, Icons.adaptive.settings, etc.
 
 * The [flutter_platform_widgets](https://pub.dev/packages/flutter_platform_widgets) package, which wraps equivalent higher-level widgets for both platforms and gives you a simple API to target both.
-* Use PlatformText rather than Text
-* Use PlatformScaffold rather than Scaffold
-* Use PlatformAppBar rather than AppBar
-* Use PlatformIconButton rather than IconButton
-* Use PlatformTextButton rather than TextButton
-* Use PlatformListTile rather than ListTile
+  * Use PlatformText rather than Text
+  * Use PlatformScaffold rather than Scaffold
+  * Use PlatformAppBar rather than AppBar
+  * Use PlatformIconButton rather than IconButton
+  * Use PlatformTextButton rather than TextButton
+  * Use PlatformListTile rather than ListTile
 
 In addition, I've added some helper classes that fills any gaps that the utilities above don't fill. See the following in the ui/ directory:
 
