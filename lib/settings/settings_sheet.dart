@@ -14,36 +14,25 @@ class SettingsSheet extends StatefulWidget {
 }
 
 class _SettingsSheetState extends State<SettingsSheet> {
-  Widget _aboutListTile(BuildContext context) {
+  Future<void> _showAboutDialog(BuildContext context) async {
     final l10n = L10n.of(context)!;
-    return FutureBuilder<PackageInfo>(
-      future: PackageInfo.fromPlatform(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const SizedBox.shrink();
-        }
-        final packageInfo = snapshot.data;
-        return AboutListTile(
-          applicationName: l10n.appBarTitle,
-          applicationVersion: packageInfo?.version,
-          applicationIcon: Image.asset(
-            'assets/icon/app_icon.png',
-            width: 48.0,
-            height: 48.0,
-          ),
-          icon: Icon(context.platformIcons.info),
-          aboutBoxChildren: [
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Text(l10n.settingsAboutDialogDescription),
-            ),
-          ],
-        );
-      },
+    final packageInfo = await PackageInfo.fromPlatform();
+    if (!context.mounted) return;
+    return showAdaptiveAboutDialog(
+      context: context,
+      applicationName: L10n.of(context)!.appBarTitle,
+      applicationVersion: packageInfo.version,
+      applicationIcon: Image.asset(
+        'assets/icon/app_icon.png',
+        width: 48.0,
+        height: 48.0,
+      ),
+      children: [Text(l10n.settingsAboutDialogDescription)],
     );
   }
 
-  Widget _content(BuildContext context, {required SharedPreferences prefs}) {
+  Widget content(BuildContext context, {required SharedPreferences prefs}) {
+    final l10n = L10n.of(context)!;
     return SliverPadding(
       padding: const EdgeInsets.all(16.0),
       sliver: SliverList(
@@ -62,7 +51,11 @@ class _SettingsSheetState extends State<SettingsSheet> {
             trailing: Text(prefs.exercisesPerPage.toString()),
           ),
           const Divider(),
-          _aboutListTile(context),
+          ListTile(
+            title: Text(l10n.appBarTitle),
+            leading: Icon(context.platformIcons.info),
+            onTap: () => _showAboutDialog(context),
+          ),
         ]),
       ),
     );
@@ -89,7 +82,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 ),
                 title: Text(L10n.of(context)!.settingsDialogTitle),
               ),
-              _content(context, prefs: snapshot.data!),
+              content(context, prefs: snapshot.data!),
             ],
           );
         },
