@@ -62,31 +62,28 @@ class _SettingsSheetState extends State<SettingsSheet> {
   }
 
   @override
-  Widget build(BuildContext context) => Material(
-    color: Colors.transparent,
-    child: PlatformScaffold(
-      body: FutureBuilder(
-        future: SharedPreferences.getInstance(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const SizedBox.shrink();
-          }
-          return CustomScrollView(
-            physics: ClampingScrollPhysics(),
-            slivers: [
-              PlatformSliverAppBar(
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                leading: PlatformIconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: Icon(AdaptiveIcons.close),
-                ),
-                title: Text(L10n.of(context)!.settingsDialogTitle),
+  Widget build(BuildContext context) => PlatformScaffold(
+    body: FutureBuilder(
+      future: SharedPreferences.getInstance(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const SizedBox.shrink();
+        }
+        return CustomScrollView(
+          physics: ClampingScrollPhysics(),
+          slivers: [
+            PlatformSliverAppBar(
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              leading: PlatformIconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: Icon(AdaptiveIcons.close),
               ),
-              content(context, prefs: snapshot.data!),
-            ],
-          );
-        },
-      ),
+              title: Text(L10n.of(context)!.settingsDialogTitle),
+            ),
+            content(context, prefs: snapshot.data!),
+          ],
+        );
+      },
     ),
   );
 }

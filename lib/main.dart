@@ -61,64 +61,67 @@ class MainApp extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => PlatformApp(
-    title: 'Q Master',
-    localizationsDelegates: L10n.localizationsDelegates,
-    supportedLocales: L10n.supportedLocales,
-    navigatorKey: _navigatorKey,
-    material: (_, _) => MaterialAppData(
-      theme: lightTheme(),
-      darkTheme: darkTheme(),
-      themeMode: ThemeMode.system,
-    ),
-    cupertino: (context, _) => CupertinoAppData(
-      theme: MaterialBasedCupertinoThemeData(
-        materialTheme:
-            MediaQuery.platformBrightnessOf(context) == Brightness.light
-            ? lightTheme()
-            : darkTheme(),
+  Widget build(BuildContext context, WidgetRef ref) => PlatformProvider(
+    settings: PlatformSettingsData(iosUsesMaterialWidgets: true),
+    builder: (_) => PlatformApp(
+      title: 'Q Master',
+      localizationsDelegates: L10n.localizationsDelegates,
+      supportedLocales: L10n.supportedLocales,
+      navigatorKey: _navigatorKey,
+      material: (_, _) => MaterialAppData(
+        theme: lightTheme(),
+        darkTheme: darkTheme(),
+        themeMode: ThemeMode.system,
       ),
-    ),
-    home: Builder(
-      builder: (context) => PlatformTabScaffold(
-        appBarBuilder: (_, index) => PlatformAppBar(
-          cupertino: (_, _) =>
-              CupertinoNavigationBarData(backgroundColor: Colors.transparent),
-          title: Text(L10n.of(context)!.appBarTitle),
-          leading: PlatformIconButton(
-            icon: Icon(context.platformIcons.gearSolid),
-            onPressed: _showSettingsModal,
+      cupertino: (context, _) => CupertinoAppData(
+        theme: MaterialBasedCupertinoThemeData(
+          materialTheme:
+              MediaQuery.platformBrightnessOf(context) == Brightness.light
+              ? lightTheme()
+              : darkTheme(),
+        ),
+      ),
+      home: Builder(
+        builder: (context) => PlatformTabScaffold(
+          appBarBuilder: (_, index) => PlatformAppBar(
+            cupertino: (_, _) =>
+                CupertinoNavigationBarData(backgroundColor: Colors.transparent),
+            title: Text(L10n.of(context)!.appBarTitle),
+            leading: PlatformIconButton(
+              icon: Icon(context.platformIcons.gearSolid),
+              onPressed: _showSettingsModal,
+            ),
+            trailingActions: [
+              switch (Tab.values[index]) {
+                .workouts => PlatformIconButton(
+                  icon: Icon(PlatformIcons(context).add),
+                  onPressed: () => _showComposeWorkoutModal(ref),
+                ),
+                _ => SizedBox.shrink(),
+              },
+            ],
           ),
-          trailingActions: [
-            switch (Tab.values[index]) {
-              .workouts => PlatformIconButton(
-                icon: Icon(PlatformIcons(context).add),
-                onPressed: () => _showComposeWorkoutModal(ref),
-              ),
-              _ => SizedBox.shrink(),
-            },
+          tabController: _tabController,
+          bodyBuilder: (_, index) => _tabPages[index],
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(AdaptiveIcons.history),
+              label: L10n.of(context)!.workoutsTabTitle,
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(AdaptiveIcons.sports),
+              label: L10n.of(context)!.gamesTabTitle,
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(AdaptiveIcons.timer),
+              label: L10n.of(context)!.timerTabTitle,
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(AdaptiveIcons.location),
+              label: L10n.of(context)!.nearMeTabTitle,
+            ),
           ],
         ),
-        tabController: _tabController,
-        bodyBuilder: (_, index) => _tabPages[index],
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(AdaptiveIcons.history),
-            label: L10n.of(context)!.workoutsTabTitle,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(AdaptiveIcons.sports),
-            label: L10n.of(context)!.gamesTabTitle,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(AdaptiveIcons.timer),
-            label: L10n.of(context)!.timerTabTitle,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(AdaptiveIcons.location),
-            label: L10n.of(context)!.nearMeTabTitle,
-          ),
-        ],
       ),
     ),
   );
