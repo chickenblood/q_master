@@ -43,6 +43,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
               value: prefs.exercisesPerPage.toDouble(),
               min: 1,
               max: 50,
+              divisions: 50,
               onChanged: (value) async {
                 await prefs.setExercisesPerPage(value.round());
                 setState(() {});
