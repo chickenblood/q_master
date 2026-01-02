@@ -42,8 +42,8 @@ class _SettingsSheetState extends State<SettingsSheet> {
             subtitle: Slider.adaptive(
               value: prefs.exercisesPerPage.toDouble(),
               min: 1,
-              max: 50,
-              divisions: 50,
+              max: 30,
+              divisions: 30,
               onChanged: (value) async {
                 await prefs.setExercisesPerPage(value.round());
                 setState(() {});
