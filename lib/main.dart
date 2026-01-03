@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:shake/shake.dart';
 
 import 'games/games_tab.dart';
 import 'l10n/l10n.dart';
@@ -21,7 +23,14 @@ void main() {
 }
 
 class MainApp extends ConsumerWidget {
-  MainApp({super.key});
+  MainApp({super.key}) {
+    // Easter egg sound effect on shake.
+    ShakeDetector.autoStart(
+      onPhoneShake: (_) => AudioPlayer()
+        ..setAsset('assets/sounds/easter_egg.wav')
+        ..play(),
+    );
+  }
 
   final _navigatorKey = GlobalKey<NavigatorState>();
   final _tabController = PlatformTabController(
