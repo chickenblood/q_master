@@ -71,7 +71,10 @@ class MainApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => PlatformProvider(
-    settings: PlatformSettingsData(iosUsesMaterialWidgets: true),
+    settings: PlatformSettingsData(
+      iosUsesMaterialWidgets: true,
+      iosUseZeroPaddingForAppbarPlatformIcon: true,
+    ),
     builder: (_) => PlatformApp(
       title: 'Q Master',
       localizationsDelegates: L10n.localizationsDelegates,
