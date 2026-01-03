@@ -6,7 +6,6 @@ import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/formatted_workout.dart';
 import 'package:q_master/model/workout.dart';
 import 'package:q_master/model/workout_list.dart';
-import 'package:q_master/ui/adaptive_alert.dart';
 import 'package:q_master/ui/adaptive_icons.dart';
 import 'package:q_master/ui/adaptive_menu.dart';
 import 'package:q_master/ui/adaptive_modal_sheet.dart';
@@ -103,17 +102,16 @@ final class _WorkoutTile extends StatelessWidget {
       title: PlatformText(L10n.of(context)!.deleteWorkoutAlertTitle),
       content: PlatformText(L10n.of(context)!.deleteWorkoutAlertDescription),
       actions: [
-        adaptiveAlertAction(
-          context: innerContext,
-          isDestructive: true,
+        PlatformDialogAction(
+          cupertino: (_, _) =>
+              CupertinoDialogActionData(isDestructiveAction: true),
           onPressed: () => Navigator.pop(innerContext, true),
           child: PlatformText(
             L10n.of(innerContext)!.deleteWorkoutConfirmAction,
           ),
         ),
-        adaptiveAlertAction(
-          context: innerContext,
-          isDefault: true,
+        PlatformDialogAction(
+          cupertino: (_, _) => CupertinoDialogActionData(isDefaultAction: true),
           onPressed: () => Navigator.pop(innerContext, false),
           child: PlatformText(L10n.of(innerContext)!.cancelAction),
         ),
