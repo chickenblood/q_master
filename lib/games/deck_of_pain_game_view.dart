@@ -53,17 +53,20 @@ class _DeckState extends ConsumerState<_Deck> {
     ref.watch(deckOfPainProvider);
     final currentCard = ref.read(deckOfPainProvider.notifier).currentCard();
     if (currentCard == null) return Text('No more cards.');
-    return Material(
-      clipBehavior: .hardEdge,
-      borderRadius: .circular(16.0),
-      child: InkWell(
-        onTap: () {
-          final card = ref.read(deckOfPainProvider.notifier).drawCard();
-          setState(() => isFlipped = card == null);
-        },
-        child: isFlipped
-            ? const _BackCardView()
-            : _FrontCardView(painCard: currentCard),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Material(
+        clipBehavior: .hardEdge,
+        borderRadius: .circular(16.0),
+        child: InkWell(
+          onTap: () {
+            final card = ref.read(deckOfPainProvider.notifier).drawCard();
+            setState(() => isFlipped = card == null);
+          },
+          child: isFlipped
+              ? const _BackCardView()
+              : _FrontCardView(painCard: currentCard),
+        ),
       ),
     );
   }
