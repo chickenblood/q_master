@@ -52,7 +52,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
             trailing: Text(prefs.exercisesPerPage.toString()),
           ),
           const Divider(),
-          ListTile(
+          PlatformListTile(
             title: Text(l10n.appBarTitle),
             leading: Icon(context.platformIcons.info),
             onTap: () => _showAboutDialog(context),
