@@ -67,5 +67,17 @@
     "cancelAction": "Cancel",
     "@cancelAction": {},
     "dodTapToStartMessage": "Tap to roll",
-    "@dodTapToStartMessage": {}
+    "@dodTapToStartMessage": {},
+    "timerPrepareLabel": "PREPARE",
+    "@timerPrepareLabel": {},
+    "timerWorkLabel": "WORK",
+    "@timerWorkLabel": {},
+    "timerStartLabel": "START",
+    "@timerStartLabel": {},
+    "timerPauseLabel": "PAUSE",
+    "@timerPauseLabel": {},
+    "timerRestLabel": "REST",
+    "@timerRestLabel": {},
+    "timerRoundsLeftLabel": "ROUNDS LEFT",
+    "@timerRoundsLeftLabel": {}
   }

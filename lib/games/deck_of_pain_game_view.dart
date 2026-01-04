@@ -7,7 +7,6 @@ import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/deck_of_pain.dart';
 import 'package:q_master/model/pain_card.dart';
 import 'package:q_master/ui/adaptive_icons.dart';
-import 'package:q_master/ui/media_query.dart';
 
 final class DeckOfPainGameView extends StatelessWidget {
   final String heroTag;
@@ -92,7 +91,7 @@ class _FrontCardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLandscape = MediaUtils.isLandscape(context);
+    final isLandscape = MediaQuery.orientationOf(context) == .landscape;
     final textStyle = isLandscape
         ? TextTheme.of(context).displaySmall!
         : TextTheme.of(context).displayLarge!;

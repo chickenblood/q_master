@@ -26,16 +26,15 @@ abstract class TimerDisplay with _$TimerDisplay {
 final class Timer extends _$Timer {
   static const defaultDisplay = TimerDisplay(
     elapsedSeconds: 0,
-    prepareIntervalSeconds: 3,
-    workIntervalSeconds: 60,
-    restIntervalSeconds: 10,
+    prepareIntervalSeconds: 5,
+    workIntervalSeconds: 30,
+    restIntervalSeconds: 5,
     rounds: 8,
   );
   final _stopWatch = Stopwatch();
 
   void start() => _stopWatch.start();
   void pause() => _stopWatch.stop();
-
   void reset() {
     _stopWatch.stop();
     _stopWatch.reset();
@@ -46,7 +45,7 @@ final class Timer extends _$Timer {
   }
 
   int get _runningTimeSeconds =>
-      (state.elapsedSeconds - state.prepareIntervalSeconds).toInt();
+      max(0, state.elapsedSeconds - state.prepareIntervalSeconds).toInt();
 
   TimerState get timerState {
     if (state.elapsedSeconds < state.prepareIntervalSeconds) {
@@ -82,8 +81,10 @@ final class Timer extends _$Timer {
       return 0;
     }
 
-    final restElapsedSeconds =
-        currentRoundElapsedSeconds - state.workIntervalSeconds;
+    final restElapsedSeconds = max(
+      currentRoundElapsedSeconds - state.workIntervalSeconds,
+      0,
+    );
     return state.restIntervalSeconds - restElapsedSeconds;
   }
 
@@ -99,6 +100,8 @@ final class Timer extends _$Timer {
 
     return state.workIntervalSeconds - currentRoundElapsedSeconds;
   }
+
+  int get workIntervalSeconds => state.workIntervalSeconds;
 
   int get remainingPrepareSeconds =>
       max(state.prepareIntervalSeconds - state.elapsedSeconds, 0);

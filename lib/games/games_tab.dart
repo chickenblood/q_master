@@ -4,7 +4,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/l10n/l10n.dart';
-import 'package:q_master/ui/media_query.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'deck_of_pain_game_view.dart';
@@ -36,7 +35,7 @@ class GamesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLandscape = MediaUtils.isLandscape(context);
+    final isLandscape = MediaQuery.orientationOf(context) == .landscape;
     return PlatformScaffold(
       body: SafeArea(
         child: Padding(
