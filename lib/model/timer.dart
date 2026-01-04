@@ -33,17 +33,6 @@ final class Timer extends _$Timer {
   );
   final _stopWatch = Stopwatch();
 
-  Timer() {
-    final timer = async.Timer.periodic(
-      const Duration(seconds: 1),
-      (_) => _tick(),
-    );
-    ref.onDispose(() {
-      timer.cancel();
-      _stopWatch.stop();
-    });
-  }
-
   void start() => _stopWatch.start();
   void pause() => _stopWatch.stop();
 
@@ -124,6 +113,23 @@ final class Timer extends _$Timer {
 
   @override
   TimerDisplay build() {
+    final timer = async.Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => _tick(),
+    );
+    ref.onDispose(() {
+      timer.cancel();
+      _stopWatch.stop();
+    });
+
     return defaultDisplay;
   }
+}
+
+String formatSeconds(int totalSeconds) {
+  final minutes = totalSeconds ~/ 60;
+  final seconds = totalSeconds % 60;
+  final minutesStr = minutes.toString().padLeft(2, '0');
+  final secondsStr = seconds.toString().padLeft(2, '0');
+  return '$minutesStr:$secondsStr';
 }

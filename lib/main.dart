@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:q_master/model/timer.dart';
 import 'package:shake/shake.dart';
 
 import 'games/games_tab.dart';
@@ -58,6 +59,11 @@ class MainApp extends ConsumerWidget {
     }
   }
 
+  void _resetTimer(WidgetRef ref) async {
+    final notifier = ref.read(timerProvider.notifier);
+    notifier.reset();
+  }
+
   Future<void> _showSettingsModal() async {
     final context = _navigatorKey.currentContext;
     assert(context != null);
@@ -108,6 +114,10 @@ class MainApp extends ConsumerWidget {
                 .workouts => PlatformIconButton(
                   icon: Icon(PlatformIcons(context).add),
                   onPressed: () => _showComposeWorkoutModal(ref),
+                ),
+                .timer => PlatformIconButton(
+                  icon: Icon(PlatformIcons(context).refresh),
+                  onPressed: () => _resetTimer(ref),
                 ),
                 _ => SizedBox.shrink(),
               },
