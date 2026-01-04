@@ -54,8 +54,8 @@ class MainApp extends ConsumerWidget {
       child: CreateWorkoutSheet(),
     );
     if (workout != null) {
-      final workoutList = await ref.read(workoutListProvider);
-      workoutList.add(workout);
+      final listNotifier = ref.read(workoutListProvider.notifier);
+      listNotifier.add(workout);
     }
   }
 

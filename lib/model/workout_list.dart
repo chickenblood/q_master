@@ -2,44 +2,43 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'workout.dart';
 
-/// Provider for the WorkoutList
-final workoutListProvider = Provider((ref) async {
-  final directory = await getApplicationDocumentsDirectory();
-  final filename = '${directory.path}/workouts.json';
-  return WorkoutList(filename: filename, onUpdate: ref.invalidateSelf);
-});
+part 'workout_list.g.dart';
 
-final class WorkoutList {
-  final String filename;
-  final workouts = <Workout>[];
-  final void Function() onUpdate;
+@riverpod
+final class WorkoutList extends _$WorkoutList {
+  String? _filename;
 
-  WorkoutList({required this.filename, required this.onUpdate}) {
-    final file = File(filename);
-    if (!file.existsSync()) {
-      return;
-    }
-    final json = file.readAsStringSync();
-    final newWorkouts = (jsonDecode(json) as List)
-        .map((e) => Workout.fromJson(e))
-        .toList();
-    workouts.addAll(newWorkouts);
+  @override
+  List<Workout> build() {
+    getApplicationDocumentsDirectory().then((directory) {
+      _filename = '${directory.path}/workouts.json';
+      final file = File(_filename!);
+      if (!file.existsSync()) {
+        return;
+      }
+      final json = file.readAsStringSync();
+      final newWorkouts = (jsonDecode(json) as List)
+          .map((e) => Workout.fromJson(e))
+          .toList();
+      state = newWorkouts;
+    });
+    return [];
   }
 
   Future<void> _save({required List<Workout> updatedWorkouts}) async {
-    final file = File(filename)..createSync();
+    final file = File(_filename!)..createSync();
     final json = jsonEncode(updatedWorkouts);
     file.writeAsStringSync(json);
-    onUpdate();
+    state = updatedWorkouts;
   }
 
   void add(Workout workout) {
-    final updatedWorkouts = List.of(workouts);
+    final updatedWorkouts = List.of(state);
     // New items go to the front of the list.
     updatedWorkouts.insert(0, workout);
     // Save updated list to disk.
@@ -47,7 +46,7 @@ final class WorkoutList {
   }
 
   void remove(Workout workout) {
-    final updatedWorkouts = List.of(workouts);
+    final updatedWorkouts = List.of(state);
     if (updatedWorkouts.remove(workout)) {
       _save(updatedWorkouts: updatedWorkouts);
     } else {
@@ -56,19 +55,19 @@ final class WorkoutList {
   }
 
   void replace(Workout existingWorkout, Workout newWorkout) {
-    final index = workouts.indexOf(existingWorkout);
+    final index = state.indexOf(existingWorkout);
     assert(index != -1);
     if (index == -1) {
       debugPrint('Unable to replace workout');
       return;
     }
-    final updatedWorkouts = List.of(workouts);
+    final updatedWorkouts = List.of(state);
     updatedWorkouts[index] = newWorkout;
     _save(updatedWorkouts: updatedWorkouts);
   }
 
   void duplicate(Workout workout) {
-    final updatedWorkouts = List.of(workouts);
+    final updatedWorkouts = List.of(state);
     // Copy workout, but give the copy the current time and date.
     final newWorkout = workout.copyWith(date: DateTime.now());
     updatedWorkouts.insert(0, newWorkout);

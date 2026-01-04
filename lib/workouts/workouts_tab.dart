@@ -24,24 +24,15 @@ class WorkoutsTab extends StatelessWidget {
     child: PlatformScaffold(
       body: Consumer(
         builder: (context, ref, _) {
-          return FutureBuilder(
-            future: ref.watch(workoutListProvider),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const Center(child: PlatformCircularProgressIndicator());
-              }
-              final workoutList = snapshot.data!;
-              return ListView.builder(
-                key:
-                    UniqueKey(), // Fixes weird issue with crashing when a workout gets deleted.
-                itemExtent: 100,
-                itemCount: workoutList.workouts.length,
-                itemBuilder: (context, index) => _WorkoutTile(
-                  workoutList: workoutList,
-                  workout: workoutList.workouts[index],
-                ),
-              );
-            },
+          final workouts = ref.watch(workoutListProvider);
+          final listNotifier = ref.read(workoutListProvider.notifier);
+          return ListView.builder(
+            itemExtent: 100,
+            itemCount: workouts.length,
+            itemBuilder: (context, index) => _WorkoutTile(
+              listNotifier: listNotifier,
+              workout: workouts[index],
+            ),
           );
         },
       ),
@@ -50,10 +41,10 @@ class WorkoutsTab extends StatelessWidget {
 }
 
 final class _WorkoutTile extends StatelessWidget {
-  final WorkoutList workoutList;
+  final WorkoutList listNotifier;
   final Workout workout;
 
-  const _WorkoutTile({required this.workoutList, required this.workout});
+  const _WorkoutTile({required this.listNotifier, required this.workout});
 
   Future<void> _showBeatdownBrowser(
     BuildContext context,
@@ -79,7 +70,7 @@ final class _WorkoutTile extends StatelessWidget {
       child: CreateWorkoutSheet(workout: workout),
     );
     if (updatedWorkout != null) {
-      workoutList.replace(workout, updatedWorkout);
+      listNotifier.replace(workout, updatedWorkout);
     }
   }
 
@@ -120,12 +111,12 @@ final class _WorkoutTile extends StatelessWidget {
   );
 
   void _duplicateWorkout(Workout workout) async {
-    workoutList.duplicate(workout);
+    listNotifier.duplicate(workout);
   }
 
   void _deleteWorkout(BuildContext context, Workout workout) async {
     if (await _confirmDelete(context) == true) {
-      workoutList.remove(workout);
+      listNotifier.remove(workout);
     }
   }
 
@@ -141,7 +132,7 @@ final class _WorkoutTile extends StatelessWidget {
         return Future.value(true);
       },
       onDismissed: (direction) {
-        if (direction == .endToStart) workoutList.remove(workout);
+        if (direction == .endToStart) listNotifier.remove(workout);
       },
       child: PlatformListTile(
         material: (context, platform) =>
