@@ -60,6 +60,7 @@ class GamesTab extends StatelessWidget {
                 child: _GameTile(
                   title: L10n.of(context)!.dopGameTileTitle,
                   imagePath: 'assets/images/DoP.png',
+                  textColor: Colors.black,
                   onTap: (tag) => _showDeckOfPainGame(context, tag),
                 ),
               ),
@@ -76,12 +77,14 @@ double _degToRad(double degrees) => degrees * pi / 180.0;
 class _GameTile extends StatelessWidget {
   final String title;
   final String? subtitle;
+  final Color? textColor;
   final String? imagePath;
   final Function(String)? onTap;
 
   const _GameTile({
     required this.title,
     this.subtitle,
+    this.textColor,
     this.imagePath,
     this.onTap,
   });
@@ -108,6 +111,7 @@ class _GameTile extends StatelessWidget {
                     style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       fontStyle: FontStyle.italic,
                       fontWeight: FontWeight.bold,
+                      color: textColor,
                     ),
                   ),
                 ),
@@ -134,9 +138,11 @@ class _GameTile extends StatelessWidget {
                 child: AutoSizeText(
                   title,
                   textAlign: TextAlign.center,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    fontWeight: FontWeight.bold,
+
+                    color: textColor,
+                  ),
                   wrapWords: false,
                 ),
               ),
