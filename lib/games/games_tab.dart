@@ -88,7 +88,7 @@ class _GameTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+    padding: const EdgeInsets.symmetric(horizontal: 22.0),
     child: Hero(
       tag: title,
       child: Material(
@@ -128,15 +128,16 @@ class _GameTile extends StatelessWidget {
                 child: AspectRatio(aspectRatio: 2 / 3),
               ),
               Positioned(
-                bottom: 0,
+                bottom: 4,
                 left: 4,
                 right: 4,
                 child: AutoSizeText(
                   title,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold),
+                  wrapWords: false,
                 ),
               ),
             ],

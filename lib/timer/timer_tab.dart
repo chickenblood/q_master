@@ -100,7 +100,7 @@ final class TimerTab extends ConsumerWidget {
               label: l10n.timerPrepareLabel,
               timeSeconds: notifier.remainingPrepareSeconds,
               fgColor: Colors.black,
-              bgColor: Colors.yellow,
+              bgColor: Colors.orange,
             ),
             secondTile: _TileSpec(
               label: l10n.timerWorkLabel,
@@ -184,6 +184,7 @@ final class _PrimaryTile extends StatelessWidget {
           style: Theme.of(
             context,
           ).textTheme.displayLarge!.copyWith(color: tileSpec.fgColor),
+          textScaler: TextScaler.noScaling,
         ),
         Spacer(),
         PlatformText(
@@ -191,10 +192,12 @@ final class _PrimaryTile extends StatelessWidget {
           style: Theme.of(context).textTheme.displayLarge!.copyWith(
             fontFeatures: [FontFeature.tabularFigures()],
             color: tileSpec.fgColor,
-            fontSize: 130,
+            fontSize: isPortrait ? 130 : 90,
             fontWeight: .bold,
           ),
+          textScaler: TextScaler.noScaling,
         ),
+        Spacer(),
       ],
     ),
   );
@@ -221,6 +224,7 @@ final class _SecondaryTile extends StatelessWidget {
             style: Theme.of(
               context,
             ).textTheme.displayMedium!.copyWith(color: tileSpec.fgColor),
+            textScaler: TextScaler.noScaling,
           ),
           PlatformText(
             formatSeconds(tileSpec.timeSeconds),
@@ -229,6 +233,7 @@ final class _SecondaryTile extends StatelessWidget {
               color: tileSpec.fgColor,
               fontWeight: .bold,
             ),
+            textScaler: TextScaler.noScaling,
           ),
         ],
       ),
@@ -264,14 +269,15 @@ final class _StatusTile extends StatelessWidget {
                     fontSize: 54,
                     fontWeight: .bold,
                   ),
+                  textScaler: TextScaler.noScaling,
                 ),
-                if (isPortrait) SizedBox(height: 22),
-                if (!isPortrait) SizedBox(width: 16),
+                SizedBox(height: isPortrait ? 22 : 16),
                 PlatformText(
                   l10n.timerRoundsLeftLabel,
                   style: Theme.of(
                     context,
                   ).textTheme.titleMedium!.copyWith(color: Colors.white),
+                  textScaler: TextScaler.noScaling,
                 ),
               ],
             ),
@@ -306,6 +312,7 @@ final class _StatusTile extends StatelessWidget {
                   style: Theme.of(
                     context,
                   ).textTheme.titleMedium!.copyWith(color: Colors.white),
+                  textScaler: TextScaler.noScaling,
                 ),
               ],
             ),
