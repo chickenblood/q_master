@@ -271,7 +271,7 @@ final class _StatusTile extends StatelessWidget {
                   ),
                   textScaler: TextScaler.noScaling,
                 ),
-                SizedBox(height: isPortrait ? 22 : 16),
+                isPortrait ? SizedBox(height: 22) : SizedBox(width: 16),
                 PlatformText(
                   l10n.timerRoundsLeftLabel,
                   style: Theme.of(
@@ -284,7 +284,7 @@ final class _StatusTile extends StatelessWidget {
           ),
           Expanded(
             child: Flex(
-              mainAxisAlignment: .center,
+              mainAxisAlignment: isPortrait ? .center : .start,
               direction: isPortrait ? Axis.vertical : Axis.horizontal,
               children: [
                 PlatformIconButton(
