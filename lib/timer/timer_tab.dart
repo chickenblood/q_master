@@ -7,207 +7,238 @@ import 'package:q_master/model/timer.dart';
 final class TimerTab extends ConsumerWidget {
   const TimerTab({super.key});
 
-  Widget _preparingLayout(L10n l10n, {required Timer timerNotifier}) => Column(
-    crossAxisAlignment: .stretch,
-    mainAxisSize: .max,
-    children: [
-      Expanded(
-        flex: 2,
-        child: Column(
-          mainAxisSize: .max,
+  Widget _layoutTiles(
+    L10n l10n, {
+    required bool isPortrait,
+    required Timer timerNotifier,
+    required _TileSpec firstTile,
+    required _TileSpec secondTile,
+  }) => isPortrait
+      ? Column(
           crossAxisAlignment: .stretch,
+          mainAxisSize: .max,
           children: [
             Expanded(
               flex: 2,
-              child: _PrimaryTile(
-                remainingSeconds: timerNotifier.remainingPrepareSeconds,
-                text: l10n.timerPrepareLabel,
-                fgColor: Colors.black,
-                bgColor: Colors.yellow,
+              child: Column(
+                mainAxisSize: .max,
+                crossAxisAlignment: .stretch,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: _PrimaryTile(
+                      tileSpec: firstTile,
+                      isPortrait: isPortrait,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: _SecondaryTile(
+                      tileSpec: secondTile,
+                      isPortrait: isPortrait,
+                    ),
+                  ),
+                ],
               ),
             ),
             Expanded(
               flex: 1,
-              child: _SecondaryTile(
-                remainingSeconds: timerNotifier.remainingWorkSeconds,
-                text: l10n.timerWorkLabel,
-                fgColor: Colors.black,
-                bgColor: Colors.green,
+              child: _StatusTile(
+                timerNotifier: timerNotifier,
+                isPortrait: isPortrait,
               ),
             ),
           ],
-        ),
-      ),
-      Expanded(flex: 1, child: _StatusTile(timerNotifier: timerNotifier)),
-    ],
-  );
-
-  Widget _workingLayout(L10n l10n, {required Timer timerNotifier}) => Column(
-    crossAxisAlignment: .stretch,
-    mainAxisSize: .max,
-    children: [
-      Expanded(
-        flex: 2,
-        child: Column(
-          mainAxisSize: .max,
+        )
+      : Row(
           crossAxisAlignment: .stretch,
+          mainAxisSize: .max,
           children: [
             Expanded(
               flex: 2,
-              child: _PrimaryTile(
-                remainingSeconds: timerNotifier.remainingWorkSeconds,
-                text: l10n.timerWorkLabel,
-                fgColor: Colors.black,
-                bgColor: Colors.green,
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: _SecondaryTile(
-                remainingSeconds: timerNotifier.remainingRestSeconds,
-                text: l10n.timerRestLabel,
-                fgColor: Colors.white,
-                bgColor: Colors.red,
-              ),
-            ),
-          ],
-        ),
-      ),
-      Expanded(flex: 1, child: _StatusTile(timerNotifier: timerNotifier)),
-    ],
-  );
-
-  Widget _restingLayout(L10n l10n, {required Timer timerNotifier}) => Column(
-    crossAxisAlignment: .stretch,
-    mainAxisSize: .max,
-    children: [
-      Expanded(
-        flex: 2,
-        child: Column(
-          mainAxisSize: .max,
-          crossAxisAlignment: .stretch,
-          children: [
-            Expanded(
-              flex: 2,
-              child: _PrimaryTile(
-                remainingSeconds: timerNotifier.remainingRestSeconds,
-                text: l10n.timerRestLabel,
-                fgColor: Colors.white,
-                bgColor: Colors.red,
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: _SecondaryTile(
-                // Upcoming work is for the next round (not the current one),
-                // so show the full interval.
-                remainingSeconds: timerNotifier.workIntervalSeconds,
-                text: l10n.timerWorkLabel,
-                fgColor: Colors.black,
-                bgColor: Colors.green,
+              child: Column(
+                mainAxisSize: .max,
+                crossAxisAlignment: .stretch,
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: _PrimaryTile(
+                      tileSpec: firstTile,
+                      isPortrait: isPortrait,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: _StatusTile(
+                            timerNotifier: timerNotifier,
+                            isPortrait: isPortrait,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: _SecondaryTile(
+                            tileSpec: secondTile,
+                            isPortrait: isPortrait,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
-        ),
-      ),
-      Expanded(flex: 1, child: _StatusTile(timerNotifier: timerNotifier)),
-    ],
-  );
+        );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(timerProvider);
     final l10n = L10n.of(context)!;
     final notifier = ref.read(timerProvider.notifier);
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
     return PlatformScaffold(
       body: SafeArea(
         child: switch (notifier.timerState) {
-          .preparing => _preparingLayout(l10n, timerNotifier: notifier),
-          .working => _workingLayout(l10n, timerNotifier: notifier),
-          .resting => _restingLayout(l10n, timerNotifier: notifier),
+          .preparing => _layoutTiles(
+            l10n,
+            isPortrait: isPortrait,
+            timerNotifier: notifier,
+            firstTile: _TileSpec(
+              label: l10n.timerPrepareLabel,
+              timeSeconds: notifier.remainingPrepareSeconds,
+              fgColor: Colors.black,
+              bgColor: Colors.yellow,
+            ),
+            secondTile: _TileSpec(
+              label: l10n.timerWorkLabel,
+              timeSeconds: notifier.remainingWorkSeconds,
+              fgColor: Colors.black,
+              bgColor: Colors.green,
+            ),
+          ),
+          .working => _layoutTiles(
+            l10n,
+            isPortrait: isPortrait,
+            timerNotifier: notifier,
+            firstTile: _TileSpec(
+              label: l10n.timerWorkLabel,
+              timeSeconds: notifier.remainingWorkSeconds,
+              fgColor: Colors.black,
+              bgColor: Colors.green,
+            ),
+            secondTile: _TileSpec(
+              label: l10n.timerRestLabel,
+              timeSeconds: notifier.remainingRestSeconds,
+              fgColor: Colors.white,
+              bgColor: Colors.red,
+            ),
+          ),
+          .resting => _layoutTiles(
+            l10n,
+            isPortrait: isPortrait,
+            timerNotifier: notifier,
+            firstTile: _TileSpec(
+              label: l10n.timerRestLabel,
+              timeSeconds: notifier.remainingRestSeconds,
+              fgColor: Colors.white,
+              bgColor: Colors.red,
+            ),
+            secondTile: _TileSpec(
+              label: l10n.timerWorkLabel,
+              // Upcoming work is for the next round (not the current one),
+              // so show the full interval.
+              timeSeconds: notifier.workIntervalSeconds,
+              fgColor: Colors.black,
+              bgColor: Colors.green,
+            ),
+          ),
         },
       ),
     );
   }
 }
 
-// Tile displaying the countdown for current ongoing work.
-final class _PrimaryTile extends StatelessWidget {
-  final int remainingSeconds;
-  final String text;
+final class _TileSpec {
+  final String label;
+  final int timeSeconds;
   final Color fgColor;
   final Color bgColor;
 
-  const _PrimaryTile({
-    required this.remainingSeconds,
-    required this.text,
+  const _TileSpec({
+    required this.label,
+    required this.timeSeconds,
     required this.fgColor,
     required this.bgColor,
   });
+}
+
+// Tile displaying the countdown for current ongoing work.
+final class _PrimaryTile extends StatelessWidget {
+  final _TileSpec tileSpec;
+  final bool isPortrait;
+
+  const _PrimaryTile({required this.tileSpec, required this.isPortrait});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: bgColor,
-      child: Column(
-        children: [
-          SizedBox(height: 16),
-          PlatformText(
-            text,
-            textAlign: .center,
-            style: Theme.of(
-              context,
-            ).textTheme.displayLarge!.copyWith(color: fgColor),
+  Widget build(BuildContext context) => Container(
+    color: tileSpec.bgColor,
+    child: Column(
+      children: [
+        if (isPortrait) SizedBox(height: 16),
+        PlatformText(
+          tileSpec.label,
+          textAlign: .center,
+          style: Theme.of(
+            context,
+          ).textTheme.displayLarge!.copyWith(color: tileSpec.fgColor),
+        ),
+        if (isPortrait) SizedBox(height: 32),
+        PlatformText(
+          formatSeconds(tileSpec.timeSeconds),
+          style: Theme.of(context).textTheme.displayLarge!.copyWith(
+            fontFeatures: [FontFeature.tabularFigures()],
+            color: tileSpec.fgColor,
+            fontSize: 130,
+            fontWeight: .bold,
           ),
-          SizedBox(height: 32),
-          PlatformText(
-            formatSeconds(remainingSeconds),
-            style: Theme.of(context).textTheme.displayLarge!.copyWith(
-              fontFeatures: [FontFeature.tabularFigures()],
-              color: fgColor,
-              fontSize: 130,
-              fontWeight: .bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
 }
 
 // Tile displaying the upcoming stage of work.
 final class _SecondaryTile extends StatelessWidget {
-  final int remainingSeconds;
-  final String text;
-  final Color fgColor;
-  final Color bgColor;
+  final _TileSpec tileSpec;
+  final bool isPortrait;
 
-  const _SecondaryTile({
-    required this.remainingSeconds,
-    required this.text,
-    required this.fgColor,
-    required this.bgColor,
-  });
+  const _SecondaryTile({required this.tileSpec, required this.isPortrait});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: bgColor,
-      child: Column(
+      color: tileSpec.bgColor,
+      child: Flex(
         mainAxisAlignment: .spaceAround,
+        direction: isPortrait ? Axis.vertical : Axis.horizontal,
         children: [
           PlatformText(
-            text,
+            tileSpec.label,
             textAlign: .center,
             style: Theme.of(
               context,
-            ).textTheme.displayMedium!.copyWith(color: fgColor),
+            ).textTheme.displayMedium!.copyWith(color: tileSpec.fgColor),
           ),
           PlatformText(
-            formatSeconds(remainingSeconds),
+            formatSeconds(tileSpec.timeSeconds),
             style: Theme.of(context).textTheme.displayLarge!.copyWith(
               fontFeatures: [FontFeature.tabularFigures()],
-              color: fgColor,
+              color: tileSpec.fgColor,
               fontWeight: .bold,
             ),
           ),
@@ -219,24 +250,24 @@ final class _SecondaryTile extends StatelessWidget {
 
 final class _StatusTile extends StatelessWidget {
   final Timer timerNotifier;
+  final bool isPortrait;
 
-  const _StatusTile({required this.timerNotifier});
+  const _StatusTile({required this.timerNotifier, required this.isPortrait});
 
   @override
   Widget build(BuildContext context) {
     final l10n = L10n.of(context)!;
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
     return Container(
       color: Colors.black,
       child: Row(
         mainAxisAlignment: .spaceEvenly,
         children: [
           Expanded(
-            child: Column(
+            child: Flex(
+              direction: isPortrait ? Axis.vertical : Axis.horizontal,
               mainAxisAlignment: .center,
               children: [
-                SizedBox(height: 16),
+                if (isPortrait) SizedBox(height: 16),
                 PlatformText(
                   '${timerNotifier.remainingRounds}',
                   style: Theme.of(context).textTheme.displayLarge!.copyWith(
@@ -245,21 +276,23 @@ final class _StatusTile extends StatelessWidget {
                     fontWeight: .bold,
                   ),
                 ),
-                SizedBox(height: 22),
+                if (isPortrait) SizedBox(height: 22),
+                if (!isPortrait) SizedBox(width: 22),
                 PlatformText(l10n.timerRoundsLeftLabel),
               ],
             ),
           ),
           Expanded(
-            child: Column(
+            child: Flex(
               mainAxisAlignment: .center,
+              direction: isPortrait ? Axis.vertical : Axis.horizontal,
               children: [
                 PlatformIconButton(
                   icon: Icon(
                     timerNotifier.executionState == .playing
                         ? context.platformIcons.pause
                         : context.platformIcons.playCircle,
-                    size: 80,
+                    size: isPortrait ? 80 : 40,
                   ),
                   onPressed: () {
                     if (timerNotifier.executionState == .playing) {
@@ -277,7 +310,7 @@ final class _StatusTile extends StatelessWidget {
               ],
             ),
           ),
-          Expanded(child: Container()),
+          if (isPortrait) Expanded(child: Container()),
         ],
       ),
     );
