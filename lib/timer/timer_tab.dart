@@ -3,6 +3,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/timer.dart';
+import 'package:q_master/ui/adaptive_icons.dart';
 
 final class TimerTab extends ConsumerWidget {
   const TimerTab({super.key});
@@ -283,7 +284,7 @@ final class _StatusTile extends StatelessWidget {
                 PlatformIconButton(
                   icon: Icon(
                     timerNotifier.executionState == .playing
-                        ? context.platformIcons.pause
+                        ? AdaptiveIcons.pauseCircle
                         : context.platformIcons.playCircle,
                     size: isPortrait ? 80 : 44,
                     color: Colors.white,

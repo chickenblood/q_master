@@ -21,4 +21,7 @@ final class AdaptiveIcons {
 
   static IconData get location =>
       Platform.isIOS ? CupertinoIcons.compass : Icons.location_on;
+
+  static IconData get pauseCircle =>
+      Platform.isIOS ? CupertinoIcons.pause_circle : Icons.pause_circle_filled;
 }
