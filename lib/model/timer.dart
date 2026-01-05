@@ -33,7 +33,13 @@ final class Timer extends _$Timer {
   );
   final _stopWatch = Stopwatch();
 
-  void start() => _stopWatch.start();
+  void start() {
+    // Call tick to guarantee an immediate update, rather than waiting for up
+    // to one second for the first timer tick.
+    _tick();
+    _stopWatch.start();
+  }
+
   void pause() {
     _stopWatch.stop();
     // Update state one last time on pause.
