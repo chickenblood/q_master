@@ -50,42 +50,29 @@ final class TimerTab extends ConsumerWidget {
             ),
           ],
         )
-      : Row(
-          crossAxisAlignment: .stretch,
+      : Column(
           mainAxisSize: .max,
+          crossAxisAlignment: .stretch,
           children: [
             Expanded(
-              flex: 2,
-              child: Column(
-                mainAxisSize: .max,
+              flex: 3,
+              child: _PrimaryTile(tileSpec: firstTile, isPortrait: isPortrait),
+            ),
+            Expanded(
+              flex: 1,
+              child: Row(
                 crossAxisAlignment: .stretch,
                 children: [
                   Expanded(
-                    flex: 3,
-                    child: _PrimaryTile(
-                      tileSpec: firstTile,
+                    child: _StatusTile(
+                      timerNotifier: timerNotifier,
                       isPortrait: isPortrait,
                     ),
                   ),
                   Expanded(
-                    flex: 1,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: _StatusTile(
-                            timerNotifier: timerNotifier,
-                            isPortrait: isPortrait,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: _SecondaryTile(
-                            tileSpec: secondTile,
-                            isPortrait: isPortrait,
-                          ),
-                        ),
-                      ],
+                    child: _SecondaryTile(
+                      tileSpec: secondTile,
+                      isPortrait: isPortrait,
                     ),
                   ),
                 ],
@@ -197,7 +184,7 @@ final class _PrimaryTile extends StatelessWidget {
             context,
           ).textTheme.displayLarge!.copyWith(color: tileSpec.fgColor),
         ),
-        if (isPortrait) SizedBox(height: 32),
+        Spacer(),
         PlatformText(
           formatSeconds(tileSpec.timeSeconds),
           style: Theme.of(context).textTheme.displayLarge!.copyWith(
@@ -257,6 +244,7 @@ final class _StatusTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = L10n.of(context)!;
+    final timerHasStarted = timerNotifier.elapsedSeconds > 0;
     return Container(
       color: Colors.black,
       child: Row(
@@ -277,8 +265,13 @@ final class _StatusTile extends StatelessWidget {
                   ),
                 ),
                 if (isPortrait) SizedBox(height: 22),
-                if (!isPortrait) SizedBox(width: 22),
-                PlatformText(l10n.timerRoundsLeftLabel),
+                if (!isPortrait) SizedBox(width: 16),
+                PlatformText(
+                  l10n.timerRoundsLeftLabel,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleMedium!.copyWith(color: Colors.white),
+                ),
               ],
             ),
           ),
@@ -292,7 +285,8 @@ final class _StatusTile extends StatelessWidget {
                     timerNotifier.executionState == .playing
                         ? context.platformIcons.pause
                         : context.platformIcons.playCircle,
-                    size: isPortrait ? 80 : 40,
+                    size: isPortrait ? 80 : 44,
+                    color: Colors.white,
                   ),
                   onPressed: () {
                     if (timerNotifier.executionState == .playing) {
@@ -305,7 +299,12 @@ final class _StatusTile extends StatelessWidget {
                 PlatformText(
                   timerNotifier.executionState == .playing
                       ? l10n.timerPauseLabel
-                      : l10n.timerStartLabel,
+                      : (timerHasStarted
+                            ? l10n.timerResumeLabel
+                            : l10n.timerStartLabel),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleMedium!.copyWith(color: Colors.white),
                 ),
               ],
             ),

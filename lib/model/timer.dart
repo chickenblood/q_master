@@ -14,7 +14,7 @@ enum ExecutionState { playing, paused }
 @freezed
 abstract class TimerDisplay with _$TimerDisplay {
   const factory TimerDisplay({
-    required int elapsedSeconds,
+    required Duration elapsedTime,
     required int prepareIntervalSeconds,
     required int workIntervalSeconds,
     required int restIntervalSeconds,
@@ -25,7 +25,7 @@ abstract class TimerDisplay with _$TimerDisplay {
 @riverpod
 final class Timer extends _$Timer {
   static const defaultDisplay = TimerDisplay(
-    elapsedSeconds: 0,
+    elapsedTime: Duration.zero,
     prepareIntervalSeconds: 5,
     workIntervalSeconds: 30,
     restIntervalSeconds: 5,
@@ -34,21 +34,28 @@ final class Timer extends _$Timer {
   final _stopWatch = Stopwatch();
 
   void start() => _stopWatch.start();
-  void pause() => _stopWatch.stop();
+  void pause() {
+    _stopWatch.stop();
+    // Update state one last time on pause.
+    _tick();
+  }
+
   void reset() {
     _stopWatch.stop();
     _stopWatch.reset();
   }
 
   void _tick() {
-    state = state.copyWith(elapsedSeconds: _stopWatch.elapsed.inSeconds);
+    state = state.copyWith(elapsedTime: _stopWatch.elapsed);
   }
 
-  int get _runningTimeSeconds =>
-      max(0, state.elapsedSeconds - state.prepareIntervalSeconds).toInt();
+  int get _runningTimeSeconds => max(
+    0,
+    state.elapsedTime.inSeconds - state.prepareIntervalSeconds,
+  ).toInt();
 
   TimerState get timerState {
-    if (state.elapsedSeconds < state.prepareIntervalSeconds) {
+    if (state.elapsedTime.inSeconds < state.prepareIntervalSeconds) {
       return TimerState.preparing;
     }
 
@@ -103,8 +110,10 @@ final class Timer extends _$Timer {
 
   int get workIntervalSeconds => state.workIntervalSeconds;
 
+  int get elapsedSeconds => state.elapsedTime.inSeconds;
+
   int get remainingPrepareSeconds =>
-      max(state.prepareIntervalSeconds - state.elapsedSeconds, 0);
+      max(state.prepareIntervalSeconds - state.elapsedTime.inSeconds, 0);
 
   int get remainingRounds {
     final totalRoundSeconds =

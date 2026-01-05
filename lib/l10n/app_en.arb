@@ -76,6 +76,8 @@
     "@timerStartLabel": {},
     "timerPauseLabel": "PAUSE",
     "@timerPauseLabel": {},
+    "timerResumeLabel": "RESUME",
+    "@timerResumeLabel": {},
     "timerRestLabel": "REST",
     "@timerRestLabel": {},
     "timerRoundsLeftLabel": "ROUNDS LEFT",
