@@ -223,8 +223,8 @@ final class _SecondaryTile extends StatelessWidget {
             textAlign: .center,
             style: Theme.of(
               context,
-            ).textTheme.displayMedium!.copyWith(color: tileSpec.fgColor),
-            textScaler: TextScaler.noScaling,
+            ).textTheme.displaySmall!.copyWith(color: tileSpec.fgColor),
+            textScaler: .noScaling,
           ),
           PlatformText(
             formatSeconds(tileSpec.timeSeconds),
@@ -233,7 +233,7 @@ final class _SecondaryTile extends StatelessWidget {
               color: tileSpec.fgColor,
               fontWeight: .bold,
             ),
-            textScaler: TextScaler.noScaling,
+            textScaler: .noScaling,
           ),
         ],
       ),

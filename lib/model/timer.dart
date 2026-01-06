@@ -28,7 +28,7 @@ final class Timer extends _$Timer {
   static const defaultDisplay = TimerDisplay(
     elapsedTime: Duration.zero,
     prepareIntervalSeconds: 5,
-    workIntervalSeconds: 10,
+    workIntervalSeconds: 30,
     restIntervalSeconds: 5,
     rounds: 8,
   );
