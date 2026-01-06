@@ -165,7 +165,12 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
             onPressed: () => Navigator.pop(context),
             icon: Icon(AdaptiveIcons.close),
           ),
-          title: Text(L10n.of(context)!.createWorkoutDialogTitle),
+          title: Text(
+            L10n.of(context)!.createWorkoutDialogTitle,
+            textScaler: MediaQuery.textScalerOf(
+              context,
+            ).clamp(maxScaleFactor: 1.5),
+          ),
           cupertino: (_, _) =>
               CupertinoSliverAppBarData(trailing: _rightAppBarButtonAction()),
           material: (_, _) =>

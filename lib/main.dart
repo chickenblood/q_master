@@ -104,7 +104,12 @@ class MainApp extends ConsumerWidget {
           appBarBuilder: (_, index) => PlatformAppBar(
             cupertino: (_, _) =>
                 CupertinoNavigationBarData(backgroundColor: Colors.transparent),
-            title: Text(L10n.of(context)!.appBarTitle),
+            title: Text(
+              L10n.of(context)!.appBarTitle,
+              textScaler: MediaQuery.textScalerOf(
+                context,
+              ).clamp(maxScaleFactor: 1.6),
+            ),
             leading: PlatformIconButton(
               icon: Icon(context.platformIcons.gearSolid),
               onPressed: _showSettingsModal,

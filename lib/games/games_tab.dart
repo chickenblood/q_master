@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/l10n/l10n.dart';
@@ -106,13 +105,16 @@ class _GameTile extends StatelessWidget {
                 Positioned(
                   top: 8.0,
                   left: 8.0,
-                  child: AutoSizeText(
+                  child: PlatformText(
                     subtitle!,
                     style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       fontStyle: FontStyle.italic,
                       fontWeight: FontWeight.bold,
                       color: textColor,
                     ),
+                    textScaler: MediaQuery.textScalerOf(
+                      context,
+                    ).clamp(maxScaleFactor: 1.4),
                   ),
                 ),
               Container(
@@ -135,7 +137,7 @@ class _GameTile extends StatelessWidget {
                 bottom: 4,
                 left: 4,
                 right: 4,
-                child: AutoSizeText(
+                child: PlatformText(
                   title,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
@@ -143,7 +145,10 @@ class _GameTile extends StatelessWidget {
 
                     color: textColor,
                   ),
-                  wrapWords: false,
+                  softWrap: true,
+                  textScaler: MediaQuery.textScalerOf(
+                    context,
+                  ).clamp(maxScaleFactor: 1.4),
                 ),
               ),
             ],

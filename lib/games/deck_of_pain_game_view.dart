@@ -29,6 +29,9 @@ final class DeckOfPainGameView extends StatelessWidget {
           title: PlatformText(
             L10n.of(context)!.dopGameScreenTitle,
             style: TextStyle(color: Colors.white),
+            textScaler: MediaQuery.textScalerOf(
+              context,
+            ).clamp(maxScaleFactor: 1.6),
           ),
         ),
         body: Center(child: _Deck()),
@@ -86,6 +89,7 @@ class _FrontCardView extends StatelessWidget {
       text,
       textAlign: .center,
       style: style.copyWith(fontWeight: FontWeight.bold, color: color),
+      textScaler: .noScaling,
     );
   }
 
@@ -115,6 +119,7 @@ class _FrontCardView extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: painCard.suit.color,
                   ),
+                  textScaler: .noScaling,
                 ),
               ),
               // Top left decoration

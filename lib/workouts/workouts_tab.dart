@@ -122,7 +122,7 @@ final class _WorkoutTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const padding = EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0);
+    const padding = EdgeInsets.fromLTRB(16.0, 14.0, 16.0, 4.0);
     return Dismissible(
       direction: .endToStart,
       key: ValueKey(workout),
@@ -139,16 +139,23 @@ final class _WorkoutTile extends StatelessWidget {
             MaterialListTileData(contentPadding: padding),
         cupertino: (context, platform) =>
             CupertinoListTileData(padding: padding),
-        title: AutoSizeText(
+        title: PlatformText(
           workout.name,
           style: TextTheme.of(
             context,
           ).headlineLarge!.copyWith(fontWeight: .bold),
           overflow: .ellipsis,
+          textScaler: MediaQuery.textScalerOf(
+            context,
+          ).clamp(maxScaleFactor: 1.3),
         ),
-        subtitle: PlatformText(
+        subtitle: AutoSizeText(
           workout.date.formattedForDisplay(),
-          style: TextTheme.of(context).bodyLarge,
+          style: TextTheme.of(context).bodyMedium,
+
+          textScaleFactor: MediaQuery.textScalerOf(
+            context,
+          ).clamp(maxScaleFactor: 1.3).textScaleFactor,
         ),
         trailing: _OverflowMenu(
           onEdit: () => _editWorkout(context, workout),

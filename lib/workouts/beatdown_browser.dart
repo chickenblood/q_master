@@ -94,6 +94,9 @@ final class BeatdownBrowser extends StatelessWidget {
                   pageIndex: _pageIndex.value,
                   exercisesPerPage: exercisesPerPage,
                 ),
+                textScaler: MediaQuery.textScalerOf(
+                  context,
+                ).clamp(maxScaleFactor: 1.6),
               ),
             ),
           ),
