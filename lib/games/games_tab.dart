@@ -117,7 +117,7 @@ class _GameTile extends StatelessWidget {
                     ).clamp(maxScaleFactor: 1.4),
                   ),
                 ),
-              Container(
+              Ink(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16.0),
                   image: imagePath != null
