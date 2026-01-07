@@ -169,6 +169,7 @@ class SettingsSheet extends StatelessWidget {
         onTimerDurationChanged: (newDuration) => duration = newDuration,
       ),
     );
+
     return duration.inSeconds;
   }
 
@@ -181,18 +182,23 @@ class SettingsSheet extends StatelessWidget {
       material: MaterialModalSheetData(
         constraints: BoxConstraints.tight(Size.fromHeight(250)),
       ),
-      builder: (context) => CupertinoPicker(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        itemExtent: 32,
-        scrollController: FixedExtentScrollController(initialItem: rounds - 1),
-        onSelectedItemChanged: (index) => rounds = index + 1,
-        looping: true,
-        children: List.generate(
-          10,
-          (index) => Center(
-            child: Text(
-              (index + 1).toString(),
-              style: Theme.of(context).textTheme.titleLarge,
+      builder: (context) => SizedBox(
+        height: 250,
+        child: CupertinoPicker(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          itemExtent: 32,
+          scrollController: FixedExtentScrollController(
+            initialItem: rounds - 1,
+          ),
+          onSelectedItemChanged: (index) => rounds = index + 1,
+          looping: true,
+          children: List.generate(
+            10,
+            (index) => Center(
+              child: Text(
+                (index + 1).toString(),
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
             ),
           ),
         ),
