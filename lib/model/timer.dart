@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:q_master/utils/shared_app_prefs.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'timer.freezed.dart';
@@ -25,13 +26,6 @@ abstract class TimerDisplay with _$TimerDisplay {
 
 @riverpod
 final class Timer extends _$Timer {
-  static const defaultDisplay = TimerDisplay(
-    elapsedTime: Duration.zero,
-    prepareIntervalSeconds: 5,
-    workIntervalSeconds: 30,
-    restIntervalSeconds: 5,
-    rounds: 8,
-  );
   static const countdownDelaySeconds = 4;
   final _prepareSound = AudioPlayer()
     ..setAsset('assets/sounds/prepare.wav')
@@ -66,6 +60,8 @@ final class Timer extends _$Timer {
   void reset() {
     _stopWatch.stop();
     _stopWatch.reset();
+    // Force a rebuild to re-read the prefs.
+    ref.invalidate(timerProvider);
   }
 
   void _tick() {
@@ -212,8 +208,22 @@ final class Timer extends _$Timer {
       timer.cancel();
       _stopWatch.stop();
     });
-
-    return defaultDisplay;
+    SharedAppPrefs.getInstance().then(
+      (prefs) => state = TimerDisplay(
+        elapsedTime: Duration.zero,
+        prepareIntervalSeconds: prefs.prepareIntervalSeconds.value,
+        workIntervalSeconds: prefs.workIntervalSeconds.value,
+        restIntervalSeconds: prefs.restIntervalSeconds.value,
+        rounds: prefs.rounds.value,
+      ),
+    );
+    return TimerDisplay(
+      elapsedTime: Duration.zero,
+      prepareIntervalSeconds: 0,
+      workIntervalSeconds: 0,
+      restIntervalSeconds: 0,
+      rounds: 0,
+    );
   }
 }
 
