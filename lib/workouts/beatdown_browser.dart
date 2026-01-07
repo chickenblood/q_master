@@ -4,8 +4,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/workout.dart';
 import 'package:q_master/ui/adaptive_icons.dart';
-import 'package:q_master/utils/shared_preferences_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:q_master/utils/shared_app_prefs.dart';
 
 final class BeatdownBrowser extends StatelessWidget {
   final _pageIndex = ValueNotifier<int>(0);
@@ -73,12 +72,12 @@ final class BeatdownBrowser extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: SharedPreferences.getInstance(),
+      future: SharedAppPrefs.getInstance(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const SizedBox.shrink();
         }
-        final exercisesPerPage = snapshot.data!.exercisesPerPage;
+        final exercisesPerPage = snapshot.data!.exercisesPerPage.value;
         final pages = _calculatePages(exercisesPerPage: exercisesPerPage);
         return PlatformScaffold(
           appBar: PlatformAppBar(

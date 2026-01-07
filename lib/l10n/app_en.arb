@@ -81,5 +81,17 @@
     "timerRestLabel": "RECOVER",
     "@timerRestLabel": {},
     "timerRoundsLeftLabel": "ROUNDS LEFT",
-    "@timerRoundsLeftLabel": {}
+    "@timerRoundsLeftLabel": {},
+    "workoutsSettingsTitle": "Workouts",
+    "@workoutsSettingsTitle": {},
+    "timerSettingsTitle": "Timer",
+    "@timerSettingsTitle": {},
+    "timerSettingsPrepareLabel": "Prepare",
+    "@timerSettingsPrepareLabel": {},
+    "timerSettingsWorkLabel": "Work",
+    "@timerSettingsWorkLabel": {},
+    "timerSettingsRestLabel": "Rest",
+    "@timerSettingsRestLabel": {},
+    "timerSettingsRoundsLabel": "Rounds",
+    "@timerSettingsRoundsLabel": {}
   }

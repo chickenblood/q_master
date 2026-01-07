@@ -4,8 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:q_master/l10n/l10n.dart';
-import 'package:q_master/utils/shared_preferences_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:q_master/utils/shared_app_prefs.dart';
 
 import 'faces_constants.dart';
 
@@ -136,10 +135,10 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
     })..start();
 
     // load any saved slider defaults for this control
-    SharedPreferences.getInstance().then((prefs) {
+    SharedAppPrefs.getInstance().then((prefs) {
       setState(() {
-        _impulseStrength = prefs.dodecahedronImpulse ?? _impulseStrength;
-        _damping = prefs.dodecahedronDamping ?? _damping;
+        _impulseStrength = prefs.dodecahedronImpulse.value;
+        _damping = prefs.dodecahedronDamping.value;
       });
     });
   }
@@ -672,11 +671,10 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                               TextButton(
                                 onPressed: () async {
                                   final prefs =
-                                      await SharedPreferences.getInstance();
-                                  await prefs.setDodecahedronImpulse(
-                                    _impulseStrength,
-                                  );
-                                  await prefs.setDodecahedronDamping(_damping);
+                                      await SharedAppPrefs.getInstance();
+                                  prefs.dodecahedronImpulse.value =
+                                      _impulseStrength;
+                                  prefs.dodecahedronDamping.value = _damping;
                                   if (!mounted) return;
                                 },
                                 child: const Text(
@@ -687,15 +685,15 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                               TextButton(
                                 onPressed: () async {
                                   final prefs =
-                                      await SharedPreferences.getInstance();
+                                      await SharedAppPrefs.getInstance();
                                   setState(() {
                                     _ax = _ay = _az = 0.0;
                                     _viewAx = _viewAy = _viewAz = 0.0;
                                     _vx = _vy = _vz = 0.0;
                                     _centerLabel = null;
                                     _impulseStrength =
-                                        prefs.dodecahedronImpulse ?? 1.0;
-                                    _damping = prefs.dodecahedronDamping ?? 0.8;
+                                        prefs.dodecahedronImpulse.value;
+                                    _damping = prefs.dodecahedronDamping.value;
                                   });
                                   // stop the ticker since there's no motion or label to animate
                                   if (_ticker.isActive) _ticker.stop();
