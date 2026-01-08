@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -76,11 +78,10 @@ class SettingsSheet extends StatelessWidget {
                   fontFeatures: [FontFeature.tabularFigures()],
                 ),
               ),
-              onTap: () async => prefs.prepareIntervalSeconds.value =
-                  await _showTimeIntervalPicker(
-                    context,
-                    timeSeconds: prefs.prepareIntervalSeconds.value,
-                  ),
+              onTap: () => _showTimeIntervalPicker(
+                context,
+                timeNotifier: prefs.prepareIntervalSeconds,
+              ),
             ),
           ),
           ListenableBuilder(
@@ -96,11 +97,10 @@ class SettingsSheet extends StatelessWidget {
                   fontFeatures: [FontFeature.tabularFigures()],
                 ),
               ),
-              onTap: () async => prefs.workIntervalSeconds.value =
-                  await _showTimeIntervalPicker(
-                    context,
-                    timeSeconds: prefs.workIntervalSeconds.value,
-                  ),
+              onTap: () => _showTimeIntervalPicker(
+                context,
+                timeNotifier: prefs.workIntervalSeconds,
+              ),
             ),
           ),
           ListenableBuilder(
@@ -116,11 +116,10 @@ class SettingsSheet extends StatelessWidget {
                   fontFeatures: [FontFeature.tabularFigures()],
                 ),
               ),
-              onTap: () async => prefs.restIntervalSeconds.value =
-                  await _showTimeIntervalPicker(
-                    context,
-                    timeSeconds: prefs.restIntervalSeconds.value,
-                  ),
+              onTap: () => _showTimeIntervalPicker(
+                context,
+                timeNotifier: prefs.restIntervalSeconds,
+              ),
             ),
           ),
           ListenableBuilder(
@@ -134,10 +133,8 @@ class SettingsSheet extends StatelessWidget {
                 prefs.rounds.value.toString(),
                 style: Theme.of(context).textTheme.displaySmall,
               ),
-              onTap: () async => prefs.rounds.value = await _showRoundsPicker(
-                context,
-                rounds: prefs.rounds.value,
-              ),
+              onTap: () =>
+                  _showRoundsPicker(context, roundsNotifier: prefs.rounds),
             ),
           ),
           const Divider(),
@@ -151,61 +148,54 @@ class SettingsSheet extends StatelessWidget {
     );
   }
 
-  Future<int> _showTimeIntervalPicker(
+  void _showTimeIntervalPicker(
     BuildContext context, {
-    required int timeSeconds,
-  }) async {
-    var duration = Duration(seconds: timeSeconds);
-    await showPlatformModalSheet(
-      context: context,
-      material: MaterialModalSheetData(
-        constraints: BoxConstraints.tight(Size.fromHeight(250)),
-      ),
-      builder: (context) => CupertinoTimerPicker(
-        mode: .ms,
-        alignment: .bottomCenter,
+    required ValueNotifier<int> timeNotifier,
+  }) => showPlatformModalSheet(
+    context: context,
+    material: MaterialModalSheetData(
+      constraints: BoxConstraints.tight(Size.fromHeight(250)),
+    ),
+    builder: (context) => CupertinoTimerPicker(
+      mode: .ms,
+      alignment: .bottomCenter,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      initialTimerDuration: Duration(seconds: timeNotifier.value),
+      onTimerDurationChanged: (newDuration) =>
+          timeNotifier.value = max(newDuration.inSeconds, 5),
+    ),
+  );
+
+  void _showRoundsPicker(
+    BuildContext context, {
+    required ValueNotifier<int> roundsNotifier,
+  }) => showPlatformModalSheet(
+    context: context,
+    material: MaterialModalSheetData(
+      constraints: BoxConstraints.tight(Size.fromHeight(250)),
+    ),
+    builder: (context) => SizedBox(
+      height: 250,
+      child: CupertinoPicker(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        initialTimerDuration: Duration(seconds: timeSeconds),
-        onTimerDurationChanged: (newDuration) => duration = newDuration,
-      ),
-    );
-
-    return duration.inSeconds;
-  }
-
-  Future<int> _showRoundsPicker(
-    BuildContext context, {
-    required int rounds,
-  }) async {
-    await showPlatformModalSheet(
-      context: context,
-      material: MaterialModalSheetData(
-        constraints: BoxConstraints.tight(Size.fromHeight(250)),
-      ),
-      builder: (context) => SizedBox(
-        height: 250,
-        child: CupertinoPicker(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          itemExtent: 32,
-          scrollController: FixedExtentScrollController(
-            initialItem: rounds - 1,
-          ),
-          onSelectedItemChanged: (index) => rounds = index + 1,
-          looping: true,
-          children: List.generate(
-            10,
-            (index) => Center(
-              child: Text(
-                (index + 1).toString(),
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+        itemExtent: 32,
+        scrollController: FixedExtentScrollController(
+          initialItem: roundsNotifier.value - 1,
+        ),
+        onSelectedItemChanged: (index) => roundsNotifier.value = index + 1,
+        looping: true,
+        children: List.generate(
+          10,
+          (index) => Center(
+            child: Text(
+              (index + 1).toString(),
+              style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
         ),
       ),
-    );
-    return rounds;
-  }
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
