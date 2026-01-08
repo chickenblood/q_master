@@ -71,92 +71,82 @@ final class BeatdownBrowser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: SharedAppPrefs.getInstance(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const SizedBox.shrink();
-        }
-        final exercisesPerPage = snapshot.data!.exercisesPerPage.value;
-        final pages = _calculatePages(exercisesPerPage: exercisesPerPage);
-        return PlatformScaffold(
-          appBar: PlatformAppBar(
-            leading: PlatformIconButton(
-              icon: Icon(AdaptiveIcons.close),
-              onPressed: () => Navigator.pop(context),
+    final SharedAppPrefs prefs = SharedAppPrefs.instance;
+    final exercisesPerPage = prefs.exercisesPerPage.value;
+    final pages = _calculatePages(exercisesPerPage: exercisesPerPage);
+    return PlatformScaffold(
+      appBar: PlatformAppBar(
+        leading: PlatformIconButton(
+          icon: Icon(AdaptiveIcons.close),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: ListenableBuilder(
+          listenable: _pageIndex,
+          builder: (_, _) => PlatformText(
+            _exerciseTypeAtPage(
+              context,
+              pageIndex: _pageIndex.value,
+              exercisesPerPage: exercisesPerPage,
             ),
-            title: ListenableBuilder(
-              listenable: _pageIndex,
-              builder: (_, _) => PlatformText(
-                _exerciseTypeAtPage(
-                  context,
-                  pageIndex: _pageIndex.value,
-                  exercisesPerPage: exercisesPerPage,
+            textScaler: MediaQuery.textScalerOf(
+              context,
+            ).clamp(maxScaleFactor: 1.6),
+          ),
+        ),
+      ),
+      body: SafeArea(
+        minimum: EdgeInsets.all(16),
+        child: PageView.builder(
+          controller: _pageController,
+          itemCount: pages.length,
+          onPageChanged: (index) => _pageIndex.value = index,
+          itemBuilder: (context, index) {
+            final pageText = pages[index];
+            return Column(
+              mainAxisSize: .max,
+              mainAxisAlignment: .spaceAround,
+              crossAxisAlignment: .stretch,
+              children: [
+                Expanded(
+                  child: Center(
+                    child: AutoSizeText(
+                      pageText,
+                      textAlign: exercisesPerPage == 1
+                          ? TextAlign.center
+                          : TextAlign.left,
+                      overflow: .fade,
+                      maxLines: 30,
+                      minFontSize: 12,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 48,
+                      ),
+                    ),
+                  ),
                 ),
-                textScaler: MediaQuery.textScalerOf(
-                  context,
-                ).clamp(maxScaleFactor: 1.6),
-              ),
-            ),
-          ),
-          body: SafeArea(
-            minimum: EdgeInsets.all(16),
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: pages.length,
-              onPageChanged: (index) => _pageIndex.value = index,
-              itemBuilder: (context, index) {
-                final pageText = pages[index];
-                return Column(
-                  mainAxisSize: .max,
-                  mainAxisAlignment: .spaceAround,
-                  crossAxisAlignment: .stretch,
-                  children: [
-                    Expanded(
-                      child: Center(
-                        child: AutoSizeText(
-                          pageText,
-                          textAlign: exercisesPerPage == 1
-                              ? TextAlign.center
-                              : TextAlign.left,
-                          overflow: .fade,
-                          maxLines: 30,
-                          minFontSize: 12,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 48,
-                          ),
-                        ),
-                      ),
-                    ),
-                    PlatformTextButton(
-                      onPressed: () => _onNextPage(
-                        context,
-                        pageIndex: index,
-                        pageCount: pages.length,
-                      ),
-                      child: PlatformText(
-                        (index + 1) < pages.length
-                            ? L10n.of(context)!.workoutNextUpText(
-                                pages[index + 1].split('\n').first,
-                              )
-                            : L10n.of(context)!.workoutCompleteText,
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: .end,
-                        overflow: .ellipsis,
-                        maxLines: 2,
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-        );
-      },
+                PlatformTextButton(
+                  onPressed: () => _onNextPage(
+                    context,
+                    pageIndex: index,
+                    pageCount: pages.length,
+                  ),
+                  child: PlatformText(
+                    (index + 1) < pages.length
+                        ? L10n.of(context)!.workoutNextUpText(
+                            pages[index + 1].split('\n').first,
+                          )
+                        : L10n.of(context)!.workoutCompleteText,
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    textAlign: .end,
+                    overflow: .ellipsis,
+                    maxLines: 2,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
     );
   }
 }

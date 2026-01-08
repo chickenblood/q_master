@@ -4,13 +4,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// SharePreferences wrapper that provides typed accessors and change notifiers
 /// for application settings.
 final class SharedAppPrefs {
-  static SharedAppPrefs? _instance;
+  static late SharedAppPrefs _instance;
   final SharedPreferences _prefs;
 
-  static Future<SharedAppPrefs> getInstance() async {
-    _instance ??= SharedAppPrefs._(await SharedPreferences.getInstance());
-    return _instance!;
+  /// Initializes the SharedAppPrefs singleton. This must be called once
+  /// before accessing the [instance].
+  static Future<void> ensureInitialized() async {
+    _instance = SharedAppPrefs._(await SharedPreferences.getInstance());
   }
+
+  static SharedAppPrefs get instance => _instance;
 
   /// Impulse strength for the dodecahedron control.
   late final ValueNotifier<double> dodecahedronImpulse;

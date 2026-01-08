@@ -135,11 +135,10 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
     })..start();
 
     // load any saved slider defaults for this control
-    SharedAppPrefs.getInstance().then((prefs) {
-      setState(() {
-        _impulseStrength = prefs.dodecahedronImpulse.value;
-        _damping = prefs.dodecahedronDamping.value;
-      });
+    final prefs = SharedAppPrefs.instance;
+    setState(() {
+      _impulseStrength = prefs.dodecahedronImpulse.value;
+      _damping = prefs.dodecahedronDamping.value;
     });
   }
 
@@ -436,6 +435,7 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
 
   @override
   Widget build(BuildContext context) {
+    final prefs = SharedAppPrefs.instance;
     return LayoutBuilder(
       builder: (context, constraints) {
         return GestureDetector(
@@ -669,9 +669,7 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               TextButton(
-                                onPressed: () async {
-                                  final prefs =
-                                      await SharedAppPrefs.getInstance();
+                                onPressed: () {
                                   prefs.dodecahedronImpulse.value =
                                       _impulseStrength;
                                   prefs.dodecahedronDamping.value = _damping;
@@ -684,8 +682,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                               ),
                               TextButton(
                                 onPressed: () async {
-                                  final prefs =
-                                      await SharedAppPrefs.getInstance();
                                   setState(() {
                                     _ax = _ay = _az = 0.0;
                                     _viewAx = _viewAy = _viewAz = 0.0;

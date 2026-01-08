@@ -14,6 +14,7 @@ import 'theme/theme.dart';
 import 'timer/timer_tab.dart';
 import 'ui/adaptive_icons.dart';
 import 'ui/adaptive_modal_sheet.dart';
+import 'utils/shared_app_prefs.dart';
 import 'workouts/create_workout_sheet.dart';
 import 'workouts/workouts_tab.dart';
 
@@ -25,6 +26,7 @@ void main() {
 
 class MainApp extends ConsumerWidget {
   MainApp({super.key}) {
+    SharedAppPrefs.ensureInitialized();
     // Easter egg sound effect on shake.
     ShakeDetector.autoStart(
       onPhoneShake: (_) => AudioPlayer()

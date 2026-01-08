@@ -61,7 +61,7 @@ final class Timer extends _$Timer {
     _stopWatch.stop();
     _stopWatch.reset();
     // Force a rebuild to re-read the prefs.
-    ref.invalidate(timerProvider);
+    ref.invalidateSelf();
   }
 
   void _tick() {
@@ -208,21 +208,13 @@ final class Timer extends _$Timer {
       timer.cancel();
       _stopWatch.stop();
     });
-    SharedAppPrefs.getInstance().then(
-      (prefs) => state = TimerDisplay(
-        elapsedTime: Duration.zero,
-        prepareIntervalSeconds: prefs.prepareIntervalSeconds.value,
-        workIntervalSeconds: prefs.workIntervalSeconds.value,
-        restIntervalSeconds: prefs.restIntervalSeconds.value,
-        rounds: prefs.rounds.value,
-      ),
-    );
+    final prefs = SharedAppPrefs.instance;
     return TimerDisplay(
       elapsedTime: Duration.zero,
-      prepareIntervalSeconds: 0,
-      workIntervalSeconds: 0,
-      restIntervalSeconds: 0,
-      rounds: 0,
+      prepareIntervalSeconds: prefs.prepareIntervalSeconds.value,
+      workIntervalSeconds: prefs.workIntervalSeconds.value,
+      restIntervalSeconds: prefs.restIntervalSeconds.value,
+      rounds: prefs.rounds.value,
     );
   }
 }

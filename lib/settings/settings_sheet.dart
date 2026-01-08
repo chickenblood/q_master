@@ -208,30 +208,25 @@ class SettingsSheet extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => PlatformScaffold(
-    body: SafeArea(
-      child: FutureBuilder(
-        future: SharedAppPrefs.getInstance(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const SizedBox.shrink();
-          }
-          return CustomScrollView(
-            physics: ClampingScrollPhysics(),
-            slivers: [
-              PlatformSliverAppBar(
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                leading: PlatformIconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: Icon(AdaptiveIcons.close),
-                ),
-                title: Text(L10n.of(context)!.settingsDialogTitle),
+  Widget build(BuildContext context) {
+    final prefs = SharedAppPrefs.instance;
+    return PlatformScaffold(
+      body: SafeArea(
+        child: CustomScrollView(
+          physics: ClampingScrollPhysics(),
+          slivers: [
+            PlatformSliverAppBar(
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              leading: PlatformIconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: Icon(AdaptiveIcons.close),
               ),
-              _content(context, prefs: snapshot.data!),
-            ],
-          );
-        },
+              title: Text(L10n.of(context)!.settingsDialogTitle),
+            ),
+            _content(context, prefs: prefs),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
