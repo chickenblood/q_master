@@ -36,11 +36,8 @@ final class Timer extends _$Timer {
   final _restSound = AudioPlayer()
     ..setAsset('assets/sounds/recover.wav')
     ..setVolume(6.0);
-  final _chime1Sound = AudioPlayer()
-    ..setAsset('assets/sounds/chime_1.wav')
-    ..setVolume(6.0);
-  final _chime2Sound = AudioPlayer()
-    ..setAsset('assets/sounds/chime_2.wav')
+  final _countdownPlayer = AudioPlayer()
+    ..setAsset('assets/sounds/countdown.wav')
     ..setVolume(6.0);
   final _stopWatch = Stopwatch();
 
@@ -70,22 +67,7 @@ final class Timer extends _$Timer {
     if (!_stopWatch.isRunning) return;
     if (remainingRounds == 0) return;
 
-    // Play sounds based on timer state transitions.
-    final totalRoundSeconds =
-        state.workIntervalSeconds + state.restIntervalSeconds;
-    final currentRoundElapsedSeconds = _runningTimeSeconds % totalRoundSeconds;
-    final preparationEnding =
-        _stopWatch.elapsed.inSeconds >
-            (state.prepareIntervalSeconds - countdownDelaySeconds) &&
-        _stopWatch.elapsed.inSeconds < state.prepareIntervalSeconds;
-    final workoutEnding =
-        (currentRoundElapsedSeconds >
-            (workIntervalSeconds - countdownDelaySeconds) &&
-        (currentRoundElapsedSeconds <= workIntervalSeconds));
-    final restEnding =
-        currentRoundElapsedSeconds >
-        (totalRoundSeconds - countdownDelaySeconds);
-
+    // Play "PREPARE" sound at the start of the timer.
     if (_stopWatch.elapsed.inSeconds == 0) {
       _prepareSound.play().then((_) {
         _prepareSound.seek(Duration.zero);
@@ -93,34 +75,58 @@ final class Timer extends _$Timer {
       });
     }
 
-    if (preparationEnding || workoutEnding || restEnding) {
-      _chime1Sound.play().then((_) {
-        _chime1Sound.seek(Duration.zero);
-        _chime1Sound.pause();
+    // Play sounds based on timer state transitions.
+    final totalRoundSeconds =
+        state.workIntervalSeconds + state.restIntervalSeconds;
+    final currentRoundElapsedSeconds = _runningTimeSeconds % totalRoundSeconds;
+
+    // An index to start the countdown audio from, if applicable.
+    int? countdownAudioIndex;
+    if (!_countdownPlayer.playing) {
+      if (_stopWatch.elapsed.inSeconds >
+              (state.prepareIntervalSeconds - countdownDelaySeconds) &&
+          _stopWatch.elapsed.inSeconds < state.prepareIntervalSeconds) {
+        countdownAudioIndex = max(
+          _stopWatch.elapsed.inSeconds - state.prepareIntervalSeconds - 1,
+          0,
+        );
+      } else if (currentRoundElapsedSeconds >
+              (state.workIntervalSeconds - countdownDelaySeconds) &&
+          (currentRoundElapsedSeconds <= state.workIntervalSeconds)) {
+        countdownAudioIndex = max(
+          currentRoundElapsedSeconds - state.workIntervalSeconds - 1,
+          0,
+        );
+      } else if (currentRoundElapsedSeconds >
+          (totalRoundSeconds - countdownDelaySeconds)) {
+        countdownAudioIndex = max(
+          currentRoundElapsedSeconds - totalRoundSeconds - 1,
+          0,
+        );
+      }
+    }
+
+    if (countdownAudioIndex != null) {
+      // Skip to the appropriate second in the countdown audio.
+      _countdownPlayer.seek(Duration(seconds: countdownAudioIndex));
+      _countdownPlayer.play().then((_) {
+        _countdownPlayer.seek(Duration.zero);
+        _countdownPlayer.pause();
       });
     }
 
     if (_stopWatch.elapsed.inSeconds < state.prepareIntervalSeconds) return;
-
-    void playFinalChime() {
-      _chime2Sound.play().then((_) {
-        _chime2Sound.seek(Duration.zero);
-        _chime2Sound.pause();
-      });
-    }
 
     if (currentRoundElapsedSeconds % totalRoundSeconds == 0) {
       _workSound.play().then((_) {
         _workSound.seek(Duration.zero);
         _workSound.pause();
       });
-      playFinalChime();
     } else if (currentRoundElapsedSeconds == workIntervalSeconds) {
       _restSound.play().then((_) {
         _restSound.seek(Duration.zero);
         _restSound.pause();
       });
-      playFinalChime();
     }
   }
 
@@ -217,12 +223,4 @@ final class Timer extends _$Timer {
       rounds: prefs.rounds.value,
     );
   }
-}
-
-String formatSeconds(int totalSeconds) {
-  final minutes = totalSeconds ~/ 60;
-  final seconds = totalSeconds % 60;
-  final minutesStr = minutes.toString().padLeft(2, '0');
-  final secondsStr = seconds.toString().padLeft(2, '0');
-  return '$minutesStr:$secondsStr';
 }
