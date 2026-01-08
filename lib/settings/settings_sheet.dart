@@ -156,13 +156,15 @@ class SettingsSheet extends StatelessWidget {
     material: MaterialModalSheetData(
       constraints: BoxConstraints.tight(Size.fromHeight(250)),
     ),
-    builder: (context) => CupertinoTimerPicker(
-      mode: .ms,
-      alignment: .bottomCenter,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      initialTimerDuration: Duration(seconds: timeNotifier.value),
-      onTimerDurationChanged: (newDuration) =>
-          timeNotifier.value = max(newDuration.inSeconds, 5),
+    builder: (context) => SafeArea(
+      child: CupertinoTimerPicker(
+        mode: .ms,
+        alignment: .bottomCenter,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        initialTimerDuration: Duration(seconds: timeNotifier.value),
+        onTimerDurationChanged: (newDuration) =>
+            timeNotifier.value = max(newDuration.inSeconds, 5),
+      ),
     ),
   );
 
@@ -174,22 +176,24 @@ class SettingsSheet extends StatelessWidget {
     material: MaterialModalSheetData(
       constraints: BoxConstraints.tight(Size.fromHeight(250)),
     ),
-    builder: (context) => SizedBox(
-      height: 250,
-      child: CupertinoPicker(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        itemExtent: 32,
-        scrollController: FixedExtentScrollController(
-          initialItem: roundsNotifier.value - 1,
-        ),
-        onSelectedItemChanged: (index) => roundsNotifier.value = index + 1,
-        looping: true,
-        children: List.generate(
-          10,
-          (index) => Center(
-            child: Text(
-              (index + 1).toString(),
-              style: Theme.of(context).textTheme.titleLarge,
+    builder: (context) => SafeArea(
+      child: SizedBox(
+        height: 250,
+        child: CupertinoPicker(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          itemExtent: 32,
+          scrollController: FixedExtentScrollController(
+            initialItem: roundsNotifier.value - 1,
+          ),
+          onSelectedItemChanged: (index) => roundsNotifier.value = index + 1,
+          looping: true,
+          children: List.generate(
+            10,
+            (index) => Center(
+              child: Text(
+                (index + 1).toString(),
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
             ),
           ),
         ),
