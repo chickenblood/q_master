@@ -25,7 +25,9 @@ class SettingsSheet extends StatelessWidget {
         width: 48.0,
         height: 48.0,
       ),
-      children: [Text(l10n.settingsAboutDialogDescription)],
+      children: [
+        SizedBox(height: 180, child: Text(l10n.settingsAboutDialogDescription)),
+      ],
     );
   }
 
