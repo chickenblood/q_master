@@ -30,7 +30,7 @@ class MainApp extends ConsumerWidget {
     // Easter egg sound effect on shake.
     ShakeDetector.autoStart(
       onPhoneShake: (_) => AudioPlayer()
-        ..setAsset('assets/sounds/easter_egg.wav')
+        ..setAsset('assets/sounds/easter_egg.m4a')
         ..play(),
     );
   }
