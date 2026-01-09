@@ -11,6 +11,7 @@ import 'package:q_master/utils/shared_app_prefs.dart';
 
 class SettingsSheet extends StatelessWidget {
   const SettingsSheet({super.key});
+  static const _minimumTimePeriodSeconds = 10;
 
   Future<void> _showAboutDialog(BuildContext context) async {
     final l10n = L10n.of(context)!;
@@ -162,10 +163,13 @@ class SettingsSheet extends StatelessWidget {
       child: CupertinoTimerPicker(
         mode: .ms,
         alignment: .bottomCenter,
+        itemExtent: 42,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         initialTimerDuration: Duration(seconds: timeNotifier.value),
-        onTimerDurationChanged: (newDuration) =>
-            timeNotifier.value = max(newDuration.inSeconds, 5),
+        onTimerDurationChanged: (newDuration) => timeNotifier.value = max(
+          newDuration.inSeconds,
+          _minimumTimePeriodSeconds,
+        ),
       ),
     ),
   );
@@ -183,7 +187,7 @@ class SettingsSheet extends StatelessWidget {
         height: 250,
         child: CupertinoPicker(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          itemExtent: 32,
+          itemExtent: 42,
           scrollController: FixedExtentScrollController(
             initialItem: roundsNotifier.value - 1,
           ),
