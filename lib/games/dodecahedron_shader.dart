@@ -40,7 +40,7 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   // user-tunable controls
   var _impulseStrength = 3.0;
   var _showControls = false;
-  var _stopVelocityThreshold = 0.01;
+  var _stopVelocityThreshold = 0.1;
 
   // bookkeeping for per-tick dt
   var _lastTick = 0.0;
@@ -505,16 +505,16 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                 child: DefaultTextStyle(
                   style:
                       Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    shadows: const [
-                      Shadow(
-                        blurRadius: 8,
-                        color: Colors.black54,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ) ??
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        shadows: const [
+                          Shadow(
+                            blurRadius: 8,
+                            color: Colors.black54,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ) ??
                       const TextStyle(
                         color: Colors.white,
                         fontSize: 44,
@@ -628,7 +628,7 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                       child: Slider(
                         value: _stopVelocityThreshold,
                         min: 0.0001,
-                        max: 0.01,
+                        max: 0.1,
                         divisions: 99,
                         label: _stopVelocityThreshold.toStringAsFixed(4),
                         onChanged: (v) =>
