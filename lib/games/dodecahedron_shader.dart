@@ -483,24 +483,28 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   }
 
   Widget _buildCenterLabel() {
-    return Center(
-      child: IgnorePointer(
-        child: AnimatedOpacity(
-          duration: const Duration(milliseconds: 200),
-          opacity: ((_time - _centerLabelStart) / _centerLabelFadeDuration)
-              .clamp(0.0, 1.0),
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: 28 * _labelSizeMultiplier,
-              vertical: 14 * _labelSizeMultiplier,
-            ),
-            decoration: BoxDecoration(
-              color: const Color.fromRGBO(0, 0, 0, 0.92),
-              borderRadius: BorderRadius.circular(8 * _labelSizeMultiplier),
-            ),
-            child: DefaultTextStyle(
-              style:
-                  Theme.of(context).textTheme.headlineLarge?.copyWith(
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 20),
+          child: IgnorePointer(
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 200),
+              opacity: ((_time - _centerLabelStart) / _centerLabelFadeDuration)
+                  .clamp(0.0, 1.0),
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 28 * _labelSizeMultiplier,
+                  vertical: 14 * _labelSizeMultiplier,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(0, 0, 0, 0.92),
+                  borderRadius: BorderRadius.circular(8 * _labelSizeMultiplier),
+                ),
+                child: DefaultTextStyle(
+                  style:
+                      Theme.of(context).textTheme.headlineLarge?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     shadows: const [
@@ -511,12 +515,14 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                       ),
                     ],
                   ) ??
-                  const TextStyle(
-                    color: Colors.white,
-                    fontSize: 44,
-                    fontWeight: FontWeight.bold,
-                  ),
-              child: Text(_centerLabel!, textAlign: TextAlign.center),
+                      const TextStyle(
+                        color: Colors.white,
+                        fontSize: 44,
+                        fontWeight: FontWeight.bold,
+                      ),
+                  child: Text(_centerLabel!, textAlign: TextAlign.center),
+                ),
+              ),
             ),
           ),
         ),
