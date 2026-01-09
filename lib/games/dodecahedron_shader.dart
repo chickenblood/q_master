@@ -424,11 +424,12 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
               _ay += _viewAy;
               _az += _viewAz;
               _viewAx = _viewAy = _viewAz = 0.0;
-              // Randomize impulse direction for varied results
+              // Randomize impulse direction and magnitude for highly varied results
               final rng = math.Random();
-              final baseX = 5.5 + rng.nextDouble() * 2.0; // 5.5 to 7.5
-              final baseY = 3.5 + rng.nextDouble() * 2.0; // 3.5 to 5.5
-              final baseZ = 2.5 + rng.nextDouble() * 2.0; // 2.5 to 4.5
+              // Wider ranges for more variation (3.0 to 9.0 range per axis)
+              final baseX = 3.0 + rng.nextDouble() * 6.0;
+              final baseY = 3.0 + rng.nextDouble() * 6.0;
+              final baseZ = 3.0 + rng.nextDouble() * 6.0;
               final signX = rng.nextBool() ? 1.0 : -1.0;
               final signY = rng.nextBool() ? 1.0 : -1.0;
               final signZ = rng.nextBool() ? 1.0 : -1.0;
