@@ -12,6 +12,10 @@ const float PHI = 1.61803398875;
 // label atlas grid
 const int LABEL_COLS = 4;
 const int LABEL_ROWS = 3;
+// Aspect ratio of each atlas cell (width / height). Matches atlas cell size in Dart (320x96).
+const float LABEL_CELL_ASPECT = 320.0 / 96.0;
+// Safe inset so we don't sample right up to the atlas cell edge
+const float LABEL_INSET = 0.92;
 
 // rotation helpers
 mat3 rotX(float a) {
@@ -188,13 +192,29 @@ void main() {
     // compute local coords on face plane using the rotated point
     float localX = dot(pRot, tangent);
     float localY = dot(pRot, bitangent);
-    // scale to normalized label area (tweak this to control how much face is used)
-    float labelScale = 1.3;
-    vec2 local = vec2(localX, localY) / labelScale;
 
-    // aspect correction: scale y by screen aspect so label is not stretched
-    float aspect = u_resolution.x / u_resolution.y;
-    local.y /= aspect;
+    // Dynamically compute the largest axis-aligned rectangle (in the current tangent basis)
+    // that fits within the pentagonal face, while preserving the atlas aspect ratio.
+    // The face interior constraints are: dot(nj, p) <= 1 for all neighbor planes nj.
+    // For points on this face plane, p = p_center + tangent*x + bitangent*y with
+    // p_center chosen as the face center (unit normal, since dot(fn, fn) = 1).
+    vec3 p_center = faceNormal; // since faceNormal is normalized
+    float A = LABEL_CELL_ASPECT;
+    float s = 1e9; // maximal uniform scale for half-height
+    for (int j = 0; j < 12; j++) {
+      if (j == faceIdx) continue;
+      vec3 nj = normalize(faces[j]);
+      float m = 1.0 - dot(nj, p_center); // margin to this edge from center
+      vec2 g = vec2(dot(nj, tangent), dot(nj, bitangent));
+      float denom = abs(g.x) * A + abs(g.y);
+      if (denom > 1e-5) {
+        s = min(s, m / denom);
+      }
+    }
+    s *= LABEL_INSET; // small safety inset
+    float scaleX = 2.0 * s * A;
+    float scaleY = 2.0 * s;
+    vec2 local = vec2(localX / scaleX, localY / scaleY);
 
     // map local (-0.5..0.5) to atlas cell
     float colIdx = float(faceIdx % LABEL_COLS);

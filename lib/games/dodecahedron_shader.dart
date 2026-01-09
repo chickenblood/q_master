@@ -21,7 +21,10 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
     with SingleTickerProviderStateMixin {
   ui.FragmentProgram? _program;
   late final Ticker _ticker;
+  late final SharedAppPrefs _prefs;
   var _time = 0.0;
+  Orientation? _lastOrientation;
+  bool _isReloadingShader = false;
 
   // rotation state (radians)
   // Initial rotation aligns face 0's normal [0, 1, phi] with camera direction [0, 0, 1]
@@ -37,7 +40,7 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   // user-tunable controls
   var _impulseStrength = 2.0;
   var _showControls = false;
-  var _snapVelocityThreshold = 0.01;
+  var _stopVelocityThreshold = 0.01;
 
   // bookkeeping for per-tick dt
   var _lastTick = 0.0;
@@ -54,92 +57,124 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   var _isSpinning = false;
   final double _labelSizeMultiplier = 3.0;
 
-  // snap animation state
-  final bool _isSnapping = false;
+  // selected face index when spin stops
   int _snapFaceIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    _prefs = SharedAppPrefs.instance;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _centerLabel = L10n.of(context)!.dodTapToStartMessage;
+      if (!mounted) return;
+      setState(() {
+        _centerLabel = L10n.of(context)!.dodTapToStartMessage;
+      });
     });
-    ui.FragmentProgram.fromAsset('shaders/dodecahedron.frag').then((p) async {
-      // build a label atlas once the program is loaded
-      final atlas = await _buildLabelAtlas(dodFaceExercises);
+    _initShader();
+    _ticker = createTicker(_onTick)..start();
+
+    // load any saved slider defaults for this control
+    setState(() {
+      _impulseStrength = _prefs.dodecahedronImpulse.value;
+      _damping = _prefs.dodecahedronDamping.value;
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final orientation = MediaQuery.of(context).orientation;
+    if (_lastOrientation != orientation) {
+      _lastOrientation = orientation;
+      _reloadForAspect();
+    }
+  }
+
+  Future<void> _initShader() async {
+    final p = await ui.FragmentProgram.fromAsset('shaders/dodecahedron.frag');
+    final atlas = await _buildLabelAtlas(dodFaceExercises);
+    if (mounted) {
       setState(() {
         _program = p;
         _labelAtlas = atlas;
       });
-    });
-    _ticker = createTicker((d) {
-      final t = d.inMilliseconds / 1000.0;
-      final dt = _lastTick == 0.0 ? (t - _time) : (t - _lastTick);
-      _lastTick = t;
+    }
+  }
 
-      // integrate velocities -> angles with exponential damping
-      if (dt > 0 && !_isSnapping) {
-        final decay = math.exp(-_damping * dt);
-        _vx *= decay;
-        _vy *= decay;
-        _vz *= decay;
+  Future<void> _reloadForAspect() async {
+    if (_isReloadingShader) return;
+    _isReloadingShader = true;
+    // Dispose old atlas to free memory; shader will be reloaded too.
+    _labelAtlas?.dispose();
+    _labelAtlas = null;
+    _program = null;
+    setState(() {});
+    try {
+      await _initShader();
+    } finally {
+      _isReloadingShader = false;
+    }
+  }
 
-        // clamp small velocities to zero to avoid floating drift
-        if (_vx.abs() < _snapVelocityThreshold) _vx = 0.0;
-        if (_vy.abs() < _snapVelocityThreshold) _vy = 0.0;
-        if (_vz.abs() < _snapVelocityThreshold) _vz = 0.0;
+  void _onTick(Duration d) {
+    final t = d.inMilliseconds / 1000.0;
+    final dt = _lastTick == 0.0 ? (t - _time) : (t - _lastTick);
+    _lastTick = t;
 
-        // update angles when there's meaningful motion
-        final hasMotion = _vx != 0.0 || _vy != 0.0 || _vz != 0.0;
-        if (hasMotion) {
-          _ax += _vx * dt;
-          _ay += _vy * dt;
-          _az += _vz * dt;
-        }
+    // integrate velocities -> angles with exponential damping
+    if (dt > 0) {
+      final decay = math.exp(-_damping * dt);
+      _vx *= decay;
+      _vy *= decay;
+      _vz *= decay;
 
-        // detect spinning -> slowed below threshold: show label for aligned face
-        final currentSpeed = math.max(
-          _vx.abs(),
-          math.max(_vy.abs(), _vz.abs()),
-        );
-        final currentlySpinning = currentSpeed > _snapVelocityThreshold;
-        if (currentlySpinning) {
-          _isSpinning = true;
-        } else if (_isSpinning) {
-          // we were spinning but now slowed below threshold
-          // Clear all inertia
-          _vx = _vy = _vz = 0.0;
-          _isSpinning = false;
+      // clamp small velocities to zero to avoid floating drift
+      if (_vx.abs() < _stopVelocityThreshold) _vx = 0.0;
+      if (_vy.abs() < _stopVelocityThreshold) _vy = 0.0;
+      if (_vz.abs() < _stopVelocityThreshold) _vz = 0.0;
 
-          // Calculate which face is most aligned and show its label
-          final snapResult = _calculateSnapTarget();
-          _snapFaceIndex = snapResult.faceIndex;
-          _centerLabel = dodFaceExercises[_snapFaceIndex];
-          _centerLabelStart = t;
-        }
+      // update angles when there's meaningful motion
+      final hasMotion = _vx != 0.0 || _vy != 0.0 || _vz != 0.0;
+      if (hasMotion) {
+        _ax += _vx * dt;
+        _ay += _vy * dt;
+        _az += _vz * dt;
       }
 
+      // detect spinning -> slowed below threshold: show label for aligned face
+      final currentSpeed = math.max(_vx.abs(), math.max(_vy.abs(), _vz.abs()));
+      final currentlySpinning = currentSpeed > _stopVelocityThreshold;
+      if (currentlySpinning) {
+        _isSpinning = true;
+      } else if (_isSpinning) {
+        // we were spinning but now slowed below threshold
+        // Clear all inertia
+        _vx = _vy = _vz = 0.0;
+        _isSpinning = false;
+
+        // Determine which face is most aligned and show its label
+        final faceIdx = _findFrontFaceIndex();
+        _snapFaceIndex = faceIdx;
+        _centerLabel = dodFaceExercises[_snapFaceIndex];
+        _centerLabelStart = t;
+      }
+    }
+
+    if (mounted) {
       setState(() {
         _time = t;
       });
+    }
 
-      // If we've come to rest (no angular velocity, not snapping) and any center-label fade-in
-      // has completed (or none exists), stop the ticker to save CPU.
-      final noVelocities = _vx == 0.0 && _vy == 0.0 && _vz == 0.0;
-      final fadeInPending =
-          _centerLabel != null &&
-          ((t - _centerLabelStart) < _centerLabelFadeDuration);
-      if (noVelocities && !_isSnapping && !fadeInPending && _ticker.isActive) {
-        _ticker.stop();
-      }
-    })..start();
-
-    // load any saved slider defaults for this control
-    final prefs = SharedAppPrefs.instance;
-    setState(() {
-      _impulseStrength = prefs.dodecahedronImpulse.value;
-      _damping = prefs.dodecahedronDamping.value;
-    });
+    // If we've come to rest (no angular velocity, not snapping) and any center-label fade-in
+    // has completed (or none exists), stop the ticker to save CPU.
+    final noVelocities = _vx == 0.0 && _vy == 0.0 && _vz == 0.0;
+    final fadeInPending =
+        _centerLabel != null &&
+        ((t - _centerLabelStart) < _centerLabelFadeDuration);
+    if (noVelocities && !fadeInPending && _ticker.isActive) {
+      _ticker.stop();
+    }
   }
 
   @override
@@ -220,6 +255,11 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
     ];
   }
 
+  // Transpose a 3x3 matrix (also gives inverse for rotation matrices)
+  List<double> _transpose(List<double> m) {
+    return [m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]];
+  }
+
   // Dot product
   double _dot(List<double> a, List<double> b) =>
       a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -231,13 +271,11 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
     a[0] * b[1] - a[1] * b[0],
   ];
 
-  // Calculate snap target: find the face most aligned with camera and snap to it
-  ({int faceIndex, double deltaAx, double deltaAy, double deltaAz})
-  _calculateSnapTarget() {
-    // The shader does: pRot = R * p, then finds argmax_i dot(n_i, pRot)
-    // For center of screen, p ≈ [0, 0, 1] (front surface point)
-    // So face at center = argmax_i dot(n_i, R * [0,0,1])
-    const frontPoint = [0.0, 0.0, 1.0];
+  // Find the front-facing face index closest to the viewer
+  // Must match shader logic: shader rotates point by R, which inverts object rotation,
+  // so we need to use R^T (inverse rotation) on normals to match.
+  int _findFrontFaceIndex() {
+    const zAxis = [0.0, 0.0, 1.0];
 
     final combinedAx = _ax + _viewAx;
     final combinedAy = _ay + _viewAy;
@@ -249,104 +287,21 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
     final rZY = _mulMatMat(rZ, rY);
     final rot = _mulMatMat(rZY, rX);
 
-    final rotatedFrontPoint = _mulMatVec(rot, frontPoint);
+    // Use transpose (inverse) to match shader's point rotation
+    final rotInv = _transpose(rot);
 
-    // Find face most aligned with the rotated front point (same as shader)
     int bestFaceIndex = 0;
     double bestDot = -2.0;
     for (int i = 0; i < _faceNormals.length; i++) {
-      final normal = _normalize(_faceNormals[i]);
-      final d = _dot(normal, rotatedFrontPoint);
+      final nLocal = _normalize(_faceNormals[i]);
+      final nWorld = _mulMatVec(rotInv, nLocal);
+      final d = _dot(nWorld, zAxis);
       if (d > bestDot) {
         bestDot = d;
         bestFaceIndex = i;
       }
     }
-
-    // Now compute the rotation to perfectly align this face
-    // We want: n_bestFace = R_new * [0,0,1]
-    // Currently: n_bestFace ≈ R * [0,0,1] (approximately)
-    // We need to find additional rotation to make it exact
-
-    final targetNormal = _normalize(_faceNormals[bestFaceIndex]);
-
-    // Compute rotation from rotatedFrontPoint to targetNormal
-    final axis = _cross(rotatedFrontPoint, targetNormal);
-    final axisLen = math.sqrt(_dot(axis, axis));
-    final cosAngle = _dot(rotatedFrontPoint, targetNormal).clamp(-1.0, 1.0);
-    final angle = math.acos(cosAngle);
-
-    if (axisLen < 1e-6 || angle < 1e-6) {
-      // Already aligned
-      return (
-        faceIndex: bestFaceIndex,
-        deltaAx: 0.0,
-        deltaAy: 0.0,
-        deltaAz: 0.0,
-      );
-    }
-
-    // Build Rodrigues rotation matrix
-    final k = [axis[0] / axisLen, axis[1] / axisLen, axis[2] / axisLen];
-    final c = math.cos(angle);
-    final s = math.sin(angle);
-    final t = 1.0 - c;
-
-    final alignRot = [
-      c + k[0] * k[0] * t,
-      k[0] * k[1] * t - k[2] * s,
-      k[0] * k[2] * t + k[1] * s,
-      k[1] * k[0] * t + k[2] * s,
-      c + k[1] * k[1] * t,
-      k[1] * k[2] * t - k[0] * s,
-      k[2] * k[0] * t - k[1] * s,
-      k[2] * k[1] * t + k[0] * s,
-      c + k[2] * k[2] * t,
-    ];
-
-    // New rotation = alignRot * rot
-    final targetRot = _mulMatMat(alignRot, rot);
-
-    // Extract Euler angles from targetRot
-    final sinAy = (-targetRot[6]).clamp(-1.0, 1.0);
-    var ay = math.asin(sinAy);
-    final cosAy = math.cos(ay);
-
-    double ax, az;
-    if (cosAy.abs() > 1e-6) {
-      ax = math.atan2(targetRot[7], targetRot[8]);
-      az = math.atan2(targetRot[3], targetRot[0]);
-    } else {
-      az = 0.0;
-      ax = math.atan2(-targetRot[5], targetRot[4]);
-    }
-
-    // Normalize to be close to current angles
-    while (ax - combinedAx > math.pi) {
-      ax -= 2 * math.pi;
-    }
-    while (ax - combinedAx < -math.pi) {
-      ax += 2 * math.pi;
-    }
-    while (ay - combinedAy > math.pi) {
-      ay -= 2 * math.pi;
-    }
-    while (ay - combinedAy < -math.pi) {
-      ay += 2 * math.pi;
-    }
-    while (az - combinedAz > math.pi) {
-      az -= 2 * math.pi;
-    }
-    while (az - combinedAz < -math.pi) {
-      az += 2 * math.pi;
-    }
-
-    return (
-      faceIndex: bestFaceIndex,
-      deltaAx: ax - combinedAx,
-      deltaAy: ay - combinedAy,
-      deltaAz: az - combinedAz,
-    );
+    return bestFaceIndex;
   }
 
   // build a label atlas texture containing each label rendered into a grid cell
@@ -371,13 +326,13 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
       bgPaint,
     );
 
-    final fontSize =
-        14 * atlasScale; // keep visible size but render at higher DPI
+    // Increase label font size by 1.5x while keeping high DPI rendering
+    final fontSize = 21 * atlasScale;
 
     // stroke paint for crisp outline
     final strokePaint = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = (atlasScale * 1.2)
+      ..strokeWidth = (atlasScale * 1.6)
       ..color = Colors.black;
 
     final fillStyle = TextStyle(
@@ -404,7 +359,7 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
         textDirection: TextDirection.ltr,
         textAlign: TextAlign.center,
       );
-      strokeTp.layout(maxWidth: cellW - 28.0);
+      strokeTp.layout(maxWidth: cellW - 24.0);
       strokeTp.paint(
         c,
         Offset(
@@ -418,7 +373,7 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
         textDirection: TextDirection.ltr,
         textAlign: TextAlign.center,
       );
-      fillTp.layout(maxWidth: cellW - 28.0);
+      fillTp.layout(maxWidth: cellW - 24.0);
       fillTp.paint(
         c,
         Offset(
@@ -435,7 +390,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
 
   @override
   Widget build(BuildContext context) {
-    final prefs = SharedAppPrefs.instance;
     return LayoutBuilder(
       builder: (context, constraints) {
         return GestureDetector(
@@ -485,232 +439,228 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
 
           child: Stack(
             children: [
-              CustomPaint(
-                size: Size.infinite,
-                painter: _program == null
-                    ? _LoadingPainter()
-                    : _ShaderPainter(
-                        _program!,
-                        _time,
-                        MediaQuery.of(context).devicePixelRatio,
-                        _ax + _viewAx,
-                        _ay + _viewAy,
-                        _az + _viewAz,
-                        _labelSizeMultiplier,
-                        _labelAtlas,
-                      ),
-              ),
-
-              // centered overlay label (shown when a face is selected). Keep this in addition to the on-surface labels.
-              if (_centerLabel != null)
-                Center(
-                  child: IgnorePointer(
-                    child: AnimatedOpacity(
-                      duration: const Duration(milliseconds: 200),
-                      opacity:
-                          ((_time - _centerLabelStart) /
-                                  _centerLabelFadeDuration)
-                              .clamp(0.0, 1.0),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 28 * _labelSizeMultiplier,
-                          vertical: 14 * _labelSizeMultiplier,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(0, 0, 0, 0.92),
-                          borderRadius: BorderRadius.circular(
-                            8 * _labelSizeMultiplier,
-                          ),
-                        ),
-                        child: DefaultTextStyle(
-                          style:
-                              Theme.of(
-                                context,
-                              ).textTheme.headlineLarge?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                shadows: const [
-                                  Shadow(
-                                    blurRadius: 8,
-                                    color: Colors.black54,
-                                    offset: Offset(0, 2),
-                                  ),
-                                ],
-                              ) ??
-                              const TextStyle(
-                                color: Colors.white,
-                                fontSize: 44,
-                                fontWeight: FontWeight.bold,
-                              ),
-                          child: Text(_centerLabel!, textAlign: .center),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              Positioned(
-                left: 12,
-                right: 12,
-                bottom: 12,
-                child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 200),
-                  opacity: _showControls ? 1.0 : 0.0,
-                  child: Card(
-                    color: Colors.black.withAlpha(153),
-                    elevation: 6,
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              const Expanded(
-                                child: Text(
-                                  'Controls',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              const Expanded(
-                                child: Text(
-                                  'Impulse',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 120,
-                                child: Slider(
-                                  value: _impulseStrength,
-                                  min: 0.0,
-                                  max: 2.0,
-                                  divisions: 20,
-                                  label: _impulseStrength.toStringAsFixed(2),
-                                  onChanged: (v) =>
-                                      setState(() => _impulseStrength = v),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                _impulseStrength.toStringAsFixed(2),
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Expanded(
-                                child: Text(
-                                  'Damping',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 120,
-                                child: Slider(
-                                  value: _damping,
-                                  min: 0.05,
-                                  max: 3.0,
-                                  divisions: 59,
-                                  label: _damping.toStringAsFixed(2),
-                                  onChanged: (v) =>
-                                      setState(() => _damping = v),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                _damping.toStringAsFixed(2),
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-
-                          // snap threshold control
-                          Row(
-                            children: [
-                              const Expanded(
-                                child: Text(
-                                  'Snap threshold',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 120,
-                                child: Slider(
-                                  value: _snapVelocityThreshold,
-                                  min: 0.0001,
-                                  max: 0.01,
-                                  divisions: 99,
-                                  label: _snapVelocityThreshold.toStringAsFixed(
-                                    4,
-                                  ),
-                                  onChanged: (v) => setState(
-                                    () => _snapVelocityThreshold = v,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                _snapVelocityThreshold.toStringAsFixed(4),
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              TextButton(
-                                onPressed: () {
-                                  prefs.dodecahedronImpulse.value =
-                                      _impulseStrength;
-                                  prefs.dodecahedronDamping.value = _damping;
-                                  if (!mounted) return;
-                                },
-                                child: const Text(
-                                  'Save Defaults',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: () async {
-                                  setState(() {
-                                    _ax = _ay = _az = 0.0;
-                                    _viewAx = _viewAy = _viewAz = 0.0;
-                                    _vx = _vy = _vz = 0.0;
-                                    _centerLabel = null;
-                                    _impulseStrength =
-                                        prefs.dodecahedronImpulse.value;
-                                    _damping = prefs.dodecahedronDamping.value;
-                                  });
-                                  // stop the ticker since there's no motion or label to animate
-                                  if (_ticker.isActive) _ticker.stop();
-                                },
-                                child: const Text(
-                                  'Reset',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              _buildShaderPainter(context),
+              if (_centerLabel != null) _buildCenterLabel(),
+              _buildControls(_prefs),
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget _buildShaderPainter(BuildContext context) {
+    return CustomPaint(
+      size: Size.infinite,
+      painter: _program == null
+          ? _LoadingPainter()
+          : _ShaderPainter(
+              _program!,
+              _time,
+              MediaQuery.of(context).devicePixelRatio,
+              _ax + _viewAx,
+              _ay + _viewAy,
+              _az + _viewAz,
+              _labelSizeMultiplier,
+              _labelAtlas,
+            ),
+    );
+  }
+
+  Widget _buildCenterLabel() {
+    return Center(
+      child: IgnorePointer(
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 200),
+          opacity: ((_time - _centerLabelStart) / _centerLabelFadeDuration)
+              .clamp(0.0, 1.0),
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: 28 * _labelSizeMultiplier,
+              vertical: 14 * _labelSizeMultiplier,
+            ),
+            decoration: BoxDecoration(
+              color: const Color.fromRGBO(0, 0, 0, 0.92),
+              borderRadius: BorderRadius.circular(8 * _labelSizeMultiplier),
+            ),
+            child: DefaultTextStyle(
+              style:
+                  Theme.of(context).textTheme.headlineLarge?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    shadows: const [
+                      Shadow(
+                        blurRadius: 8,
+                        color: Colors.black54,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ) ??
+                  const TextStyle(
+                    color: Colors.white,
+                    fontSize: 44,
+                    fontWeight: FontWeight.bold,
+                  ),
+              child: Text(_centerLabel!, textAlign: TextAlign.center),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildControls(SharedAppPrefs prefs) {
+    return Positioned(
+      left: 12,
+      right: 12,
+      bottom: 12,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 200),
+        opacity: _showControls ? 1.0 : 0.0,
+        child: Card(
+          color: Colors.black.withAlpha(153),
+          elevation: 6,
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Controls',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Impulse',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 120,
+                      child: Slider(
+                        value: _impulseStrength,
+                        min: 0.0,
+                        max: 2.0,
+                        divisions: 20,
+                        label: _impulseStrength.toStringAsFixed(2),
+                        onChanged: (v) => setState(() => _impulseStrength = v),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      _impulseStrength.toStringAsFixed(2),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Damping',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 120,
+                      child: Slider(
+                        value: _damping,
+                        min: 0.05,
+                        max: 3.0,
+                        divisions: 59,
+                        label: _damping.toStringAsFixed(2),
+                        onChanged: (v) => setState(() => _damping = v),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      _damping.toStringAsFixed(2),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+
+                // stop threshold control
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Stop threshold',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 120,
+                      child: Slider(
+                        value: _stopVelocityThreshold,
+                        min: 0.0001,
+                        max: 0.01,
+                        divisions: 99,
+                        label: _stopVelocityThreshold.toStringAsFixed(4),
+                        onChanged: (v) =>
+                            setState(() => _stopVelocityThreshold = v),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      _stopVelocityThreshold.toStringAsFixed(4),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        prefs.dodecahedronImpulse.value = _impulseStrength;
+                        prefs.dodecahedronDamping.value = _damping;
+                      },
+                      child: const Text(
+                        'Save Defaults',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        setState(() {
+                          _ax = -math.atan(1 / phi);
+                          _ay = _az = 0.0;
+                          _viewAx = _viewAy = _viewAz = 0.0;
+                          _vx = _vy = _vz = 0.0;
+                          _centerLabel = null;
+                          _impulseStrength = prefs.dodecahedronImpulse.value;
+                          _damping = prefs.dodecahedronDamping.value;
+                        });
+                        // stop the ticker since there's no motion or label to animate
+                        if (_ticker.isActive) _ticker.stop();
+                      },
+                      child: const Text(
+                        'Reset',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
