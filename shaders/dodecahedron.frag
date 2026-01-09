@@ -3,6 +3,8 @@ uniform vec2 u_resolution; // (px)
 uniform float u_time;      // seconds
 uniform vec3 u_angles;    // rotation angles (radians) for X, Y, Z provided by host
 uniform sampler2D u_labelAtlas; // atlas containing rendered label glyphs
+uniform float u_highlightFace; // face index to highlight (-1 = none)
+uniform float u_highlightProgress; // 0..1 progress of highlight fade-out
 
 out vec4 FragColor;
 
@@ -228,6 +230,14 @@ void main() {
       // make label respect lighting slightly by tinting with surface color
       vec3 labelCol = lab.rgb * 1.1;
       col = mix(col, labelCol, a * 0.95);
+    }
+
+    // Apply highlight tint to the selected face (blue glow that fades out)
+    if (faceIdx == int(u_highlightFace) && u_highlightProgress < 1.0) {
+      float highlight = 1.0 - u_highlightProgress; // fade from 1 to 0
+      highlight = highlight * highlight; // ease out
+      vec3 highlightColor = vec3(0.1, 0.3, 1.0); // bright blue
+      col = mix(col, highlightColor, highlight * 0.6);
     }
 
     // gentle brightness boost and reduce dark vignetting

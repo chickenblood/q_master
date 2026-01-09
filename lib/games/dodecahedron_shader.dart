@@ -34,11 +34,11 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   // angular velocities (radians/sec)
   var _vx = 0.0, _vy = 0.0, _vz = 0.0;
   // damping (per second) and thresholds (editable)
-  var _damping = 1.0;
+  var _damping = 1.5;
   static const double _velocityEpsilon = 0.001;
 
   // user-tunable controls
-  var _impulseStrength = 2.0;
+  var _impulseStrength = 3.0;
   var _showControls = false;
   var _stopVelocityThreshold = 0.01;
 
@@ -57,8 +57,10 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   var _isSpinning = false;
   final double _labelSizeMultiplier = 3.0;
 
-  // selected face index when spin stops
-  int _snapFaceIndex = 0;
+  // highlight state (momentary red flash on selected face)
+  int _highlightFaceIndex = -1; // -1 = no highlight
+  var _highlightStartTime = 0.0;
+  final _highlightDuration = 0.4; // seconds
 
   @override
   void initState() {
@@ -121,6 +123,12 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
     final dt = _lastTick == 0.0 ? (t - _time) : (t - _lastTick);
     _lastTick = t;
 
+    // Clear highlight after duration expires
+    if (_highlightFaceIndex >= 0 &&
+        (t - _highlightStartTime) >= _highlightDuration) {
+      _highlightFaceIndex = -1;
+    }
+
     // integrate velocities -> angles with exponential damping
     if (dt > 0) {
       final decay = math.exp(-_damping * dt);
@@ -154,9 +162,12 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
 
         // Determine which face is most aligned and show its label
         final faceIdx = _findFrontFaceIndex();
-        _snapFaceIndex = faceIdx;
-        _centerLabel = dodFaceExercises[_snapFaceIndex];
+        _centerLabel = dodFaceExercises[faceIdx];
         _centerLabelStart = t;
+
+        // Highlight the selected face momentarily
+        _highlightFaceIndex = faceIdx;
+        _highlightStartTime = t;
       }
     }
 
@@ -166,13 +177,17 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
       });
     }
 
-    // If we've come to rest (no angular velocity, not snapping) and any center-label fade-in
-    // has completed (or none exists), stop the ticker to save CPU.
+    // If we've come to rest (no angular velocity) and any center-label fade-in
+    // has completed (or none exists), and highlight has finished, stop the ticker to save CPU.
     final noVelocities = _vx == 0.0 && _vy == 0.0 && _vz == 0.0;
     final fadeInPending =
         _centerLabel != null &&
         ((t - _centerLabelStart) < _centerLabelFadeDuration);
-    if (noVelocities && !fadeInPending && _ticker.isActive) {
+    final highlightPending = _highlightFaceIndex >= 0;
+    if (noVelocities &&
+        !fadeInPending &&
+        !highlightPending &&
+        _ticker.isActive) {
       _ticker.stop();
     }
   }
@@ -263,13 +278,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   // Dot product
   double _dot(List<double> a, List<double> b) =>
       a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-
-  // Cross product
-  List<double> _cross(List<double> a, List<double> b) => [
-    a[1] * b[2] - a[2] * b[1],
-    a[2] * b[0] - a[0] * b[2],
-    a[0] * b[1] - a[1] * b[0],
-  ];
 
   // Find the front-facing face index closest to the viewer
   // Must match shader logic: shader rotates point by R, which inverts object rotation,
@@ -450,6 +458,11 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   }
 
   Widget _buildShaderPainter(BuildContext context) {
+    // Calculate highlight progress (0 at start, 1 when done)
+    final highlightProgress = _highlightFaceIndex >= 0
+        ? ((_time - _highlightStartTime) / _highlightDuration).clamp(0.0, 1.0)
+        : 1.0;
+
     return CustomPaint(
       size: Size.infinite,
       painter: _program == null
@@ -463,6 +476,8 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
               _az + _viewAz,
               _labelSizeMultiplier,
               _labelAtlas,
+              _highlightFaceIndex,
+              highlightProgress,
             ),
     );
   }
@@ -553,7 +568,7 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                       child: Slider(
                         value: _impulseStrength,
                         min: 0.0,
-                        max: 2.0,
+                        max: 3.0,
                         divisions: 20,
                         label: _impulseStrength.toStringAsFixed(2),
                         onChanged: (v) => setState(() => _impulseStrength = v),
@@ -693,6 +708,8 @@ class _ShaderPainter extends CustomPainter {
   final double ax, ay, az;
   final double labelSizeMultiplier;
   final ui.Image? labelAtlas; // rendered atlas image containing all labels
+  final int highlightFace; // -1 = no highlight
+  final double highlightProgress; // 0..1 fade-out progress
 
   _ShaderPainter(
     this.program,
@@ -703,6 +720,8 @@ class _ShaderPainter extends CustomPainter {
     this.az,
     this.labelSizeMultiplier,
     this.labelAtlas,
+    this.highlightFace,
+    this.highlightProgress,
   );
 
   @override
@@ -715,6 +734,8 @@ class _ShaderPainter extends CustomPainter {
     shader.setFloat(3, ax); // u_angles.x
     shader.setFloat(4, ay); // u_angles.y
     shader.setFloat(5, az); // u_angles.z
+    shader.setFloat(6, highlightFace.toDouble()); // u_highlightFace
+    shader.setFloat(7, highlightProgress); // u_highlightProgress
 
     // set label atlas sampler if available (sampler index 0)
     if (labelAtlas != null) {
@@ -731,5 +752,7 @@ class _ShaderPainter extends CustomPainter {
       old.ax != ax ||
       old.ay != ay ||
       old.az != az ||
-      old.labelSizeMultiplier != labelSizeMultiplier;
+      old.labelSizeMultiplier != labelSizeMultiplier ||
+      old.highlightFace != highlightFace ||
+      old.highlightProgress != highlightProgress;
 }
