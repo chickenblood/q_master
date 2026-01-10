@@ -5,6 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:q_master/utils/shared_app_prefs.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 part 'timer.freezed.dart';
 part 'timer.g.dart';
@@ -47,11 +48,16 @@ final class Timer extends _$Timer {
     _tick();
     _stopWatch.start();
     if (_countdownPlayer.position > Duration.zero) _countdownPlayer.play();
+    // Keep the screen awake while the timer is running.
+    WakelockPlus.enable();
   }
 
   void pause() {
     _stopWatch.stop();
     if (_countdownPlayer.playing) _countdownPlayer.pause();
+    // Allow the screen to sleep when the timer is paused.
+    WakelockPlus.disable();
+
     // Update state one last time on pause.
     _tick();
   }
