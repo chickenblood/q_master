@@ -77,6 +77,31 @@ class MainApp extends ConsumerWidget {
     );
   }
 
+  // The FAB is only for Android. We use app bar actions on iOS.
+  Widget? _androidFloatingActionButton(
+    BuildContext context, {
+    required WidgetRef ref,
+    required int index,
+  }) {
+    final tab = Tab.values[index];
+    if (tab != .workouts && tab != .timer) {
+      return null;
+    }
+    return FloatingActionButton(
+      backgroundColor: tab == .timer ? Colors.red : null,
+      onPressed: switch (tab) {
+        Tab.workouts => () => _showComposeWorkoutModal(ref),
+        Tab.timer => () => _resetTimer(ref),
+        _ => null,
+      },
+      child: Icon(switch (tab) {
+        Tab.workouts => PlatformIcons(context).add,
+        Tab.timer => PlatformIcons(context).refresh,
+        _ => null,
+      }),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) => PlatformProvider(
     settings: PlatformSettingsData(
@@ -117,21 +142,31 @@ class MainApp extends ConsumerWidget {
               onPressed: _showSettingsModal,
             ),
             trailingActions: [
-              switch (Tab.values[index]) {
-                .workouts => PlatformIconButton(
-                  icon: Icon(PlatformIcons(context).add),
-                  onPressed: () => _showComposeWorkoutModal(ref),
-                ),
-                .timer => PlatformIconButton(
-                  icon: Icon(PlatformIcons(context).refresh),
-                  onPressed: () => _resetTimer(ref),
-                ),
-                _ => SizedBox.shrink(),
-              },
+              if (Theme.of(context).platform == .iOS)
+                switch (Tab.values[index]) {
+                  .workouts => PlatformIconButton(
+                    icon: Icon(PlatformIcons(context).add),
+                    onPressed: () => _showComposeWorkoutModal(ref),
+                  ),
+                  .timer => PlatformIconButton(
+                    icon: Icon(PlatformIcons(context).refresh),
+                    onPressed: () => _resetTimer(ref),
+                  ),
+                  _ => SizedBox.shrink(),
+                },
             ],
           ),
           tabController: _tabController,
           bodyBuilder: (_, index) => _tabPages[index],
+          materialBuilder: (context, platform, index) =>
+              MaterialTabScaffoldData(
+                floatingActionButtonLocation: .endFloat,
+                floatingActionButton: _androidFloatingActionButton(
+                  context,
+                  ref: ref,
+                  index: index,
+                ),
+              ),
           items: [
             BottomNavigationBarItem(
               icon: Icon(AdaptiveIcons.history),
