@@ -162,6 +162,9 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
         PlatformSliverAppBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           leading: PlatformIconButton(
+            padding: Theme.of(context).platform == TargetPlatform.iOS
+                ? EdgeInsets.only(left: 8)
+                : EdgeInsets.zero,
             onPressed: () => Navigator.pop(context),
             icon: Icon(AdaptiveIcons.close),
           ),
@@ -171,8 +174,10 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
               context,
             ).clamp(maxScaleFactor: 1.5),
           ),
-          cupertino: (_, _) =>
-              CupertinoSliverAppBarData(trailing: _rightAppBarButtonAction()),
+          cupertino: (_, _) => CupertinoSliverAppBarData(
+            trailing: _rightAppBarButtonAction(),
+            padding: EdgeInsetsDirectional.only(end: 8),
+          ),
           material: (_, _) =>
               MaterialSliverAppBarData(actions: [_rightAppBarButtonAction()]),
         ),
