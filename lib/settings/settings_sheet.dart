@@ -163,7 +163,7 @@ class SettingsSheet extends StatelessWidget {
       child: CupertinoTimerPicker(
         mode: .ms,
         alignment: .bottomCenter,
-        itemExtent: 42,
+        itemExtent: 60,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         initialTimerDuration: Duration(seconds: timeNotifier.value),
         onTimerDurationChanged: (newDuration) => timeNotifier.value = max(
@@ -187,7 +187,7 @@ class SettingsSheet extends StatelessWidget {
         height: 250,
         child: CupertinoPicker(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          itemExtent: 42,
+          itemExtent: 60,
           scrollController: FixedExtentScrollController(
             initialItem: roundsNotifier.value - 1,
           ),

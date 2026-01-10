@@ -19,6 +19,17 @@ import 'beatdown_browser.dart';
 class WorkoutsTab extends StatelessWidget {
   const WorkoutsTab({super.key});
 
+  Widget _emptyContentPlaceholder(BuildContext context) => Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Center(
+      child: Text(
+        L10n.of(context)!.noWorkoutsPlaceholderText,
+        style: Theme.of(context).textTheme.headlineLarge,
+        textAlign: TextAlign.center,
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) => SafeArea(
     child: PlatformScaffold(
@@ -26,6 +37,9 @@ class WorkoutsTab extends StatelessWidget {
         builder: (context, ref, _) {
           final workouts = ref.watch(workoutListProvider);
           final listNotifier = ref.read(workoutListProvider.notifier);
+          if (workouts.isEmpty) {
+            return _emptyContentPlaceholder(context);
+          }
           return ListView.builder(
             itemExtent: 100,
             itemCount: workouts.length,
