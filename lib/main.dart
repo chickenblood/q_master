@@ -103,90 +103,100 @@ class MainApp extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => PlatformProvider(
-    settings: PlatformSettingsData(
-      iosUsesMaterialWidgets: true,
-      iosUseZeroPaddingForAppbarPlatformIcon: true,
-    ),
-    builder: (_) => PlatformApp(
-      title: 'Q Master',
-      localizationsDelegates: L10n.localizationsDelegates,
-      supportedLocales: L10n.supportedLocales,
-      navigatorKey: _navigatorKey,
-      material: (_, _) => MaterialAppData(
-        theme: lightTheme(),
-        darkTheme: darkTheme(),
-        themeMode: ThemeMode.system,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedTab = Tab.values[_tabController.index(context)];
+    final shouldHideTabBar =
+        MediaQuery.orientationOf(context) == .landscape &&
+        selectedTab == .timer;
+
+    return PlatformProvider(
+      settings: PlatformSettingsData(
+        iosUsesMaterialWidgets: true,
+        iosUseZeroPaddingForAppbarPlatformIcon: true,
       ),
-      cupertino: (context, _) => CupertinoAppData(
-        theme: MaterialBasedCupertinoThemeData(
-          materialTheme:
-              MediaQuery.platformBrightnessOf(context) == Brightness.light
-              ? lightTheme()
-              : darkTheme(),
+      builder: (_) => PlatformApp(
+        title: 'Q Master',
+        localizationsDelegates: L10n.localizationsDelegates,
+        supportedLocales: L10n.supportedLocales,
+        navigatorKey: _navigatorKey,
+        material: (_, _) => MaterialAppData(
+          theme: lightTheme(),
+          darkTheme: darkTheme(),
+          themeMode: ThemeMode.system,
         ),
-      ),
-      home: Builder(
-        builder: (context) => PlatformTabScaffold(
-          appBarBuilder: (_, index) => PlatformAppBar(
-            cupertino: (_, _) =>
-                CupertinoNavigationBarData(backgroundColor: Colors.transparent),
-            title: Text(
-              L10n.of(context)!.appBarTitle,
-              textScaler: MediaQuery.textScalerOf(
-                context,
-              ).clamp(maxScaleFactor: 1.6),
-            ),
-            leading: PlatformIconButton(
-              icon: Icon(context.platformIcons.gearSolid),
-              onPressed: _showSettingsModal,
-            ),
-            trailingActions: [
-              if (Theme.of(context).platform == .iOS)
-                switch (Tab.values[index]) {
-                  .workouts => PlatformIconButton(
-                    icon: Icon(PlatformIcons(context).add),
-                    onPressed: () => _showComposeWorkoutModal(ref),
-                  ),
-                  .timer => PlatformIconButton(
-                    icon: Icon(PlatformIcons(context).refresh),
-                    onPressed: () => _resetTimer(ref),
-                  ),
-                  _ => SizedBox.shrink(),
-                },
-            ],
+        cupertino: (context, _) => CupertinoAppData(
+          theme: MaterialBasedCupertinoThemeData(
+            materialTheme:
+                MediaQuery.platformBrightnessOf(context) == Brightness.light
+                ? lightTheme()
+                : darkTheme(),
           ),
-          tabController: _tabController,
-          bodyBuilder: (_, index) => _tabPages[index],
-          materialBuilder: (context, platform, index) =>
-              MaterialTabScaffoldData(
-                floatingActionButtonLocation: .endFloat,
-                floatingActionButton: _androidFloatingActionButton(
-                  context,
-                  ref: ref,
-                  index: index,
-                ),
+        ),
+        home: Builder(
+          builder: (context) => PlatformTabScaffold(
+            appBarBuilder: (_, index) => PlatformAppBar(
+              cupertino: (_, _) => CupertinoNavigationBarData(
+                backgroundColor: Colors.transparent,
               ),
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(AdaptiveIcons.history),
-              label: L10n.of(context)!.workoutsTabTitle,
+              title: Text(
+                L10n.of(context)!.appBarTitle,
+                textScaler: MediaQuery.textScalerOf(
+                  context,
+                ).clamp(maxScaleFactor: 1.6),
+              ),
+              leading: PlatformIconButton(
+                icon: Icon(context.platformIcons.gearSolid),
+                onPressed: _showSettingsModal,
+              ),
+              trailingActions: [
+                if (Theme.of(context).platform == .iOS)
+                  switch (selectedTab) {
+                    .workouts => PlatformIconButton(
+                      icon: Icon(PlatformIcons(context).add),
+                      onPressed: () => _showComposeWorkoutModal(ref),
+                    ),
+                    .timer => PlatformIconButton(
+                      icon: Icon(PlatformIcons(context).refresh),
+                      onPressed: () => _resetTimer(ref),
+                    ),
+                    _ => SizedBox.shrink(),
+                  },
+              ],
             ),
-            BottomNavigationBarItem(
-              icon: Icon(AdaptiveIcons.sports),
-              label: L10n.of(context)!.gamesTabTitle,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(AdaptiveIcons.timer),
-              label: L10n.of(context)!.timerTabTitle,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(AdaptiveIcons.location),
-              label: L10n.of(context)!.nearMeTabTitle,
-            ),
-          ],
+            tabController: _tabController,
+            bodyBuilder: (_, index) => _tabPages[index],
+            materialBuilder: (context, platform, index) =>
+                MaterialTabScaffoldData(
+                  floatingActionButtonLocation: .endFloat,
+                  floatingActionButton: _androidFloatingActionButton(
+                    context,
+                    ref: ref,
+                    index: index,
+                  ),
+                ),
+            items: [
+              BottomNavigationBarItem(
+                icon: Icon(AdaptiveIcons.history),
+                label: L10n.of(context)!.workoutsTabTitle,
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(AdaptiveIcons.sports),
+                label: L10n.of(context)!.gamesTabTitle,
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(AdaptiveIcons.timer),
+                label: L10n.of(context)!.timerTabTitle,
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(AdaptiveIcons.location),
+                label: L10n.of(context)!.nearMeTabTitle,
+              ),
+            ],
+            navBarHeight: shouldHideTabBar ? 0 : null,
+            tabsBackgroundColor: shouldHideTabBar ? Colors.transparent : null,
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
