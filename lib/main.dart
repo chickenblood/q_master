@@ -142,31 +142,38 @@ class MainApp extends ConsumerWidget {
               appBarBuilder: (_, index) => PlatformAppBar(
                 cupertino: (_, _) => CupertinoNavigationBarData(
                   backgroundColor: Colors.transparent,
+
+                  leading: PlatformIconButton(
+                    padding: EdgeInsets.only(right: 22),
+                    icon: Icon(context.platformIcons.gearSolid),
+                    onPressed: _showSettingsModal,
+                  ),
+                  title: Text(
+                    L10n.of(context)!.appBarTitle,
+                    textScaler: MediaQuery.textScalerOf(
+                      context,
+                    ).clamp(maxScaleFactor: 1.6),
+                  ),
+                  // Action buttons – iOS only
+                  trailing: Row(
+                    mainAxisAlignment: .end,
+                    children: [
+                      Spacer(),
+                      switch (Tab.values[selectedIndex]) {
+                        .workouts => PlatformIconButton(
+                          icon: Icon(PlatformIcons(context).add),
+                          onPressed: () => _showComposeWorkoutModal(ref),
+                        ),
+                        .timer => PlatformIconButton(
+                          icon: Icon(PlatformIcons(context).refresh),
+                          onPressed: () => _resetTimer(ref),
+                        ),
+                        _ => SizedBox.shrink(),
+                      },
+                      SizedBox(width: 8),
+                    ],
+                  ),
                 ),
-                title: Text(
-                  L10n.of(context)!.appBarTitle,
-                  textScaler: MediaQuery.textScalerOf(
-                    context,
-                  ).clamp(maxScaleFactor: 1.6),
-                ),
-                leading: PlatformIconButton(
-                  icon: Icon(context.platformIcons.gearSolid),
-                  onPressed: _showSettingsModal,
-                ),
-                trailingActions: [
-                  if (Theme.of(context).platform == .iOS)
-                    switch (Tab.values[index]) {
-                      .workouts => PlatformIconButton(
-                        icon: Icon(PlatformIcons(context).add),
-                        onPressed: () => _showComposeWorkoutModal(ref),
-                      ),
-                      .timer => PlatformIconButton(
-                        icon: Icon(PlatformIcons(context).refresh),
-                        onPressed: () => _resetTimer(ref),
-                      ),
-                      _ => SizedBox.shrink(),
-                    },
-                ],
               ),
               tabController: _tabController,
               bodyBuilder: (_, index) => _tabPages[index],
