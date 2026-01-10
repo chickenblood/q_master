@@ -190,6 +190,16 @@ class MainApp extends ConsumerWidget {
                   label: L10n.of(context)!.nearMeTabTitle,
                 ),
               ],
+              // FAB button – Adndroid only
+              materialBuilder: (context, platform, index) =>
+                  MaterialTabScaffoldData(
+                    floatingActionButtonLocation: .endFloat,
+                    floatingActionButton: _androidFloatingActionButton(
+                      context,
+                      ref: ref,
+                      index: index,
+                    ),
+                  ),
             );
           },
         ),
