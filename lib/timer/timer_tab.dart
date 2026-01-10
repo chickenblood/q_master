@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -175,10 +176,12 @@ final class _PrimaryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
+    padding: EdgeInsets.all(4),
     color: tileSpec.bgColor,
     child: Column(
+      mainAxisAlignment: .spaceBetween,
+      spacing: 8,
       children: [
-        if (isPortrait) SizedBox(height: 16),
         PlatformText(
           tileSpec.label,
           textAlign: .center,
@@ -187,18 +190,19 @@ final class _PrimaryTile extends StatelessWidget {
           ).textTheme.displayLarge!.copyWith(color: tileSpec.fgColor),
           textScaler: TextScaler.noScaling,
         ),
-        Spacer(),
-        PlatformText(
-          formatSeconds(tileSpec.timeSeconds),
-          style: Theme.of(context).textTheme.displayLarge!.copyWith(
-            fontFeatures: [FontFeature.tabularFigures()],
-            color: tileSpec.fgColor,
-            fontSize: isPortrait ? 130 : 90,
-            fontWeight: .bold,
+        Expanded(
+          child: AutoSizeText(
+            formatSeconds(tileSpec.timeSeconds),
+            style: Theme.of(context).textTheme.displayLarge!.copyWith(
+              fontFeatures: [FontFeature.tabularFigures()],
+              color: tileSpec.fgColor,
+              fontSize: 800,
+              fontWeight: .bold,
+            ),
+            textScaleFactor: 1.0,
+            maxLines: 1,
           ),
-          textScaler: TextScaler.noScaling,
         ),
-        Spacer(),
       ],
     ),
   );
@@ -214,10 +218,12 @@ final class _SecondaryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: EdgeInsets.all(4),
       color: tileSpec.bgColor,
       child: Flex(
-        mainAxisAlignment: .spaceAround,
+        mainAxisAlignment: .spaceBetween,
         direction: isPortrait ? Axis.vertical : Axis.horizontal,
+        spacing: 8,
         children: [
           PlatformText(
             tileSpec.label,
@@ -225,16 +231,20 @@ final class _SecondaryTile extends StatelessWidget {
             style: Theme.of(
               context,
             ).textTheme.displaySmall!.copyWith(color: tileSpec.fgColor),
-            textScaler: .noScaling,
+            textScaler: TextScaler.noScaling,
           ),
-          PlatformText(
-            formatSeconds(tileSpec.timeSeconds),
-            style: Theme.of(context).textTheme.displayLarge!.copyWith(
-              fontFeatures: [FontFeature.tabularFigures()],
-              color: tileSpec.fgColor,
-              fontWeight: .bold,
+          Expanded(
+            child: AutoSizeText(
+              formatSeconds(tileSpec.timeSeconds),
+              style: Theme.of(context).textTheme.displayLarge!.copyWith(
+                fontFeatures: [FontFeature.tabularFigures()],
+                color: tileSpec.fgColor,
+                fontWeight: .bold,
+                fontSize: 400,
+              ),
+              textScaleFactor: 1,
+              maxLines: 1,
             ),
-            textScaler: .noScaling,
           ),
         ],
       ),
