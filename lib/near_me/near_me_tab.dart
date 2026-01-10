@@ -11,6 +11,7 @@ class NearMeTab extends StatelessWidget {
       NavigationDelegate(
         onNavigationRequest: (NavigationRequest request) {
           if (request.url.startsWith('https://f3near.me/') ||
+              request.url.startsWith('https://map.f3nation.com/') ||
               request.url.startsWith('https://f3-workout.firebaseapp.com/')) {
             return NavigationDecision.navigate;
           }
