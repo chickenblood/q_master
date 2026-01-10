@@ -20,7 +20,8 @@ class SettingsSheet extends StatelessWidget {
     return showAdaptiveAboutDialog(
       context: context,
       applicationName: L10n.of(context)!.appBarTitle,
-      applicationVersion: packageInfo.version,
+      applicationVersion:
+          'Version: ${packageInfo.version}\nBuild:${packageInfo.buildNumber}',
       applicationIcon: Image.asset(
         'assets/icon/app_icon.png',
         width: 48.0,
