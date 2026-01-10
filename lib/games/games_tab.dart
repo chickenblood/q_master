@@ -37,33 +37,39 @@ class GamesTab extends StatelessWidget {
     final isLandscape = MediaQuery.orientationOf(context) == .landscape;
     return PlatformScaffold(
       body: SafeArea(
-        child: Padding(
-          padding: isLandscape
-              ? const EdgeInsets.all(16.0)
-              : const EdgeInsets.fromLTRB(80.0, 16.0, 80.0, 16.0),
-          child: Flex(
-            direction: isLandscape ? Axis.horizontal : Axis.vertical,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Transform.rotate(
-                angle: _degToRad(5.0),
-                child: _GameTile(
-                  title: L10n.of(context)!.dodGameTileTitle,
-                  subtitle: 'Kermit‘s',
-                  imagePath: 'assets/images/DoD.png',
-                  onTap: (tag) => _showDodGame(context, tag),
+        child: Center(
+          child: Padding(
+            padding: isLandscape
+                ? const EdgeInsets.all(16.0)
+                : const EdgeInsets.fromLTRB(80.0, 16.0, 80.0, 16.0),
+            child: Flex(
+              direction: isLandscape ? Axis.horizontal : Axis.vertical,
+              mainAxisAlignment: .center,
+              children: [
+                Expanded(
+                  child: Transform.rotate(
+                    angle: _degToRad(5.0),
+                    child: _GameTile(
+                      title: L10n.of(context)!.dodGameTileTitle,
+                      subtitle: 'Kermit‘s',
+                      imagePath: 'assets/images/DoD.png',
+                      onTap: (tag) => _showDodGame(context, tag),
+                    ),
+                  ),
                 ),
-              ),
-              Transform.rotate(
-                angle: _degToRad(-5.0),
-                child: _GameTile(
-                  title: L10n.of(context)!.dopGameTileTitle,
-                  imagePath: 'assets/images/DoP.png',
-                  textColor: Colors.black,
-                  onTap: (tag) => _showDeckOfPainGame(context, tag),
+                Expanded(
+                  child: Transform.rotate(
+                    angle: _degToRad(-5.0),
+                    child: _GameTile(
+                      title: L10n.of(context)!.dopGameTileTitle,
+                      imagePath: 'assets/images/DoP.png',
+                      textColor: Colors.black,
+                      onTap: (tag) => _showDeckOfPainGame(context, tag),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
