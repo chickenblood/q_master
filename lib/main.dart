@@ -140,7 +140,7 @@ class MainApp extends ConsumerWidget {
                     MediaQuery.orientationOf(context) == .landscape);
             return PlatformTabScaffold(
               appBarBuilder: (_, index) => PlatformAppBar(
-                cupertino: (_, _) => CupertinoNavigationBarData(
+                cupertino: (appBarContext, _) => CupertinoNavigationBarData(
                   backgroundColor: Colors.transparent,
 
                   leading: PlatformIconButton(
@@ -159,7 +159,7 @@ class MainApp extends ConsumerWidget {
                     mainAxisAlignment: .end,
                     children: [
                       Spacer(),
-                      switch (Tab.values[selectedIndex]) {
+                      switch (Tab.values[_tabController.index(appBarContext)]) {
                         .workouts => PlatformIconButton(
                           icon: Icon(PlatformIcons(context).add),
                           onPressed: () => _showComposeWorkoutModal(ref),
