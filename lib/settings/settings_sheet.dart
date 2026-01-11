@@ -49,7 +49,11 @@ class SettingsSheet extends StatelessWidget {
           ListenableBuilder(
             listenable: prefs.exercisesPerPage,
             builder: (_, _) => PlatformListTile(
-              title: Text(L10n.of(context)!.exercisesPerPageSettingsLabel),
+              title: Text(
+                L10n.of(context)!.exercisesPerPageSettingsLabel,
+
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               subtitle: Slider.adaptive(
                 value: prefs.exercisesPerPage.value.toDouble(),
                 min: 1,
@@ -58,7 +62,12 @@ class SettingsSheet extends StatelessWidget {
                 onChanged: (value) =>
                     prefs.exercisesPerPage.value = value.round(),
               ),
-              trailing: Text(prefs.exercisesPerPage.value.toString()),
+              trailing: Text(
+                prefs.exercisesPerPage.value.toString(),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelLarge!.copyWith(fontSize: 20),
+              ),
             ),
           ),
           const Divider(),
@@ -219,8 +228,11 @@ class SettingsSheet extends StatelessWidget {
             PlatformSliverAppBar(
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               leading: PlatformIconButton(
-                onPressed: () => Navigator.pop(context),
+                padding: Theme.of(context).platform == TargetPlatform.iOS
+                    ? EdgeInsets.only(right: 24)
+                    : EdgeInsets.zero,
                 icon: Icon(AdaptiveIcons.close),
+                onPressed: () => Navigator.pop(context),
               ),
               title: Text(L10n.of(context)!.settingsDialogTitle),
             ),

@@ -34,7 +34,7 @@ final class SharedAppPrefs {
     dodecahedronImpulse = _valueSetup<double>('dodecahedron_impulse', 2);
     dodecahedronDamping = _valueSetup<double>('dodecahedron_damping', 1);
 
-    exercisesPerPage = _valueSetup<int>('exercises_per_page', 1);
+    exercisesPerPage = _valueSetup<int>('exercises_per_page', 8);
 
     prepareIntervalSeconds = _valueSetup<int>('prepare_interval_seconds', 10);
     workIntervalSeconds = _valueSetup<int>('work_interval_seconds', 30);
