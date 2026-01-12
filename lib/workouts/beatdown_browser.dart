@@ -14,22 +14,24 @@ final class BeatdownBrowser extends StatelessWidget {
   BeatdownBrowser({super.key, required this.workout});
 
   // Calculate the total number of pages with their content, based on exercises
-  // per page
-  List<String> _calculatePages({required int exercisesPerPage}) {
-    final pages = <String>[];
+  // per page. Each page is represented as a list of exercise names.
+  List<({AutoSizeGroup group, List<String> lines})> _calculatePages({
+    required int exercisesPerPage,
+  }) {
+    final pages = <({AutoSizeGroup group, List<String> lines})>[];
 
     for (final exercises in {workout.warmup, workout.thang, workout.mary}) {
-      final pageContent = StringBuffer();
+      final pageContent = <String>[];
 
       for (final exercise in exercises.indexed) {
-        pageContent.write('${exercise.$2.name}\n');
+        pageContent.add(exercise.$2.name);
         if (((exercise.$1 + 1) % exercisesPerPage) == 0) {
-          pages.add(pageContent.toString());
+          pages.add((group: AutoSizeGroup(), lines: List.of(pageContent)));
           pageContent.clear();
         }
       }
       if (pageContent.isNotEmpty) {
-        pages.add(pageContent.toString());
+        pages.add((group: AutoSizeGroup(), lines: List.of(pageContent)));
         pageContent.clear();
       }
     }
@@ -101,26 +103,41 @@ final class BeatdownBrowser extends StatelessWidget {
           itemCount: pages.length,
           onPageChanged: (index) => _pageIndex.value = index,
           itemBuilder: (context, index) {
-            final pageText = pages[index];
+            final autoSizeGroup = pages[index].group;
+            final pageLines = pages[index].lines;
             return Column(
-              mainAxisSize: .max,
-              mainAxisAlignment: .spaceAround,
-              crossAxisAlignment: .stretch,
+              crossAxisAlignment: .end,
               children: [
                 Expanded(
                   child: Center(
-                    child: AutoSizeText(
-                      pageText,
-                      textAlign: exercisesPerPage == 1
-                          ? TextAlign.center
-                          : TextAlign.left,
-                      overflow: .fade,
-                      maxLines: 30,
-                      minFontSize: 12,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 48,
-                      ),
+                    child: Column(
+                      mainAxisSize: .max,
+                      mainAxisAlignment: .spaceBetween,
+                      crossAxisAlignment: exercisesPerPage == 1
+                          ? .center
+                          : .start,
+                      children: [
+                        Spacer(),
+                        ...pageLines.map(
+                          (line) => Expanded(
+                            child: AutoSizeText(
+                              group: autoSizeGroup,
+                              line,
+                              textAlign: exercisesPerPage == 1
+                                  ? TextAlign.center
+                                  : TextAlign.left,
+                              overflow: .fade,
+                              maxLines: 2,
+                              minFontSize: 12,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 48,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Spacer(),
+                      ],
                     ),
                   ),
                 ),
@@ -132,9 +149,9 @@ final class BeatdownBrowser extends StatelessWidget {
                   ),
                   child: PlatformText(
                     (index + 1) < pages.length
-                        ? L10n.of(context)!.workoutNextUpText(
-                            pages[index + 1].split('\n').first,
-                          )
+                        ? L10n.of(
+                            context,
+                          )!.workoutNextUpText(pages[index + 1].lines.first)
                         : L10n.of(context)!.workoutCompleteText,
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     textAlign: .end,
