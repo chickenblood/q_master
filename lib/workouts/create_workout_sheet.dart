@@ -55,6 +55,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     _warmupTextController.dispose();
     _thangTextController.dispose();
     _maryTextController.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 

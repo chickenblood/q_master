@@ -8,19 +8,23 @@ import 'workout_constants.dart';
 class WorkoutAutocompleteTextField extends StatefulWidget {
   final TextEditingController textEditingController;
   final OptionsViewOpenDirection optionsViewOpenDirection;
+  final bool autofocus;
   final int? _minLines;
   final int? _maxLines;
   final bool? expands;
   final VoidCallback? onTap;
+  final VoidCallback? onSubmitted;
 
   const WorkoutAutocompleteTextField({
     super.key,
     required this.textEditingController,
     this.optionsViewOpenDirection = .down,
+    this.autofocus = false,
     int? minLines,
     int? maxLines,
     this.expands,
     this.onTap,
+    this.onSubmitted,
   }) : _minLines = expands == true ? null : (minLines ?? 1),
        _maxLines = expands == true ? null : (maxLines ?? 1);
 
@@ -88,14 +92,17 @@ class _WorkoutAutocompleteTextFieldState
           return PlatformTextField(
             minLines: widget._minLines,
             maxLines: widget._maxLines,
+            autofocus: widget.autofocus,
             expands: widget.expands,
             autocorrect: false,
             textCapitalization: TextCapitalization.sentences,
             controller: textEditingController,
             focusNode: focusNode,
             onTap: widget.onTap,
-            onSubmitted: (String value) =>
-                onFieldSubmitted(), // Important for form submission
+            onSubmitted: (String value) {
+              onFieldSubmitted();
+              widget.onSubmitted?.call(); // Important for form submission
+            },
           );
         },
     optionsViewOpenDirection: widget.optionsViewOpenDirection,

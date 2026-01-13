@@ -169,6 +169,7 @@ final class _WorkoutTile extends StatelessWidget {
 
           textScaleFactor: MediaQuery.textScalerOf(
             context,
+            // ignore: deprecated_member_use
           ).clamp(maxScaleFactor: 1.3).textScaleFactor,
         ),
         trailing: _OverflowMenu(

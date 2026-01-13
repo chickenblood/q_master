@@ -16,7 +16,8 @@ import 'ui/adaptive_icons.dart';
 import 'ui/adaptive_modal_sheet.dart';
 import 'ui/media_query.dart';
 import 'utils/shared_app_prefs.dart';
-import 'workouts/create_workout_sheet.dart';
+//import 'workouts/create_workout_sheet.dart';
+import 'workouts/new_create_workout_sheet.dart';
 import 'workouts/workouts_tab.dart';
 
 enum Tab { workouts, games, timer, location }
@@ -54,7 +55,7 @@ class MainApp extends ConsumerWidget {
 
     final workout = await showAdaptiveModalSheet(
       context: _navigatorKey.currentContext!,
-      child: CreateWorkoutSheet(),
+      child: NewCreateWorkoutSheet(),
     );
     if (workout != null) {
       final listNotifier = ref.read(workoutListProvider.notifier);
