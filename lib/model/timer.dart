@@ -82,8 +82,18 @@ final class Timer extends _$Timer {
     state = state.copyWith(elapsedTime: Duration(seconds: elapsedSeconds));
 
     if (!_stopWatch.isRunning) return;
-    if (remainingRounds == 0) return;
     final runningTimeSeconds = calculateRunningTime();
+
+    // Play sounds based on timer state transitions.
+    final totalRoundSeconds =
+        state.workIntervalSeconds + state.restIntervalSeconds;
+    final currentRoundElapsedSeconds = runningTimeSeconds % totalRoundSeconds;
+
+    var allRoundsCompleted = false;
+    if (runningTimeSeconds >= state.rounds * totalRoundSeconds) {
+      // Timer complete, no more sounds to play.
+      allRoundsCompleted = true;
+    }
 
     // Play "PREPARE" sound at the start of the timer.
     if (elapsedSeconds == 0) {
@@ -92,11 +102,6 @@ final class Timer extends _$Timer {
         _prepareSound.pause();
       });
     }
-
-    // Play sounds based on timer state transitions.
-    final totalRoundSeconds =
-        state.workIntervalSeconds + state.restIntervalSeconds;
-    final currentRoundElapsedSeconds = runningTimeSeconds % totalRoundSeconds;
 
     // An index to start the countdown audio from, if applicable.
     int? countdownAudioIndex;
@@ -117,7 +122,9 @@ final class Timer extends _$Timer {
       }
     }
 
-    if (countdownAudioIndex != null && countdownAudioIndex >= 0) {
+    if (countdownAudioIndex != null &&
+        countdownAudioIndex >= 0 &&
+        !allRoundsCompleted) {
       // Skip to the appropriate second in the countdown audio.
       await _countdownPlayer.seek(Duration(seconds: countdownAudioIndex));
       await _countdownPlayer.play();
@@ -126,6 +133,7 @@ final class Timer extends _$Timer {
     }
 
     if (elapsedSeconds < state.prepareIntervalSeconds) return;
+    if (allRoundsCompleted) return;
 
     if (currentRoundElapsedSeconds % totalRoundSeconds == 0) {
       _workSound.play().then((_) {
