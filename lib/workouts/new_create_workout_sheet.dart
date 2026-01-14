@@ -115,8 +115,9 @@ class _NewCreateWorkoutSheetState extends State<NewCreateWorkoutSheet> {
     required int fromIndex,
     required int toIndex,
   }) {
-    final exercise = exercises.removeAt(fromIndex);
+    final exercise = exercises[fromIndex];
     exercises.insert(min(toIndex, exercises.length), exercise);
+    exercises.removeAt(fromIndex > toIndex ? fromIndex + 1 : fromIndex);
   }
 
   Widget _addExerciseButton(
