@@ -193,7 +193,9 @@ class _NewCreateWorkoutSheetState extends State<NewCreateWorkoutSheet> {
                   child: PlatformListTile(
                     key: ValueKey('exercise_$exercise$index'),
                     title: Text(exercise),
-                    trailing: Icon(Icons.drag_handle),
+                    trailing: exercises.length > 1
+                        ? Icon(Icons.drag_handle)
+                        : null,
                   ),
                 );
               },
