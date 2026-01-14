@@ -47,24 +47,28 @@ class GamesTab extends StatelessWidget {
               mainAxisAlignment: .center,
               children: [
                 Expanded(
-                  child: Transform.rotate(
-                    angle: _degToRad(5.0),
-                    child: _GameTile(
-                      title: L10n.of(context)!.dodGameTileTitle,
-                      subtitle: 'Kermit‘s',
-                      imagePath: 'assets/images/DoD.png',
-                      onTap: (tag) => _showDodGame(context, tag),
+                  child: Center(
+                    child: Transform.rotate(
+                      angle: _degToRad(5.0),
+                      child: _GameTile(
+                        title: L10n.of(context)!.dodGameTileTitle,
+                        subtitle: 'Kermit‘s',
+                        imagePath: 'assets/images/DoD.png',
+                        onTap: (tag) => _showDodGame(context, tag),
+                      ),
                     ),
                   ),
                 ),
                 Expanded(
-                  child: Transform.rotate(
-                    angle: _degToRad(-5.0),
-                    child: _GameTile(
-                      title: L10n.of(context)!.dopGameTileTitle,
-                      imagePath: 'assets/images/DoP.png',
-                      textColor: Colors.black,
-                      onTap: (tag) => _showDeckOfPainGame(context, tag),
+                  child: Center(
+                    child: Transform.rotate(
+                      angle: _degToRad(-5.0),
+                      child: _GameTile(
+                        title: L10n.of(context)!.dopGameTileTitle,
+                        imagePath: 'assets/images/DoP.png',
+                        textColor: Colors.black,
+                        onTap: (tag) => _showDeckOfPainGame(context, tag),
+                      ),
                     ),
                   ),
                 ),
