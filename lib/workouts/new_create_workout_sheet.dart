@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/l10n/l10n.dart';
@@ -65,8 +67,9 @@ class _NewCreateWorkoutSheetState extends State<NewCreateWorkoutSheet> {
 
   Future<String?> _showExercisePicker(BuildContext context) async {
     final controller = TextEditingController();
-    await showAdaptiveModalSheet<String>(
+    return showAdaptiveModalSheet<String>(
       context: context,
+      dismissible: false,
       child: PlatformScaffold(
         appBar: PlatformAppBar(
           cupertino: (appBarContext, _) => CupertinoNavigationBarData(
@@ -96,7 +99,7 @@ class _NewCreateWorkoutSheetState extends State<NewCreateWorkoutSheet> {
                   autofocus: true,
                   minLines: 1,
                   maxLines: 1,
-                  onSubmitted: () => Navigator.of(context).pop(),
+                  onSubmitted: () => Navigator.of(context).pop(controller.text),
                 ),
                 Spacer(),
               ],
@@ -105,7 +108,6 @@ class _NewCreateWorkoutSheetState extends State<NewCreateWorkoutSheet> {
         ),
       ),
     );
-    return controller.text;
   }
 
   void _moveExercise(
@@ -114,41 +116,8 @@ class _NewCreateWorkoutSheetState extends State<NewCreateWorkoutSheet> {
     required int toIndex,
   }) {
     final exercise = exercises.removeAt(fromIndex);
-    exercises.insert(toIndex, exercise);
+    exercises.insert(min(toIndex, exercises.length - 1), exercise);
   }
-
-  Widget _addOrRemoveExerciseButtons(
-    BuildContext context, {
-    required List<String> exercises,
-    required int? index,
-  }) => Row(
-    mainAxisAlignment: .end,
-    mainAxisSize: .min,
-    children: [
-      if (index == exercises.length - 1)
-        PlatformIconButton(
-          icon: Icon(PlatformIcons(context).add),
-          onPressed: () async {
-            final exercise = await _showExercisePicker(context);
-            // Maybe add new empty exercise
-            if (exercise?.isNotEmpty ?? false) {
-              setState(() {
-                exercises.add(exercise!);
-              });
-            }
-          },
-        ),
-      if (exercises.isNotEmpty && index != null)
-        PlatformIconButton(
-          icon: Icon(PlatformIcons(context).remove),
-          onPressed: () {
-            setState(() {
-              exercises.removeAt(index);
-            });
-          },
-        ),
-    ],
-  );
 
   Widget _addExerciseButton(
     BuildContext context, {
@@ -158,9 +127,9 @@ class _NewCreateWorkoutSheetState extends State<NewCreateWorkoutSheet> {
     onPressed: () async {
       final exercise = await _showExercisePicker(context);
       // Maybe add new empty exercise
-      if (exercise != null) {
+      if (exercise?.trim().isNotEmpty ?? false) {
         setState(() {
-          exercises.add(exercise);
+          exercises.add(exercise!);
         });
       }
     },
@@ -181,9 +150,7 @@ class _NewCreateWorkoutSheetState extends State<NewCreateWorkoutSheet> {
       title,
       style: Theme.of(context).textTheme.headlineSmall,
     ),
-    trailing: exercises.isEmpty
-        ? _addExerciseButton(context, exercises: exercises)
-        : null,
+    trailing: _addExerciseButton(context, exercises: exercises),
   );
 
   Widget _content(BuildContext context) {
@@ -212,16 +179,21 @@ class _NewCreateWorkoutSheetState extends State<NewCreateWorkoutSheet> {
               ),
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
-              buildDefaultDragHandles: true,
               itemBuilder: (context, index) {
                 final exercise = exercises[index];
-                return PlatformListTile(
-                  key: ValueKey(exercise),
-                  title: Text(exercise),
-                  trailing: _addOrRemoveExerciseButtons(
-                    context,
-                    exercises: exercises,
-                    index: index,
+                return Dismissible(
+                  key: ValueKey('dismissible_$exercise$index'),
+                  background: Container(color: Colors.red),
+                  direction: DismissDirection.endToStart,
+                  onDismissed: (direction) {
+                    setState(() {
+                      exercises.removeAt(index);
+                    });
+                  },
+                  child: PlatformListTile(
+                    key: ValueKey('exercise_$exercise$index'),
+                    title: Text(exercise),
+                    trailing: Icon(Icons.drag_handle),
                   ),
                 );
               },
