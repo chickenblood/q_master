@@ -74,14 +74,14 @@ final class Timer extends _$Timer {
   Future<void> reset() async {
     _stopWatch.stop();
     _stopWatch.reset();
-    await _prepareSound.seek(Duration.zero);
     await _prepareSound.pause();
-    await _workSound.seek(Duration.zero);
+    await _prepareSound.seek(Duration.zero);
     await _workSound.pause();
-    await _restSound.seek(Duration.zero);
+    await _workSound.seek(Duration.zero);
     await _restSound.pause();
-    await _countdownPlayer.seek(Duration.zero);
+    await _restSound.seek(Duration.zero);
     await _countdownPlayer.pause();
+    await _countdownPlayer.seek(Duration.zero);
     // Force a rebuild to re-read the prefs.
     ref.invalidateSelf();
   }
@@ -109,10 +109,9 @@ final class Timer extends _$Timer {
 
     // Play "PREPARE" sound at the start of the timer.
     if (totalStopWatchTime.inSeconds == 0) {
-      _prepareSound.play().then((_) {
-        _prepareSound.seek(Duration.zero);
-        _prepareSound.pause();
-      });
+      await _prepareSound.play();
+      await _prepareSound.pause();
+      await _prepareSound.seek(Duration.zero);
     }
 
     // An index to start the countdown audio from, if applicable.
@@ -143,8 +142,8 @@ final class Timer extends _$Timer {
       // Skip to the appropriate second in the countdown audio.
       await _countdownPlayer.seek(Duration(seconds: countdownAudioIndex));
       await _countdownPlayer.play();
-      await _countdownPlayer.seek(Duration.zero);
       await _countdownPlayer.pause();
+      await _countdownPlayer.seek(Duration.zero);
     }
 
     if (totalStopWatchTime < state.prepareInterval) return;
@@ -152,12 +151,12 @@ final class Timer extends _$Timer {
 
     if (currentRoundElapsedSeconds % totalRoundTime.inSeconds == 0) {
       await _workSound.play();
-      await _workSound.seek(Duration.zero);
       await _workSound.pause();
+      await _workSound.seek(Duration.zero);
     } else if (currentRoundElapsedSeconds == workInterval.inSeconds) {
       await _restSound.play();
-      await _restSound.seek(Duration.zero);
       await _restSound.pause();
+      await _restSound.seek(Duration.zero);
     }
   }
 
@@ -200,7 +199,7 @@ final class Timer extends _$Timer {
     final totalRoundSeconds = state.workInterval + state.restInterval;
     final runningTime = calculateElapsedTime();
     final completedRounds = runningTime.inSeconds / totalRoundSeconds.inSeconds;
-    final currentRoundElapsedSeconds = Duration(
+    final currentRoundElapsedTime = Duration(
       seconds: runningTime.inSeconds % totalRoundSeconds.inSeconds,
     );
 
@@ -208,8 +207,8 @@ final class Timer extends _$Timer {
       return Duration.zero;
     }
 
-    final restElapsedTime = currentRoundElapsedSeconds > state.workInterval
-        ? currentRoundElapsedSeconds - state.workInterval
+    final restElapsedTime = currentRoundElapsedTime > state.workInterval
+        ? currentRoundElapsedTime - state.workInterval
         : Duration.zero;
     return state.restInterval - restElapsedTime;
   }
