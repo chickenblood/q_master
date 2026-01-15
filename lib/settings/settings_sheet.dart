@@ -3,13 +3,15 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:q_master/l10n/l10n.dart';
+import 'package:q_master/model/timer.dart';
 import 'package:q_master/ui/adaptive_icons.dart';
 import 'package:q_master/utils/datetime_utils.dart';
 import 'package:q_master/utils/shared_app_prefs.dart';
 
-class SettingsSheet extends StatelessWidget {
+class SettingsSheet extends ConsumerWidget {
   const SettingsSheet({super.key});
   static const _minimumTimePeriodSeconds = 10;
 
@@ -33,8 +35,21 @@ class SettingsSheet extends StatelessWidget {
     );
   }
 
-  Widget _content(BuildContext context, {required SharedAppPrefs prefs}) {
+  Widget _content(
+    BuildContext context, {
+    required SharedAppPrefs prefs,
+    required WidgetRef ref,
+  }) {
     final l10n = L10n.of(context)!;
+    final timer = ref.read(timerProvider.notifier);
+    final timeIntervalSettings = [
+      (
+        prefs.prepareIntervalSeconds,
+        L10n.of(context)!.timerSettingsPrepareLabel,
+      ),
+      (prefs.workIntervalSeconds, L10n.of(context)!.timerSettingsWorkLabel),
+      (prefs.restIntervalSeconds, L10n.of(context)!.timerSettingsRestLabel),
+    ];
     return SliverPadding(
       padding: const EdgeInsets.all(16.0),
       sliver: SliverList(
@@ -92,73 +107,32 @@ class SettingsSheet extends StatelessWidget {
               selected: {prefs.timerType.value},
               onSelectionChanged: (newSelection) {
                 prefs.timerType.value = newSelection.single;
+                timer.reset();
               },
             ),
           ),
           SizedBox(height: 16),
-          ListenableBuilder(
-            listenable: prefs.prepareIntervalSeconds,
-            builder: (_, _) => PlatformListTile(
-              title: PlatformText(
-                l10n.timerSettingsPrepareLabel,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              trailing: PlatformText(
-                formatDuration(
-                  Duration(seconds: prefs.prepareIntervalSeconds.value),
+          for (final (intervalNotifier, label) in timeIntervalSettings)
+            ListenableBuilder(
+              listenable: intervalNotifier,
+              builder: (_, _) => PlatformListTile(
+                title: PlatformText(
+                  label,
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
-                style: Theme.of(context).textTheme.displaySmall!.copyWith(
-                  fontFeatures: [FontFeature.tabularFigures()],
+                trailing: PlatformText(
+                  formatDuration(Duration(seconds: intervalNotifier.value)),
+                  style: Theme.of(context).textTheme.displaySmall!.copyWith(
+                    fontFeatures: [FontFeature.tabularFigures()],
+                  ),
                 ),
-              ),
-              onTap: () => _showTimeIntervalPicker(
-                context,
-                timeNotifier: prefs.prepareIntervalSeconds,
+                onTap: () => _showTimeIntervalPicker(
+                  context,
+                  timeNotifier: intervalNotifier,
+                  timer: timer,
+                ),
               ),
             ),
-          ),
-          ListenableBuilder(
-            listenable: prefs.workIntervalSeconds,
-            builder: (_, _) => PlatformListTile(
-              title: PlatformText(
-                l10n.timerSettingsWorkLabel,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              trailing: PlatformText(
-                formatDuration(
-                  Duration(seconds: prefs.workIntervalSeconds.value),
-                ),
-                style: Theme.of(context).textTheme.displaySmall!.copyWith(
-                  fontFeatures: [FontFeature.tabularFigures()],
-                ),
-              ),
-              onTap: () => _showTimeIntervalPicker(
-                context,
-                timeNotifier: prefs.workIntervalSeconds,
-              ),
-            ),
-          ),
-          ListenableBuilder(
-            listenable: prefs.restIntervalSeconds,
-            builder: (_, _) => PlatformListTile(
-              title: PlatformText(
-                l10n.timerSettingsRestLabel,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              trailing: PlatformText(
-                formatDuration(
-                  Duration(seconds: prefs.restIntervalSeconds.value),
-                ),
-                style: Theme.of(context).textTheme.displaySmall!.copyWith(
-                  fontFeatures: [FontFeature.tabularFigures()],
-                ),
-              ),
-              onTap: () => _showTimeIntervalPicker(
-                context,
-                timeNotifier: prefs.restIntervalSeconds,
-              ),
-            ),
-          ),
           ListenableBuilder(
             listenable: prefs.rounds,
             builder: (_, _) => PlatformListTile(
@@ -170,8 +144,11 @@ class SettingsSheet extends StatelessWidget {
                 prefs.rounds.value.toString(),
                 style: Theme.of(context).textTheme.displaySmall,
               ),
-              onTap: () =>
-                  _showRoundsPicker(context, roundsNotifier: prefs.rounds),
+              onTap: () => _showRoundsPicker(
+                context,
+                roundsNotifier: prefs.rounds,
+                timer: timer,
+              ),
             ),
           ),
           const Divider(),
@@ -188,6 +165,7 @@ class SettingsSheet extends StatelessWidget {
   void _showTimeIntervalPicker(
     BuildContext context, {
     required ValueNotifier<int> timeNotifier,
+    required Timer timer,
   }) => showPlatformModalSheet(
     context: context,
     material: MaterialModalSheetData(
@@ -200,10 +178,13 @@ class SettingsSheet extends StatelessWidget {
         itemExtent: 60,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         initialTimerDuration: Duration(seconds: timeNotifier.value),
-        onTimerDurationChanged: (newDuration) => timeNotifier.value = max(
-          newDuration.inSeconds,
-          _minimumTimePeriodSeconds,
-        ),
+        onTimerDurationChanged: (newDuration) {
+          timeNotifier.value = max(
+            newDuration.inSeconds,
+            _minimumTimePeriodSeconds,
+          );
+          timer.reset();
+        },
       ),
     ),
   );
@@ -211,6 +192,7 @@ class SettingsSheet extends StatelessWidget {
   void _showRoundsPicker(
     BuildContext context, {
     required ValueNotifier<int> roundsNotifier,
+    required Timer timer,
   }) => showPlatformModalSheet(
     context: context,
     material: MaterialModalSheetData(
@@ -225,7 +207,10 @@ class SettingsSheet extends StatelessWidget {
           scrollController: FixedExtentScrollController(
             initialItem: roundsNotifier.value - 1,
           ),
-          onSelectedItemChanged: (index) => roundsNotifier.value = index + 1,
+          onSelectedItemChanged: (index) {
+            roundsNotifier.value = index + 1;
+            timer.reset();
+          },
           looping: true,
           children: List.generate(
             10,
@@ -242,7 +227,7 @@ class SettingsSheet extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final prefs = SharedAppPrefs.instance;
     return PlatformScaffold(
       body: SafeArea(
@@ -260,7 +245,7 @@ class SettingsSheet extends StatelessWidget {
               ),
               title: Text(L10n.of(context)!.settingsDialogTitle),
             ),
-            _content(context, prefs: prefs),
+            _content(context, prefs: prefs, ref: ref),
           ],
         ),
       ),
