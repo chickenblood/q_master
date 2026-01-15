@@ -285,8 +285,9 @@ final class _StatusTile extends StatelessWidget {
       child: Row(
         mainAxisAlignment: .spaceEvenly,
         children: [
-          if (isTabata)
-            Expanded(
+          Expanded(
+            child: Visibility(
+              visible: isTabata,
               child: Flex(
                 direction: isPortrait ? Axis.vertical : Axis.horizontal,
                 mainAxisAlignment: .center,
@@ -312,6 +313,7 @@ final class _StatusTile extends StatelessWidget {
                 ],
               ),
             ),
+          ),
           Expanded(
             child: Flex(
               mainAxisAlignment: isPortrait ? .center : .start,
@@ -347,7 +349,7 @@ final class _StatusTile extends StatelessWidget {
               ],
             ),
           ),
-          if (isPortrait && isTabata) Expanded(child: Container()),
+          if (isPortrait) Expanded(child: Container()),
         ],
       ),
     );
