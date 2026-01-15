@@ -15,7 +15,7 @@ final class TimerTab extends ConsumerWidget {
     required bool isPortrait,
     required Timer timerNotifier,
     required _TileSpec firstTile,
-    required _TileSpec secondTile,
+    required _TileSpec? secondTile,
   }) => isPortrait
       ? Column(
           crossAxisAlignment: .stretch,
@@ -34,13 +34,14 @@ final class TimerTab extends ConsumerWidget {
                       isPortrait: isPortrait,
                     ),
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: _SecondaryTile(
-                      tileSpec: secondTile,
-                      isPortrait: isPortrait,
+                  if (secondTile != null)
+                    Expanded(
+                      flex: 1,
+                      child: _SecondaryTile(
+                        tileSpec: secondTile,
+                        isPortrait: isPortrait,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -72,12 +73,13 @@ final class TimerTab extends ConsumerWidget {
                       isPortrait: isPortrait,
                     ),
                   ),
-                  Expanded(
-                    child: _SecondaryTile(
-                      tileSpec: secondTile,
-                      isPortrait: isPortrait,
+                  if (secondTile != null)
+                    Expanded(
+                      child: _SecondaryTile(
+                        tileSpec: secondTile,
+                        isPortrait: isPortrait,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -89,8 +91,15 @@ final class TimerTab extends ConsumerWidget {
     ref.watch(timerProvider);
     final l10n = L10n.of(context)!;
     final notifier = ref.read(timerProvider.notifier);
+    final timerType = notifier.timerType;
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
+    final workTime = timerType == .tabata
+        ? notifier.remainingWorkTime
+        : notifier.elapsedTime;
+    final formatter = timerType == .tabata
+        ? formatDuration
+        : formatPreciseDuration;
     return PlatformScaffold(
       body: SafeArea(
         child: switch (notifier.timerState) {
@@ -100,16 +109,18 @@ final class TimerTab extends ConsumerWidget {
             timerNotifier: notifier,
             firstTile: _TileSpec(
               label: l10n.timerPrepareLabel,
-              timeSeconds: notifier.remainingPrepareSeconds,
+              timeLabel: formatter(notifier.remainingPrepareTime),
               fgColor: Colors.black,
               bgColor: Colors.orange,
             ),
-            secondTile: _TileSpec(
-              label: l10n.timerWorkLabel,
-              timeSeconds: notifier.remainingWorkSeconds,
-              fgColor: Colors.black,
-              bgColor: Colors.green,
-            ),
+            secondTile: timerType == .tabata
+                ? _TileSpec(
+                    label: l10n.timerWorkLabel,
+                    timeLabel: formatter(workTime),
+                    fgColor: Colors.black,
+                    bgColor: Colors.green,
+                  )
+                : null,
           ),
           .working => _layoutTiles(
             l10n,
@@ -117,16 +128,18 @@ final class TimerTab extends ConsumerWidget {
             timerNotifier: notifier,
             firstTile: _TileSpec(
               label: l10n.timerWorkLabel,
-              timeSeconds: notifier.remainingWorkSeconds,
+              timeLabel: formatter(workTime),
               fgColor: Colors.black,
               bgColor: Colors.green,
             ),
-            secondTile: _TileSpec(
-              label: l10n.timerRestLabel,
-              timeSeconds: notifier.remainingRestSeconds,
-              fgColor: Colors.white,
-              bgColor: Colors.red,
-            ),
+            secondTile: timerType == .tabata
+                ? _TileSpec(
+                    label: l10n.timerRestLabel,
+                    timeLabel: formatter(notifier.remainingRestTime),
+                    fgColor: Colors.white,
+                    bgColor: Colors.red,
+                  )
+                : null,
           ),
           .resting => _layoutTiles(
             l10n,
@@ -134,18 +147,20 @@ final class TimerTab extends ConsumerWidget {
             timerNotifier: notifier,
             firstTile: _TileSpec(
               label: l10n.timerRestLabel,
-              timeSeconds: notifier.remainingRestSeconds,
+              timeLabel: formatter(notifier.remainingRestTime),
               fgColor: Colors.white,
               bgColor: Colors.red,
             ),
-            secondTile: _TileSpec(
-              label: l10n.timerWorkLabel,
-              // Upcoming work is for the next round (not the current one),
-              // so show the full interval.
-              timeSeconds: notifier.workIntervalSeconds,
-              fgColor: Colors.black,
-              bgColor: Colors.green,
-            ),
+            secondTile: timerType == .tabata
+                ? _TileSpec(
+                    label: l10n.timerWorkLabel,
+                    // Upcoming work is for the next round (not the current one),
+                    // so show the full interval.
+                    timeLabel: formatter(notifier.workInterval),
+                    fgColor: Colors.black,
+                    bgColor: Colors.green,
+                  )
+                : null,
           ),
         },
       ),
@@ -155,13 +170,13 @@ final class TimerTab extends ConsumerWidget {
 
 final class _TileSpec {
   final String label;
-  final int timeSeconds;
+  final String timeLabel;
   final Color fgColor;
   final Color bgColor;
 
   const _TileSpec({
     required this.label,
-    required this.timeSeconds,
+    required this.timeLabel,
     required this.fgColor,
     required this.bgColor,
   });
@@ -191,16 +206,18 @@ final class _PrimaryTile extends StatelessWidget {
           textScaler: TextScaler.noScaling,
         ),
         Expanded(
-          child: AutoSizeText(
-            formatSeconds(tileSpec.timeSeconds),
-            style: Theme.of(context).textTheme.displayLarge!.copyWith(
-              fontFeatures: [FontFeature.tabularFigures()],
-              color: tileSpec.fgColor,
-              fontSize: 800,
-              fontWeight: .bold,
+          child: Center(
+            child: AutoSizeText(
+              tileSpec.timeLabel,
+              style: Theme.of(context).textTheme.displayLarge!.copyWith(
+                fontFeatures: [FontFeature.tabularFigures()],
+                color: tileSpec.fgColor,
+                fontSize: 800,
+                fontWeight: .bold,
+              ),
+              textScaleFactor: 1.0,
+              maxLines: 1,
             ),
-            textScaleFactor: 1.0,
-            maxLines: 1,
           ),
         ),
       ],
@@ -235,7 +252,7 @@ final class _SecondaryTile extends StatelessWidget {
           ),
           Expanded(
             child: AutoSizeText(
-              formatSeconds(tileSpec.timeSeconds),
+              tileSpec.timeLabel,
               style: Theme.of(context).textTheme.displayLarge!.copyWith(
                 fontFeatures: [FontFeature.tabularFigures()],
                 color: tileSpec.fgColor,
@@ -261,38 +278,40 @@ final class _StatusTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = L10n.of(context)!;
-    final timerHasStarted = timerNotifier.elapsedSeconds > 0;
+    final timerHasStarted = timerNotifier.elapsedTime > Duration.zero;
+    final isTabata = timerNotifier.timerType == .tabata;
     return Container(
       color: Colors.black,
       child: Row(
         mainAxisAlignment: .spaceEvenly,
         children: [
-          Expanded(
-            child: Flex(
-              direction: isPortrait ? Axis.vertical : Axis.horizontal,
-              mainAxisAlignment: .center,
-              children: [
-                if (isPortrait) SizedBox(height: 16),
-                PlatformText(
-                  '${timerNotifier.remainingRounds}',
-                  style: Theme.of(context).textTheme.displayLarge!.copyWith(
-                    color: Colors.blue,
-                    fontSize: 54,
-                    fontWeight: .bold,
+          if (isTabata)
+            Expanded(
+              child: Flex(
+                direction: isPortrait ? Axis.vertical : Axis.horizontal,
+                mainAxisAlignment: .center,
+                children: [
+                  if (isPortrait) SizedBox(height: 16),
+                  PlatformText(
+                    '${timerNotifier.remainingRounds}',
+                    style: Theme.of(context).textTheme.displayLarge!.copyWith(
+                      color: Colors.blue,
+                      fontSize: 54,
+                      fontWeight: .bold,
+                    ),
+                    textScaler: TextScaler.noScaling,
                   ),
-                  textScaler: TextScaler.noScaling,
-                ),
-                isPortrait ? SizedBox(height: 22) : SizedBox(width: 16),
-                PlatformText(
-                  l10n.timerRoundsLeftLabel,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleMedium!.copyWith(color: Colors.white),
-                  textScaler: TextScaler.noScaling,
-                ),
-              ],
+                  isPortrait ? SizedBox(height: 22) : SizedBox(width: 16),
+                  PlatformText(
+                    l10n.timerRoundsLeftLabel,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleMedium!.copyWith(color: Colors.white),
+                    textScaler: TextScaler.noScaling,
+                  ),
+                ],
+              ),
             ),
-          ),
           Expanded(
             child: Flex(
               mainAxisAlignment: isPortrait ? .center : .start,
@@ -328,7 +347,7 @@ final class _StatusTile extends StatelessWidget {
               ],
             ),
           ),
-          if (isPortrait) Expanded(child: Container()),
+          if (isPortrait && isTabata) Expanded(child: Container()),
         ],
       ),
     );

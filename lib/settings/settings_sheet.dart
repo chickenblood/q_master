@@ -104,7 +104,9 @@ class SettingsSheet extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               trailing: PlatformText(
-                formatSeconds(prefs.prepareIntervalSeconds.value),
+                formatDuration(
+                  Duration(seconds: prefs.prepareIntervalSeconds.value),
+                ),
                 style: Theme.of(context).textTheme.displaySmall!.copyWith(
                   fontFeatures: [FontFeature.tabularFigures()],
                 ),
@@ -123,7 +125,9 @@ class SettingsSheet extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               trailing: PlatformText(
-                formatSeconds(prefs.workIntervalSeconds.value),
+                formatDuration(
+                  Duration(seconds: prefs.workIntervalSeconds.value),
+                ),
                 style: Theme.of(context).textTheme.displaySmall!.copyWith(
                   fontFeatures: [FontFeature.tabularFigures()],
                 ),
@@ -142,7 +146,9 @@ class SettingsSheet extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               trailing: PlatformText(
-                formatSeconds(prefs.restIntervalSeconds.value),
+                formatDuration(
+                  Duration(seconds: prefs.restIntervalSeconds.value),
+                ),
                 style: Theme.of(context).textTheme.displaySmall!.copyWith(
                   fontFeatures: [FontFeature.tabularFigures()],
                 ),

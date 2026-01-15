@@ -10,6 +10,8 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 part 'timer.freezed.dart';
 part 'timer.g.dart';
 
+enum TimerType { stopwatch, tabata }
+
 enum TimerState { preparing, working, resting }
 
 enum ExecutionState { playing, paused }
@@ -18,9 +20,10 @@ enum ExecutionState { playing, paused }
 abstract class TimerDisplay with _$TimerDisplay {
   const factory TimerDisplay({
     required Duration elapsedTime,
-    required int prepareIntervalSeconds,
-    required int workIntervalSeconds,
-    required int restIntervalSeconds,
+    required TimerType timerType,
+    required Duration prepareInterval,
+    required Duration workInterval,
+    required Duration restInterval,
     required int rounds,
   }) = _TimerDisplay;
 }
@@ -62,6 +65,12 @@ final class Timer extends _$Timer {
     _tick();
   }
 
+  void _stop() {
+    _stopWatch.stop();
+    if (_countdownPlayer.playing) _countdownPlayer.pause();
+    WakelockPlus.disable();
+  }
+
   Future<void> reset() async {
     _stopWatch.stop();
     _stopWatch.reset();
@@ -78,25 +87,29 @@ final class Timer extends _$Timer {
   }
 
   Future<void> _tick() async {
-    final elapsedSeconds = _stopWatch.elapsed.inSeconds;
-    state = state.copyWith(elapsedTime: Duration(seconds: elapsedSeconds));
+    final totalStopWatchSeconds = _stopWatch.elapsed.inSeconds;
+    state = state.copyWith(elapsedTime: _stopWatch.elapsed);
 
     if (!_stopWatch.isRunning) return;
-    final runningTimeSeconds = calculateRunningTime();
+    if (state.timerType == .stopwatch && elapsedTime > Duration.zero) return;
+
+    final runningTimeSeconds = _calculateElapsedTime();
 
     // Play sounds based on timer state transitions.
-    final totalRoundSeconds =
-        state.workIntervalSeconds + state.restIntervalSeconds;
-    final currentRoundElapsedSeconds = runningTimeSeconds % totalRoundSeconds;
+    final totalRoundTime = state.workInterval + state.restInterval;
+    final currentRoundElapsedSeconds =
+        runningTimeSeconds.inSeconds % totalRoundTime.inSeconds;
 
     var allRoundsCompleted = false;
-    if (runningTimeSeconds >= state.rounds * totalRoundSeconds) {
+    if (runningTimeSeconds.inSeconds >=
+        state.rounds * totalRoundTime.inSeconds) {
       // Timer complete, no more sounds to play.
       allRoundsCompleted = true;
+      _stop();
     }
 
     // Play "PREPARE" sound at the start of the timer.
-    if (elapsedSeconds == 0) {
+    if (totalStopWatchSeconds == 0) {
       _prepareSound.play().then((_) {
         _prepareSound.seek(Duration.zero);
         _prepareSound.pause();
@@ -106,19 +119,21 @@ final class Timer extends _$Timer {
     // An index to start the countdown audio from, if applicable.
     int? countdownAudioIndex;
     if (!_countdownPlayer.playing) {
-      if (elapsedSeconds >
-              (state.prepareIntervalSeconds - countdownDelaySeconds) &&
-          elapsedSeconds < state.prepareIntervalSeconds) {
+      if (totalStopWatchSeconds >
+              (state.prepareInterval.inSeconds - countdownDelaySeconds) &&
+          totalStopWatchSeconds < state.prepareInterval.inSeconds) {
         countdownAudioIndex =
-            countdownDelaySeconds - remainingPrepareSeconds - 1;
+            countdownDelaySeconds - remainingPrepareTime.inSeconds - 1;
       } else if (currentRoundElapsedSeconds >
-              (state.workIntervalSeconds - countdownDelaySeconds) &&
-          currentRoundElapsedSeconds < state.workIntervalSeconds) {
-        countdownAudioIndex = countdownDelaySeconds - remainingWorkSeconds - 1;
+              (state.workInterval.inSeconds - countdownDelaySeconds) &&
+          currentRoundElapsedSeconds < state.workInterval.inSeconds) {
+        countdownAudioIndex =
+            countdownDelaySeconds - remainingWorkTime.inSeconds - 1;
       } else if (currentRoundElapsedSeconds >
-              (totalRoundSeconds - countdownDelaySeconds) &&
-          currentRoundElapsedSeconds < totalRoundSeconds) {
-        countdownAudioIndex = countdownDelaySeconds - remainingRestSeconds - 1;
+              (totalRoundTime.inSeconds - countdownDelaySeconds) &&
+          currentRoundElapsedSeconds < totalRoundTime.inSeconds) {
+        countdownAudioIndex =
+            countdownDelaySeconds - remainingRestTime.inSeconds - 1;
       }
     }
 
@@ -132,15 +147,15 @@ final class Timer extends _$Timer {
       await _countdownPlayer.pause();
     }
 
-    if (elapsedSeconds < state.prepareIntervalSeconds) return;
+    if (totalStopWatchSeconds < state.prepareInterval.inSeconds) return;
     if (allRoundsCompleted) return;
 
-    if (currentRoundElapsedSeconds % totalRoundSeconds == 0) {
+    if (currentRoundElapsedSeconds % totalRoundTime.inSeconds == 0) {
       _workSound.play().then((_) {
         _workSound.seek(Duration.zero);
         _workSound.pause();
       });
-    } else if (currentRoundElapsedSeconds == workIntervalSeconds) {
+    } else if (currentRoundElapsedSeconds == workInterval.inSeconds) {
       _restSound.play().then((_) {
         _restSound.seek(Duration.zero);
         _restSound.pause();
@@ -148,102 +163,108 @@ final class Timer extends _$Timer {
     }
   }
 
-  int calculateRunningTime() => max(
-    0,
-    state.elapsedTime.inSeconds - state.prepareIntervalSeconds,
-  ).toInt();
+  TimerType get timerType => state.timerType;
+
+  Duration _calculateElapsedTime() => state.elapsedTime > state.prepareInterval
+      ? state.elapsedTime - state.prepareInterval
+      : Duration.zero;
 
   TimerState get timerState {
-    if (state.elapsedTime.inSeconds <= state.prepareIntervalSeconds) {
+    if (state.elapsedTime <= state.prepareInterval) {
       return TimerState.preparing;
     }
 
-    final totalRoundSeconds =
-        state.workIntervalSeconds + state.restIntervalSeconds;
-    final runningTimeSeconds = calculateRunningTime();
-    final completedRounds = runningTimeSeconds / totalRoundSeconds;
-    final currentRoundElapsedSeconds = runningTimeSeconds % totalRoundSeconds;
+    final totalRoundSeconds = state.workInterval + state.restInterval;
+    final runningTime = _calculateElapsedTime();
+    final completedRounds = runningTime.inSeconds / totalRoundSeconds.inSeconds;
+    final currentRoundElapsedSeconds =
+        runningTime.inSeconds % totalRoundSeconds.inSeconds;
 
     if (completedRounds >= state.rounds) {
-      return TimerState.resting;
+      return timerType == TimerType.tabata
+          ? TimerState.resting
+          : TimerState.working;
     }
 
-    if (currentRoundElapsedSeconds <= state.workIntervalSeconds) {
+    if (currentRoundElapsedSeconds <= state.workInterval.inSeconds) {
       return TimerState.working;
     } else {
-      return TimerState.resting;
+      return timerType == TimerType.tabata
+          ? TimerState.resting
+          : TimerState.working;
     }
   }
 
   ExecutionState get executionState =>
       _stopWatch.isRunning ? ExecutionState.playing : ExecutionState.paused;
 
-  int get remainingRestSeconds {
-    final totalRoundSeconds =
-        state.workIntervalSeconds + state.restIntervalSeconds;
-    final runningTimeSeconds = calculateRunningTime();
-    final completedRounds = runningTimeSeconds / totalRoundSeconds;
-    final currentRoundElapsedSeconds = runningTimeSeconds % totalRoundSeconds;
-
-    if (completedRounds >= state.rounds) {
-      return 0;
-    }
-
-    final restElapsedSeconds = max(
-      currentRoundElapsedSeconds - state.workIntervalSeconds,
-      0,
+  Duration get remainingRestTime {
+    final totalRoundSeconds = state.workInterval + state.restInterval;
+    final runningTime = _calculateElapsedTime();
+    final completedRounds = runningTime.inSeconds / totalRoundSeconds.inSeconds;
+    final currentRoundElapsedSeconds = Duration(
+      seconds: runningTime.inSeconds % totalRoundSeconds.inSeconds,
     );
-    return state.restIntervalSeconds - restElapsedSeconds;
-  }
-
-  int get remainingWorkSeconds {
-    final totalRoundSeconds =
-        state.workIntervalSeconds + state.restIntervalSeconds;
-    final runningTimeSeconds = calculateRunningTime();
-    final completedRounds = runningTimeSeconds / totalRoundSeconds;
-    final currentRoundElapsedSeconds = runningTimeSeconds % totalRoundSeconds;
 
     if (completedRounds >= state.rounds) {
-      return 0;
+      return Duration.zero;
     }
 
-    return max(
-      state.workIntervalSeconds - currentRoundElapsedSeconds,
-      0,
-    ).toInt();
+    final restElapsedTime = currentRoundElapsedSeconds > state.workInterval
+        ? currentRoundElapsedSeconds - state.workInterval
+        : Duration.zero;
+    return state.restInterval - restElapsedTime;
   }
 
-  int get workIntervalSeconds => state.workIntervalSeconds;
+  Duration get remainingWorkTime {
+    final totalRoundTime = state.workInterval + state.restInterval;
+    final runningTime = _calculateElapsedTime();
+    final completedRounds = runningTime.inSeconds / totalRoundTime.inSeconds;
+    final currentRoundElapsedSeconds =
+        runningTime.inSeconds % totalRoundTime.inSeconds;
 
-  int get elapsedSeconds => state.elapsedTime.inSeconds;
+    if (completedRounds >= state.rounds) {
+      return Duration.zero;
+    }
 
-  int get remainingPrepareSeconds =>
-      max(state.prepareIntervalSeconds - state.elapsedTime.inSeconds, 0);
+    return state.workInterval.inSeconds > currentRoundElapsedSeconds
+        ? state.workInterval - Duration(seconds: currentRoundElapsedSeconds)
+        : Duration.zero;
+  }
+
+  Duration get workInterval => state.workInterval;
+
+  Duration get elapsedTime => _calculateElapsedTime();
+
+  Duration get remainingPrepareTime => state.prepareInterval > state.elapsedTime
+      ? state.prepareInterval - state.elapsedTime
+      : Duration.zero;
 
   int get remainingRounds {
-    final totalRoundSeconds =
-        state.workIntervalSeconds + state.restIntervalSeconds;
-    final completedRounds = calculateRunningTime() / totalRoundSeconds;
+    final totalRoundSeconds = state.workInterval + state.restInterval;
+    final completedRounds =
+        _calculateElapsedTime().inSeconds / totalRoundSeconds.inSeconds;
 
     return max(state.rounds - completedRounds, 0).toInt();
   }
 
   @override
   TimerDisplay build() {
+    final prefs = SharedAppPrefs.instance;
     final timer = async.Timer.periodic(
-      const Duration(seconds: 1),
+      const Duration(milliseconds: 10),
       (_) => _tick(),
     );
     ref.onDispose(() {
       timer.cancel();
       _stopWatch.stop();
     });
-    final prefs = SharedAppPrefs.instance;
     return TimerDisplay(
       elapsedTime: Duration.zero,
-      prepareIntervalSeconds: prefs.prepareIntervalSeconds.value,
-      workIntervalSeconds: prefs.workIntervalSeconds.value,
-      restIntervalSeconds: prefs.restIntervalSeconds.value,
+      timerType: TimerType.values[prefs.timerType.value],
+      prepareInterval: Duration(seconds: prefs.prepareIntervalSeconds.value),
+      workInterval: Duration(seconds: prefs.workIntervalSeconds.value),
+      restInterval: Duration(seconds: prefs.restIntervalSeconds.value),
       rounds: prefs.rounds.value,
     );
   }
