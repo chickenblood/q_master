@@ -123,102 +123,101 @@ class MainApp extends ConsumerWidget {
       iosUsesMaterialWidgets: true,
       iosUseZeroPaddingForAppbarPlatformIcon: true,
     ),
-    builder: (context) => PlatformApp(
-      title: 'Q Master',
-      localizationsDelegates: L10n.localizationsDelegates,
-      supportedLocales: L10n.supportedLocales,
-      navigatorKey: _navigatorKey,
-      material: (_, _) => MaterialAppData(
-        theme: lightTheme(),
-        darkTheme: darkTheme(),
-        themeMode: ThemeMode.system,
+    builder: (_) => PlatformTheme(
+      materialLightTheme: lightTheme(),
+      materialDarkTheme: darkTheme(),
+      cupertinoLightTheme: MaterialBasedCupertinoThemeData(
+        materialTheme: lightTheme(),
       ),
-      cupertino: (context, _) => CupertinoAppData(
-        theme: MaterialBasedCupertinoThemeData(
-          materialTheme:
-              MediaQuery.platformBrightnessOf(context) == Brightness.light
-              ? lightTheme()
-              : darkTheme(),
-        ),
+      cupertinoDarkTheme: MaterialBasedCupertinoThemeData(
+        materialTheme: darkTheme(),
       ),
-      home: Builder(
-        builder: (context) => PlatformTabScaffold(
-          appBarBuilder: (_, index) => PlatformAppBar(
-            cupertino: (appBarContext, _) => CupertinoNavigationBarData(
-              backgroundColor: Colors.transparent,
+      themeMode: .system,
+      builder: (context) => PlatformApp(
+        title: 'Q Master',
+        localizationsDelegates: L10n.localizationsDelegates,
+        supportedLocales: L10n.supportedLocales,
+        navigatorKey: _navigatorKey,
+        home: Builder(
+          builder: (context) => PlatformTabScaffold(
+            appBarBuilder: (_, index) => PlatformAppBar(
+              cupertino: (appBarContext, _) => CupertinoNavigationBarData(
+                backgroundColor: Colors.transparent,
 
-              leading: PlatformIconButton(
-                padding: EdgeInsets.only(right: 22),
-                icon: Icon(context.platformIcons.gearSolid),
-                onPressed: _showSettingsModal,
-              ),
-              title: Text(
-                L10n.of(context)!.appBarTitle,
-                textScaler: MediaQuery.textScalerOf(
-                  context,
-                ).clamp(maxScaleFactor: 1.6),
-              ),
-              // Action buttons – iOS only
-              trailing: Row(
-                mainAxisAlignment: .end,
-                children: [
-                  Spacer(),
-                  switch (Tab.values[_tabController.index(appBarContext)]) {
-                    .workouts => PlatformIconButton(
-                      icon: Icon(PlatformIcons(context).add),
-                      onPressed: () => _showComposeWorkoutModal(ref),
-                    ),
-                    .timer => PlatformIconButton(
-                      icon: Icon(PlatformIcons(context).refresh),
-                      onPressed: () => _resetTimer(ref),
-                    ),
-                    _ => SizedBox.shrink(),
-                  },
-                  SizedBox(width: 8),
-                ],
+                leading: PlatformIconButton(
+                  padding: EdgeInsets.only(right: 22),
+                  icon: Icon(context.platformIcons.gearSolid),
+                  onPressed: _showSettingsModal,
+                ),
+                title: Text(
+                  L10n.of(context)!.appBarTitle,
+                  textScaler: MediaQuery.textScalerOf(
+                    context,
+                  ).clamp(maxScaleFactor: 1.6),
+                ),
+                // Action buttons – iOS only
+                trailing: Row(
+                  mainAxisAlignment: .end,
+                  children: [
+                    Spacer(),
+                    switch (Tab.values[_tabController.index(appBarContext)]) {
+                      .workouts => PlatformIconButton(
+                        icon: Icon(PlatformIcons(context).add),
+                        onPressed: () => _showComposeWorkoutModal(ref),
+                      ),
+                      .timer => PlatformIconButton(
+                        icon: Icon(PlatformIcons(context).refresh),
+                        onPressed: () => _resetTimer(ref),
+                      ),
+                      _ => SizedBox.shrink(),
+                    },
+                    SizedBox(width: 8),
+                  ],
+                ),
               ),
             ),
+            tabController: _tabController,
+            bodyBuilder: (_, index) => _tabPages[index],
+            materialBuilder: (tabBarContext, _, index) =>
+                MaterialTabScaffoldData(
+                  height: _shouldShowTabBar(tabBarContext) ? null : 0,
+                  tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
+                      ? null
+                      : Colors.transparent,
+                  // FAB button – Android only
+                  floatingActionButtonLocation: .endFloat,
+                  floatingActionButton: _androidFloatingActionButton(
+                    context,
+                    ref: ref,
+                    index: index,
+                  ),
+                ),
+            cupertinoBuilder: (tabBarContext, _, index) =>
+                CupertinoTabScaffoldData(
+                  navBarHeight: _shouldShowTabBar(tabBarContext) ? null : 0,
+                  tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
+                      ? Colors.black
+                      : Colors.transparent,
+                ),
+            items: [
+              BottomNavigationBarItem(
+                icon: Icon(AdaptiveIcons.history),
+                label: L10n.of(context)!.workoutsTabTitle,
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(AdaptiveIcons.sports),
+                label: L10n.of(context)!.gamesTabTitle,
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(AdaptiveIcons.timer),
+                label: L10n.of(context)!.timerTabTitle,
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(AdaptiveIcons.location),
+                label: L10n.of(context)!.nearMeTabTitle,
+              ),
+            ],
           ),
-          tabController: _tabController,
-          bodyBuilder: (_, index) => _tabPages[index],
-          materialBuilder: (tabBarContext, _, index) => MaterialTabScaffoldData(
-            height: _shouldShowTabBar(tabBarContext) ? null : 0,
-            tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
-                ? null
-                : Colors.transparent,
-            // FAB button – Android only
-            floatingActionButtonLocation: .endFloat,
-            floatingActionButton: _androidFloatingActionButton(
-              context,
-              ref: ref,
-              index: index,
-            ),
-          ),
-          cupertinoBuilder: (tabBarContext, _, index) =>
-              CupertinoTabScaffoldData(
-                navBarHeight: _shouldShowTabBar(tabBarContext) ? null : 0,
-                tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
-                    ? Colors.black
-                    : Colors.transparent,
-              ),
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(AdaptiveIcons.history),
-              label: L10n.of(context)!.workoutsTabTitle,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(AdaptiveIcons.sports),
-              label: L10n.of(context)!.gamesTabTitle,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(AdaptiveIcons.timer),
-              label: L10n.of(context)!.timerTabTitle,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(AdaptiveIcons.location),
-              label: L10n.of(context)!.nearMeTabTitle,
-            ),
-          ],
         ),
       ),
     ),
