@@ -74,12 +74,12 @@ final class Timer extends _$Timer {
   Future<void> reset() async {
     _stopWatch.stop();
     _stopWatch.reset();
+    await _prepareSound.seek(Duration.zero);
+    await _prepareSound.pause();
     await _workSound.seek(Duration.zero);
     await _workSound.pause();
     await _restSound.seek(Duration.zero);
     await _restSound.pause();
-    await _prepareSound.seek(Duration.zero);
-    await _prepareSound.pause();
     await _countdownPlayer.seek(Duration.zero);
     await _countdownPlayer.pause();
     // Force a rebuild to re-read the prefs.
@@ -87,29 +87,28 @@ final class Timer extends _$Timer {
   }
 
   Future<void> _tick() async {
-    final totalStopWatchSeconds = _stopWatch.elapsed.inSeconds;
-    state = state.copyWith(elapsedTime: _stopWatch.elapsed);
+    final totalStopWatchTime = _stopWatch.elapsed;
+    state = state.copyWith(elapsedTime: totalStopWatchTime);
 
     if (!_stopWatch.isRunning) return;
     if (state.timerType == .stopwatch && elapsedTime > Duration.zero) return;
 
-    final runningTimeSeconds = _calculateElapsedTime();
+    final runningTime = calculateElapsedTime();
 
     // Play sounds based on timer state transitions.
     final totalRoundTime = state.workInterval + state.restInterval;
     final currentRoundElapsedSeconds =
-        runningTimeSeconds.inSeconds % totalRoundTime.inSeconds;
+        runningTime.inSeconds % totalRoundTime.inSeconds;
 
     var allRoundsCompleted = false;
-    if (runningTimeSeconds.inSeconds >=
-        state.rounds * totalRoundTime.inSeconds) {
+    if (runningTime >= totalRoundTime * state.rounds) {
       // Timer complete, no more sounds to play.
       allRoundsCompleted = true;
       _stop();
     }
 
     // Play "PREPARE" sound at the start of the timer.
-    if (totalStopWatchSeconds == 0) {
+    if (totalStopWatchTime.inSeconds == 0) {
       _prepareSound.play().then((_) {
         _prepareSound.seek(Duration.zero);
         _prepareSound.pause();
@@ -119,9 +118,10 @@ final class Timer extends _$Timer {
     // An index to start the countdown audio from, if applicable.
     int? countdownAudioIndex;
     if (!_countdownPlayer.playing) {
-      if (totalStopWatchSeconds >
-              (state.prepareInterval.inSeconds - countdownDelaySeconds) &&
-          totalStopWatchSeconds < state.prepareInterval.inSeconds) {
+      if (totalStopWatchTime >
+              (state.prepareInterval -
+                  Duration(seconds: countdownDelaySeconds)) &&
+          totalStopWatchTime < state.prepareInterval) {
         countdownAudioIndex =
             countdownDelaySeconds - remainingPrepareTime.inSeconds - 1;
       } else if (currentRoundElapsedSeconds >
@@ -147,25 +147,23 @@ final class Timer extends _$Timer {
       await _countdownPlayer.pause();
     }
 
-    if (totalStopWatchSeconds < state.prepareInterval.inSeconds) return;
+    if (totalStopWatchTime < state.prepareInterval) return;
     if (allRoundsCompleted) return;
 
     if (currentRoundElapsedSeconds % totalRoundTime.inSeconds == 0) {
-      _workSound.play().then((_) {
-        _workSound.seek(Duration.zero);
-        _workSound.pause();
-      });
+      await _workSound.play();
+      await _workSound.seek(Duration.zero);
+      await _workSound.pause();
     } else if (currentRoundElapsedSeconds == workInterval.inSeconds) {
-      _restSound.play().then((_) {
-        _restSound.seek(Duration.zero);
-        _restSound.pause();
-      });
+      await _restSound.play();
+      await _restSound.seek(Duration.zero);
+      await _restSound.pause();
     }
   }
 
   TimerType get timerType => state.timerType;
 
-  Duration _calculateElapsedTime() => state.elapsedTime > state.prepareInterval
+  Duration calculateElapsedTime() => state.elapsedTime > state.prepareInterval
       ? state.elapsedTime - state.prepareInterval
       : Duration.zero;
 
@@ -175,7 +173,7 @@ final class Timer extends _$Timer {
     }
 
     final totalRoundSeconds = state.workInterval + state.restInterval;
-    final runningTime = _calculateElapsedTime();
+    final runningTime = calculateElapsedTime();
     final completedRounds = runningTime.inSeconds / totalRoundSeconds.inSeconds;
     final currentRoundElapsedSeconds =
         runningTime.inSeconds % totalRoundSeconds.inSeconds;
@@ -200,7 +198,7 @@ final class Timer extends _$Timer {
 
   Duration get remainingRestTime {
     final totalRoundSeconds = state.workInterval + state.restInterval;
-    final runningTime = _calculateElapsedTime();
+    final runningTime = calculateElapsedTime();
     final completedRounds = runningTime.inSeconds / totalRoundSeconds.inSeconds;
     final currentRoundElapsedSeconds = Duration(
       seconds: runningTime.inSeconds % totalRoundSeconds.inSeconds,
@@ -218,7 +216,7 @@ final class Timer extends _$Timer {
 
   Duration get remainingWorkTime {
     final totalRoundTime = state.workInterval + state.restInterval;
-    final runningTime = _calculateElapsedTime();
+    final runningTime = calculateElapsedTime();
     final completedRounds = runningTime.inSeconds / totalRoundTime.inSeconds;
     final currentRoundElapsedSeconds =
         runningTime.inSeconds % totalRoundTime.inSeconds;
@@ -234,7 +232,7 @@ final class Timer extends _$Timer {
 
   Duration get workInterval => state.workInterval;
 
-  Duration get elapsedTime => _calculateElapsedTime();
+  Duration get elapsedTime => calculateElapsedTime();
 
   Duration get remainingPrepareTime => state.prepareInterval > state.elapsedTime
       ? state.prepareInterval - state.elapsedTime
@@ -243,7 +241,7 @@ final class Timer extends _$Timer {
   int get remainingRounds {
     final totalRoundSeconds = state.workInterval + state.restInterval;
     final completedRounds =
-        _calculateElapsedTime().inSeconds / totalRoundSeconds.inSeconds;
+        calculateElapsedTime().inSeconds / totalRoundSeconds.inSeconds;
 
     return max(state.rounds - completedRounds, 0).toInt();
   }
