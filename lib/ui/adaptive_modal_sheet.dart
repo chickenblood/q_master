@@ -12,7 +12,7 @@ Future<T?> showAdaptiveModalSheet<T>({
   if (Theme.of(context).platform == TargetPlatform.iOS) {
     return showCupertinoSheet(
       context: context,
-      enableDrag: false,
+      enableDrag: dismissible,
       builder: (_) => child,
     );
   } else {

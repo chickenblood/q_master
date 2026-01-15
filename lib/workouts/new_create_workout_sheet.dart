@@ -69,7 +69,6 @@ class _NewCreateWorkoutSheetState extends State<NewCreateWorkoutSheet> {
     final controller = TextEditingController();
     return showAdaptiveModalSheet<String>(
       context: context,
-      dismissible: false,
       child: PlatformScaffold(
         appBar: PlatformAppBar(
           cupertino: (appBarContext, _) => CupertinoNavigationBarData(
