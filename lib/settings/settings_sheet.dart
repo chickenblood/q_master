@@ -79,6 +79,24 @@ class SettingsSheet extends StatelessWidget {
             ),
           ),
           ListenableBuilder(
+            listenable: prefs.timerType,
+            builder: (_, _) => SegmentedButton(
+              showSelectedIcon: false,
+              segments: [
+                ButtonSegment(
+                  value: 0,
+                  label: Text(l10n.timerTypeStopwatchLabel),
+                ),
+                ButtonSegment(value: 1, label: Text(l10n.timerTypeTabataLabel)),
+              ],
+              selected: {prefs.timerType.value},
+              onSelectionChanged: (newSelection) {
+                prefs.timerType.value = newSelection.single;
+              },
+            ),
+          ),
+          SizedBox(height: 16),
+          ListenableBuilder(
             listenable: prefs.prepareIntervalSeconds,
             builder: (_, _) => PlatformListTile(
               title: PlatformText(

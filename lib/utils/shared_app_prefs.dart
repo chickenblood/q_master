@@ -25,6 +25,7 @@ final class SharedAppPrefs {
   /// (defaults to 1 if not set)
   late final ValueNotifier<int> exercisesPerPage;
 
+  late final ValueNotifier<int> timerType;
   late final ValueNotifier<int> prepareIntervalSeconds;
   late final ValueNotifier<int> workIntervalSeconds;
   late final ValueNotifier<int> restIntervalSeconds;
@@ -36,6 +37,7 @@ final class SharedAppPrefs {
 
     exercisesPerPage = _valueSetup<int>('exercises_per_page', 8);
 
+    timerType = _valueSetup<int>('timer_type', 0);
     prepareIntervalSeconds = _valueSetup<int>('prepare_interval_seconds', 10);
     workIntervalSeconds = _valueSetup<int>('work_interval_seconds', 30);
     restIntervalSeconds = _valueSetup<int>('rest_interval_seconds', 10);
