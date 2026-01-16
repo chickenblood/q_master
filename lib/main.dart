@@ -141,14 +141,15 @@ class MainApp extends ConsumerWidget {
         home: Builder(
           builder: (context) => PlatformTabScaffold(
             appBarBuilder: (_, index) => PlatformAppBar(
+              leading: PlatformIconButton(
+                padding: Theme.of(context).platform == TargetPlatform.iOS
+                    ? EdgeInsets.only(right: 22)
+                    : EdgeInsets.zero,
+                icon: Icon(context.platformIcons.gearSolid),
+                onPressed: _showSettingsModal,
+              ),
               cupertino: (appBarContext, _) => CupertinoNavigationBarData(
                 backgroundColor: Colors.transparent,
-
-                leading: PlatformIconButton(
-                  padding: EdgeInsets.only(right: 22),
-                  icon: Icon(context.platformIcons.gearSolid),
-                  onPressed: _showSettingsModal,
-                ),
                 title: Text(
                   L10n.of(context)!.appBarTitle,
                   textScaler: MediaQuery.textScalerOf(
