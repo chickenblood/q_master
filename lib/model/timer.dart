@@ -10,9 +10,14 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 part 'timer.freezed.dart';
 part 'timer.g.dart';
 
-enum TimerType { stopwatch, tabata }
+enum TimerType {
+  stopwatch,
+  tabata;
 
-enum TimerState { preparing, working, resting }
+  static TimerType fromIndex(int index) => TimerType.values[index];
+}
+
+enum ExercisePhase { preparing, working, resting }
 
 enum ExecutionState { playing, paused }
 
@@ -166,9 +171,9 @@ final class Timer extends _$Timer {
       ? state.elapsedTime - state.prepareInterval
       : Duration.zero;
 
-  TimerState get timerState {
+  ExercisePhase get timerState {
     if (state.elapsedTime <= state.prepareInterval) {
-      return TimerState.preparing;
+      return ExercisePhase.preparing;
     }
 
     final totalRoundSeconds = state.workInterval + state.restInterval;
@@ -179,16 +184,16 @@ final class Timer extends _$Timer {
 
     if (completedRounds >= state.rounds) {
       return timerType == TimerType.tabata
-          ? TimerState.resting
-          : TimerState.working;
+          ? ExercisePhase.resting
+          : ExercisePhase.working;
     }
 
     if (currentRoundElapsedSeconds <= state.workInterval.inSeconds) {
-      return TimerState.working;
+      return ExercisePhase.working;
     } else {
       return timerType == TimerType.tabata
-          ? TimerState.resting
-          : TimerState.working;
+          ? ExercisePhase.resting
+          : ExercisePhase.working;
     }
   }
 
