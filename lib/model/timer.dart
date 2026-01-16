@@ -35,7 +35,6 @@ abstract class TimerDisplay with _$TimerDisplay {
 
 @riverpod
 final class Timer extends _$Timer {
-  static const countdownDelaySeconds = 4;
   final _prepareSound = AudioPlayer()
     ..setAsset('assets/sounds/prepare.m4a')
     ..setVolume(6.0);
@@ -45,24 +44,41 @@ final class Timer extends _$Timer {
   final _restSound = AudioPlayer()
     ..setAsset('assets/sounds/recover.m4a')
     ..setVolume(6.0);
-  final _countdownPlayer = AudioPlayer()
+  final _countdownChimePlayer = AudioPlayer()
     ..setAsset('assets/sounds/countdown.m4a')
     ..setVolume(6.0);
+  late final allChimePlayers = [_countdownChimePlayer];
   final _stopWatch = Stopwatch();
+
+  // Track last played sound to avoid replaying
+  int _lastPrepareSecond = -1;
+  int _lastWorkSecond = -1;
+  int _lastRestSecond = -1;
+
+  // Track countdown chimes per phase to ensure each plays only once
+  int _lastPrepareCountdown = -1;
+  int _lastWorkCountdown = -1;
+  int _lastRestCountdown = -1;
+
+  // Track phase start sounds
+  int _lastPrepareStart = -1;
+  int _lastWorkStart = -1;
+  int _lastRestStart = -1;
 
   void start() {
     // Call tick to guarantee an immediate update, rather than waiting for up
     // to one second for the first timer tick.
     _tick();
     _stopWatch.start();
-    if (_countdownPlayer.position > Duration.zero) _countdownPlayer.play();
     // Keep the screen awake while the timer is running.
     WakelockPlus.enable();
   }
 
   void pause() {
     _stopWatch.stop();
-    if (_countdownPlayer.playing) _countdownPlayer.pause();
+    for (final player in allChimePlayers) {
+      if (player.playing) player.pause();
+    }
     // Allow the screen to sleep when the timer is paused.
     WakelockPlus.disable();
 
@@ -72,22 +88,37 @@ final class Timer extends _$Timer {
 
   void _stop() {
     _stopWatch.stop();
-    if (_countdownPlayer.playing) _countdownPlayer.pause();
+    for (final player in allChimePlayers) {
+      if (player.playing) player.pause();
+    }
     WakelockPlus.disable();
+  }
+
+  Future<void> _resetAudioPlayer(AudioPlayer player) async {
+    await player.pause();
+    await player.seek(Duration.zero);
   }
 
   Future<void> reset() async {
     _stopWatch.stop();
     _stopWatch.reset();
-    await _prepareSound.pause();
-    await _prepareSound.seek(Duration.zero);
-    await _workSound.pause();
-    await _workSound.seek(Duration.zero);
-    await _restSound.pause();
-    await _restSound.seek(Duration.zero);
-    await _countdownPlayer.pause();
-    await _countdownPlayer.seek(Duration.zero);
-    // Force a rebuild to re-read the prefs.
+    _lastPrepareSecond = -1;
+    _lastWorkSecond = -1;
+    _lastRestSecond = -1;
+    _lastPrepareCountdown = -1;
+    _lastWorkCountdown = -1;
+    _lastRestCountdown = -1;
+    _lastPrepareStart = -1;
+    _lastWorkStart = -1;
+    _lastRestStart = -1;
+
+    await Future.wait([
+      _resetAudioPlayer(_prepareSound),
+      _resetAudioPlayer(_workSound),
+      _resetAudioPlayer(_restSound),
+      ...allChimePlayers.map(_resetAudioPlayer),
+    ]);
+
     if (ref.mounted) {
       ref.invalidateSelf();
     }
@@ -101,70 +132,123 @@ final class Timer extends _$Timer {
     if (state.timerType == .stopwatch && elapsedTime > Duration.zero) return;
 
     final runningTime = calculateElapsedTime();
-
-    // Play sounds based on timer state transitions.
     final totalRoundTime = state.workInterval + state.restInterval;
+
+    // Avoid division by zero
+    if (totalRoundTime.inSeconds == 0) return;
+
     final currentRoundElapsedSeconds =
         runningTime.inSeconds % totalRoundTime.inSeconds;
 
-    var allRoundsCompleted = false;
-    if (runningTime >= totalRoundTime * state.rounds) {
-      // Timer complete, no more sounds to play.
-      allRoundsCompleted = true;
+    // Check if all rounds are completed
+    final allRoundsCompleted = runningTime >= totalRoundTime * state.rounds;
+    if (allRoundsCompleted) {
       _stop();
+      return;
     }
 
-    // Play "PREPARE" sound at the start of the timer.
-    if (totalStopWatchTime.inSeconds == 0) {
-      await _prepareSound.play();
-      await _prepareSound.pause();
-      await _prepareSound.seek(Duration.zero);
+    final currentSecond = totalStopWatchTime.inSeconds;
+
+    // Play phase sounds at the start of each phase
+    if (currentSecond == 0 && _lastPrepareStart != 0) {
+      _lastPrepareStart = 0;
+      await _playSound(_prepareSound);
+    } else if (currentRoundElapsedSeconds == 0 &&
+        runningTime > Duration.zero &&
+        _lastWorkStart != currentSecond) {
+      _lastWorkStart = currentSecond;
+      await _playSound(_workSound);
+    } else if (currentRoundElapsedSeconds == state.workInterval.inSeconds &&
+        currentRoundElapsedSeconds > 0 &&
+        _lastRestStart != currentSecond) {
+      _lastRestStart = currentSecond;
+      await _playSound(_restSound);
     }
 
-    // An index to start the countdown audio from, if applicable.
-    int? countdownAudioIndex;
-    if (!_countdownPlayer.playing) {
-      if (totalStopWatchTime >
-              (state.prepareInterval -
-                  Duration(seconds: countdownDelaySeconds)) &&
-          totalStopWatchTime < state.prepareInterval) {
-        countdownAudioIndex =
-            countdownDelaySeconds - remainingPrepareTime.inSeconds - 1;
-      } else if (currentRoundElapsedSeconds >
-              (state.workInterval.inSeconds - countdownDelaySeconds) &&
-          currentRoundElapsedSeconds < state.workInterval.inSeconds) {
-        countdownAudioIndex =
-            countdownDelaySeconds - remainingWorkTime.inSeconds - 1;
-      } else if (currentRoundElapsedSeconds >
-              (totalRoundTime.inSeconds - countdownDelaySeconds) &&
-          currentRoundElapsedSeconds < totalRoundTime.inSeconds) {
-        countdownAudioIndex =
-            countdownDelaySeconds - remainingRestTime.inSeconds - 1;
-      }
+    // Play final chime at the end of each phase (when phase completes)
+    if (totalStopWatchTime == state.prepareInterval &&
+        _lastPrepareSecond != totalStopWatchTime.inSeconds) {
+      _lastPrepareSecond = totalStopWatchTime.inSeconds;
+      _playFinalChime();
+    } else if (currentRoundElapsedSeconds == state.workInterval.inSeconds &&
+        currentRoundElapsedSeconds > 0 &&
+        _lastWorkSecond != currentSecond) {
+      _lastWorkSecond = currentSecond;
+      _playFinalChime();
+    } else if (currentRoundElapsedSeconds == totalRoundTime.inSeconds &&
+        currentRoundElapsedSeconds > 0 &&
+        _lastRestSecond != currentSecond) {
+      _lastRestSecond = currentSecond;
+      _playFinalChime();
     }
 
-    if (countdownAudioIndex != null &&
-        countdownAudioIndex >= 0 &&
-        !allRoundsCompleted) {
-      // Skip to the appropriate second in the countdown audio.
-      await _countdownPlayer.seek(Duration(seconds: countdownAudioIndex));
-      await _countdownPlayer.play();
-      await _countdownPlayer.pause();
-      await _countdownPlayer.seek(Duration.zero);
+    // Play countdown chimes at exact times during the last 3 seconds of each phase
+    final prepareEndSeconds = state.prepareInterval.inSeconds;
+    if (currentSecond == prepareEndSeconds - 3 && _lastPrepareCountdown != 3) {
+      await _countdownChimePlayer.seek(Duration(seconds: 0));
+      await _countdownChimePlayer.play();
+      _lastPrepareCountdown = 3;
+    } else if (currentSecond == prepareEndSeconds - 2 &&
+        _lastPrepareCountdown != 2) {
+      await _countdownChimePlayer.seek(Duration(seconds: 1));
+      await _countdownChimePlayer.play();
+      _lastPrepareCountdown = 2;
+    } else if (currentSecond == prepareEndSeconds - 1 &&
+        _lastPrepareCountdown != 1) {
+      await _countdownChimePlayer.seek(Duration(seconds: 2));
+      await _countdownChimePlayer.play();
+      _lastPrepareCountdown = 1;
     }
 
-    if (totalStopWatchTime < state.prepareInterval) return;
-    if (allRoundsCompleted) return;
-
-    if (currentRoundElapsedSeconds % totalRoundTime.inSeconds == 0) {
-      await _workSound.play();
-      await _workSound.pause();
-      await _workSound.seek(Duration.zero);
-    } else if (currentRoundElapsedSeconds == workInterval.inSeconds) {
-      await _restSound.play();
-      await _restSound.pause();
-      await _restSound.seek(Duration.zero);
+    final totalRoundSeconds = totalRoundTime.inSeconds;
+    final completedRounds = runningTime.inSeconds ~/ totalRoundSeconds;
+    final currentWorkEndSeconds =
+        state.prepareInterval.inSeconds +
+        completedRounds * totalRoundSeconds +
+        state.workInterval.inSeconds;
+    if (currentSecond == currentWorkEndSeconds - 3 && _lastWorkCountdown != 3) {
+      await _countdownChimePlayer.seek(Duration(seconds: 0));
+      await _countdownChimePlayer.play();
+      _lastWorkCountdown = 3;
+    } else if (currentSecond == currentWorkEndSeconds - 2 &&
+        _lastWorkCountdown != 2) {
+      await _countdownChimePlayer.seek(Duration(seconds: 1));
+      await _countdownChimePlayer.play();
+      _lastWorkCountdown = 2;
+    } else if (currentSecond == currentWorkEndSeconds - 1 &&
+        _lastWorkCountdown != 1) {
+      await _countdownChimePlayer.seek(Duration(seconds: 2));
+      await _countdownChimePlayer.play();
+      _lastWorkCountdown = 1;
     }
+
+    final currentRestEndSeconds =
+        currentWorkEndSeconds + state.restInterval.inSeconds;
+    if (currentSecond == currentRestEndSeconds - 3 && _lastRestCountdown != 3) {
+      await _countdownChimePlayer.seek(Duration(seconds: 0));
+      await _countdownChimePlayer.play();
+      _lastRestCountdown = 3;
+    } else if (currentSecond == currentRestEndSeconds - 2 &&
+        _lastRestCountdown != 2) {
+      await _countdownChimePlayer.seek(Duration(seconds: 1));
+      await _countdownChimePlayer.play();
+      _lastRestCountdown = 2;
+    } else if (currentSecond == currentRestEndSeconds - 1 &&
+        _lastRestCountdown != 1) {
+      await _countdownChimePlayer.seek(Duration(seconds: 2));
+      await _countdownChimePlayer.play();
+      _lastRestCountdown = 1;
+    }
+  }
+
+  Future<void> _playSound(AudioPlayer player) async {
+    await player.seek(Duration.zero);
+    player.play();
+  }
+
+  Future<void> _playFinalChime() async {
+    await _countdownChimePlayer.seek(Duration(seconds: 3));
+    await _countdownChimePlayer.play();
   }
 
   TimerType get timerType => state.timerType;
@@ -255,6 +339,7 @@ final class Timer extends _$Timer {
   @override
   TimerDisplay build() {
     final prefs = SharedAppPrefs.instance;
+
     final timer = async.Timer.periodic(
       const Duration(milliseconds: 10),
       (_) => _tick(),
