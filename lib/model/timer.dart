@@ -88,7 +88,9 @@ final class Timer extends _$Timer {
     await _countdownPlayer.pause();
     await _countdownPlayer.seek(Duration.zero);
     // Force a rebuild to re-read the prefs.
-    ref.invalidateSelf();
+    if (ref.mounted) {
+      ref.invalidateSelf();
+    }
   }
 
   Future<void> _tick() async {
