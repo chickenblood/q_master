@@ -1,3 +1,4 @@
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,7 +17,6 @@ import 'ui/adaptive_icons.dart';
 import 'ui/adaptive_modal_sheet.dart';
 import 'ui/media_query.dart';
 import 'utils/shared_app_prefs.dart';
-//import 'workouts/create_workout_sheet.dart';
 import 'workouts/new_create_workout_sheet.dart';
 import 'workouts/workouts_tab.dart';
 
@@ -29,6 +29,7 @@ void main() {
 class MainApp extends ConsumerWidget {
   MainApp({super.key}) {
     SharedAppPrefs.ensureInitialized();
+    _configureAudioSession();
     // Easter egg sound effect on shake.
     ShakeDetector.autoStart(
       onPhoneShake: (_) => AudioPlayer()
@@ -221,6 +222,27 @@ class MainApp extends ConsumerWidget {
           ),
         ),
       ),
+    ),
+  );
+}
+
+// Configure the audio session to not interruptother audio apps.
+Future<void> _configureAudioSession() async {
+  final session = await AudioSession.instance;
+  await session.configure(
+    AudioSessionConfiguration(
+      avAudioSessionCategory: .playback,
+      avAudioSessionCategoryOptions: .duckOthers,
+      avAudioSessionMode: .defaultMode,
+      avAudioSessionRouteSharingPolicy: .defaultPolicy,
+      avAudioSessionSetActiveOptions: .none,
+      androidAudioAttributes: const AndroidAudioAttributes(
+        contentType: .sonification,
+        flags: .none,
+        usage: .assistanceSonification,
+      ),
+      androidAudioFocusGainType: .gainTransientMayDuck,
+      androidWillPauseWhenDucked: false,
     ),
   );
 }
