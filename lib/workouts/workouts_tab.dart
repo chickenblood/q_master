@@ -10,11 +10,11 @@ import 'package:q_master/ui/adaptive_icons.dart';
 import 'package:q_master/ui/adaptive_menu.dart';
 import 'package:q_master/ui/adaptive_modal_sheet.dart';
 import 'package:q_master/utils/datetime_utils.dart';
-import 'package:q_master/workouts/new_create_workout_sheet.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'beatdown_browser.dart';
+import 'create_workout_sheet.dart';
 
 class WorkoutsTab extends StatelessWidget {
   const WorkoutsTab({super.key});
@@ -88,7 +88,7 @@ final class _WorkoutTile extends StatelessWidget {
   Future<void> _editWorkout(BuildContext context, Workout workout) async {
     Workout? updatedWorkout = await showAdaptiveModalSheet(
       context: context,
-      child: NewCreateWorkoutSheet(workout: workout),
+      child: CreateWorkoutSheet(workout: workout),
     );
     if (updatedWorkout != null) {
       listNotifier.replace(workout, updatedWorkout);

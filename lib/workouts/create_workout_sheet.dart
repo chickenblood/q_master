@@ -1,10 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/workout.dart';
 import 'package:q_master/ui/adaptive_icons.dart';
-
-import 'workout_auto_completions.dart';
+import 'package:q_master/ui/adaptive_modal_sheet.dart';
+import 'package:q_master/workouts/workout_auto_completions.dart';
 
 class CreateWorkoutSheet extends StatefulWidget {
   final Workout? workout;
@@ -16,19 +18,12 @@ class CreateWorkoutSheet extends StatefulWidget {
 }
 
 class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
-  static const _focusScrollDuration = Duration(milliseconds: 100);
-
-  final _verticalSpacing = const SizedBox(height: 16.0);
-  final focusNode = FocusNode();
-
+  final _focusNode = FocusNode();
   final _nameTextController = TextEditingController();
-  final _warmupTextController = TextEditingController();
-  final _thangTextController = TextEditingController();
-  final _maryTextController = TextEditingController();
 
-  final _warmupTextKey = GlobalKey();
-  final _thangTextKey = GlobalKey();
-  final _maryTextKey = GlobalKey();
+  final _warmup = <String>[];
+  final _thang = <String>[];
+  final _mary = <String>[];
 
   @override
   void initState() {
@@ -37,13 +32,19 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     final workout = widget.workout;
     if (workout != null) {
       _nameTextController.text = workout.name;
-      _warmupTextController.text = workout.warmup.map((e) => e.name).join('\n');
-      _thangTextController.text = workout.thang.map((e) => e.name).join('\n');
-      _maryTextController.text = workout.mary.map((e) => e.name).join('\n');
+      for (final exercise in workout.warmup) {
+        _warmup.add(exercise.name);
+      }
+      for (final exercise in workout.thang) {
+        _thang.add(exercise.name);
+      }
+      for (final exercise in workout.mary) {
+        _mary.add(exercise.name);
+      }
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _nameTextController.text = L10n.of(context)!.defaultWorkoutName;
-        focusNode.requestFocus();
+        _focusNode.requestFocus();
         _selectNameText();
       });
     }
@@ -52,10 +53,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   @override
   void dispose() {
     _nameTextController.dispose();
-    _warmupTextController.dispose();
-    _thangTextController.dispose();
-    _maryTextController.dispose();
-    focusNode.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -67,88 +65,175 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     );
   }
 
-  Widget _content(BuildContext context) => SliverSafeArea(
-    minimum: const EdgeInsets.all(16.0),
-    sliver: SliverList(
-      delegate: SliverChildListDelegate([
-        PlatformText(L10n.of(context)!.workoutNameFieldLabel),
-        PlatformTextField(
-          controller: _nameTextController,
-          textCapitalization: TextCapitalization.sentences,
-          maxLines: 2,
-          focusNode: focusNode,
-        ),
-        _verticalSpacing,
-        PlatformText(L10n.of(context)!.workoutWarmupFieldLabel),
-        WorkoutAutocompleteTextField(
-          key: _warmupTextKey,
-          textEditingController: _warmupTextController,
-          minLines: 5,
-          maxLines: 5,
-        ),
-        _verticalSpacing,
-        PlatformText(L10n.of(context)!.workoutThangFieldLabel),
-        WorkoutAutocompleteTextField(
-          key: _thangTextKey,
-          textEditingController: _thangTextController,
-          minLines: 5,
-          maxLines: 5,
-          onTap: () => Scrollable.ensureVisible(
-            _thangTextKey.currentContext!,
-            duration: _focusScrollDuration,
+  Future<String?> _showExercisePicker(BuildContext context) async {
+    final controller = TextEditingController();
+    return showAdaptiveModalSheet<String>(
+      context: context,
+      child: PlatformScaffold(
+        appBar: PlatformAppBar(
+          cupertino: (appBarContext, _) => CupertinoNavigationBarData(
+            backgroundColor: Colors.transparent,
+
+            leading: PlatformIconButton(
+              padding: EdgeInsets.only(right: 22),
+              icon: Icon(AdaptiveIcons.close),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            title: Text(
+              L10n.of(context)!.appBarTitle,
+              textScaler: MediaQuery.textScalerOf(
+                context,
+              ).clamp(maxScaleFactor: 1.6),
+            ),
           ),
         ),
-        _verticalSpacing,
-        PlatformText(L10n.of(context)!.workoutMaryFieldLabel),
-        WorkoutAutocompleteTextField(
-          key: _maryTextKey,
-          textEditingController: _maryTextController,
-          optionsViewOpenDirection: .up,
-          minLines: 5,
-          maxLines: 5,
-          onTap: () => Scrollable.ensureVisible(
-            _maryTextKey.currentContext!,
-            duration: _focusScrollDuration,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
+              crossAxisAlignment: .stretch,
+              children: [
+                WorkoutAutocompleteTextField(
+                  textEditingController: controller,
+                  autofocus: true,
+                  minLines: 1,
+                  maxLines: 1,
+                  onSubmitted: () => Navigator.of(context).pop(controller.text),
+                ),
+                Spacer(),
+              ],
+            ),
           ),
         ),
-      ]),
-    ),
+      ),
+    );
+  }
+
+  void _moveExercise(
+    List<String> exercises, {
+    required int fromIndex,
+    required int toIndex,
+  }) {
+    final exercise = exercises[fromIndex];
+    exercises.insert(min(toIndex, exercises.length), exercise);
+    exercises.removeAt(fromIndex > toIndex ? fromIndex + 1 : fromIndex);
+  }
+
+  Widget _addExerciseButton(
+    BuildContext context, {
+    required List<String> exercises,
+  }) => PlatformIconButton(
+    icon: Icon(PlatformIcons(context).add),
+    onPressed: () async {
+      final exercise = await _showExercisePicker(context);
+      // Maybe add new empty exercise
+      if (exercise?.trim().isNotEmpty ?? false) {
+        setState(() {
+          exercises.add(exercise!);
+        });
+      }
+    },
   );
 
-  List<Exercise> _convertTextToExerciseList(String text) {
-    return text
-        .split('\n')
-        .map((line) => line.trim())
-        .where((line) => line.isNotEmpty)
-        .map((line) => Exercise(name: line))
-        .toList();
+  static const _headerInsets = EdgeInsets.symmetric(vertical: 8.0);
+
+  Widget _sectionHeader(
+    BuildContext context, {
+    required String title,
+    required List<String> exercises,
+  }) => PlatformListTile(
+    material: (context, platform) =>
+        MaterialListTileData(contentPadding: _headerInsets),
+    cupertino: (context, platform) =>
+        CupertinoListTileData(padding: _headerInsets),
+    title: PlatformText(
+      title,
+      style: Theme.of(context).textTheme.headlineSmall,
+    ),
+    trailing: _addExerciseButton(context, exercises: exercises),
+  );
+
+  Widget _content(BuildContext context) {
+    final groupedExercises = [
+      (L10n.of(context)!.workoutWarmupFieldLabel, _warmup),
+      (L10n.of(context)!.workoutThangFieldLabel, _thang),
+      (L10n.of(context)!.workoutMaryFieldLabel, _mary),
+    ];
+    return SliverSafeArea(
+      minimum: const EdgeInsets.all(16.0),
+      sliver: SliverList(
+        delegate: SliverChildListDelegate([
+          PlatformText(L10n.of(context)!.workoutNameFieldLabel),
+          PlatformTextField(
+            controller: _nameTextController,
+            textCapitalization: TextCapitalization.sentences,
+            maxLines: 2,
+            focusNode: _focusNode,
+          ),
+          for (final (sectionTitle, exercises) in groupedExercises) ...[
+            ReorderableListView.builder(
+              header: _sectionHeader(
+                context,
+                title: sectionTitle,
+                exercises: exercises,
+              ),
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                final exercise = exercises[index];
+                return Dismissible(
+                  key: ValueKey('dismissible_$exercise$index'),
+                  background: Container(color: Colors.red),
+                  direction: DismissDirection.endToStart,
+                  onDismissed: (direction) {
+                    setState(() {
+                      exercises.removeAt(index);
+                    });
+                  },
+                  child: PlatformListTile(
+                    key: ValueKey('exercise_$exercise$index'),
+                    title: Text(exercise),
+                    trailing: exercises.length > 1
+                        ? Icon(Icons.drag_handle)
+                        : null,
+                  ),
+                );
+              },
+              itemCount: exercises.length,
+              onReorder: (startIndex, endIndex) {
+                setState(() {
+                  _moveExercise(
+                    exercises,
+                    fromIndex: startIndex,
+                    toIndex: endIndex,
+                  );
+                });
+              },
+            ),
+          ],
+        ]),
+      ),
+    );
   }
 
   bool get _workoutCreationEnabled {
-    return _nameTextController.text.isNotEmpty &&
-        (_warmupTextController.text.isNotEmpty ||
-            _thangTextController.text.isNotEmpty ||
-            _maryTextController.text.isNotEmpty);
+    return _nameTextController.text.trim().isNotEmpty &&
+        (_warmup.isNotEmpty || _thang.isNotEmpty || _mary.isNotEmpty);
   }
 
   void _createWorkout(BuildContext context) {
     final workout = Workout(
-      name: _nameTextController.text,
+      name: _nameTextController.text.trim(),
       date: DateTime.now(),
-      warmup: _convertTextToExerciseList(_warmupTextController.text),
-      thang: _convertTextToExerciseList(_thangTextController.text),
-      mary: _convertTextToExerciseList(_maryTextController.text),
+      warmup: _warmup.map((e) => Exercise(name: e)).toList(),
+      thang: _thang.map((e) => Exercise(name: e)).toList(),
+      mary: _mary.map((e) => Exercise(name: e)).toList(),
     );
     Navigator.pop(context, workout);
   }
 
-  Widget _rightAppBarButtonAction() => ListenableBuilder(
-    listenable: Listenable.merge([
-      _nameTextController,
-      _warmupTextController,
-      _thangTextController,
-      _maryTextController,
-    ]),
+  Widget _rightAppBarButtonAction(BuildContext context) => ListenableBuilder(
+    listenable: Listenable.merge([_nameTextController]),
     builder: (_, _) => PlatformIconButton(
       onPressed: _workoutCreationEnabled ? () => _createWorkout(context) : null,
       icon: Icon(PlatformIcons(context).checkMark),
@@ -166,8 +251,8 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
             padding: Theme.of(context).platform == TargetPlatform.iOS
                 ? EdgeInsets.only(left: 8)
                 : EdgeInsets.zero,
-            onPressed: () => Navigator.pop(context),
             icon: Icon(AdaptiveIcons.close),
+            onPressed: () => Navigator.pop(context),
           ),
           title: Text(
             L10n.of(context)!.createWorkoutDialogTitle,
@@ -176,11 +261,12 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
             ).clamp(maxScaleFactor: 1.5),
           ),
           cupertino: (_, _) => CupertinoSliverAppBarData(
-            trailing: _rightAppBarButtonAction(),
+            trailing: _rightAppBarButtonAction(context),
             padding: EdgeInsetsDirectional.only(end: 8),
           ),
-          material: (_, _) =>
-              MaterialSliverAppBarData(actions: [_rightAppBarButtonAction()]),
+          material: (_, _) => MaterialSliverAppBarData(
+            actions: [_rightAppBarButtonAction(context)],
+          ),
         ),
         _content(context),
       ],
