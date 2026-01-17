@@ -66,6 +66,16 @@ final class WorkoutList extends _$WorkoutList {
     _save(updatedWorkouts: updatedWorkouts);
   }
 
+  void move(int fromIndex, int toIndex) {
+    final updatedWorkouts = List.of(state);
+    final workout = updatedWorkouts.removeAt(fromIndex);
+    updatedWorkouts.insert(
+      toIndex > fromIndex ? toIndex - 1 : toIndex,
+      workout,
+    );
+    _save(updatedWorkouts: updatedWorkouts);
+  }
+
   void duplicate(Workout workout) {
     final updatedWorkouts = List.of(state);
     // Copy workout, but give the copy the current time and date.

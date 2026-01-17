@@ -40,13 +40,16 @@ class WorkoutsTab extends StatelessWidget {
           if (workouts.isEmpty) {
             return _emptyContentPlaceholder(context);
           }
-          return ListView.builder(
+          return ReorderableListView.builder(
             itemExtent: 100,
             itemCount: workouts.length,
             itemBuilder: (context, index) => _WorkoutTile(
+              key: ValueKey(workouts[index]),
               listNotifier: listNotifier,
               workout: workouts[index],
             ),
+            onReorder: (oldIndex, newIndex) =>
+                listNotifier.move(oldIndex, newIndex),
           );
         },
       ),
@@ -58,7 +61,11 @@ final class _WorkoutTile extends StatelessWidget {
   final WorkoutList listNotifier;
   final Workout workout;
 
-  const _WorkoutTile({required this.listNotifier, required this.workout});
+  const _WorkoutTile({
+    required super.key,
+    required this.listNotifier,
+    required this.workout,
+  });
 
   Future<void> _showBeatdownBrowser(
     BuildContext context,
