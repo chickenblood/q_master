@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/l10n/l10n.dart';
@@ -114,9 +112,8 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     required int fromIndex,
     required int toIndex,
   }) {
-    final exercise = exercises[fromIndex];
-    exercises.insert(min(toIndex, exercises.length), exercise);
-    exercises.removeAt(fromIndex > toIndex ? fromIndex + 1 : fromIndex);
+    final exercise = exercises.removeAt(fromIndex);
+    exercises.insert(toIndex > fromIndex ? toIndex - 1 : toIndex, exercise);
   }
 
   Widget _addExerciseButton(
