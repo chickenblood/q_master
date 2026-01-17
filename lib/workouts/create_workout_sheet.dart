@@ -163,11 +163,13 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
       minimum: const EdgeInsets.all(16.0),
       sliver: SliverList(
         delegate: SliverChildListDelegate([
-          PlatformText(L10n.of(context)!.workoutNameFieldLabel),
+          PlatformText(
+            L10n.of(context)!.workoutNameFieldLabel,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
           PlatformTextField(
             controller: _nameTextController,
             textCapitalization: TextCapitalization.sentences,
-            maxLines: 2,
             focusNode: _focusNode,
           ),
           for (final (sectionTitle, exercises) in groupedExercises) ...[
