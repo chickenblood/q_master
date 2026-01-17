@@ -292,30 +292,9 @@ final class _StatusTile extends StatelessWidget {
           Expanded(
             child: Visibility(
               visible: isTabata,
-              child: Column(
-                mainAxisAlignment: .center,
-                children: [
-                  if (isPortrait) SizedBox(height: 16),
-                  AutoSizeText(
-                    '${timerNotifier.remainingRounds}',
-                    style: Theme.of(context).textTheme.displayLarge!.copyWith(
-                      color: Colors.blue,
-                      fontSize: 54,
-                      fontWeight: .bold,
-                    ),
-                    textScaleFactor: 1,
-                  ),
-                  isPortrait ? SizedBox(height: 22) : SizedBox(width: 16),
-                  AutoSizeText(
-                    l10n.timerRoundsLeftLabel,
-                    softWrap: true,
-                    maxLines: 1,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.titleMedium!.copyWith(color: Colors.white),
-                    textScaleFactor: 1,
-                  ),
-                ],
+              child: _StatusElement(
+                label: l10n.timerRoundsLeftLabel,
+                value: timerNotifier.remainingRounds.toString(),
               ),
             ),
           ),
@@ -339,7 +318,7 @@ final class _StatusTile extends StatelessWidget {
                     }
                   },
                 ),
-                if (isPortrait && !isTablet)
+                if (isPortrait || isTablet)
                   PlatformText(
                     timerNotifier.executionState == .playing
                         ? l10n.timerPauseLabel
@@ -357,30 +336,9 @@ final class _StatusTile extends StatelessWidget {
           Expanded(
             child: Visibility(
               visible: isTabata,
-              child: Column(
-                mainAxisAlignment: .center,
-                children: [
-                  if (isPortrait) SizedBox(height: 16),
-                  AutoSizeText(
-                    '${timerNotifier.remainingCycles}',
-                    style: Theme.of(context).textTheme.displayLarge!.copyWith(
-                      color: Colors.blue,
-                      fontSize: 54,
-                      fontWeight: .bold,
-                    ),
-                    textScaleFactor: 1,
-                  ),
-                  isPortrait ? SizedBox(height: 22) : SizedBox(width: 16),
-                  AutoSizeText(
-                    l10n.timerCyclesLeftLabel,
-                    softWrap: true,
-                    maxLines: 1,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.titleMedium!.copyWith(color: Colors.white),
-                    textScaleFactor: 1,
-                  ),
-                ],
+              child: _StatusElement(
+                label: l10n.timerCyclesLeftLabel,
+                value: timerNotifier.remainingCycles.toString(),
               ),
             ),
           ),
@@ -388,4 +346,50 @@ final class _StatusTile extends StatelessWidget {
       ),
     );
   }
+}
+
+final class _StatusElement extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _StatusElement({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) => Column(
+    mainAxisAlignment: .spaceAround,
+    children: [
+      Spacer(),
+      Expanded(
+        flex: 3,
+        child: Center(
+          child: AutoSizeText(
+            value,
+            style: Theme.of(context).textTheme.displayLarge!.copyWith(
+              color: Colors.blue,
+              fontSize: 54,
+              fontWeight: .bold,
+            ),
+            textScaleFactor: 1,
+          ),
+        ),
+      ),
+      SizedBox(height: 8),
+      Expanded(
+        flex: 1,
+        child: Center(
+          child: AutoSizeText(
+            label,
+            softWrap: true,
+            maxLines: 1,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium!.copyWith(color: Colors.white),
+            textScaleFactor: 1,
+            minFontSize: 10,
+          ),
+        ),
+      ),
+      Spacer(flex: 2),
+    ],
+  );
 }
