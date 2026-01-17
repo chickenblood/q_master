@@ -30,6 +30,7 @@ abstract class TimerDisplay with _$TimerDisplay {
     required Duration workInterval,
     required Duration restInterval,
     required int rounds,
+    required int cycles,
   }) = _TimerDisplay;
 }
 
@@ -140,30 +141,7 @@ final class Timer extends _$Timer {
     final currentRoundElapsedSeconds =
         runningTime.inSeconds % totalRoundTime.inSeconds;
 
-    // Check if all rounds are completed
-    final allRoundsCompleted = runningTime >= totalRoundTime * state.rounds;
-    if (allRoundsCompleted) {
-      _stop();
-      return;
-    }
-
     final currentSecond = totalStopWatchTime.inSeconds;
-
-    // Play phase sounds at the start of each phase
-    if (currentSecond == 0 && _lastPrepareStart != 0) {
-      _lastPrepareStart = 0;
-      await _playSound(_prepareSound);
-    } else if (currentRoundElapsedSeconds == 0 &&
-        runningTime > Duration.zero &&
-        _lastWorkStart != currentSecond) {
-      _lastWorkStart = currentSecond;
-      await _playSound(_workSound);
-    } else if (currentRoundElapsedSeconds == state.workInterval.inSeconds &&
-        currentRoundElapsedSeconds > 0 &&
-        _lastRestStart != currentSecond) {
-      _lastRestStart = currentSecond;
-      await _playSound(_restSound);
-    }
 
     // Play final chime at the end of each phase (when phase completes)
     if (totalStopWatchTime == state.prepareInterval &&
@@ -180,6 +158,29 @@ final class Timer extends _$Timer {
         _lastRestSecond != currentSecond) {
       _lastRestSecond = currentSecond;
       _playFinalChime();
+    }
+    // Check if all rounds are completed
+    final allRoundsCompleted =
+        runningTime >= (totalRoundTime * state.rounds * state.cycles);
+    if (allRoundsCompleted) {
+      _stop();
+      return;
+    }
+
+    // Play phase sounds at the start of each phase
+    if (currentSecond == 0 && _lastPrepareStart != 0) {
+      _lastPrepareStart = 0;
+      await _playSound(_prepareSound);
+    } else if (currentRoundElapsedSeconds == 0 &&
+        runningTime > Duration.zero &&
+        _lastWorkStart != currentSecond) {
+      _lastWorkStart = currentSecond;
+      await _playSound(_workSound);
+    } else if (currentRoundElapsedSeconds == state.workInterval.inSeconds &&
+        currentRoundElapsedSeconds > 0 &&
+        _lastRestStart != currentSecond) {
+      _lastRestStart = currentSecond;
+      await _playSound(_restSound);
     }
 
     // Play countdown chimes at exact times during the last 3 seconds of each phase
@@ -268,7 +269,7 @@ final class Timer extends _$Timer {
     final currentRoundElapsedSeconds =
         runningTime.inSeconds % totalRoundSeconds.inSeconds;
 
-    if (completedRounds >= state.rounds) {
+    if (completedRounds >= (state.rounds * state.cycles)) {
       return timerType == TimerType.tabata
           ? ExercisePhase.resting
           : ExercisePhase.working;
@@ -294,7 +295,7 @@ final class Timer extends _$Timer {
       seconds: runningTime.inSeconds % totalRoundSeconds.inSeconds,
     );
 
-    if (completedRounds >= state.rounds) {
+    if (completedRounds >= (state.rounds * state.cycles)) {
       return Duration.zero;
     }
 
@@ -311,7 +312,7 @@ final class Timer extends _$Timer {
     final currentRoundElapsedSeconds =
         runningTime.inSeconds % totalRoundTime.inSeconds;
 
-    if (completedRounds >= state.rounds) {
+    if (completedRounds >= (state.rounds * state.cycles)) {
       return Duration.zero;
     }
 
@@ -328,12 +329,22 @@ final class Timer extends _$Timer {
       ? state.prepareInterval - state.elapsedTime
       : Duration.zero;
 
+  /// The number of rounds left in the current cycle.
   int get remainingRounds {
-    final totalRoundSeconds = state.workInterval + state.restInterval;
+    final totalRoundTime = state.workInterval + state.restInterval;
     final completedRounds =
-        calculateElapsedTime().inSeconds / totalRoundSeconds.inSeconds;
+        calculateElapsedTime().inSeconds ~/ totalRoundTime.inSeconds;
 
     return max(state.rounds - completedRounds, 0).toInt();
+  }
+
+  int get remainingCycles {
+    final totalRoundTime = state.workInterval + state.restInterval;
+    final totalCycleTime = totalRoundTime * state.rounds;
+    final completedCycles =
+        calculateElapsedTime().inSeconds / totalCycleTime.inSeconds;
+
+    return max(state.cycles - completedCycles, 0).toInt();
   }
 
   @override
@@ -355,6 +366,7 @@ final class Timer extends _$Timer {
       workInterval: Duration(seconds: prefs.workIntervalSeconds.value),
       restInterval: Duration(seconds: prefs.restIntervalSeconds.value),
       rounds: prefs.rounds.value,
+      cycles: prefs.cycles.value,
     );
   }
 }

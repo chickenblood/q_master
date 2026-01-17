@@ -13,7 +13,7 @@ import 'package:q_master/utils/shared_app_prefs.dart';
 
 class SettingsSheet extends ConsumerWidget {
   const SettingsSheet({super.key});
-  static const _minimumTimePeriodSeconds = 10;
+  static const _minimumTimePeriodSeconds = 5;
 
   Future<void> _showAboutDialog(BuildContext context) async {
     final l10n = L10n.of(context)!;
@@ -151,6 +151,24 @@ class SettingsSheet extends ConsumerWidget {
               ),
             ),
           ),
+          ListenableBuilder(
+            listenable: prefs.cycles,
+            builder: (_, _) => PlatformListTile(
+              title: PlatformText(
+                l10n.timerSettingsCyclesLabel,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              trailing: PlatformText(
+                prefs.cycles.value.toString(),
+                style: Theme.of(context).textTheme.displaySmall,
+              ),
+              onTap: () => _showRoundsPicker(
+                context,
+                roundsNotifier: prefs.cycles,
+                timer: timer,
+              ),
+            ),
+          ),
           const Divider(),
           PlatformListTile(
             title: PlatformText(l10n.appBarTitle),
@@ -211,7 +229,6 @@ class SettingsSheet extends ConsumerWidget {
             roundsNotifier.value = index + 1;
             timer.reset();
           },
-          looping: true,
           children: List.generate(
             10,
             (index) => Center(

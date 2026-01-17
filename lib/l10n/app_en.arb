@@ -88,6 +88,8 @@
     "@timerRestLabel": {},
     "timerRoundsLeftLabel": "ROUNDS LEFT",
     "@timerRoundsLeftLabel": {},
+    "timerCyclesLeftLabel": "CYCLES LEFT",
+    "@timerCyclesLeftLabel": {},
     "workoutsSettingsTitle": "Workouts",
     "@workoutsSettingsTitle": {},
     "timerSettingsTitle": "Timer",
@@ -99,5 +101,7 @@
     "timerSettingsRestLabel": "Rest",
     "@timerSettingsRestLabel": {},
     "timerSettingsRoundsLabel": "Rounds",
-    "@timerSettingsRoundsLabel": {}
+    "@timerSettingsRoundsLabel": {},
+    "timerSettingsCyclesLabel": "Cycles",
+    "@timerSettingsCyclesLabel": {}
   }

@@ -30,6 +30,7 @@ final class SharedAppPrefs {
   late final ValueNotifier<int> workIntervalSeconds;
   late final ValueNotifier<int> restIntervalSeconds;
   late final ValueNotifier<int> rounds;
+  late final ValueNotifier<int> cycles;
 
   SharedAppPrefs._(this._prefs) {
     dodecahedronImpulse = _valueSetup<double>('dodecahedron_impulse', 2);
@@ -42,6 +43,7 @@ final class SharedAppPrefs {
     workIntervalSeconds = _valueSetup<int>('work_interval_seconds', 30);
     restIntervalSeconds = _valueSetup<int>('rest_interval_seconds', 10);
     rounds = _valueSetup<int>('rounds', 8);
+    cycles = _valueSetup<int>('cycles', 1);
   }
 
   ValueNotifier<T> _valueSetup<T>(String key, T defaultValue) {

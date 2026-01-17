@@ -59,11 +59,11 @@ final class TimerTab extends ConsumerWidget {
           crossAxisAlignment: .stretch,
           children: [
             Expanded(
-              flex: 3,
+              flex: 5,
               child: _PrimaryTile(tileSpec: firstTile, isPortrait: isPortrait),
             ),
             Expanded(
-              flex: 1,
+              flex: 2,
               child: Row(
                 crossAxisAlignment: .stretch,
                 children: [
@@ -251,16 +251,18 @@ final class _SecondaryTile extends StatelessWidget {
             textScaler: TextScaler.noScaling,
           ),
           Expanded(
-            child: AutoSizeText(
-              tileSpec.timeLabel,
-              style: Theme.of(context).textTheme.displayLarge!.copyWith(
-                fontFeatures: [FontFeature.tabularFigures()],
-                color: tileSpec.fgColor,
-                fontWeight: .bold,
-                fontSize: 400,
+            child: Center(
+              child: AutoSizeText(
+                tileSpec.timeLabel,
+                style: Theme.of(context).textTheme.displayLarge!.copyWith(
+                  fontFeatures: [FontFeature.tabularFigures()],
+                  color: tileSpec.fgColor,
+                  fontWeight: .bold,
+                  fontSize: 400,
+                ),
+                textScaleFactor: 1,
+                maxLines: 1,
               ),
-              textScaleFactor: 1,
-              maxLines: 1,
             ),
           ),
         ],
@@ -279,52 +281,54 @@ final class _StatusTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = L10n.of(context)!;
     final timerHasStarted = timerNotifier.elapsedTime > Duration.zero;
+    final isTablet = MediaQuery.of(context).size.shortestSide >= 600;
     final isTabata = timerNotifier.timerType == .tabata;
     return Container(
       color: Colors.black,
+      padding: EdgeInsets.all(4),
       child: Row(
         mainAxisAlignment: .spaceEvenly,
         children: [
           Expanded(
             child: Visibility(
               visible: isTabata,
-              child: Flex(
-                direction: isPortrait ? Axis.vertical : Axis.horizontal,
+              child: Column(
                 mainAxisAlignment: .center,
                 children: [
                   if (isPortrait) SizedBox(height: 16),
-                  PlatformText(
+                  AutoSizeText(
                     '${timerNotifier.remainingRounds}',
                     style: Theme.of(context).textTheme.displayLarge!.copyWith(
                       color: Colors.blue,
                       fontSize: 54,
                       fontWeight: .bold,
                     ),
-                    textScaler: TextScaler.noScaling,
+                    textScaleFactor: 1,
                   ),
                   isPortrait ? SizedBox(height: 22) : SizedBox(width: 16),
-                  PlatformText(
+                  AutoSizeText(
                     l10n.timerRoundsLeftLabel,
+                    softWrap: true,
+                    maxLines: 1,
                     style: Theme.of(
                       context,
                     ).textTheme.titleMedium!.copyWith(color: Colors.white),
-                    textScaler: TextScaler.noScaling,
+                    textScaleFactor: 1,
                   ),
                 ],
               ),
             ),
           ),
           Expanded(
-            child: Flex(
-              mainAxisAlignment: isPortrait ? .center : .start,
-              direction: isPortrait ? Axis.vertical : Axis.horizontal,
+            child: Column(
+              mainAxisAlignment: .center,
               children: [
                 PlatformIconButton(
                   icon: Icon(
                     timerNotifier.executionState == .playing
                         ? AdaptiveIcons.pauseCircle
                         : context.platformIcons.playCircle,
-                    size: isPortrait ? 80 : 44,
+                    size: isPortrait ? 80 : 52,
                     color: Colors.white,
                   ),
                   onPressed: () {
@@ -335,21 +339,51 @@ final class _StatusTile extends StatelessWidget {
                     }
                   },
                 ),
-                PlatformText(
-                  timerNotifier.executionState == .playing
-                      ? l10n.timerPauseLabel
-                      : (timerHasStarted
-                            ? l10n.timerResumeLabel
-                            : l10n.timerStartLabel),
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleMedium!.copyWith(color: Colors.white),
-                  textScaler: TextScaler.noScaling,
-                ),
+                if (isPortrait && !isTablet)
+                  PlatformText(
+                    timerNotifier.executionState == .playing
+                        ? l10n.timerPauseLabel
+                        : (timerHasStarted
+                              ? l10n.timerResumeLabel
+                              : l10n.timerStartLabel),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleMedium!.copyWith(color: Colors.white),
+                    textScaler: TextScaler.noScaling,
+                  ),
               ],
             ),
           ),
-          if (isPortrait) Expanded(child: Container()),
+          Expanded(
+            child: Visibility(
+              visible: isTabata,
+              child: Column(
+                mainAxisAlignment: .center,
+                children: [
+                  if (isPortrait) SizedBox(height: 16),
+                  AutoSizeText(
+                    '${timerNotifier.remainingCycles}',
+                    style: Theme.of(context).textTheme.displayLarge!.copyWith(
+                      color: Colors.blue,
+                      fontSize: 54,
+                      fontWeight: .bold,
+                    ),
+                    textScaleFactor: 1,
+                  ),
+                  isPortrait ? SizedBox(height: 22) : SizedBox(width: 16),
+                  AutoSizeText(
+                    l10n.timerCyclesLeftLabel,
+                    softWrap: true,
+                    maxLines: 1,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleMedium!.copyWith(color: Colors.white),
+                    textScaleFactor: 1,
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
