@@ -15,19 +15,19 @@ extension FormatttedOutput on Workout {
     result.writeln(date.formattedForDisplay());
     result.writeln();
 
-    result.writeln('*${l10n.workoutWarmupFieldLabel}*');
+    result.writeln('*${l10n.workoutWarmupFieldLabel.toUpperCase()}*');
     for (final exercise in warmup) {
       result.writeln(exercise.name);
     }
     result.writeln();
 
-    result.writeln('*${l10n.workoutThangFieldLabel}*');
+    result.writeln('*${l10n.workoutThangFieldLabel.toUpperCase()}*');
     for (final exercise in thang) {
       result.writeln(exercise.name);
     }
     result.writeln();
 
-    result.writeln('*${l10n.workoutMaryFieldLabel}*');
+    result.writeln('*${l10n.workoutMaryFieldLabel.toUpperCase()}*');
     for (final exercise in mary) {
       result.writeln(exercise.name);
     }
