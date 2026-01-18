@@ -6,6 +6,7 @@ import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/timer.dart';
 import 'package:q_master/settings/settings_sheet.dart';
 import 'package:q_master/ui/adaptive_icons.dart';
+import 'package:q_master/ui/media_query.dart';
 import 'package:q_master/utils/datetime_utils.dart';
 
 final class TimerTab extends ConsumerWidget {
@@ -109,6 +110,7 @@ final class TimerTab extends ConsumerWidget {
     final timerType = notifier.timerType;
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
+    final isTablet = MediaUtils.isTablet(context);
     final workTime = timerType == .tabata
         ? notifier.remainingWorkTime
         : notifier.elapsedTime;
@@ -116,24 +118,27 @@ final class TimerTab extends ConsumerWidget {
         ? formatDuration
         : formatPreciseDuration;
     return PlatformScaffold(
-      appBar: PlatformAppBar(
-        leading: const SettingsActionButton(),
-        title: Text(
-          L10n.of(context)!.timerTabTitle,
-          textScaler: MediaQuery.textScalerOf(
-            context,
-          ).clamp(maxScaleFactor: 1.6),
-        ),
-        cupertino: (appBarContext, _) => CupertinoNavigationBarData(
-          backgroundColor: Colors.transparent,
-          // Action buttons – iOS only
-          trailing: PlatformIconButton(
-            icon: Icon(PlatformIcons(context).refresh),
-            padding: const EdgeInsets.only(right: 16.0),
-            onPressed: () => _resetTimer(ref),
-          ),
-        ),
-      ),
+      appBar: isPortrait || isTablet
+          ? PlatformAppBar(
+              leading: const SettingsActionButton(),
+              title: Text(
+                L10n.of(context)!.timerTabTitle,
+                textScaler: MediaQuery.textScalerOf(
+                  context,
+                ).clamp(maxScaleFactor: 1.6),
+              ),
+
+              cupertino: (appBarContext, _) => CupertinoNavigationBarData(
+                backgroundColor: Colors.transparent,
+                // Action buttons – iOS only
+                trailing: PlatformIconButton(
+                  icon: Icon(PlatformIcons(context).refresh),
+                  padding: const EdgeInsets.only(right: 16.0),
+                  onPressed: () => _resetTimer(ref),
+                ),
+              ),
+            )
+          : null,
       body: SafeArea(
         child: switch (notifier.timerState) {
           .preparing => _layoutTiles(
