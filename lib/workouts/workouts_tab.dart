@@ -6,6 +6,7 @@ import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/formatted_workout.dart';
 import 'package:q_master/model/workout.dart';
 import 'package:q_master/model/workout_list.dart';
+import 'package:q_master/settings/settings_sheet.dart';
 import 'package:q_master/ui/adaptive_icons.dart';
 import 'package:q_master/ui/adaptive_menu.dart';
 import 'package:q_master/ui/adaptive_modal_sheet.dart';
@@ -16,7 +17,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import 'beatdown_browser.dart';
 import 'create_workout_sheet.dart';
 
-class WorkoutsTab extends StatelessWidget {
+class WorkoutsTab extends ConsumerWidget {
   const WorkoutsTab({super.key});
 
   Widget _emptyContentPlaceholder(BuildContext context) => Padding(
@@ -30,31 +31,78 @@ class WorkoutsTab extends StatelessWidget {
     ),
   );
 
-  @override
-  Widget build(BuildContext context) => SafeArea(
-    child: PlatformScaffold(
-      body: Consumer(
-        builder: (context, ref, _) {
-          final workouts = ref.watch(workoutListProvider);
-          final listNotifier = ref.read(workoutListProvider.notifier);
-          if (workouts.isEmpty) {
-            return _emptyContentPlaceholder(context);
-          }
-          return ReorderableListView.builder(
-            itemExtent: 100,
-            itemCount: workouts.length,
-            itemBuilder: (context, index) => _WorkoutTile(
-              key: ValueKey(workouts[index]),
-              listNotifier: listNotifier,
-              workout: workouts[index],
-            ),
-            onReorder: (oldIndex, newIndex) =>
-                listNotifier.move(oldIndex, newIndex),
-          );
-        },
-      ),
-    ),
+  Future<void> _showComposeWorkoutModal(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final navigator = Navigator.of(context, rootNavigator: true);
+
+    final workout = await showAdaptiveModalSheet(
+      context: navigator.context,
+      child: CreateWorkoutSheet(),
+    );
+    if (workout != null) {
+      final listNotifier = ref.read(workoutListProvider.notifier);
+      listNotifier.add(workout);
+    }
+  }
+
+  // The FAB is only for Android. We use app bar actions on iOS.
+  Widget? _androidAddWorkoutFAB(
+    BuildContext context, {
+    required WidgetRef ref,
+  }) => FloatingActionButton(
+    backgroundColor: Colors.red,
+    onPressed: () => _showComposeWorkoutModal(context, ref),
+    child: Icon(PlatformIcons(context).add),
   );
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final workouts = ref.watch(workoutListProvider);
+    final listNotifier = ref.read(workoutListProvider.notifier);
+    return SafeArea(
+      child: PlatformScaffold(
+        appBar: PlatformAppBar(
+          leading: SettingsActionButton(),
+          title: Text(
+            L10n.of(context)!.workoutsTabTitle,
+            textScaler: MediaQuery.textScalerOf(
+              context,
+            ).clamp(maxScaleFactor: 1.6),
+          ),
+          cupertino: (appBarContext, _) => CupertinoNavigationBarData(
+            backgroundColor: Colors.transparent,
+
+            // Action buttons – iOS only
+            trailing: PlatformIconButton(
+              icon: Icon(PlatformIcons(context).add),
+              padding: const EdgeInsets.only(right: 16.0),
+              onPressed: () => _showComposeWorkoutModal(context, ref),
+            ),
+          ),
+        ),
+        body: workouts.isNotEmpty
+            ? ReorderableListView.builder(
+                header: SizedBox.fromSize(
+                  size: const Size.fromHeight(kToolbarHeight),
+                ),
+                itemCount: workouts.length,
+                itemBuilder: (context, index) => _WorkoutTile(
+                  key: ValueKey(workouts[index]),
+                  listNotifier: listNotifier,
+                  workout: workouts[index],
+                ),
+                onReorder: (oldIndex, newIndex) =>
+                    listNotifier.move(oldIndex, newIndex),
+              )
+            : _emptyContentPlaceholder(context),
+        material: (innerContext, _) => MaterialScaffoldData(
+          floatingActionButton: _androidAddWorkoutFAB(innerContext, ref: ref),
+        ),
+      ),
+    );
+  }
 }
 
 final class _WorkoutTile extends StatelessWidget {

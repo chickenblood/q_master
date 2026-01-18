@@ -8,11 +8,31 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/timer.dart';
 import 'package:q_master/ui/adaptive_icons.dart';
+import 'package:q_master/ui/adaptive_modal_sheet.dart';
 import 'package:q_master/utils/datetime_utils.dart';
 import 'package:q_master/utils/shared_app_prefs.dart';
 
-class SettingsSheet extends ConsumerWidget {
-  const SettingsSheet({super.key});
+final class SettingsActionButton extends StatelessWidget {
+  const SettingsActionButton({super.key});
+
+  @override
+  Widget build(BuildContext context) => PlatformIconButton(
+    padding: Theme.of(context).platform == TargetPlatform.iOS
+        ? EdgeInsets.only(right: 22)
+        : EdgeInsets.zero,
+    icon: Icon(context.platformIcons.gearSolid),
+    onPressed: () async {
+      final navigator = Navigator.of(context, rootNavigator: true);
+      await showAdaptiveModalSheet(
+        context: navigator.context,
+        child: const _SettingsSheet(),
+      );
+    },
+  );
+}
+
+class _SettingsSheet extends ConsumerWidget {
+  const _SettingsSheet({super.key});
   static const _minimumTimePeriodSeconds = 5;
 
   Future<void> _showAboutDialog(BuildContext context) async {

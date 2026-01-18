@@ -4,11 +4,26 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/timer.dart';
+import 'package:q_master/settings/settings_sheet.dart';
 import 'package:q_master/ui/adaptive_icons.dart';
 import 'package:q_master/utils/datetime_utils.dart';
 
 final class TimerTab extends ConsumerWidget {
   const TimerTab({super.key});
+
+  Future<void> _resetTimer(WidgetRef ref) async {
+    final notifier = ref.read(timerProvider.notifier);
+    await notifier.reset();
+  }
+
+  // The FAB is only for Android. We use app bar actions on iOS.
+  Widget? _androidResetFAB(BuildContext context, {required WidgetRef ref}) {
+    return FloatingActionButton(
+      backgroundColor: Colors.red,
+      onPressed: () => _resetTimer(ref),
+      child: Icon(PlatformIcons(context).refresh),
+    );
+  }
 
   Widget _layoutTiles(
     L10n l10n, {
@@ -101,6 +116,24 @@ final class TimerTab extends ConsumerWidget {
         ? formatDuration
         : formatPreciseDuration;
     return PlatformScaffold(
+      appBar: PlatformAppBar(
+        leading: const SettingsActionButton(),
+        title: Text(
+          L10n.of(context)!.timerTabTitle,
+          textScaler: MediaQuery.textScalerOf(
+            context,
+          ).clamp(maxScaleFactor: 1.6),
+        ),
+        cupertino: (appBarContext, _) => CupertinoNavigationBarData(
+          backgroundColor: Colors.transparent,
+          // Action buttons – iOS only
+          trailing: PlatformIconButton(
+            icon: Icon(PlatformIcons(context).refresh),
+            padding: const EdgeInsets.only(right: 16.0),
+            onPressed: () => _resetTimer(ref),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: switch (notifier.timerState) {
           .preparing => _layoutTiles(
@@ -163,6 +196,9 @@ final class TimerTab extends ConsumerWidget {
                 : null,
           ),
         },
+      ),
+      material: (innerContext, _) => MaterialScaffoldData(
+        floatingActionButton: _androidResetFAB(innerContext, ref: ref),
       ),
     );
   }

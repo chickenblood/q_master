@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/l10n/l10n.dart';
+import 'package:q_master/settings/settings_sheet.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'deck_of_pain_game_view.dart';
@@ -36,6 +37,17 @@ class GamesTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final isLandscape = MediaQuery.orientationOf(context) == .landscape;
     return PlatformScaffold(
+      appBar: PlatformAppBar(
+        leading: const SettingsActionButton(),
+        title: Text(
+          L10n.of(context)!.gamesTabTitle,
+          textScaler: MediaQuery.textScalerOf(
+            context,
+          ).clamp(maxScaleFactor: 1.6),
+        ),
+        cupertino: (appBarContext, _) =>
+            CupertinoNavigationBarData(backgroundColor: Colors.transparent),
+      ),
       body: SafeArea(
         child: Center(
           child: Padding(

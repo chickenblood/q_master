@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:q_master/l10n/l10n.dart';
+import 'package:q_master/settings/settings_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
@@ -43,6 +45,15 @@ class NearMeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => PlatformScaffold(
+    appBar: PlatformAppBar(
+      leading: SettingsActionButton(),
+      title: Text(
+        L10n.of(context)!.nearMeTabTitle,
+        textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.6),
+      ),
+      cupertino: (appBarContext, _) =>
+          CupertinoNavigationBarData(backgroundColor: Colors.transparent),
+    ),
     body: SafeArea(child: WebViewWidget(controller: controller)),
   );
 }
