@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/ui/adaptive_icons.dart';
 
 import 'dodecahedron_shader.dart';
@@ -20,6 +21,13 @@ final class DodGameView extends StatelessWidget {
           leading: PlatformIconButton(
             icon: Icon(AdaptiveIcons.close, color: Colors.white),
             onPressed: () => Navigator.pop(context),
+          ),
+          title: PlatformText(
+            L10n.of(context)!.dodShakeToRollDiceMessage,
+            textScaler: MediaQuery.textScalerOf(
+              context,
+            ).clamp(maxScaleFactor: 1.6),
+            style: TextStyle(color: Colors.white),
           ),
         ),
         body: const Center(child: DodecahedronShader()),

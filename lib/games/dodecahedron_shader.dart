@@ -3,8 +3,8 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/utils/shared_app_prefs.dart';
+import 'package:shake/shake.dart';
 
 import 'faces_constants.dart';
 
@@ -39,8 +39,7 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
 
   // user-tunable controls
   var _impulseStrength = 3.0;
-  var _showControls = false;
-  var _stopVelocityThreshold = 0.1;
+  final _stopVelocityThreshold = 0.1;
 
   // bookkeeping for per-tick dt
   var _lastTick = 0.0;
@@ -62,24 +61,71 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   var _highlightStartTime = 0.0;
   final _highlightDuration = 0.4; // seconds
 
+  late final ShakeDetector _shakeDetector;
+
   @override
   void initState() {
     super.initState();
     _prefs = SharedAppPrefs.instance;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      setState(() {
-        _centerLabel = L10n.of(context)!.dodTapToStartMessage;
-      });
-    });
     _initShader();
     _ticker = createTicker(_onTick)..start();
+
+    _shakeDetector = ShakeDetector.autoStart(
+      onPhoneShake: (_) {
+        // If a center label is shown, clear it and continue to start a spin.
+        setState(() {
+          _centerLabel = null;
+        });
+
+        // ignore taps while spinning
+        if (_vx.abs() > _velocityEpsilon ||
+            _vy.abs() > _velocityEpsilon ||
+            _vz.abs() > _velocityEpsilon) {
+          return;
+        }
+
+        // add an impulse to angular velocity to kick off a spin scaled by user control
+        setState(() {
+          // clear any previous selection when we start a new spin
+          _centerLabel = null;
+          // Fold view offset into object rotation before starting new spin
+          _ax += _viewAx;
+          _ay += _viewAy;
+          _az += _viewAz;
+          _viewAx = _viewAy = _viewAz = 0.0;
+          // Randomize impulse direction and magnitude for highly varied results
+          final rng = math.Random();
+          // Wider ranges for more variation (3.0 to 9.0 range per axis)
+          final baseX = 3.0 + rng.nextDouble() * 6.0;
+          final baseY = 3.0 + rng.nextDouble() * 6.0;
+          final baseZ = 3.0 + rng.nextDouble() * 6.0;
+          final signX = rng.nextBool() ? 1.0 : -1.0;
+          final signY = rng.nextBool() ? 1.0 : -1.0;
+          final signZ = rng.nextBool() ? 1.0 : -1.0;
+          _vx += signX * baseX * _impulseStrength;
+          _vy += signY * baseY * _impulseStrength;
+          _vz += signZ * baseZ * _impulseStrength;
+        });
+
+        // reset tick bookkeeping and ensure the ticker is running so animation resumes
+        _lastTick = 0.0;
+        if (!_ticker.isActive) _ticker.start();
+      },
+    );
 
     // load any saved slider defaults for this control
     setState(() {
       _impulseStrength = _prefs.dodecahedronImpulse.value;
       _damping = _prefs.dodecahedronDamping.value;
     });
+  }
+
+  @override
+  void dispose() {
+    _ticker.dispose();
+    _labelAtlas?.dispose();
+    _shakeDetector.stopListening();
+    super.dispose();
   }
 
   @override
@@ -190,13 +236,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
         _ticker.isActive) {
       _ticker.stop();
     }
-  }
-
-  @override
-  void dispose() {
-    _ticker.dispose();
-    _labelAtlas?.dispose();
-    super.dispose();
   }
 
   // Dodecahedron face normals (same as in shader)
@@ -397,66 +436,12 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            // If a center label is shown, clear it and continue to start a spin.
-            setState(() {
-              _centerLabel = null;
-            });
-
-            // ignore taps while spinning
-            if (_vx.abs() > _velocityEpsilon ||
-                _vy.abs() > _velocityEpsilon ||
-                _vz.abs() > _velocityEpsilon) {
-              return;
-            }
-
-            // add an impulse to angular velocity to kick off a spin scaled by user control
-            setState(() {
-              // clear any previous selection when we start a new spin
-              _centerLabel = null;
-              // Fold view offset into object rotation before starting new spin
-              _ax += _viewAx;
-              _ay += _viewAy;
-              _az += _viewAz;
-              _viewAx = _viewAy = _viewAz = 0.0;
-              // Randomize impulse direction and magnitude for highly varied results
-              final rng = math.Random();
-              // Wider ranges for more variation (3.0 to 9.0 range per axis)
-              final baseX = 3.0 + rng.nextDouble() * 6.0;
-              final baseY = 3.0 + rng.nextDouble() * 6.0;
-              final baseZ = 3.0 + rng.nextDouble() * 6.0;
-              final signX = rng.nextBool() ? 1.0 : -1.0;
-              final signY = rng.nextBool() ? 1.0 : -1.0;
-              final signZ = rng.nextBool() ? 1.0 : -1.0;
-              _vx += signX * baseX * _impulseStrength;
-              _vy += signY * baseY * _impulseStrength;
-              _vz += signZ * baseZ * _impulseStrength;
-            });
-
-            // reset tick bookkeeping and ensure the ticker is running so animation resumes
-            _lastTick = 0.0;
-            if (!_ticker.isActive) _ticker.start();
-          },
-
-          // double-tap toggles the controls overlay
-          onDoubleTap: () => setState(() => _showControls = !_showControls),
-
-          child: Stack(
-            children: [
-              _buildShaderPainter(context),
-              if (_centerLabel != null) _buildCenterLabel(),
-              _buildControls(_prefs),
-            ],
-          ),
-        );
-      },
-    );
-  }
+  Widget build(BuildContext context) => Stack(
+    children: [
+      _buildShaderPainter(context),
+      if (_centerLabel != null) _buildCenterLabel(),
+    ],
+  );
 
   Widget _buildShaderPainter(BuildContext context) {
     // Calculate highlight progress (0 at start, 1 when done)
@@ -524,161 +509,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                   child: Text(_centerLabel!, textAlign: TextAlign.center),
                 ),
               ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildControls(SharedAppPrefs prefs) {
-    return Positioned(
-      left: 12,
-      right: 12,
-      bottom: 12,
-      child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 200),
-        opacity: _showControls ? 1.0 : 0.0,
-        child: Card(
-          color: Colors.black.withAlpha(153),
-          elevation: 6,
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Controls',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Expanded(
-                      child: Text(
-                        'Impulse',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 120,
-                      child: Slider(
-                        value: _impulseStrength,
-                        min: 0.0,
-                        max: 3.0,
-                        divisions: 20,
-                        label: _impulseStrength.toStringAsFixed(2),
-                        onChanged: (v) => setState(() => _impulseStrength = v),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _impulseStrength.toStringAsFixed(2),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    const Expanded(
-                      child: Text(
-                        'Damping',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 120,
-                      child: Slider(
-                        value: _damping,
-                        min: 0.05,
-                        max: 3.0,
-                        divisions: 59,
-                        label: _damping.toStringAsFixed(2),
-                        onChanged: (v) => setState(() => _damping = v),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _damping.toStringAsFixed(2),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
-
-                // stop threshold control
-                Row(
-                  children: [
-                    const Expanded(
-                      child: Text(
-                        'Stop threshold',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 120,
-                      child: Slider(
-                        value: _stopVelocityThreshold,
-                        min: 0.0001,
-                        max: 0.1,
-                        divisions: 99,
-                        label: _stopVelocityThreshold.toStringAsFixed(4),
-                        onChanged: (v) =>
-                            setState(() => _stopVelocityThreshold = v),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _stopVelocityThreshold.toStringAsFixed(4),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        prefs.dodecahedronImpulse.value = _impulseStrength;
-                        prefs.dodecahedronDamping.value = _damping;
-                      },
-                      child: const Text(
-                        'Save Defaults',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        setState(() {
-                          _ax = -math.atan(1 / phi);
-                          _ay = _az = 0.0;
-                          _viewAx = _viewAy = _viewAz = 0.0;
-                          _vx = _vy = _vz = 0.0;
-                          _centerLabel = null;
-                          _impulseStrength = prefs.dodecahedronImpulse.value;
-                          _damping = prefs.dodecahedronDamping.value;
-                        });
-                        // stop the ticker since there's no motion or label to animate
-                        if (_ticker.isActive) _ticker.stop();
-                      },
-                      child: const Text(
-                        'Reset',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
             ),
           ),
         ),
