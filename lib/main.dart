@@ -97,6 +97,7 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
         localizationsDelegates: L10n.localizationsDelegates,
         supportedLocales: L10n.supportedLocales,
         navigatorKey: _navigatorKey,
+        debugShowCheckedModeBanner: false,
         home: Builder(
           builder: (context) => PlatformTabScaffold(
             tabController: _tabController,
