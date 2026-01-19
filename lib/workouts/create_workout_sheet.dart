@@ -85,7 +85,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
               onPressed: () => Navigator.of(context).pop(),
             ),
             title: Text(
-              L10n.of(context)!.appBarTitle,
+              L10n.of(context)!.exerciseEntryPromptText,
               textScaler: MediaQuery.textScalerOf(
                 context,
               ).clamp(maxScaleFactor: 1.6),
@@ -105,6 +105,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                   maxLines: 1,
                   onSubmitted: () => Navigator.of(context).pop(controller.text),
                 ),
+
                 Spacer(),
               ],
             ),

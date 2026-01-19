@@ -52,6 +52,8 @@
     },
     "noWorkoutsPlaceholderText": "No workouts yet.\n Tap the + button to create one",
     "@noWorkoutsPlaceholderText": {},
+    "exerciseEntryPromptText": "Describe your exercise",
+    "@exerciseEntryPromptText": {},
     "editWorkoutText": "Edit",
     "@editWorkoutText": {},
     "duplicateWorkoutText": "Duplicate",
