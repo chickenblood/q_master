@@ -100,8 +100,9 @@ class _WorkoutAutocompleteTextFieldState
             focusNode: focusNode,
             onTap: widget.onTap,
             onSubmitted: (String value) {
-              onFieldSubmitted();
-              widget.onSubmitted?.call(); // Important for form submission
+              if (value.isEmpty) return;
+              onFieldSubmitted(); // Important for form submission
+              widget.onSubmitted?.call();
             },
           );
         },

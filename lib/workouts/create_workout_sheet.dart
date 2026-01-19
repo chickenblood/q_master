@@ -6,6 +6,8 @@ import 'package:q_master/ui/adaptive_icons.dart';
 import 'package:q_master/ui/adaptive_modal_sheet.dart';
 import 'package:q_master/workouts/workout_auto_completions.dart';
 
+enum WorkoutGroup { warmup, thang, mary }
+
 class CreateWorkoutSheet extends StatefulWidget {
   final Workout? workout;
 
@@ -18,10 +20,14 @@ class CreateWorkoutSheet extends StatefulWidget {
 class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   final _focusNode = FocusNode();
   final _nameTextController = TextEditingController();
+  final _scrollController = ScrollController();
 
   final _warmup = <String>[];
   final _thang = <String>[];
   final _mary = <String>[];
+
+  // Track the group of the most recently added exercise for scrolling
+  WorkoutGroup? _lastAddedItemGroup;
 
   @override
   void initState() {
@@ -52,6 +58,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   void dispose() {
     _nameTextController.dispose();
     _focusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -119,6 +126,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   Widget _addExerciseButton(
     BuildContext context, {
     required List<String> exercises,
+    required WorkoutGroup sectionGroup,
   }) => PlatformIconButton(
     icon: Icon(PlatformIcons(context).add),
     onPressed: () async {
@@ -127,6 +135,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
       if (exercise?.trim().isNotEmpty ?? false) {
         setState(() {
           exercises.add(exercise!);
+          _lastAddedItemGroup = sectionGroup;
         });
       }
     },
@@ -138,6 +147,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     BuildContext context, {
     required String title,
     required List<String> exercises,
+    required WorkoutGroup sectionGroup,
   }) => PlatformListTile(
     material: (context, platform) =>
         MaterialListTileData(contentPadding: _headerInsets),
@@ -147,14 +157,18 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
       title,
       style: Theme.of(context).textTheme.headlineSmall,
     ),
-    trailing: _addExerciseButton(context, exercises: exercises),
+    trailing: _addExerciseButton(
+      context,
+      exercises: exercises,
+      sectionGroup: sectionGroup,
+    ),
   );
 
   Widget _content(BuildContext context) {
     final groupedExercises = [
-      (L10n.of(context)!.workoutWarmupFieldLabel, _warmup),
-      (L10n.of(context)!.workoutThangFieldLabel, _thang),
-      (L10n.of(context)!.workoutMaryFieldLabel, _mary),
+      (WorkoutGroup.warmup, L10n.of(context)!.workoutWarmupFieldLabel, _warmup),
+      (WorkoutGroup.thang, L10n.of(context)!.workoutThangFieldLabel, _thang),
+      (WorkoutGroup.mary, L10n.of(context)!.workoutMaryFieldLabel, _mary),
     ];
     return SliverSafeArea(
       minimum: const EdgeInsets.all(16.0),
@@ -169,17 +183,20 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
             textCapitalization: TextCapitalization.sentences,
             focusNode: _focusNode,
           ),
-          for (final (sectionTitle, exercises) in groupedExercises) ...[
+          for (final (sectionGroup, sectionTitle, exercises)
+              in groupedExercises) ...[
             ReorderableListView.builder(
               header: _sectionHeader(
                 context,
                 title: sectionTitle,
                 exercises: exercises,
+                sectionGroup: sectionGroup,
               ),
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
                 final exercise = exercises[index];
+                final isLastItem = index == (exercises.length - 1);
                 return Dismissible(
                   key: ValueKey('dismissible_$exercise$index'),
                   background: Container(color: Colors.red),
@@ -189,12 +206,28 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                       exercises.removeAt(index);
                     });
                   },
-                  child: PlatformListTile(
-                    key: ValueKey('exercise_$exercise$index'),
-                    title: Text(exercise),
-                    trailing: exercises.length > 1
-                        ? Icon(Icons.drag_handle)
-                        : null,
+                  child: Builder(
+                    builder: (itemContext) {
+                      // Scroll to the newly added item after the frame is rendered
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (isLastItem && _lastAddedItemGroup == sectionGroup) {
+                          Scrollable.ensureVisible(
+                            itemContext,
+                            duration: const Duration(milliseconds: 300),
+                            alignment: 0.5,
+                            alignmentPolicy: .explicit,
+                          );
+                          _lastAddedItemGroup = null;
+                        }
+                      });
+                      return PlatformListTile(
+                        key: ValueKey('exercise_$exercise$index'),
+                        title: Text(exercise),
+                        trailing: exercises.length > 1
+                            ? Icon(Icons.drag_handle)
+                            : null,
+                      );
+                    },
                   ),
                 );
               },
@@ -242,6 +275,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   @override
   Widget build(BuildContext context) => PlatformScaffold(
     body: CustomScrollView(
+      controller: _scrollController,
       physics: ClampingScrollPhysics(),
       slivers: [
         PlatformSliverAppBar(

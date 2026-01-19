@@ -32,7 +32,7 @@ final class SettingsActionButton extends StatelessWidget {
 }
 
 class _SettingsSheet extends ConsumerWidget {
-  const _SettingsSheet({super.key});
+  const _SettingsSheet();
   static const _minimumTimePeriodSeconds = 5;
 
   Future<void> _showAboutDialog(BuildContext context) async {
