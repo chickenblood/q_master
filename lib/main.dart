@@ -28,11 +28,17 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
     SharedAppPrefs.ensureInitialized();
     _configureAudioSession();
     WidgetsBinding.instance.addObserver(this);
-    // Easter egg sound effect on shake.
+
+    // Easter egg sound effect or game action on shake.
     _shakeDetector = ShakeDetector.autoStart(
-      onPhoneShake: (_) => AudioPlayer()
-        ..setAsset('assets/sounds/easter_egg.m4a')
-        ..play(),
+      onPhoneShake: (_) {
+        final selectedTab = _tabController.index(_navigatorKey.currentContext!);
+        if (selectedTab != Tab.games.index) {
+          AudioPlayer()
+            ..setAsset('assets/sounds/easter_egg.m4a')
+            ..play();
+        }
+      },
     );
   }
 
