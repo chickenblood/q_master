@@ -21,12 +21,15 @@ void main() {
   runApp(ProviderScope(child: MainApp()));
 }
 
-class MainApp extends ConsumerWidget {
+class MainApp extends ConsumerWidget with WidgetsBindingObserver {
+  late final ShakeDetector _shakeDetector;
+
   MainApp({super.key}) {
     SharedAppPrefs.ensureInitialized();
     _configureAudioSession();
+    WidgetsBinding.instance.addObserver(this);
     // Easter egg sound effect on shake.
-    ShakeDetector.autoStart(
+    _shakeDetector = ShakeDetector.autoStart(
       onPhoneShake: (_) => AudioPlayer()
         ..setAsset('assets/sounds/easter_egg.m4a')
         ..play(),
@@ -43,6 +46,16 @@ class MainApp extends ConsumerWidget {
     TimerTab(),
     NearMeTab(),
   ];
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused) {
+      _shakeDetector.stopListening();
+    } else if (state == AppLifecycleState.resumed) {
+      _shakeDetector.startListening();
+    }
+  }
 
   // Determine whether to show the tab bar based on the selected tab, device
   // and orientation.
