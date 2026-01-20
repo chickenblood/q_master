@@ -70,8 +70,15 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     );
   }
 
-  Future<String?> _showExercisePicker(BuildContext context) async {
-    final controller = TextEditingController();
+  Future<String?> _showExercisePicker(
+    BuildContext context, {
+    String? text,
+  }) async {
+    final controller = TextEditingController(text: text);
+    controller.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: text?.length ?? 0,
+    );
     return showAdaptiveModalSheet<String>(
       context: context,
       child: PlatformScaffold(
@@ -141,6 +148,26 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
       }
     },
   );
+
+  void _editExercise(
+    BuildContext context, {
+    required List<String> exercises,
+    required int index,
+    required WorkoutGroup sectionGroup,
+  }) async {
+    final existingExercise = exercises[index];
+    final updatedExercise = await _showExercisePicker(
+      context,
+      text: existingExercise,
+    );
+    // Maybe update exercise
+    if (updatedExercise?.trim().isNotEmpty ?? false) {
+      setState(() {
+        exercises[index] = updatedExercise!;
+        _lastAddedItemGroup = sectionGroup;
+      });
+    }
+  }
 
   static const _headerInsets = EdgeInsets.symmetric(vertical: 8.0);
 
@@ -221,12 +248,20 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                           _lastAddedItemGroup = null;
                         }
                       });
-                      return PlatformListTile(
-                        key: ValueKey('exercise_$exercise$index'),
-                        title: Text(exercise),
-                        trailing: exercises.length > 1
-                            ? Icon(Icons.drag_handle)
-                            : null,
+                      return GestureDetector(
+                        child: PlatformListTile(
+                          key: ValueKey('exercise_$exercise$index'),
+                          title: Text(exercise),
+                          trailing: exercises.length > 1
+                              ? Icon(Icons.drag_handle)
+                              : null,
+                        ),
+                        onDoubleTap: () => _editExercise(
+                          context,
+                          exercises: exercises,
+                          index: index,
+                          sectionGroup: sectionGroup,
+                        ),
                       );
                     },
                   ),
