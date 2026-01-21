@@ -77,68 +77,74 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => PlatformProvider(
-    settings: PlatformSettingsData(
-      iosUsesMaterialWidgets: true,
-      iosUseZeroPaddingForAppbarPlatformIcon: true,
-    ),
-    builder: (_) => PlatformTheme(
-      materialLightTheme: lightTheme(),
-      materialDarkTheme: darkTheme(),
-      cupertinoLightTheme: MaterialBasedCupertinoThemeData(
-        materialTheme: lightTheme(),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final prefs = SharedAppPrefs.instance;
+    return PlatformProvider(
+      settings: PlatformSettingsData(
+        iosUsesMaterialWidgets: true,
+        iosUseZeroPaddingForAppbarPlatformIcon: true,
       ),
-      cupertinoDarkTheme: MaterialBasedCupertinoThemeData(
-        materialTheme: darkTheme(),
-      ),
-      themeMode: .system,
-      builder: (context) => PlatformApp(
-        title: 'Q Master',
-        localizationsDelegates: L10n.localizationsDelegates,
-        supportedLocales: L10n.supportedLocales,
-        navigatorKey: _navigatorKey,
-        debugShowCheckedModeBanner: false,
-        home: Builder(
-          builder: (context) => PlatformTabScaffold(
-            tabController: _tabController,
-            bodyBuilder: (_, index) => _tabPages[index],
-            materialBuilder: (tabBarContext, _, index) =>
-                MaterialTabScaffoldData(
-                  height: _shouldShowTabBar(tabBarContext) ? null : 0,
-                  tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
-                      ? null
-                      : Colors.transparent,
-                ),
-            cupertinoBuilder: (tabBarContext, _, index) =>
-                CupertinoTabScaffoldData(
-                  navBarHeight: _shouldShowTabBar(tabBarContext) ? null : 0,
-                  tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
-                      ? null
-                      : Colors.transparent,
-                ),
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(AdaptiveIcons.history),
-                label: L10n.of(context)!.workoutsTabTitle,
+      builder: (_) => ListenableBuilder(
+        listenable: prefs.theme,
+        builder: (_, _) => PlatformTheme(
+          materialLightTheme: lightTheme(),
+          materialDarkTheme: darkTheme(),
+          cupertinoLightTheme: MaterialBasedCupertinoThemeData(
+            materialTheme: lightTheme(),
+          ),
+          cupertinoDarkTheme: MaterialBasedCupertinoThemeData(
+            materialTheme: darkTheme(),
+          ),
+          themeMode: ThemeMode.values[prefs.theme.value],
+          builder: (context) => PlatformApp(
+            title: 'Q Master',
+            localizationsDelegates: L10n.localizationsDelegates,
+            supportedLocales: L10n.supportedLocales,
+            navigatorKey: _navigatorKey,
+            debugShowCheckedModeBanner: false,
+            home: Builder(
+              builder: (context) => PlatformTabScaffold(
+                tabController: _tabController,
+                bodyBuilder: (_, index) => _tabPages[index],
+                materialBuilder: (tabBarContext, _, index) =>
+                    MaterialTabScaffoldData(
+                      height: _shouldShowTabBar(tabBarContext) ? null : 0,
+                      tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
+                          ? null
+                          : Colors.transparent,
+                    ),
+                cupertinoBuilder: (tabBarContext, _, index) =>
+                    CupertinoTabScaffoldData(
+                      navBarHeight: _shouldShowTabBar(tabBarContext) ? null : 0,
+                      tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
+                          ? null
+                          : Colors.transparent,
+                    ),
+                items: [
+                  BottomNavigationBarItem(
+                    icon: Icon(AdaptiveIcons.history),
+                    label: L10n.of(context)!.workoutsTabTitle,
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(AdaptiveIcons.sports),
+                    label: L10n.of(context)!.gamesTabTitle,
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(AdaptiveIcons.timer),
+                    label: L10n.of(context)!.timerTabTitle,
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(AdaptiveIcons.location),
+                    label: L10n.of(context)!.nearMeTabTitle,
+                  ),
+                ],
               ),
-              BottomNavigationBarItem(
-                icon: Icon(AdaptiveIcons.sports),
-                label: L10n.of(context)!.gamesTabTitle,
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(AdaptiveIcons.timer),
-                label: L10n.of(context)!.timerTabTitle,
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(AdaptiveIcons.location),
-                label: L10n.of(context)!.nearMeTabTitle,
-              ),
-            ],
+            ),
           ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 // Configure the audio session to not interruptother audio apps.

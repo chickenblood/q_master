@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// SharePreferences wrapper that provides typed accessors and change notifiers
@@ -15,11 +15,7 @@ final class SharedAppPrefs {
 
   static SharedAppPrefs get instance => _instance;
 
-  /// Impulse strength for the dodecahedron control.
-  late final ValueNotifier<double> dodecahedronImpulse;
-
-  /// Damping for the dodecahedron control.
-  late final ValueNotifier<double> dodecahedronDamping;
+  late final ValueNotifier<int> theme;
 
   /// Exercises per page in the beatdown browser
   /// (defaults to 1 if not set)
@@ -33,8 +29,7 @@ final class SharedAppPrefs {
   late final ValueNotifier<int> cycles;
 
   SharedAppPrefs._(this._prefs) {
-    dodecahedronImpulse = _valueSetup<double>('dodecahedron_impulse', 2);
-    dodecahedronDamping = _valueSetup<double>('dodecahedron_damping', 1);
+    theme = _valueSetup<int>('theme', ThemeMode.system.index);
 
     exercisesPerPage = _valueSetup<int>('exercises_per_page', 8);
 

@@ -105,7 +105,10 @@ class _SettingsSheet extends ConsumerWidget {
               ),
             ),
           ),
-          const Divider(),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: const Divider(),
+          ),
           Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
             child: PlatformText(
@@ -131,7 +134,7 @@ class _SettingsSheet extends ConsumerWidget {
               },
             ),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 8),
           for (final (intervalNotifier, label) in timeIntervalSettings)
             ListenableBuilder(
               listenable: intervalNotifier,
@@ -189,7 +192,46 @@ class _SettingsSheet extends ConsumerWidget {
               ),
             ),
           ),
-          const Divider(),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: const Divider(),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: PlatformText(
+              l10n.themeSettingsTitle,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+          ),
+          ListenableBuilder(
+            listenable: prefs.theme,
+            builder: (_, _) => SegmentedButton<ThemeMode>(
+              showSelectedIcon: false,
+              segments: [
+                ButtonSegment(
+                  value: ThemeMode.system,
+                  label: Text(l10n.themeSettingsSystemLabel),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.light,
+                  label: Text(l10n.themeSettingsLightLabel),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.dark,
+                  label: Text(l10n.themeSettingsDarkLabel),
+                ),
+              ],
+              selected: {ThemeMode.values[prefs.theme.value]},
+              onSelectionChanged: (newSelection) {
+                prefs.theme.value = newSelection.single.index;
+                timer.reset();
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: const Divider(),
+          ),
           PlatformListTile(
             title: PlatformText(l10n.appBarTitle),
             leading: Icon(context.platformIcons.info),

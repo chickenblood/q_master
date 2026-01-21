@@ -3,7 +3,6 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:q_master/utils/shared_app_prefs.dart';
 import 'package:shake/shake.dart';
 
 import 'faces_constants.dart';
@@ -19,9 +18,14 @@ class DodecahedronShader extends StatefulWidget {
 
 class _DodecahedronShaderState extends State<DodecahedronShader>
     with SingleTickerProviderStateMixin {
+  // damping (per second) and thresholds
+  static const _damping = 1.5;
+  static const _impulseStrength = 2.0;
+  static const _stopVelocityThreshold = 0.1;
+  static const _velocityEpsilon = 0.001;
+
   ui.FragmentProgram? _program;
   late final Ticker _ticker;
-  late final SharedAppPrefs _prefs;
   var _time = 0.0;
   Orientation? _lastOrientation;
   bool _isReloadingShader = false;
@@ -33,13 +37,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   var _viewAx = 0.0, _viewAy = 0.0, _viewAz = 0.0;
   // angular velocities (radians/sec)
   var _vx = 0.0, _vy = 0.0, _vz = 0.0;
-  // damping (per second) and thresholds (editable)
-  var _damping = 1.5;
-  static const double _velocityEpsilon = 0.001;
-
-  // user-tunable controls
-  var _impulseStrength = 3.0;
-  final _stopVelocityThreshold = 0.1;
 
   // bookkeeping for per-tick dt
   var _lastTick = 0.0;
@@ -66,7 +63,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   @override
   void initState() {
     super.initState();
-    _prefs = SharedAppPrefs.instance;
     _initShader();
     _ticker = createTicker(_onTick)..start();
 
@@ -112,12 +108,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
         if (!_ticker.isActive) _ticker.start();
       },
     );
-
-    // load any saved slider defaults for this control
-    setState(() {
-      _impulseStrength = _prefs.dodecahedronImpulse.value;
-      _damping = _prefs.dodecahedronDamping.value;
-    });
   }
 
   @override
