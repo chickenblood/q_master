@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// SharePreferences wrapper that provides typed accessors and change notifiers
 /// for application settings.
 final class SharedAppPrefs {
-  static late SharedAppPrefs _instance;
+  static late final SharedAppPrefs _instance;
   final SharedPreferences _prefs;
 
   /// Initializes the SharedAppPrefs singleton. This must be called once
