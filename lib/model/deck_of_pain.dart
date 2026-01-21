@@ -26,6 +26,9 @@ final class DeckOfPain extends _$DeckOfPain {
   /// Returns the top card from the deck.
   PainCard? currentCard() => state.isNotEmpty ? state[0] : null;
 
+  /// Returns the next card from the deck.
+  PainCard? nextCard() => state.length > 1 ? state[1] : null;
+
   @override
   List<PainCard> build() {
     final deck = <PainCard>[];

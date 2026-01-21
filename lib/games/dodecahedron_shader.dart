@@ -20,7 +20,7 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
     with SingleTickerProviderStateMixin {
   // damping (per second) and thresholds
   static const _damping = 1.5;
-  static const _impulseStrength = 2.0;
+  static const _impulseStrength = 3.0;
   static const _stopVelocityThreshold = 0.1;
   static const _velocityEpsilon = 0.001;
 

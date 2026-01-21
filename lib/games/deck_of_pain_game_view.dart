@@ -44,31 +44,126 @@ final class _Deck extends ConsumerStatefulWidget {
   const _Deck();
 
   @override
-  ConsumerState<_Deck> createState() => _DeckState();
+  _DeckState createState() => _DeckState();
 }
 
-class _DeckState extends ConsumerState<_Deck> {
-  bool isFlipped = true; // Start with the card face down.
+class _DeckState extends ConsumerState<_Deck> with TickerProviderStateMixin {
+  // Always maintain exactly 2 cards in the stack
+  PainCard? _topCard;
+  PainCard? _bottomCard;
+  bool _topCardFlipped = true; // true = face down
+  bool _bottomCardFlipped = true;
+
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
+  bool _isSlidingOff = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize animation for sliding card off
+    _slideController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+    _slideAnimation =
+        Tween<Offset>(begin: Offset.zero, end: const Offset(0, 1.5)).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeInOut),
+        );
+    _slideController.addStatusListener(_onSlideComplete);
+
+    // Initialize the two-card stack
+    final notifier = ref.read(deckOfPainProvider.notifier);
+    _topCard = notifier.currentCard();
+    _bottomCard = notifier.nextCard();
+  }
+
+  @override
+  void dispose() {
+    _slideController.dispose();
+    super.dispose();
+  }
+
+  void _onSlideComplete(AnimationStatus status) {
+    if (status == AnimationStatus.completed) {
+      setState(() {
+        // Move bottom card to top position (keep it face down)
+        _topCard = _bottomCard;
+        _topCardFlipped = true; // Ensure revealed card is face down
+
+        // Draw new bottom card
+        final notifier = ref.read(deckOfPainProvider.notifier);
+        _bottomCard = notifier.drawCard();
+        _bottomCardFlipped = true; // New bottom card is face down
+
+        // Reset slide animation
+        _isSlidingOff = false;
+        _slideController.reset();
+      });
+
+      // Auto-flip the newly revealed top card after a brief delay
+      Future.delayed(const Duration(milliseconds: 200), () {
+        if (mounted) {
+          setState(() => _topCardFlipped = false);
+        }
+      });
+    }
+  }
+
+  void _handleTap() {
+    if (_isSlidingOff) return;
+
+    if (_topCardFlipped) {
+      // Flip top card to reveal front
+      setState(() => _topCardFlipped = false);
+    } else {
+      // Slide top card off to reveal bottom card
+      setState(() => _isSlidingOff = true);
+      _slideController.forward(from: 0);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     ref.watch(deckOfPainProvider);
-    final currentCard = ref.read(deckOfPainProvider.notifier).currentCard();
-    if (currentCard == null) return Text('No more cards.');
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Material(
-        clipBehavior: .hardEdge,
-        borderRadius: .circular(16.0),
-        child: InkWell(
-          onTap: () {
-            final card = ref.read(deckOfPainProvider.notifier).drawCard();
-            setState(() => isFlipped = card == null);
-          },
-          child: isFlipped
-              ? const _BackCardView()
-              : _FrontCardView(painCard: currentCard),
-        ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Bottom card - always present, offset slightly
+          if (_bottomCard != null)
+            Transform.translate(
+              offset: Offset(0, -0),
+              child: _CardFlipView(
+                isFlipped: _bottomCardFlipped,
+                shouldAnimate:
+                    true, // Enable animation so it can flip when revealed
+                front: _FrontCardView(painCard: _bottomCard!),
+                back: const _BackCardView(),
+              ),
+            ),
+          // Top card - interactive, slides off when tapped
+          if (_topCard != null)
+            SlideTransition(
+              position: _slideAnimation,
+              child: Material(
+                clipBehavior: Clip.hardEdge,
+                borderRadius: BorderRadius.circular(16.0),
+                child: InkWell(
+                  onTap: _handleTap,
+                  child: _CardFlipView(
+                    isFlipped: _topCardFlipped,
+                    shouldAnimate: true,
+                    front: _FrontCardView(painCard: _topCard!),
+                    back: const _BackCardView(),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -190,4 +285,24 @@ class _BackCardView extends StatelessWidget {
     ),
     child: AspectRatio(aspectRatio: 2 / 3),
   );
+}
+
+final class _CardFlipView extends StatelessWidget {
+  final bool isFlipped;
+  final bool shouldAnimate;
+  final Widget front;
+  final Widget back;
+
+  const _CardFlipView({
+    super.key,
+    required this.isFlipped,
+    required this.shouldAnimate,
+    required this.front,
+    required this.back,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return isFlipped ? back : front;
+  }
 }
