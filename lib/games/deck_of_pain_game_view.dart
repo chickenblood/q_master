@@ -52,7 +52,6 @@ class _DeckState extends ConsumerState<_Deck> with TickerProviderStateMixin {
   PainCard? _topCard;
   PainCard? _bottomCard;
   bool _topCardFlipped = true; // true = face down
-  bool _bottomCardFlipped = true;
 
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -86,7 +85,7 @@ class _DeckState extends ConsumerState<_Deck> with TickerProviderStateMixin {
   }
 
   void _onSlideComplete(AnimationStatus status) {
-    if (status == AnimationStatus.completed) {
+    if (status == .completed) {
       setState(() {
         // Move bottom card to top position (keep it face down)
         _topCard = _bottomCard;
@@ -95,7 +94,6 @@ class _DeckState extends ConsumerState<_Deck> with TickerProviderStateMixin {
         // Draw new bottom card
         final notifier = ref.read(deckOfPainProvider.notifier);
         _bottomCard = notifier.drawCard();
-        _bottomCardFlipped = true; // New bottom card is face down
 
         // Reset slide animation
         _isSlidingOff = false;
@@ -126,40 +124,32 @@ class _DeckState extends ConsumerState<_Deck> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(deckOfPainProvider);
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Bottom card - always present, offset slightly
+          // Bottom card - always present.
           if (_bottomCard != null)
-            Transform.translate(
-              offset: Offset(0, -0),
-              child: _CardFlipView(
-                isFlipped: _bottomCardFlipped,
-                shouldAnimate:
-                    true, // Enable animation so it can flip when revealed
-                front: _FrontCardView(painCard: _bottomCard!),
-                back: const _BackCardView(),
-              ),
+            _CardFlipView(
+              key: ValueKey(_bottomCard),
+              isFlipped: true,
+              shouldAnimate: false, // Don't animate until it becomes top card
+              front: _FrontCardView(painCard: _bottomCard!),
+              back: const _BackCardView(),
             ),
           // Top card - interactive, slides off when tapped
           if (_topCard != null)
             SlideTransition(
               position: _slideAnimation,
-              child: Material(
-                clipBehavior: Clip.hardEdge,
-                borderRadius: BorderRadius.circular(16.0),
-                child: InkWell(
-                  onTap: _handleTap,
-                  child: _CardFlipView(
-                    isFlipped: _topCardFlipped,
-                    shouldAnimate: true,
-                    front: _FrontCardView(painCard: _topCard!),
-                    back: const _BackCardView(),
-                  ),
+              child: GestureDetector(
+                onTap: _handleTap,
+                child: _CardFlipView(
+                  key: ValueKey(_topCard),
+                  isFlipped: _topCardFlipped,
+                  shouldAnimate: true,
+                  front: _FrontCardView(painCard: _topCard!),
+                  back: const _BackCardView(),
                 ),
               ),
             ),
@@ -172,7 +162,7 @@ class _DeckState extends ConsumerState<_Deck> with TickerProviderStateMixin {
 class _FrontCardView extends StatelessWidget {
   final PainCard painCard;
 
-  const _FrontCardView({required this.painCard});
+  const _FrontCardView({super.key, required this.painCard});
 
   Widget _buildText(
     BuildContext context, {
@@ -183,7 +173,7 @@ class _FrontCardView extends StatelessWidget {
     return PlatformText(
       text,
       textAlign: .center,
-      style: style.copyWith(fontWeight: FontWeight.bold, color: color),
+      style: style.copyWith(fontWeight: .bold, color: color),
       textScaler: .noScaling,
     );
   }
@@ -195,7 +185,11 @@ class _FrontCardView extends StatelessWidget {
         ? TextTheme.of(context).displaySmall!
         : TextTheme.of(context).displayLarge!;
     return Container(
-      color: Colors.white,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16.0),
+        color: Colors.white,
+      ),
+      clipBehavior: .hardEdge,
       child: AspectRatio(
         aspectRatio: 2 / 3,
         child: Padding(
@@ -207,11 +201,11 @@ class _FrontCardView extends StatelessWidget {
                 alignment: Alignment.center,
                 child: PlatformText(
                   painCard.description,
-                  textAlign: TextAlign.center,
+                  textAlign: .center,
                   overflow: .fade,
                   maxLines: 5,
                   style: textStyle.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: .bold,
                     color: painCard.suit.color,
                   ),
                   textScaler: .noScaling,
@@ -283,11 +277,12 @@ class _BackCardView extends StatelessWidget {
         fit: .contain,
       ),
     ),
+    clipBehavior: .hardEdge,
     child: AspectRatio(aspectRatio: 2 / 3),
   );
 }
 
-final class _CardFlipView extends StatelessWidget {
+final class _CardFlipView extends StatefulWidget {
   final bool isFlipped;
   final bool shouldAnimate;
   final Widget front;
@@ -302,7 +297,57 @@ final class _CardFlipView extends StatelessWidget {
   });
 
   @override
+  State<_CardFlipView> createState() => _CardFlipViewState();
+}
+
+class _CardFlipViewState extends State<_CardFlipView>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _animator;
+
+  @override
+  void initState() {
+    super.initState();
+    _animator = AnimationController(
+      vsync: this,
+      lowerBound: 0,
+      upperBound: pi,
+      duration: const Duration(milliseconds: 400),
+    );
+
+    // Start with the correct side based on isFlipped
+    _animator.value = widget.isFlipped ? 0 : pi;
+  }
+
+  @override
+  void didUpdateWidget(covariant _CardFlipView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isFlipped != widget.isFlipped) {
+      // Set to current position and animate to target
+      _animator.value = oldWidget.isFlipped ? 0 : pi;
+      _animator.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _animator.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return isFlipped ? back : front;
+    return AnimatedBuilder(
+      animation: _animator,
+      builder: (context, child) {
+        final progress = _animator.value;
+        return Transform(
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.001) // Add perspective
+            ..rotateY(pi + progress),
+          alignment: .center,
+          child: progress < pi / 2 ? widget.back : widget.front,
+        );
+      },
+    );
   }
 }
