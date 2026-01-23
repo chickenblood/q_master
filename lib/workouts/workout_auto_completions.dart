@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/utils/text_editing_value_utils.dart';
@@ -41,12 +43,13 @@ class _WorkoutAutocompleteTextFieldState
   // Adjusts the caret to be placed after the newly-inserted text.
   void _updateCaretForOptionText(String text) {
     if (_replacementRange.isValid) {
+      final entireText = widget.textEditingController.text;
+
       // Hack to ensure the caret is placed at the correct point after the
       // replacement.
       final selection = TextSelection.collapsed(
-        offset: _replacementRange.start + text.length,
+        offset: min(_replacementRange.start + text.length, entireText.length),
       );
-      final entireText = widget.textEditingController.text;
 
       widget.textEditingController.value = TextEditingValue(
         text: entireText,
@@ -73,7 +76,7 @@ class _WorkoutAutocompleteTextFieldState
 
       // Otherwise, filter options based on user input
       final completions = workoutCompletions.where((String option) {
-        return option.toLowerCase().startsWith(precedingText.toLowerCase());
+        return option.toLowerCase().contains(precedingText.toLowerCase());
       });
       if (precedingText.isNotEmpty && completions.isNotEmpty) {
         _replacementRange = replacementRange;
@@ -113,6 +116,14 @@ class _WorkoutAutocompleteTextFieldState
           AutocompleteOnSelected<String> onSelected,
           Iterable<String> options,
         ) {
+          late String highlightText;
+          if (_replacementRange.isValid) {
+            highlightText = widget.textEditingController.value.text
+                .substring(_replacementRange.start, _replacementRange.end)
+                .toLowerCase();
+          } else {
+            highlightText = '';
+          }
           // Builds the list of suggestions
           return Material(
             child: SafeArea(
@@ -122,8 +133,34 @@ class _WorkoutAutocompleteTextFieldState
                 itemCount: options.length,
                 itemBuilder: (BuildContext context, int index) {
                   final String option = options.elementAt(index);
+                  final startIndex = option.toLowerCase().indexOf(
+                    highlightText,
+                  );
+                  final textStyle = Theme.of(context).textTheme.titleLarge!;
                   return PlatformListTile(
-                    title: PlatformText(option),
+                    title: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: option.substring(0, startIndex),
+                            style: textStyle,
+                          ),
+                          TextSpan(
+                            text: option.substring(
+                              startIndex,
+                              startIndex + highlightText.length,
+                            ),
+                            style: textStyle.copyWith(fontWeight: .bold),
+                          ),
+                          TextSpan(
+                            text: option.substring(
+                              startIndex + highlightText.length,
+                            ),
+                            style: textStyle,
+                          ),
+                        ],
+                      ),
+                    ),
                     onTap: () => onSelected(option),
                   );
                 },

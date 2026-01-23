@@ -13,7 +13,7 @@ extension Utils on TextEditingValue {
     if (!selection.isCollapsed) return _emptyResult;
 
     // Get the current word being typed by the user.
-    final caretIndex = selection.baseOffset;
+    final caretIndex = min(selection.baseOffset, text.length);
 
     // Find whitespace or beginning of line to locate where the current word
     // starts. Starting search at caretIndex -1 means we start at the
