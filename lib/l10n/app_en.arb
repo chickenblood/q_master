@@ -25,6 +25,8 @@
     "@settingsAboutDialogDescription": {},
     "createWorkoutDialogTitle": "Create Workout",
     "@createWorkoutDialogTitle": {},
+    "editWorkoutDialogTitle": "Edit Workout",
+    "@editWorkoutDialogTitle": {},
     "startWorkoutButtonText": "Start",
     "@startWorkoutButtonText": {},
     "workoutNameFieldLabel": "Name",

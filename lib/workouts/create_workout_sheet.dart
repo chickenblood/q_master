@@ -324,7 +324,9 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
-            L10n.of(context)!.createWorkoutDialogTitle,
+            widget.workout == null
+                ? L10n.of(context)!.createWorkoutDialogTitle
+                : L10n.of(context)!.editWorkoutDialogTitle,
             textScaler: MediaQuery.textScalerOf(
               context,
             ).clamp(maxScaleFactor: 1.5),
