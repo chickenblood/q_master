@@ -40,6 +40,23 @@ class _WorkoutAutocompleteTextFieldState
   final focusNode = FocusNode();
   var _replacementRange = TextRange.collapsed(-1);
 
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.autofocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        FocusScope.of(context).requestFocus(focusNode);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    focusNode.dispose();
+    super.dispose();
+  }
+
   // Adjusts the caret to be placed after the newly-inserted text.
   void _updateCaretForOptionText(String text) {
     if (_replacementRange.isValid) {
@@ -95,7 +112,6 @@ class _WorkoutAutocompleteTextFieldState
           return PlatformTextField(
             minLines: widget._minLines,
             maxLines: widget._maxLines,
-            autofocus: widget.autofocus,
             expands: widget.expands,
             autocorrect: false,
             textCapitalization: TextCapitalization.sentences,
@@ -103,7 +119,6 @@ class _WorkoutAutocompleteTextFieldState
             focusNode: focusNode,
             onTap: widget.onTap,
             onSubmitted: (String value) {
-              if (value.isEmpty) return;
               onFieldSubmitted(); // Important for form submission
               widget.onSubmitted?.call();
             },
