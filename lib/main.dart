@@ -34,7 +34,8 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
     _shakeDetector = ShakeDetector.autoStart(
       onPhoneShake: (_) {
         final selectedTab = _tabController.index(_navigatorKey.currentContext!);
-        if (selectedTab != Tab.games.index) {
+        if (selectedTab != Tab.games.index &&
+            SharedAppPrefs.instance.motorboatSoundEnabled.value) {
           AudioPlayer()
             ..setAsset('assets/sounds/easter_egg.m4a')
             ..play();

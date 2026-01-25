@@ -201,33 +201,56 @@ class _SettingsSheet extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
             child: PlatformText(
-              l10n.themeSettingsTitle,
+              l10n.generalSettingsTitle,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
           ),
           ListenableBuilder(
             listenable: prefs.theme,
-            builder: (_, _) => SegmentedButton<ThemeMode>(
-              showSelectedIcon: false,
-              segments: [
-                ButtonSegment(
-                  value: ThemeMode.system,
-                  label: Text(l10n.themeSettingsSystemLabel),
+            builder: (_, _) => PlatformListTile(
+              title: PlatformText(
+                l10n.themeSettingsTitle,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              trailing: SegmentedButton<ThemeMode>(
+                showSelectedIcon: false,
+                segments: [
+                  ButtonSegment(
+                    value: ThemeMode.system,
+                    label: Text(l10n.themeSettingsSystemLabel),
+                  ),
+                  ButtonSegment(
+                    value: ThemeMode.light,
+                    label: Text(l10n.themeSettingsLightLabel),
+                  ),
+                  ButtonSegment(
+                    value: ThemeMode.dark,
+                    label: Text(l10n.themeSettingsDarkLabel),
+                  ),
+                ],
+                selected: {ThemeMode.values[prefs.theme.value]},
+                onSelectionChanged: (newSelection) {
+                  prefs.theme.value = newSelection.single.index;
+                  timer.reset();
+                },
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: ListenableBuilder(
+              listenable: prefs.motorboatSoundEnabled,
+              builder: (_, _) => PlatformListTile(
+                title: PlatformText(
+                  l10n.motorboatSoundSettingsLabel,
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
-                ButtonSegment(
-                  value: ThemeMode.light,
-                  label: Text(l10n.themeSettingsLightLabel),
+                trailing: Switch.adaptive(
+                  value: prefs.motorboatSoundEnabled.value,
+                  onChanged: (value) =>
+                      prefs.motorboatSoundEnabled.value = value,
                 ),
-                ButtonSegment(
-                  value: ThemeMode.dark,
-                  label: Text(l10n.themeSettingsDarkLabel),
-                ),
-              ],
-              selected: {ThemeMode.values[prefs.theme.value]},
-              onSelectionChanged: (newSelection) {
-                prefs.theme.value = newSelection.single.index;
-                timer.reset();
-              },
+              ),
             ),
           ),
           Padding(
@@ -313,7 +336,7 @@ class _SettingsSheet extends ConsumerWidget {
     return PlatformScaffold(
       body: SafeArea(
         child: CustomScrollView(
-          physics: ClampingScrollPhysics(),
+          physics: dismissibleSheetScrollPhysics(context),
           slivers: [
             PlatformSliverAppBar(
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,

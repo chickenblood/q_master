@@ -15,8 +15,6 @@ final class SharedAppPrefs {
 
   static SharedAppPrefs get instance => _instance;
 
-  late final ValueNotifier<int> theme;
-
   /// Exercises per page in the beatdown browser
   /// (defaults to 1 if not set)
   late final ValueNotifier<int> exercisesPerPage;
@@ -28,9 +26,10 @@ final class SharedAppPrefs {
   late final ValueNotifier<int> rounds;
   late final ValueNotifier<int> cycles;
 
-  SharedAppPrefs._(this._prefs) {
-    theme = _valueSetup<int>('theme', ThemeMode.system.index);
+  late final ValueNotifier<int> theme;
+  late final ValueNotifier<bool> motorboatSoundEnabled;
 
+  SharedAppPrefs._(this._prefs) {
     exercisesPerPage = _valueSetup<int>('exercises_per_page', 8);
 
     timerType = _valueSetup<int>('timer_type', 0);
@@ -39,6 +38,9 @@ final class SharedAppPrefs {
     restIntervalSeconds = _valueSetup<int>('rest_interval_seconds', 10);
     rounds = _valueSetup<int>('rounds', 8);
     cycles = _valueSetup<int>('cycles', 1);
+
+    theme = _valueSetup<int>('theme', ThemeMode.system.index);
+    motorboatSoundEnabled = _valueSetup<bool>('motorboat_sound', true);
   }
 
   ValueNotifier<T> _valueSetup<T>(String key, T defaultValue) {
