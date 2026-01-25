@@ -118,8 +118,9 @@ class _WorkoutAutocompleteTextFieldState
             controller: textEditingController,
             focusNode: focusNode,
             onTap: widget.onTap,
+            // Important for form submission
+            onSubmitted: (_) => onFieldSubmitted,
             onEditingComplete: () {
-              //onFieldSubmitted(); // Important for form submission
               widget.onSubmitted?.call();
               focusNode.unfocus();
             },
