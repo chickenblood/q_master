@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:q_master/utils/text_editing_value_utils.dart';
 
+import '../utils/text_editing_value_utils.dart';
 import 'workout_constants.dart';
 
 /// A text field with autocomplete functionality for describing workouts.

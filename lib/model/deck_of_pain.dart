@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:q_master/model/pain_card.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'pain_card.dart';
 import 'pain_exercise_constants.dart';
 
 part 'deck_of_pain.g.dart';

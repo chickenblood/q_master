@@ -2,18 +2,18 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:q_master/l10n/l10n.dart';
-import 'package:q_master/model/formatted_workout.dart';
-import 'package:q_master/model/workout.dart';
-import 'package:q_master/model/workout_list.dart';
-import 'package:q_master/settings/settings_sheet.dart';
-import 'package:q_master/ui/adaptive_icons.dart';
-import 'package:q_master/ui/adaptive_menu.dart';
-import 'package:q_master/ui/adaptive_modal_sheet.dart';
-import 'package:q_master/utils/datetime_utils.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../l10n/l10n.dart';
+import '../model/formatted_workout.dart';
+import '../model/workout.dart';
+import '../model/workout_list.dart';
+import '../settings/settings_sheet.dart';
+import '../ui/adaptive_icons.dart';
+import '../ui/adaptive_menu.dart';
+import '../ui/adaptive_modal_sheet.dart';
+import '../utils/datetime_utils.dart';
 import 'beatdown_browser.dart';
 import 'create_workout_sheet.dart';
 

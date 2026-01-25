@@ -3,9 +3,10 @@ import 'dart:math';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:q_master/utils/shared_app_prefs.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+
+import '../utils/shared_app_prefs.dart';
 
 part 'timer.freezed.dart';
 part 'timer.g.dart';

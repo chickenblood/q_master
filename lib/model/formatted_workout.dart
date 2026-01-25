@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:q_master/l10n/l10n.dart';
-import 'package:q_master/utils/datetime_utils.dart';
 
+import '../l10n/l10n.dart';
+import '../utils/datetime_utils.dart';
 import 'workout.dart';
 
 extension FormatttedOutput on Workout {

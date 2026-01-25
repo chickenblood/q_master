@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:q_master/l10n/l10n.dart';
-import 'package:q_master/model/workout.dart';
-import 'package:q_master/ui/adaptive_icons.dart';
-import 'package:q_master/ui/adaptive_modal_sheet.dart';
-import 'package:q_master/workouts/workout_auto_completions.dart';
+
+import '../l10n/l10n.dart';
+import '../model/workout.dart';
+import '../ui/adaptive_icons.dart';
+import '../ui/adaptive_modal_sheet.dart';
+import 'workout_auto_completions.dart';
 
 enum WorkoutGroup { warmup, thang, mary }
 

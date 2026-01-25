@@ -3,10 +3,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:q_master/l10n/l10n.dart';
-import 'package:q_master/model/deck_of_pain.dart';
-import 'package:q_master/model/pain_card.dart';
-import 'package:q_master/ui/adaptive_icons.dart';
+
+import '../l10n/l10n.dart';
+import '../model/deck_of_pain.dart';
+import '../model/pain_card.dart';
+import '../ui/adaptive_icons.dart';
 
 final class DeckOfPainGameView extends StatelessWidget {
   final String heroTag;

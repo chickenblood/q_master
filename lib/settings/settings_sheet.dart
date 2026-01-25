@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:q_master/l10n/l10n.dart';
-import 'package:q_master/model/timer.dart';
-import 'package:q_master/ui/adaptive_icons.dart';
-import 'package:q_master/ui/adaptive_modal_sheet.dart';
-import 'package:q_master/utils/datetime_utils.dart';
-import 'package:q_master/utils/shared_app_prefs.dart';
+
+import '../l10n/l10n.dart';
+import '../model/timer.dart';
+import '../ui/adaptive_icons.dart';
+import '../ui/adaptive_modal_sheet.dart';
+import '../ui/scroll_physics.dart';
+import '../utils/datetime_utils.dart';
+import '../utils/shared_app_prefs.dart';
 
 final class SettingsActionButton extends StatelessWidget {
   const SettingsActionButton({super.key});

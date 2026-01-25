@@ -2,10 +2,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:q_master/l10n/l10n.dart';
-import 'package:q_master/settings/settings_sheet.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../l10n/l10n.dart';
+import '../settings/settings_sheet.dart';
 import 'deck_of_pain_game_view.dart';
 import 'dod_game_view.dart';
 

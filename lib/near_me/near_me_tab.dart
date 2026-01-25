@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:q_master/l10n/l10n.dart';
-import 'package:q_master/settings/settings_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
+
+import '../l10n/l10n.dart';
+import '../settings/settings_sheet.dart';
 
 class NearMeTab extends StatelessWidget {
   final controller = WebViewController()
