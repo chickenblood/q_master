@@ -9,87 +9,96 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.6;
             color: #333;
-            max-width: 800px;
+            max-width: 750px;
             margin: 0 auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-        .container {
-            background: #fff;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 30px 20px;
+            background-color: #ffffff;
         }
         h1 {
-            color: #000;
-            border-bottom: 2px solid #eee;
+            color: #1a1a1a;
+            font-size: 2rem;
+            border-bottom: 2px solid #f0f0f0;
             padding-bottom: 10px;
         }
         h2 {
             color: #2c3e50;
-            margin-top: 30px;
+            margin-top: 1.5em;
+            font-size: 1.25rem;
         }
         p, ul {
-            margin-bottom: 15px;
+            margin-bottom: 1rem;
         }
-        .highlight {
-            background-color: #e8f4fd;
-            padding: 15px;
-            border-left: 5px solid #2980b9;
+        ul {
+            padding-left: 20px;
+        }
+        .highlight-box {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
             margin: 20px 0;
         }
-        .footer {
-            margin-top: 50px;
-            font-size: 0.9em;
-            color: #7f8c8d;
-            text-align: center;
+        .contact-info {
+            background-color: #eef7ff;
+            padding: 15px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+        footer {
+            margin-top: 40px;
+            font-size: 0.85rem;
+            color: #888;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
     <h1>Privacy Policy for Q Master</h1>
-    <p><strong>Effective Date:</strong> January 25, 2026</p>
+    <p><strong>Effective Date:</strong> January 26, 2026</p>
 
-    <div class="highlight">
-        <strong>Our Privacy Commitment:</strong> Q Master is built with a "privacy-first" mindset. We do not collect personal identifiers, we do not track your behavior, and we do not sell your data.
+    <div class="highlight-box">
+        <strong>The Short Version:</strong> Q Master does not collect, store, or share any of your personal data. Your information stays exactly where it belongs: on your device.
     </div>
 
-    <h2>1. Data Collection and Usage</h2>
-    <p>Q Master does not require a user account, login, or the submission of personal information such as your name, phone number, or email address.</p>
+    <h2>1. Data Collection</h2>
+    <p>Q Master does not collect any personally identifiable information (PII). We do not require account creation, and we do not track your name, email address, phone number, or device identifiers.</p>
 
-    <h2>2. Location Data & Network Transmission</h2>
-    <p>To provide the core functionality of finding a local workout, Q Master requests access to your device’s location coordinates.</p>
+    <h2>2. Location Services</h2>
+    <p>To help you find nearby workouts, the app requests access to your device’s location.</p>
     <ul>
-        <li><strong>Network Transmission:</strong> When you initiate a search, your approximate location coordinates are sent to the external service <code>f3near.me</code>.</li>
-        <li><strong>Anonymity:</strong> This request is strictly anonymous. No personal identifiers (like your name or Device ID) are attached to this request.</li>
-        <li><strong>Retention:</strong> We do not store your location history. The data is used solely to fetch nearby workout results in real-time.</li>
+        <li><strong>On-Device Processing:</strong> Your location data is used strictly for real-time calculations within the app.</li>
+        <li><strong>No Transmission:</strong> Your location is <strong>never</strong> sent over the network to a server, shared with third parties, or stored by the developer.</li>
+        <li><strong>Control:</strong> You may grant or revoke location access at any time through your device's system settings.</li>
     </ul>
 
     <h2>3. Local Storage</h2>
-    <p>Q Master saves user-specific settings and preferences (such as app configurations) directly on your device. This data stays on your phone and is never uploaded to our servers.</p>
+    <p>Q Master saves your personal settings and app preferences directly to your device's local storage.</p>
+    <ul>
+        <li>This data is not synced to a cloud or transmitted to external servers.</li>
+        <li>We cannot access this data.</li>
+        <li>Deleting the app typically removes all locally stored app data.</li>
+    </ul>
 
     <h2>4. Third-Party Services</h2>
-    <p>Aside from the specific workout search request to <code>f3near.me</code>, Q Master does not use any third-party analytics, tracking SDKs, or advertising networks (such as Firebase, Google Analytics, or AdMob).</p>
+    <p>Q Master does not utilize third-party SDKs, analytics engines (such as Firebase or Google Analytics), or advertising networks. The app is a self-contained experience with no hidden tracking mechanisms.</p>
 
     <h2>5. Children’s Privacy</h2>
-    <p>Q Master is not directed at children under the age of 13. Since the app collects no personally identifiable information from any user, it is inherently compliant with COPPA and international privacy standards.</p>
+    <p>Q Master is not directed at children under the age of 13. However, because we collect zero personal data from any user, we are inherently compliant with COPPA (Children’s Online Privacy Protection Act) and similar global privacy regulations.</p>
 
-    <h2>6. Security</h2>
-    <p>Because we do not maintain a database of users or store personal information on our servers, there is no risk of your personal data being compromised by a data breach on our end. You remain the sole custodian of the data stored on your device.</p>
+    <h2>6. Changes to This Policy</h2>
+    <p>We may update this policy if we add new features. Any updates will be posted here with a new effective date. If we ever decide to collect data, we will provide a prominent notice and ask for your explicit consent.</p>
 
-    <h2>7. Changes to This Policy</h2>
-    <p>We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated "Effective Date."</p>
-
-    <h2>8. Contact Us</h2>
-    <p>If you have any questions or concerns about this Privacy Policy, please contact us at:</p>
-    <p><strong>Email:</strong> <a href="mailto:f3appdev@gmail.com">f3appdev@gmail.com</a></p>
-
-    <div class="footer">
-        &copy; 2026 Q Master. All rights reserved.
+    <h2>7. Contact Us</h2>
+    <p>If you have questions about our privacy practices, please contact us at:</p>
+    <div class="contact-info">
+        <strong>Email:</strong> <a href="mailto:f3appdev@gmail.com">f3appdev@gmail.com</a>
     </div>
-</div>
+
+    <footer>
+        &copy; 2026 Q Master. Built with a focus on user privacy.
+    </footer>
 
 </body>
 </html>
