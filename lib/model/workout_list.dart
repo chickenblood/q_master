@@ -40,8 +40,9 @@ final class WorkoutList extends _$WorkoutList {
     file.writeAsStringSync(json);
     state = updatedWorkouts;
 
+    // Sync to watch.
     if (await _watch.isPaired && await _watch.isReachable) {
-      _watch.updateApplicationContext({'data': json});
+      _watch.updateApplicationContext({'workouts': json});
     }
   }
 
