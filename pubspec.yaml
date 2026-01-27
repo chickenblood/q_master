@@ -35,6 +35,8 @@ dependencies:
   shake: ^3.0.0
   just_audio: ^0.10.5
   audio_session: ^0.2.2
+  watch_connectivity: ^0.2.6
+  logger: ^2.6.2
 
 
 dev_dependencies:

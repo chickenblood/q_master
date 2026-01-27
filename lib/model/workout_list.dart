@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:watch_connectivity/watch_connectivity.dart';
 
 import 'workout.dart';
 
@@ -11,6 +13,8 @@ part 'workout_list.g.dart';
 
 @riverpod
 final class WorkoutList extends _$WorkoutList {
+  static final _logger = Logger();
+  final _watch = WatchConnectivity();
   String? _filename;
 
   @override
@@ -35,6 +39,10 @@ final class WorkoutList extends _$WorkoutList {
     final json = jsonEncode(updatedWorkouts);
     file.writeAsStringSync(json);
     state = updatedWorkouts;
+
+    if (await _watch.isPaired && await _watch.isReachable) {
+      _watch.updateApplicationContext({'data': json});
+    }
   }
 
   void add(Workout workout) {
