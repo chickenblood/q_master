@@ -1,6 +1,6 @@
 # Q Master - AI Coding Instructions
 
-F3 Q Master is a Flutter app for managing F3 workout routines. Targets all platforms with adaptive UI.
+Q Master is a Flutter app for managing F3 workout routines. Targets all platforms with adaptive UI.
 
 ## Platform-Adaptive UI
 

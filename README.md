@@ -1,6 +1,6 @@
 # Q Master
 
-F3 Q Master. An app to manage your F3 workouts  (digital weinke)
+Q Master. An app to manage your F3 workouts  (digital weinke)
 
 ## Why Flutter?
 I chose Dart/Flutter over native Swift or Kotlin development, so that we can keep changes in lockstep and get them out to iOS and Android users with minimal additional effort. It is by far the, fastest most productive cross-platform development framework I have ever used and perfect for a small team.
