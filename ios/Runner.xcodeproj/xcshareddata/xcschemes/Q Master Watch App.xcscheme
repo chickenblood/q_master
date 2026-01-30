@@ -15,7 +15,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3C641B3C2F299E5400E55BF3"
+               BlueprintIdentifier = "3CC3C3532F2C6D7E0027F4B0"
                BuildableName = "Q Master Watch App.app"
                BlueprintName = "Q Master Watch App"
                ReferencedContainer = "container:Runner.xcodeproj">
@@ -58,7 +58,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3C641B3C2F299E5400E55BF3"
+            BlueprintIdentifier = "3CC3C3532F2C6D7E0027F4B0"
             BuildableName = "Q Master Watch App.app"
             BlueprintName = "Q Master Watch App"
             ReferencedContainer = "container:Runner.xcodeproj">
@@ -75,7 +75,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3C641B3C2F299E5400E55BF3"
+            BlueprintIdentifier = "3CC3C3532F2C6D7E0027F4B0"
             BuildableName = "Q Master Watch App.app"
             BlueprintName = "Q Master Watch App"
             ReferencedContainer = "container:Runner.xcodeproj">
