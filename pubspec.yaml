@@ -37,6 +37,7 @@ dependencies:
   audio_session: ^0.2.2
   watch_connectivity: ^0.2.6
   logger: ^2.6.2
+  dots_indicator: ^4.0.1
 
 
 dev_dependencies:

@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -77,15 +78,15 @@ final class BeatdownBrowser extends StatelessWidget {
     final SharedAppPrefs prefs = SharedAppPrefs.instance;
     final exercisesPerPage = prefs.exercisesPerPage.value;
     final pages = _calculatePages(exercisesPerPage: exercisesPerPage);
-    return PlatformScaffold(
-      appBar: PlatformAppBar(
-        leading: PlatformIconButton(
-          icon: Icon(AdaptiveIcons.close),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: ListenableBuilder(
-          listenable: _pageIndex,
-          builder: (_, _) => PlatformText(
+    return ListenableBuilder(
+      listenable: _pageIndex,
+      builder: (_, _) => PlatformScaffold(
+        appBar: PlatformAppBar(
+          leading: PlatformIconButton(
+            icon: Icon(AdaptiveIcons.close),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: PlatformText(
             _exerciseTypeAtPage(
               context,
               pageIndex: _pageIndex.value,
@@ -96,73 +97,89 @@ final class BeatdownBrowser extends StatelessWidget {
             ).clamp(maxScaleFactor: 1.6),
           ),
         ),
-      ),
-      body: SafeArea(
-        minimum: EdgeInsets.all(16),
-        child: PageView.builder(
-          controller: _pageController,
-          itemCount: pages.length,
-          onPageChanged: (index) => _pageIndex.value = index,
-          itemBuilder: (context, index) {
-            final autoSizeGroup = pages[index].group;
-            final pageLines = pages[index].lines;
-            return Column(
-              crossAxisAlignment: .end,
-              children: [
-                Expanded(
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: .max,
-                      mainAxisAlignment: .spaceBetween,
-                      crossAxisAlignment: exercisesPerPage == 1
-                          ? .center
-                          : .start,
+        body: SafeArea(
+          minimum: EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Expanded(
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: pages.length,
+                  onPageChanged: (index) => _pageIndex.value = index,
+                  itemBuilder: (context, index) {
+                    final autoSizeGroup = pages[index].group;
+                    final pageLines = pages[index].lines;
+                    return Column(
+                      crossAxisAlignment: .end,
                       children: [
-                        Spacer(),
-                        ...pageLines.map(
-                          (line) => Expanded(
-                            child: AutoSizeText(
-                              group: autoSizeGroup,
-                              line,
-                              textAlign: exercisesPerPage == 1
-                                  ? TextAlign.center
-                                  : TextAlign.left,
-                              overflow: .fade,
-                              maxLines: 2,
-                              minFontSize: 12,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 48,
-                              ),
+                        Expanded(
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: .max,
+                              mainAxisAlignment: .spaceBetween,
+                              crossAxisAlignment: exercisesPerPage == 1
+                                  ? .center
+                                  : .start,
+                              children: [
+                                Spacer(),
+                                ...pageLines.map(
+                                  (line) => Expanded(
+                                    child: AutoSizeText(
+                                      group: autoSizeGroup,
+                                      line,
+                                      textAlign: exercisesPerPage == 1
+                                          ? TextAlign.center
+                                          : TextAlign.left,
+                                      overflow: .fade,
+                                      maxLines: 2,
+                                      minFontSize: 12,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 48,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Spacer(),
+                              ],
                             ),
                           ),
                         ),
-                        Spacer(),
-                      ],
-                    ),
-                  ),
-                ),
-                PlatformTextButton(
-                  onPressed: () => _onNextPage(
-                    context,
-                    pageIndex: index,
-                    pageCount: pages.length,
-                  ),
-                  child: PlatformText(
-                    (index + 1) < pages.length
-                        ? L10n.of(
+                        PlatformTextButton(
+                          onPressed: () => _onNextPage(
                             context,
-                          )!.workoutNextUpText(pages[index + 1].lines.first)
-                        : L10n.of(context)!.workoutCompleteText,
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                    textAlign: .end,
-                    overflow: .ellipsis,
-                    maxLines: 2,
-                  ),
+                            pageIndex: index,
+                            pageCount: pages.length,
+                          ),
+                          child: PlatformText(
+                            (index + 1) < pages.length
+                                ? L10n.of(context)!.workoutNextUpText(
+                                    pages[index + 1].lines.first,
+                                  )
+                                : L10n.of(context)!.workoutCompleteText,
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: .end,
+                            overflow: .ellipsis,
+                            maxLines: 2,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
-              ],
-            );
-          },
+              ),
+              DotsIndicator(
+                dotsCount: pages.length,
+                decorator: DotsDecorator(
+                  activeColor: Theme.of(context).colorScheme.onSurface,
+                ),
+                position: _pageIndex.value.toDouble(),
+              ),
+            ],
+          ),
         ),
       ),
     );

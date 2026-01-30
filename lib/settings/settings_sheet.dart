@@ -212,27 +212,30 @@ class _SettingsSheet extends ConsumerWidget {
                 l10n.themeSettingsTitle,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              trailing: SegmentedButton<ThemeMode>(
-                showSelectedIcon: false,
-                segments: [
-                  ButtonSegment(
-                    value: ThemeMode.system,
-                    label: Text(l10n.themeSettingsSystemLabel),
-                  ),
-                  ButtonSegment(
-                    value: ThemeMode.light,
-                    label: Text(l10n.themeSettingsLightLabel),
-                  ),
-                  ButtonSegment(
-                    value: ThemeMode.dark,
-                    label: Text(l10n.themeSettingsDarkLabel),
-                  ),
-                ],
-                selected: {ThemeMode.values[prefs.theme.value]},
-                onSelectionChanged: (newSelection) {
-                  prefs.theme.value = newSelection.single.index;
-                  timer.reset();
-                },
+              trailing: Padding(
+                padding: const EdgeInsets.only(8),
+                child: SegmentedButton<ThemeMode>(
+                  showSelectedIcon: false,
+                  segments: [
+                    ButtonSegment(
+                      value: ThemeMode.system,
+                      label: Text(l10n.themeSettingsSystemLabel),
+                    ),
+                    ButtonSegment(
+                      value: ThemeMode.light,
+                      label: Text(l10n.themeSettingsLightLabel),
+                    ),
+                    ButtonSegment(
+                      value: ThemeMode.dark,
+                      label: Text(l10n.themeSettingsDarkLabel),
+                    ),
+                  ],
+                  selected: {ThemeMode.values[prefs.theme.value]},
+                  onSelectionChanged: (newSelection) {
+                    prefs.theme.value = newSelection.single.index;
+                    timer.reset();
+                  },
+                ),
               ),
             ),
           ),
