@@ -3,7 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// SharePreferences wrapper that provides typed accessors and change notifiers
 /// for application settings.
-final class SharedAppPrefs {
+///
+/// Listen to the object itself if you don't care what specific setting changed.
+final class SharedAppPrefs extends ChangeNotifier {
   static late final SharedAppPrefs _instance;
   final SharedPreferences _prefs;
 
@@ -65,6 +67,7 @@ final class SharedAppPrefs {
     final notifier = ValueNotifier<T>(getter(key) ?? defaultValue);
     notifier.addListener(() {
       setter(key, notifier.value);
+      notifyListeners();
     });
     return notifier;
   }

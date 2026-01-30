@@ -163,7 +163,7 @@ class _DeckState extends ConsumerState<_Deck> with TickerProviderStateMixin {
 class _FrontCardView extends StatelessWidget {
   final PainCard painCard;
 
-  const _FrontCardView({super.key, required this.painCard});
+  const _FrontCardView({required this.painCard});
 
   Widget _buildText(
     BuildContext context, {

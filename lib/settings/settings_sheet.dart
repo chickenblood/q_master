@@ -72,20 +72,20 @@ class _SettingsSheet extends ConsumerWidget {
       (prefs.workIntervalSeconds, L10n.of(context)!.timerSettingsWorkLabel),
       (prefs.restIntervalSeconds, L10n.of(context)!.timerSettingsRestLabel),
     ];
-    return SliverPadding(
-      padding: const EdgeInsets.all(16.0),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate([
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: PlatformText(
-              l10n.workoutsSettingsTitle,
-              style: Theme.of(context).textTheme.headlineSmall,
+    return ListenableBuilder(
+      listenable: prefs,
+      builder: (_, _) => SliverPadding(
+        padding: const EdgeInsets.all(16.0),
+        sliver: SliverList(
+          delegate: SliverChildListDelegate([
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: PlatformText(
+                l10n.workoutsSettingsTitle,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
             ),
-          ),
-          ListenableBuilder(
-            listenable: prefs.exercisesPerPage,
-            builder: (_, _) => PlatformListTile(
+            PlatformListTile(
               title: Text(
                 L10n.of(context)!.exercisesPerPageSettingsLabel,
 
@@ -106,21 +106,18 @@ class _SettingsSheet extends ConsumerWidget {
                 ).textTheme.labelLarge!.copyWith(fontSize: 20),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: const Divider(),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: PlatformText(
-              l10n.timerSettingsTitle,
-              style: Theme.of(context).textTheme.headlineSmall,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: const Divider(),
             ),
-          ),
-          ListenableBuilder(
-            listenable: prefs.timerType,
-            builder: (_, _) => SegmentedButton(
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: PlatformText(
+                l10n.timerSettingsTitle,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+            ),
+            SegmentedButton(
               showSelectedIcon: false,
               segments: [
                 ButtonSegment(
@@ -135,12 +132,9 @@ class _SettingsSheet extends ConsumerWidget {
                 timer.reset();
               },
             ),
-          ),
-          SizedBox(height: 8),
-          for (final (intervalNotifier, label) in timeIntervalSettings)
-            ListenableBuilder(
-              listenable: intervalNotifier,
-              builder: (_, _) => PlatformListTile(
+            SizedBox(height: 8),
+            for (final (intervalNotifier, label) in timeIntervalSettings)
+              PlatformListTile(
                 title: PlatformText(
                   label,
                   style: Theme.of(context).textTheme.titleLarge,
@@ -157,10 +151,7 @@ class _SettingsSheet extends ConsumerWidget {
                   timer: timer,
                 ),
               ),
-            ),
-          ListenableBuilder(
-            listenable: prefs.rounds,
-            builder: (_, _) => PlatformListTile(
+            PlatformListTile(
               title: PlatformText(
                 l10n.timerSettingsRoundsLabel,
                 style: Theme.of(context).textTheme.titleLarge,
@@ -175,10 +166,7 @@ class _SettingsSheet extends ConsumerWidget {
                 timer: timer,
               ),
             ),
-          ),
-          ListenableBuilder(
-            listenable: prefs.cycles,
-            builder: (_, _) => PlatformListTile(
+            PlatformListTile(
               title: PlatformText(
                 l10n.timerSettingsCyclesLabel,
                 style: Theme.of(context).textTheme.titleLarge,
@@ -193,27 +181,24 @@ class _SettingsSheet extends ConsumerWidget {
                 timer: timer,
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: const Divider(),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: PlatformText(
-              l10n.generalSettingsTitle,
-              style: Theme.of(context).textTheme.headlineSmall,
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: const Divider(),
             ),
-          ),
-          ListenableBuilder(
-            listenable: prefs.theme,
-            builder: (_, _) => PlatformListTile(
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: PlatformText(
+                l10n.generalSettingsTitle,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+            ),
+            PlatformListTile(
               title: PlatformText(
                 l10n.themeSettingsTitle,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               trailing: Padding(
-                padding: const EdgeInsets.only(8),
+                padding: const EdgeInsets.only(left: 8),
                 child: SegmentedButton<ThemeMode>(
                   showSelectedIcon: false,
                   segments: [
@@ -238,12 +223,9 @@ class _SettingsSheet extends ConsumerWidget {
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: ListenableBuilder(
-              listenable: prefs.motorboatSoundEnabled,
-              builder: (_, _) => PlatformListTile(
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: PlatformListTile(
                 title: PlatformText(
                   l10n.motorboatSoundSettingsLabel,
                   style: Theme.of(context).textTheme.titleLarge,
@@ -255,17 +237,17 @@ class _SettingsSheet extends ConsumerWidget {
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: const Divider(),
-          ),
-          PlatformListTile(
-            title: PlatformText(l10n.appBarTitle),
-            leading: Icon(context.platformIcons.info),
-            onTap: () => _showAboutDialog(context),
-          ),
-        ]),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: const Divider(),
+            ),
+            PlatformListTile(
+              title: PlatformText(l10n.appBarTitle),
+              leading: Icon(context.platformIcons.info),
+              onTap: () => _showAboutDialog(context),
+            ),
+          ]),
+        ),
       ),
     );
   }
