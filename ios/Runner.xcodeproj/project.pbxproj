@@ -88,10 +88,21 @@
 		FA02A479923149E2A4DA1F56 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3C0433DD2F2EBFD0007CD175 /* Exceptions for "Q Master Watch App" folder in "Q Master Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Assets.xcassets,
+			);
+			target = 3CC3C3532F2C6D7E0027F4B0 /* Q Master Watch App */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3CC3C3552F2C6D7E0027F4B0 /* Q Master Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				3C0433DD2F2EBFD0007CD175 /* Exceptions for "Q Master Watch App" folder in "Q Master Watch App" target */,
 			);
 			explicitFileTypes = {
 			};

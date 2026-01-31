@@ -30,6 +30,12 @@ final class WorkoutList extends _$WorkoutList {
           .map((e) => Workout.fromJson(e))
           .toList();
       state = newWorkouts;
+      Future.wait([_watch.isPaired, _watch.isReachable]).then((values) {
+        if (values == [true, true]) {
+          _logger.i('workouts: $json');
+          _watch.updateApplicationContext({'workouts': json});
+        }
+      });
     });
     return [];
   }
@@ -41,7 +47,9 @@ final class WorkoutList extends _$WorkoutList {
     state = updatedWorkouts;
 
     // Sync to watch.
-    if (await _watch.isPaired && await _watch.isReachable) {
+    final isPaired = await _watch.isPaired;
+    final isReachable = await _watch.isReachable;
+    if (isPaired && isReachable) {
       _watch.updateApplicationContext({'workouts': json});
     }
   }
