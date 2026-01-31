@@ -5,7 +5,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
-import '../ui/adaptive_icons.dart';
 import '../utils/shared_app_prefs.dart';
 
 final class BeatdownBrowser extends StatelessWidget {
@@ -82,10 +81,7 @@ final class BeatdownBrowser extends StatelessWidget {
       listenable: _pageIndex,
       builder: (_, _) => PlatformScaffold(
         appBar: PlatformAppBar(
-          leading: PlatformIconButton(
-            icon: Icon(AdaptiveIcons.close),
-            onPressed: () => Navigator.pop(context),
-          ),
+          automaticallyImplyLeading: true,
           title: PlatformText(
             _exerciseTypeAtPage(
               context,

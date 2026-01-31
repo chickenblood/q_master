@@ -124,10 +124,9 @@ final class _WorkoutTile extends StatelessWidget {
     // Stop the screen from sleeping while the beatdown browser is shown.
     WakelockPlus.enable();
 
-    await Navigator.of(context, rootNavigator: true).push(
+    await Navigator.of(context).push(
       platformPageRoute(
         context: context,
-        fullscreenDialog: true,
         builder: (context) => BeatdownBrowser(workout: workout),
       ),
     );
