@@ -5,7 +5,7 @@
   "dart.previewFlutterUiGuidesCustomTracking": true,
   "dart.debugExternalPackageLibraries": false,
   "dart.debugSdkLibraries": false,
-  "dart.openDevTools": "flutter",
+  "dart.openDevTools": "never",
 
   // Editor
   "editor.formatOnSave": true,

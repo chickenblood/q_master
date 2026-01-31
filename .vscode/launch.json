@@ -19,13 +19,6 @@
       "program": "lib/main.dart"
     },
     {
-      "name": "q_master (Chrome)",
-      "request": "launch",
-      "type": "dart",
-      "program": "lib/main.dart",
-      "args": ["-d", "chrome"]
-    },
-    {
       "name": "q_master (profile mode)",
       "request": "launch",
       "type": "dart",
