@@ -2,6 +2,18 @@
 
 Q Master is a Flutter app for managing F3 workout routines. Targets all platforms with adaptive UI.
 
+## Design Principles: The Gloom
+
+F3 beatdowns happen at 5:30am in the dark, cold, and rain. Design for:
+
+- **Darkness** — Pre-dawn with no sun. High contrast, audio-first.
+- **Cold hands** — Gloves, frozen fingers. Forgiving inputs.
+- **Constant movement** — Q is moseying, crawling, circling. Glanceable, hands-free.
+- **Any weather** — Rain, heat, humidity. Offline-first, battery conscious.
+- **The circle** — PAX spread out, stations rotating. Visible and audible at distance.
+- **Simplicity** — No time for complexity. Minimal screens, big buttons, clear text.
+- **F3 Lexicon** — Use authentic terminology and exercise names.
+
 ## Platform-Adaptive UI
 
 **Always use `flutter_platform_widgets`** (`PlatformScaffold`, `PlatformAppBar`, `PlatformText`, etc.) instead of raw Material/Cupertino widgets.
@@ -27,6 +39,8 @@ else { /* Navigator.push with platformPageRoute */ }
 | `L10n.of(context)!.key` | Localization from [app_en.arb](lib/l10n/app_en.arb) |
 
 ## Development Practices
+
+**ALWAYS:** Leave code better than you found it, acting as a steward for future maintainers and top 1% Flutter expert with a deep appreciation for beautiful, maintainable code.
 
 ### Pre-Commit Checklist
 - [ ] `flutter pub get` — if `pubspec.yaml` changed
