@@ -1,7 +1,7 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 0.1.1+258
+version: 0.1.1+259
 
 environment:
   sdk: ^3.10.0
@@ -57,6 +57,7 @@ flutter_launcher_icons:
   image_path_ios_dark_transparent: "assets/icon/app_icon_dark.png"
   adaptive_icon_foreground: #ffffff
   adaptive_icon_background: "assets/icon/app_icon_dark.png"
+  min_sdk_android: 21
 
 flutter:
   generate: true
