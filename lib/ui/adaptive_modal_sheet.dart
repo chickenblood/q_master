@@ -19,7 +19,7 @@ Future<T?> showAdaptiveModalSheet<T>({
     (_, true) => showAdaptiveDialog(
       context: context,
       builder: (_) => BackdropFilter(
-        filter: .blur(sigmaX: 10, sigmaY: 10),
+        filter: .blur(sigmaX: 5, sigmaY: 5),
         child: Dialog(
           insetPadding: const EdgeInsets.all(150),
           clipBehavior: .hardEdge,
