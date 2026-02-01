@@ -168,7 +168,6 @@ class _GameTile extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineMedium!.copyWith(
                     fontWeight: FontWeight.bold,
-
                     color: textColor,
                   ),
                   softWrap: true,

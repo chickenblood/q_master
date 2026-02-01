@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:q_master/ui/media_query.dart';
 
 import '../l10n/l10n.dart';
 import '../model/deck_of_pain.dart';
@@ -182,9 +183,12 @@ class _FrontCardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLandscape = MediaQuery.orientationOf(context) == .landscape;
-    final textStyle = isLandscape
-        ? TextTheme.of(context).displaySmall!
-        : TextTheme.of(context).displayLarge!;
+    final isTablet = MediaUtils.isTablet(context);
+    final textStyle = switch ((isLandscape, isTablet)) {
+      (_, true) => TextTheme.of(context).displayLarge!.copyWith(fontSize: 96),
+      (true, _) => TextTheme.of(context).displaySmall!,
+      (false, _) => TextTheme.of(context).displayLarge!,
+    };
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16.0),
