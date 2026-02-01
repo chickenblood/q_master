@@ -25,7 +25,7 @@ final class SettingsActionButton extends StatelessWidget {
     icon: Icon(context.platformIcons.gearSolid),
     onPressed: () async {
       final navigator = Navigator.of(context, rootNavigator: true);
-      await showAdaptiveModalSheet(
+      return showAdaptiveModalSheet(
         context: navigator.context,
         child: const _SettingsSheet(),
       );

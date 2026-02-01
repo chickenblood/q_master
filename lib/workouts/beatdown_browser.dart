@@ -167,13 +167,14 @@ final class BeatdownBrowser extends StatelessWidget {
                   },
                 ),
               ),
-              DotsIndicator(
-                dotsCount: pages.length,
-                decorator: DotsDecorator(
-                  activeColor: Theme.of(context).colorScheme.onSurface,
+              if (pages.isNotEmpty)
+                DotsIndicator(
+                  dotsCount: pages.length,
+                  decorator: DotsDecorator(
+                    activeColor: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  position: _pageIndex.value.toDouble(),
                 ),
-                position: _pageIndex.value.toDouble(),
-              ),
             ],
           ),
         ),
