@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -127,16 +128,18 @@ class _GameTile extends StatelessWidget {
                 Positioned(
                   top: 8.0,
                   left: 8.0,
-                  child: PlatformText(
+                  right: 8.0,
+                  child: AutoSizeText(
                     subtitle!,
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                       fontStyle: FontStyle.italic,
                       fontWeight: FontWeight.bold,
                       color: textColor,
                     ),
-                    textScaler: MediaQuery.textScalerOf(
-                      context,
-                    ).clamp(maxScaleFactor: 1.4),
+                    textScaleFactor: min(
+                      MediaQuery.textScaleFactorOf(context),
+                      1.4,
+                    ),
                   ),
                 ),
               Ink(
@@ -158,19 +161,22 @@ class _GameTile extends StatelessWidget {
               Positioned(
                 bottom: 4,
                 left: 4,
-                right: 4,
-                child: PlatformText(
+                right: 16, // Larger padding on right to account 'A'
+                // in card graphic.
+                child: AutoSizeText(
                   title,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  style: Theme.of(context).textTheme.headlineMedium!.copyWith(
                     fontWeight: FontWeight.bold,
 
                     color: textColor,
                   ),
                   softWrap: true,
-                  textScaler: MediaQuery.textScalerOf(
-                    context,
-                  ).clamp(maxScaleFactor: 1.4),
+                  maxLines: 1,
+                  textScaleFactor: min(
+                    MediaQuery.textScaleFactorOf(context),
+                    1.4,
+                  ),
                 ),
               ),
             ],
