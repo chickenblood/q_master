@@ -26,7 +26,12 @@ Future<T?> showAdaptiveModalSheet<T>({
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
           ),
-          child: child,
+          // Remove status bar padding at the top. There will be no status bar
+          // in the form sheet.
+          child: MediaQuery(
+            data: MediaQuery.of(context).removePadding(removeTop: true),
+            child: child,
+          ),
         ),
       ),
     ),
