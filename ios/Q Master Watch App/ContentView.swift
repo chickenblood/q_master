@@ -59,7 +59,7 @@ struct ContentView: View {
       Image(systemName: "globe")
         .imageScale(.large)
         .foregroundStyle(.tint)
-      Text(viewModel.workouts.first?.name ?? "")
+      Text(viewModel.workouts.first?.name ?? "No workouts")
     }
     .padding()
   }
