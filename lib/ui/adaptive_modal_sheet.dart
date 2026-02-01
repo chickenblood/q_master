@@ -45,5 +45,4 @@ Future<T?> showAdaptiveModalSheet<T>({
     ),
     _ => Future.value(null),
   };
-  return null;
 }
