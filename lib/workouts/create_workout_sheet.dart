@@ -5,7 +5,7 @@ import '../l10n/l10n.dart';
 import '../model/workout.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_modal_sheet.dart';
-import '../ui/scroll_physics.dart';
+import '../ui/cupertino_sheet_fork.dart';
 import 'workout_auto_completions.dart';
 
 enum WorkoutGroup { warmup, thang, mary }
@@ -338,7 +338,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   Widget build(BuildContext context) => PlatformScaffold(
     body: CustomScrollView(
       controller: _scrollController,
-      physics: dismissibleSheetScrollPhysics(context),
+      physics: BottomSheetScrollPhysics(),
       slivers: [
         PlatformSliverAppBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,

@@ -10,7 +10,7 @@ import '../l10n/l10n.dart';
 import '../model/timer.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_modal_sheet.dart';
-import '../ui/scroll_physics.dart';
+import '../ui/cupertino_sheet_fork.dart';
 import '../utils/datetime_utils.dart';
 import '../utils/shared_app_prefs.dart';
 
@@ -321,7 +321,7 @@ class _SettingsSheet extends ConsumerWidget {
     return PlatformScaffold(
       body: SafeArea(
         child: CustomScrollView(
-          physics: dismissibleSheetScrollPhysics(context),
+          physics: BottomSheetScrollPhysics(),
           slivers: [
             PlatformSliverAppBar(
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
