@@ -5,6 +5,7 @@ import '../l10n/l10n.dart';
 import '../model/workout.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_modal_sheet.dart';
+import '../ui/scroll_physics.dart';
 import 'workout_auto_completions.dart';
 
 enum WorkoutGroup { warmup, thang, mary }
@@ -170,7 +171,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     }
   }
 
-  static const _headerInsets = EdgeInsets.symmetric(vertical: 8.0);
+  static const _headerInsets = EdgeInsets.only(left: 16.0, right: 8.0);
 
   Widget _sectionHeader(
     BuildContext context, {
@@ -193,96 +194,120 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     ),
   );
 
-  Widget _content(BuildContext context) {
+  static const _itemInsets = EdgeInsets.only(left: 32.0, right: 24.0);
+
+  List<Widget> _content(BuildContext context) {
     final groupedExercises = [
       (WorkoutGroup.warmup, L10n.of(context)!.workoutWarmupFieldLabel, _warmup),
       (WorkoutGroup.thang, L10n.of(context)!.workoutThangFieldLabel, _thang),
       (WorkoutGroup.mary, L10n.of(context)!.workoutMaryFieldLabel, _mary),
     ];
-    return SliverSafeArea(
-      minimum: const EdgeInsets.all(16.0),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate([
-          PlatformText(
-            L10n.of(context)!.workoutNameFieldLabel,
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          PlatformTextField(
-            controller: _nameTextController,
-            textCapitalization: TextCapitalization.sentences,
-            focusNode: _focusNode,
-          ),
-          for (final (sectionGroup, sectionTitle, exercises)
-              in groupedExercises) ...[
-            ReorderableListView.builder(
-              header: _sectionHeader(
-                context,
-                title: sectionTitle,
-                exercises: exercises,
-                sectionGroup: sectionGroup,
+    return [
+      SliverSafeArea(
+        bottom: false,
+        sliver: SliverList(
+          delegate: SliverChildListDelegate([
+            Padding(
+              padding: _headerInsets,
+              child: PlatformText(
+                L10n.of(context)!.workoutNameFieldLabel,
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
-                final exercise = exercises[index];
-                final isLastItem = index == (exercises.length - 1);
-                return Dismissible(
-                  key: ValueKey('dismissible_$exercise$index'),
-                  background: Container(color: Colors.red),
-                  direction: DismissDirection.endToStart,
-                  onDismissed: (direction) {
-                    setState(() {
-                      exercises.removeAt(index);
+            ),
+            Padding(
+              padding: _headerInsets,
+              child: PlatformTextField(
+                controller: _nameTextController,
+                textCapitalization: TextCapitalization.sentences,
+                focusNode: _focusNode,
+              ),
+            ),
+          ]),
+        ),
+      ),
+      for (final (sectionGroup, sectionTitle, exercises)
+          in groupedExercises) ...[
+        SliverSafeArea(
+          bottom: false,
+          sliver: SliverToBoxAdapter(
+            child: _sectionHeader(
+              context,
+              title: sectionTitle,
+              exercises: exercises,
+              sectionGroup: sectionGroup,
+            ),
+          ),
+        ),
+        SliverSafeArea(
+          top: false,
+          bottom: sectionGroup == WorkoutGroup.mary,
+          sliver: SliverReorderableList(
+            itemBuilder: (context, index) {
+              final exercise = exercises[index];
+              final isLastItem = index == (exercises.length - 1);
+              return Dismissible(
+                key: ValueKey('dismissible_$exercise$index'),
+                background: Container(color: Colors.red),
+                direction: DismissDirection.endToStart,
+                onDismissed: (direction) {
+                  setState(() {
+                    exercises.removeAt(index);
+                  });
+                },
+                child: Builder(
+                  builder: (itemContext) {
+                    // Scroll to the newly added item after the frame is rendered
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (isLastItem && _lastAddedItemGroup == sectionGroup) {
+                        Scrollable.ensureVisible(
+                          itemContext,
+                          duration: const Duration(milliseconds: 300),
+                          alignment: 0.5,
+                          alignmentPolicy: .explicit,
+                        );
+                        _lastAddedItemGroup = null;
+                      }
                     });
-                  },
-                  child: Builder(
-                    builder: (itemContext) {
-                      // Scroll to the newly added item after the frame is rendered
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (isLastItem && _lastAddedItemGroup == sectionGroup) {
-                          Scrollable.ensureVisible(
-                            itemContext,
-                            duration: const Duration(milliseconds: 300),
-                            alignment: 0.5,
-                            alignmentPolicy: .explicit,
-                          );
-                          _lastAddedItemGroup = null;
-                        }
-                      });
-                      return GestureDetector(
+                    return GestureDetector(
+                      child: ReorderableDelayedDragStartListener(
+                        index: index,
                         child: PlatformListTile(
                           key: ValueKey('exercise_$exercise$index'),
                           title: Text(exercise),
                           trailing: exercises.length > 1
                               ? Icon(Icons.drag_handle)
                               : null,
+                          material: (context, platform) =>
+                              MaterialListTileData(contentPadding: _itemInsets),
+                          cupertino: (context, platform) =>
+                              CupertinoListTileData(padding: _itemInsets),
                         ),
-                        onDoubleTap: () => _editExercise(
-                          context,
-                          exercises: exercises,
-                          index: index,
-                          sectionGroup: sectionGroup,
-                        ),
-                      );
-                    },
-                  ),
+                      ),
+                      onDoubleTap: () => _editExercise(
+                        context,
+                        exercises: exercises,
+                        index: index,
+                        sectionGroup: sectionGroup,
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+            itemCount: exercises.length,
+            onReorder: (startIndex, endIndex) {
+              setState(() {
+                _moveExercise(
+                  exercises,
+                  fromIndex: startIndex,
+                  toIndex: endIndex,
                 );
-              },
-              itemCount: exercises.length,
-              onReorder: (startIndex, endIndex) {
-                setState(() {
-                  _moveExercise(
-                    exercises,
-                    fromIndex: startIndex,
-                    toIndex: endIndex,
-                  );
-                });
-              },
-            ),
-          ],
-        ]),
-      ),
-    );
+              });
+            },
+          ),
+        ),
+      ],
+    ];
   }
 
   bool get _workoutCreationEnabled {
@@ -313,7 +338,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   Widget build(BuildContext context) => PlatformScaffold(
     body: CustomScrollView(
       controller: _scrollController,
-      physics: ClampingScrollPhysics(),
+      physics: dismissibleSheetScrollPhysics(context),
       slivers: [
         PlatformSliverAppBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -340,7 +365,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
             actions: [_rightAppBarButtonAction(context)],
           ),
         ),
-        _content(context),
+        ..._content(context),
       ],
     ),
   );

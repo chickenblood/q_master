@@ -94,7 +94,7 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
     _initialScale =
         prefs.exercisesPerPage.value.toDouble() /
         SharedAppPrefs.maxExercisesPerPage;
-    // Must resset to first page before changing exercises per page, so
+    // Must reset to first page before changing exercises per page, so
     // that the current page index is still valid.
     _pageIndex.value = 0;
     _pageController.jumpToPage(0);
