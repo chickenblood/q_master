@@ -1,7 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
+import '../ui/cupertino_sheet_fork.dart' show showCupertinoSheet;
 import '../ui/media_query.dart';
 
 /// Presents a modal sheet, utlizing the perspetive modal presentation style on
@@ -38,7 +38,7 @@ Future<T?> showAdaptiveModalSheet<T>({
     (TargetPlatform.iOS, false) => showCupertinoSheet(
       context: context,
       enableDrag: dismissible,
-      builder: (_) => child,
+      pageBuilder: (_) => child,
     ),
     (TargetPlatform.android, false) => Navigator.push(
       context,
