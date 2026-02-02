@@ -94,7 +94,7 @@ class _SettingsSheet extends ConsumerWidget {
               subtitle: Slider.adaptive(
                 value: prefs.exercisesPerPage.value.toDouble(),
                 min: 1,
-                max: 30,
+                max: SharedAppPrefs.maxExercisesPerPage.toDouble(),
                 divisions: 30,
                 onChanged: (value) =>
                     prefs.exercisesPerPage.value = value.round(),

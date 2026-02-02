@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 ///
 /// Listen to the object itself if you don't care what specific setting changed.
 final class SharedAppPrefs extends ChangeNotifier {
+  static const maxExercisesPerPage = 20;
   static late final SharedAppPrefs _instance;
   final SharedPreferences _prefs;
 
