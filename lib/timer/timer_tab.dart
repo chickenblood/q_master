@@ -11,6 +11,7 @@ import '../ui/media_query.dart';
 import '../utils/datetime_utils.dart';
 
 final class TimerTab extends ConsumerWidget {
+  static const fontFamily = 'Lexend-VariableFont_wght';
   const TimerTab({super.key});
 
   Future<void> _resetTimer(WidgetRef ref) async {
@@ -252,6 +253,7 @@ final class _PrimaryTile extends StatelessWidget {
             child: AutoSizeText(
               tileSpec.timeLabel,
               style: Theme.of(context).textTheme.displayLarge!.copyWith(
+                fontFamily: TimerTab.fontFamily,
                 fontFeatures: [FontFeature.tabularFigures()],
                 color: tileSpec.fgColor,
                 fontSize: 800,
@@ -297,6 +299,7 @@ final class _SecondaryTile extends StatelessWidget {
               child: AutoSizeText(
                 tileSpec.timeLabel,
                 style: Theme.of(context).textTheme.displayLarge!.copyWith(
+                  fontFamily: TimerTab.fontFamily,
                   fontFeatures: [FontFeature.tabularFigures()],
                   color: tileSpec.fgColor,
                   fontWeight: .bold,
