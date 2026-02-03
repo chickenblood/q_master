@@ -140,6 +140,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   }) => PlatformIconButton(
     icon: Icon(PlatformIcons(context).add),
     onPressed: () async {
+      _focusNode.unfocus();
       final exercise = await _showExercisePicker(context);
       // Maybe add new empty exercise
       if (exercise?.trim().isNotEmpty ?? false) {
