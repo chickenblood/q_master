@@ -254,7 +254,7 @@ final class _PrimaryTile extends StatelessWidget {
               tileSpec.timeLabel,
               style: Theme.of(context).textTheme.displayLarge!.copyWith(
                 fontFamily: TimerTab.fontFamily,
-                fontVariations: [FontVariation.weight(600)],
+                fontVariations: [FontVariation.weight(700)],
                 fontFeatures: [FontFeature.tabularFigures()],
                 color: tileSpec.fgColor,
                 fontSize: 800,
@@ -300,7 +300,7 @@ final class _SecondaryTile extends StatelessWidget {
                 tileSpec.timeLabel,
                 style: Theme.of(context).textTheme.displayLarge!.copyWith(
                   fontFamily: TimerTab.fontFamily,
-                  fontVariations: [FontVariation.weight(600)],
+                  fontVariations: [FontVariation.weight(500)],
                   fontFeatures: [FontFeature.tabularFigures()],
                   color: tileSpec.fgColor,
                   fontWeight: .w900,
