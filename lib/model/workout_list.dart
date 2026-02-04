@@ -19,7 +19,8 @@ final class WorkoutList extends _$WorkoutList {
 
   @override
   List<Workout> build() {
-    getApplicationDocumentsDirectory().then((directory) {
+    () async {
+      final directory = await getApplicationDocumentsDirectory();
       _filename = '${directory.path}/workouts.json';
       final file = File(_filename!);
       if (!file.existsSync()) {
@@ -30,13 +31,17 @@ final class WorkoutList extends _$WorkoutList {
           .map((e) => Workout.fromJson(e))
           .toList();
       state = newWorkouts;
-      Future.wait([_watch.isPaired, _watch.isReachable]).then((values) {
-        if (values == [true, true]) {
-          _logger.i('workouts: $json');
-          _watch.updateApplicationContext({'workouts': json});
-        }
-      });
-    });
+
+      // Sync to watch. Ignore Android for now.
+      if (Platform.isAndroid) return;
+
+      final isPaired = await _watch.isPaired;
+      final isReachable = await _watch.isReachable;
+      if (isPaired && isReachable) {
+        _logger.i('workouts: $json');
+        _watch.updateApplicationContext({'workouts': json});
+      }
+    }();
     return [];
   }
 
@@ -46,7 +51,9 @@ final class WorkoutList extends _$WorkoutList {
     file.writeAsStringSync(json);
     state = updatedWorkouts;
 
-    // Sync to watch.
+    // Sync to watch. Ignore Android for now.
+    if (Platform.isAndroid) return;
+
     final isPaired = await _watch.isPaired;
     final isReachable = await _watch.isReachable;
     if (isPaired && isReachable) {
