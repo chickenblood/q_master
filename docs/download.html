@@ -17,36 +17,38 @@
             align-items: center;
             min-height: 100vh;
         }
+
         .container {
-            max-width: 550px;
+            display: flex; /* Side-by-side layout */
+            max-width: 1000px;
             background: #1f2833;
-            padding: 0;
             border-radius: 20px;
             box-shadow: 0 25px 60px rgba(0,0,0,0.8);
-            text-align: center;
             border: 1px solid #45a29e;
             overflow: hidden;
+            align-items: stretch;
         }
 
+        /* Left Side: Image Section */
         .hero-wrapper {
             position: relative;
-            width: 100%;
-            display: block;
-            border-bottom: 3px solid #66fcf1;
+            flex: 1; /* Takes up 50% */
+            min-width: 400px;
+            border-right: 3px solid #66fcf1;
         }
 
         .hero-image {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: cover; /* Ensures image fills the height */
             display: block;
         }
 
-        /* Clickable Corner Logo Styling */
         .corner-logo-link {
             position: absolute;
             bottom: 15px;
             right: 15px;
-            height: 15%; /* Linked to container height */
+            height: 12%;
             display: flex;
             align-items: flex-end;
             transition: transform 0.2s ease;
@@ -57,72 +59,80 @@
         }
 
         .corner-logo {
-            max-height: 100%; /* Relative to the 15% link wrapper */
+            max-height: 100%;
             width: auto;
             filter: drop-shadow(0 2px 10px rgba(0,0,0,0.8));
         }
 
+        /* Right Side: Content Section */
         .content-padding {
-            padding: 40px;
+            flex: 1;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: left; /* Aligned left for the horizontal look */
         }
 
         .story-text {
             font-style: italic;
             color: #ffffff;
-            margin-bottom: 35px;
-            text-align: left;
+            margin-bottom: 30px;
             border-left: 5px solid #66fcf1;
             padding: 10px 0 10px 25px;
-            font-size: 1.25rem;
-            line-height: 1.8;
+            font-size: 1.15rem;
+            line-height: 1.7;
             background: rgba(102, 252, 241, 0.05);
             border-radius: 0 10px 10px 0;
         }
 
         h1 {
             color: #ffffff;
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             margin: 0;
             letter-spacing: -1px;
         }
+
         .tagline {
             font-weight: 600;
             color: #66fcf1;
             margin-top: 5px;
             margin-bottom: 40px;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
         }
 
         .badge-container {
             display: flex;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: flex-end;
-            gap: 25px;
+            gap: 20px;
             flex-wrap: wrap;
-            margin-bottom: 10px;
         }
+
         .badge-item {
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: flex-start;
         }
+
         .badge-label {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            letter-spacing: 2px;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
         }
+
         .label-active { color: #66fcf1; }
         .label-soon { color: #45a29e; }
 
         .app-store-badge img {
-            height: 48px;
+            height: 44px;
             width: auto;
             transition: transform 0.2s ease;
         }
+
         .app-store-badge:hover img {
-            transform: scale(1.08);
+            transform: scale(1.05);
         }
 
         .badge-disabled {
@@ -130,16 +140,42 @@
             filter: grayscale(1) opacity(0.2);
             pointer-events: none;
         }
+
         .badge-disabled img {
-            height: 48px;
+            height: 44px;
         }
 
         .footer {
-            margin-top: 50px;
-            font-size: 0.9rem;
+            margin-top: auto; /* Pushes footer to bottom of right side */
+            padding-top: 40px;
+            font-size: 0.85rem;
             color: #8892b0;
-            border-top: 1px solid #0b0c10;
-            padding-top: 25px;
+        }
+
+        /* Responsive: Stack vertically on small screens */
+        @media (max-width: 850px) {
+            .container {
+                flex-direction: column;
+                max-width: 500px;
+            }
+            .hero-wrapper {
+                min-width: unset;
+                border-right: none;
+                border-bottom: 3px solid #66fcf1;
+            }
+            .content-padding {
+                text-align: center;
+                padding: 30px;
+            }
+            .story-text {
+                text-align: left;
+            }
+            .badge-container {
+                justify-content: center;
+            }
+            .badge-item {
+                align-items: center;
+            }
         }
     </style>
 </head>
@@ -149,8 +185,8 @@
     <div class="hero-wrapper">
         <img src="gloom.png" alt="The November Gloom" class="hero-image">
 
-        <a href="https://apps.apple.com/app/app-name/id6756852098" target="_blank" class="corner-logo-link">
-            <img src="logo.png" alt="Q Master Logo" class="corner-logo">
+        <a href="https://apps.apple.com/app/id6756852098" target="_blank" class="corner-logo-link">
+            <img src="logo.png" alt="F3 Hangar 1 Logo" class="corner-logo">
         </a>
     </div>
 
@@ -159,19 +195,19 @@
             “There I was, preparing to Q in the November gloom, with a soggy weinke in my left hand and a blinking headlamp in my right. The wind was blowing as I squinted, trying to read my merkin count off the wet page. I thought, 'There has to be a better way.'”
         </div>
 
-        <p class="tagline">…and the Pax Master app was born.</p>
         <h1>Pax Master</h1>
-        <p>
+        <p class="tagline">…and the Pax Master app was born.</p>
+
         <div class="badge-container">
             <div class="badge-item">
                 <span class="badge-label label-active">iOS</span>
-                <a href="https://apps.apple.com/app/app-name/id6756852098" target="_blank" class="app-store-badge">
+                <a href="https://apps.apple.com/app/id6756852098" target="_blank" class="app-store-badge">
                     <img src="Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg" alt="Download on the App Store">
                 </a>
             </div>
 
             <div class="badge-item">
-                <span class="badge-label label-soon">Android</span>
+                <span class="badge-label label-soon">Android (Coming Soon)</span>
                 <div class="badge-disabled">
                     <img src="GetItOnGooglePlay_Badge_Web_color_English.svg" alt="Get it on Google Play">
                 </div>
@@ -179,7 +215,7 @@
         </div>
 
         <div class="footer">
-            Brought to you by Vevo and the Pax of F3 Hangar 1
+            Brought to you by Vevo and the Pax of F3 Hangar 1.
         </div>
     </div>
 </div>
