@@ -52,6 +52,12 @@ class NearMeTab extends StatelessWidget {
         L10n.of(context)!.nearMeTabTitle,
         textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.6),
       ),
+      trailingActions: [
+        PlatformIconButton(
+          icon: Icon(PlatformIcons(context).refresh),
+          onPressed: () => controller.reload(),
+        ),
+      ],
       cupertino: (appBarContext, _) =>
           CupertinoNavigationBarData(backgroundColor: Colors.transparent),
     ),

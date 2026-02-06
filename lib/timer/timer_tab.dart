@@ -135,7 +135,6 @@ final class TimerTab extends ConsumerWidget {
                 // Action buttons – iOS only
                 trailing: PlatformIconButton(
                   icon: Icon(PlatformIcons(context).refresh),
-                  padding: const EdgeInsets.only(right: 16.0),
                   onPressed: () => _resetTimer(ref),
                 ),
               ),
