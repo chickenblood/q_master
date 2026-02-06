@@ -356,10 +356,14 @@ final class Timer extends _$Timer {
       const Duration(milliseconds: 10),
       (_) => _tick(),
     );
-    ref.onDispose(() {
-      timer.cancel();
-      _stopWatch.stop();
-    });
+    ref
+      // Needed on Android for some reason to ensure the timer keeps running
+      // when the tab is not selected.
+      ..keepAlive()
+      ..onDispose(() {
+        timer.cancel();
+        _stopWatch.stop();
+      });
     return TimerDisplay(
       elapsedTime: Duration.zero,
       timerType: TimerType.values[prefs.timerType.value],

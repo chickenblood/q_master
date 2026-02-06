@@ -48,12 +48,7 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
   final _tabController = PlatformTabController(
     initialIndex: Tab.workouts.index,
   );
-  final List<Widget> _tabPages = [
-    WorkoutsTab(),
-    GamesTab(),
-    TimerTab(),
-    NearMeTab(),
-  ];
+  final _tabPages = [WorkoutsTab(), GamesTab(), TimerTab(), NearMeTab()];
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
