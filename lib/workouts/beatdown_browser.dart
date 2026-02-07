@@ -4,7 +4,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:logger/logger.dart';
 
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
@@ -20,10 +19,16 @@ final class BeatdownBrowser extends StatefulWidget {
 }
 
 class _BeatdownBrowserState extends State<BeatdownBrowser> {
-  static final _logger = Logger();
   final _pageIndex = ValueNotifier<int>(0);
   final _pageController = PageController();
   double _initialScale = 1.0;
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _pageIndex.dispose();
+    super.dispose();
+  }
 
   // Calculate the total number of pages with their content, based on exercises
   List<({AutoSizeGroup group, List<String> lines})> _calculatePages({

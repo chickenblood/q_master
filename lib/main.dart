@@ -1,4 +1,6 @@
 import 'package:audio_session/audio_session.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -48,6 +50,7 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
   final _tabController = PlatformTabController(
     initialIndex: Tab.workouts.index,
   );
+
   final _tabPages = [WorkoutsTab(), GamesTab(), TimerTab(), NearMeTab()];
 
   @override
@@ -100,7 +103,8 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
           home: Builder(
             builder: (context) => PlatformTabScaffold(
               tabController: _tabController,
-              bodyBuilder: (_, index) => _tabPages[index],
+              bodyBuilder: (_, index) =>
+                  _TabsContainer(selectedIndex: index, children: _tabPages),
               materialBuilder: (tabBarContext, _, index) =>
                   MaterialTabScaffoldData(
                     height: _shouldShowTabBar(tabBarContext) ? null : 0,
@@ -160,4 +164,39 @@ Future<void> _configureAudioSession() async {
       androidWillPauseWhenDucked: false,
     ),
   );
+}
+
+/// Wraps tabs on Android so that it supports nested navigation and remembers
+/// the navigation stack when switching tabs. On iOS, the CupertinoTabScaffold
+/// already provides this behavior.
+final class _TabsContainer extends StatelessWidget {
+  final List<Widget> _children;
+  final int selectedIndex;
+
+  _TabsContainer({required List<Widget> children, required this.selectedIndex})
+    : _children = children.map((child) => _TabWrapper(child: child)).toList();
+
+  @override
+  Widget build(BuildContext context) {
+    if (defaultTargetPlatform == .android) {
+      return IndexedStack(index: selectedIndex, children: _children);
+    }
+    return _children[selectedIndex];
+  }
+}
+
+final class _TabWrapper extends StatelessWidget {
+  final Widget child;
+
+  const _TabWrapper({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    if (defaultTargetPlatform == .android) {
+      return CupertinoTabView(
+        onGenerateRoute: (_) => MaterialPageRoute(builder: (_) => child),
+      );
+    }
+    return child;
+  }
 }
