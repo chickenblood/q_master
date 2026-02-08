@@ -4,7 +4,6 @@
 //
 //  Created by Ian Wilkinson on 1/26/26.
 //
-#if os(watchOS)
 import SwiftUI
 import WatchConnectivity
 import Dispatch
@@ -68,4 +67,4 @@ struct ContentView: View {
 #Preview {
   ContentView()
 }
-#endif
+

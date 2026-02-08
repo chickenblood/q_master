@@ -10,11 +10,7 @@ import SwiftUI
 struct Q_Master_Watch_AppApp: App {
   var body: some Scene {
     WindowGroup {
-#if os(watchOS)
       ContentView()
-#else
-      EmptyView()
-#endif
     }
   }
 }
