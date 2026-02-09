@@ -11,11 +11,11 @@ internal import Combine
 
 struct Workout: Codable {
   var name: String
-  var date: Date
+  var date: String
   
-  var warmup: [String]
-  var thang: [String]
-  var mary: [String]
+  var warmup: [[String:String]]
+  var thang: [[String:String]]
+  var mary: [[String:String]]
 }
 
 class WorkoutListViewModel: NSObject, ObservableObject {
@@ -34,7 +34,9 @@ extension WorkoutListViewModel: WCSessionDelegate {
   internal func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
     let decoder = JSONDecoder()
     do {
-      if let workouts = try decoder.decode(Array<Workout>.self, from: applicationContext["workouts"] as! Data) as [Workout]? {
+      let data = Data((applicationContext["workouts"] as! String).utf8)
+      let workouts = try decoder.decode(Array<Workout>.self, from:data)
+      if !workouts.isEmpty {
         DispatchQueue.main.async {
           self.workouts = workouts
         }
@@ -42,7 +44,7 @@ extension WorkoutListViewModel: WCSessionDelegate {
         debugPrint("No workouts")
       }
     } catch {
-      debugPrint("Parsing error")
+      debugPrint("Parsing error \(error)")
     }
   }
   
