@@ -28,13 +28,12 @@ class WorkoutListViewModel: NSObject, ObservableObject {
       WCSession.default.activate()
     }
   }
-}
-
-extension WorkoutListViewModel: WCSessionDelegate {
-  internal func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
+  
+  private func parseApplicationContext(applicationContext: [String : Any]) {
+    guard let workoutsData = applicationContext["workouts"] as? String else { return }
     let decoder = JSONDecoder()
     do {
-      let data = Data((applicationContext["workouts"] as! String).utf8)
+      let data = Data(workoutsData.utf8)
       let workouts = try decoder.decode(Array<Workout>.self, from:data)
       if !workouts.isEmpty {
         DispatchQueue.main.async {
@@ -47,8 +46,18 @@ extension WorkoutListViewModel: WCSessionDelegate {
       debugPrint("Parsing error \(error)")
     }
   }
+}
+
+extension WorkoutListViewModel: WCSessionDelegate {
+  internal func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
+    parseApplicationContext(applicationContext: applicationContext)
+  }
   
-  internal func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {}
+  internal func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
+    if activationState == .activated {
+      parseApplicationContext(applicationContext: WCSession.default.applicationContext)
+    }
+  }
 }
 
 // Main view for the watch app.
