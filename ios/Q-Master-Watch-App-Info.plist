@@ -3,6 +3,6 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleShortVersion</key>
-	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<string>$(FLUTTER_BUILD_NAME)</string>
 </dict>
 </plist>
