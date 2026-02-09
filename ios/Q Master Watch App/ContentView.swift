@@ -9,6 +9,8 @@ import WatchConnectivity
 import Dispatch
 internal import Combine
 
+fileprivate let listItemFontSize = 28.0;
+
 struct Workout: Codable {
   var name: String
   var date: String
@@ -79,6 +81,8 @@ struct ContentView: View {
              Text(workout.name)
          }
      }
+      .font(.system(size: listItemFontSize))
+      .listStyle(.carousel)
      .navigationTitle("Workouts") // Set the title for the list view
    }
   }
@@ -101,6 +105,7 @@ struct DetailView: View {
       ForEach(workouts) { exercise in
         Text(exercise)
       }
+      .font(.system(size: listItemFontSize))
       .listStyle(.carousel)
       .navigationTitle("Exercises")
     }
