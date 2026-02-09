@@ -18,6 +18,14 @@ struct Workout: Codable {
   var mary: [[String:String]]
 }
 
+extension Workout: Identifiable {
+  var id: UUID { get { UUID() } }
+}
+
+extension String : @retroactive Identifiable {
+  public var id: UUID { get { UUID() } }
+}
+
 class WorkoutListViewModel: NSObject, ObservableObject {
   @Published var workouts: [Workout] = []
   
@@ -65,13 +73,37 @@ struct ContentView: View {
   @StateObject var viewModel = WorkoutListViewModel()
   
   var body: some View {
-    VStack {
-      Image(systemName: "globe")
-        .imageScale(.large)
-        .foregroundStyle(.tint)
-      Text(viewModel.workouts.first?.name ?? "No workouts")
+    NavigationStack {
+      List(viewModel.workouts) { workout in
+         NavigationLink(destination: DetailView(workout: workout)) {
+             Text(workout.name)
+         }
+     }
+     .navigationTitle("Workouts") // Set the title for the list view
+   }
+  }
+}
+
+struct DetailView: View {
+  let workout: Workout
+  
+  var workouts: [String] {
+    get {
+      let warmups = workout.warmup.compactMap { $0["name"] }
+      let thangs = workout.thang.compactMap { $0["name"] }
+      let marys = workout.mary.compactMap { $0["name"] }
+      return warmups + thangs + marys
     }
-    .padding()
+  }
+
+  var body: some View {
+    List {
+      ForEach(workouts) { exercise in
+        Text(exercise)
+      }
+      .listStyle(.carousel)
+      .navigationTitle("Exercises")
+    }
   }
 }
 
