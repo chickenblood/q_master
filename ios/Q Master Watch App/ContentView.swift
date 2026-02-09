@@ -65,7 +65,7 @@ extension WorkoutListViewModel: WCSessionDelegate {
   
   internal func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
     if activationState == .activated {
-      parseApplicationContext(applicationContext: WCSession.default.applicationContext)
+      parseApplicationContext(applicationContext: WCSession.default.receivedApplicationContext)
     }
   }
 }

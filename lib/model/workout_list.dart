@@ -34,8 +34,7 @@ final class WorkoutList extends _$WorkoutList {
       if (Platform.isAndroid) return;
 
       final isPaired = await _watch.isPaired;
-      final isReachable = await _watch.isReachable;
-      if (isPaired && isReachable) {
+      if (isPaired) {
         await _watch.updateApplicationContext({'workouts': json});
       }
     }();
@@ -52,8 +51,7 @@ final class WorkoutList extends _$WorkoutList {
     if (Platform.isAndroid) return;
 
     final isPaired = await _watch.isPaired;
-    final isReachable = await _watch.isReachable;
-    if (isPaired && isReachable) {
+    if (isPaired) {
       await _watch.updateApplicationContext({'workouts': json});
     }
   }
