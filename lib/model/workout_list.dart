@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
@@ -13,7 +12,6 @@ part 'workout_list.g.dart';
 
 @riverpod
 final class WorkoutList extends _$WorkoutList {
-  static final _logger = Logger();
   final _watch = WatchConnectivity();
   String? _filename;
 
@@ -38,7 +36,6 @@ final class WorkoutList extends _$WorkoutList {
       final isPaired = await _watch.isPaired;
       final isReachable = await _watch.isReachable;
       if (isPaired && isReachable) {
-        _logger.i('workouts: $json');
         await _watch.updateApplicationContext({'workouts': json});
       }
     }();
