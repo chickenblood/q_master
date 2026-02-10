@@ -15,9 +15,13 @@ struct Workout: Codable {
   var name: String
   var date: String
   
-  var warmup: [[String:String]]
-  var thang: [[String:String]]
-  var mary: [[String:String]]
+  struct Exercise: Codable {
+    var name: String
+  }
+  
+  var warmup: [Exercise]
+  var thang: [Exercise]
+  var mary: [Exercise]
 }
 
 extension Workout: Identifiable {
@@ -93,9 +97,9 @@ struct DetailView: View {
   
   var workouts: [String] {
     get {
-      let warmups = workout.warmup.compactMap { $0["name"] }
-      let thangs = workout.thang.compactMap { $0["name"] }
-      let marys = workout.mary.compactMap { $0["name"] }
+      let warmups = workout.warmup.compactMap { $0.name }
+      let thangs = workout.thang.compactMap { $0.name }
+      let marys = workout.mary.compactMap { $0.name }
       return warmups + thangs + marys
     }
   }
