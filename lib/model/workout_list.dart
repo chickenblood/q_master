@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
@@ -18,6 +18,9 @@ final class WorkoutList extends _$WorkoutList {
   @override
   List<Workout> build() {
     () async {
+      // Sync with watch when the app is backgrounded.
+      AppLifecycleListener(onPause: _syncToWatch);
+
       final directory = await getApplicationDocumentsDirectory();
       _filename = '${directory.path}/workouts.json';
       final file = File(_filename!);
@@ -29,17 +32,21 @@ final class WorkoutList extends _$WorkoutList {
           .map((e) => Workout.fromJson(e))
           .toList();
       state = newWorkouts;
-
-      // Sync to watch. Ignore Android for now.
-      if (Platform.isAndroid) return;
-
-      final isPaired = await _watch.isPaired;
-      final isReachable = await _watch.isReachable;
-      if (isPaired && isReachable) {
-        await _watch.updateApplicationContext({'workouts': json});
-      }
+      _syncToWatch();
     }();
     return [];
+  }
+
+  // Sync to watch. Ignore Android for now.
+  void _syncToWatch() async {
+    if (Platform.isAndroid) return;
+
+    final json = jsonEncode(state);
+    final isPaired = await _watch.isPaired;
+    final isReachable = await _watch.isReachable;
+    if (isPaired && isReachable) {
+      await _watch.updateApplicationContext({'workouts': json});
+    }
   }
 
   Future<void> _save({required List<Workout> updatedWorkouts}) async {
