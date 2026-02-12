@@ -22,6 +22,7 @@ final class TimerTab extends ConsumerWidget {
   // The FAB is only for Android. We use app bar actions on iOS.
   Widget? _androidResetFAB(BuildContext context, {required WidgetRef ref}) {
     return FloatingActionButton(
+      heroTag: 'ResetTimerFAB',
       backgroundColor: Colors.red,
       onPressed: () => _resetTimer(ref),
       child: Icon(PlatformIcons(context).refresh),

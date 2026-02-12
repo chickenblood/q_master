@@ -52,6 +52,7 @@ class WorkoutsTab extends ConsumerWidget {
     BuildContext context, {
     required WidgetRef ref,
   }) => FloatingActionButton(
+    heroTag: 'AddWorkoutFAB',
     backgroundColor: Colors.red,
     onPressed: () => _showComposeWorkoutModal(context, ref),
     child: Icon(PlatformIcons(context).add),
