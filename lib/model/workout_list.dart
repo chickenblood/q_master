@@ -37,10 +37,7 @@ final class WorkoutList extends _$WorkoutList {
     return [];
   }
 
-  // Sync to watch. Ignore Android for now.
   void _syncToWatch() async {
-    if (Platform.isAndroid) return;
-
     final json = jsonEncode(state);
     final isPaired = await _watch.isPaired;
     final isReachable = await _watch.isReachable;
@@ -54,9 +51,6 @@ final class WorkoutList extends _$WorkoutList {
     final json = jsonEncode(updatedWorkouts);
     file.writeAsStringSync(json);
     state = updatedWorkouts;
-
-    // Sync to watch. Ignore Android for now.
-    if (Platform.isAndroid) return;
 
     final isPaired = await _watch.isPaired;
     final isReachable = await _watch.isReachable;
