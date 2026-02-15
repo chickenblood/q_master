@@ -5,20 +5,19 @@
 
 package com.f3nation.q_master.presentation
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataItem
-import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.Wearable
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
@@ -41,9 +40,8 @@ import androidx.lifecycle.ViewModel
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
-
-//import kotlinx.serialization.json.Json
-//import kotlinx.serialization.decodeFromString
+import java.io.ByteArrayInputStream
+import java.io.ObjectInputStream
 
 /// A workout to mirror the definition  in workout.dart
 data class Workout(
@@ -55,6 +53,26 @@ data class Workout(
 )
 
 data class Exercise(val name: String)
+
+/// Converts a map to a workout.
+fun Map<*, *>.toWorkout(): Workout {
+    val badData = "Bad data"
+
+    val warmup = (this["warmup"] as? List<*>
+        ?: emptyList<String>()).map { Exercise((it as Map<*, *>)["name"] as String) }
+    val thang = (this["thang"] as? List<*>
+        ?: emptyList<String>()).map { Exercise((it as Map<*, *>)["name"] as String) }
+    val mary = (this["warmup"] as? List<*>
+        ?: emptyList<String>()).map { Exercise((it as Map<*, *>)["name"] as String) }
+
+    return Workout(
+        name = this["name"] as? String ?: badData,
+        date = this["date"] as? String ?: badData,
+        warmup = warmup,
+        thang = thang,
+        mary = mary,
+    )
+}
 
 class WorkoutsViewModel : ViewModel() {
     private val _workouts = mutableStateOf(emptyList<Workout>())
@@ -119,14 +137,14 @@ class WatchActivity : ComponentActivity(), DataClient.OnDataChangedListener {
     private fun parseData(dataItem: DataItem) {
         if (dataItem.data == null) return;
         try {
-            val jsonString = String(dataItem.data!!, Charsets.UTF_8)
+            val bytes = dataItem.data!!
+            val byteArrayInputStream = ByteArrayInputStream(bytes)
+            val objectInputStream = ObjectInputStream(byteArrayInputStream)
+            val map = objectInputStream.readObject() as Map<*, *>
+            val workouts =
+                (map["workouts"] as List<*>).map { it as Map<*, *> }.map { it.toWorkout() }
 
-            // 3. Parse JSON string into a Map (Dictionary)
-            //val jsonMap: Map<String, Any> = Json.decodeFromString<Map<String, Any>>(jsonString)
-            // Extract the DataMap from the item
-            val dataMapItem = DataMapItem.fromDataItem(dataItem)
-            val dataMap = dataMapItem.dataMap
-            println(dataMap)
+            viewModel.setWorkouts(workouts)
         } catch (e: Exception) {
             println("Error parsing data: $e")
             viewModel.setWorkouts(stockContent)
@@ -179,6 +197,7 @@ fun MainListScreen(viewModel: WorkoutsViewModel, onItemSelected: (Int) -> Unit) 
                     ),
 
                 ) {
+                Text(text = stringResource(R.string.app_name))
             }
         },
     ) { contentPadding ->
@@ -224,6 +243,7 @@ fun DetailListScreen(workout: Workout) {
                     ),
 
                 ) {
+                Text(text = stringResource(R.string.app_name))
             }
         }
     ) { contentPadding -> // ScreenScaffold provides default padding; adjust as needed
@@ -253,11 +273,14 @@ fun DetailListScreen(workout: Workout) {
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @WearPreviewDevices
 @WearPreviewFontScales
 @Composable
 fun DefaultPreview() {
-    WearApp("Preview Android")
+    val viewModel = WorkoutsViewModel()
+    viewModel.setWorkouts(stockContent)
+    WearApp("Preview Android", viewModel)
 }
 
 val exercises = listOf(
