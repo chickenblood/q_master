@@ -38,11 +38,11 @@ final class WorkoutList extends _$WorkoutList {
   }
 
   void _syncToWatch() async {
-    final json = jsonEncode(state);
+    final workoutsArray = state.map((e) => e.toJson()).toList();
     final isPaired = await _watch.isPaired;
     final isReachable = await _watch.isReachable;
     if (isPaired && isReachable) {
-      await _watch.updateApplicationContext({'workouts': json});
+      await _watch.updateApplicationContext({'workouts': workoutsArray});
     }
   }
 
@@ -52,11 +52,7 @@ final class WorkoutList extends _$WorkoutList {
     file.writeAsStringSync(json);
     state = updatedWorkouts;
 
-    final isPaired = await _watch.isPaired;
-    final isReachable = await _watch.isReachable;
-    if (isPaired && isReachable) {
-      await _watch.updateApplicationContext({'workouts': json});
-    }
+    _syncToWatch();
   }
 
   void add(Workout workout) {

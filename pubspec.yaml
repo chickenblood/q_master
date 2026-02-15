@@ -1,7 +1,7 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 1.0.1+313
+version: 1.0.1+314
 
 environment:
   sdk: ^3.10.0
@@ -73,4 +73,5 @@ flutter:
         - asset: assets/fonts/RobotoCondensed-VariableFont_wght.ttf
   shaders:
     - shaders/dodecahedron.frag
+
 

@@ -6,6 +6,8 @@ part 'workout.g.dart';
 /// Model class representing a workout.
 @freezed
 abstract class Workout with _$Workout {
+  // ignore: invalid_annotation_target
+  @JsonSerializable(explicitToJson: true)
   const factory Workout({
     required String name,
     required DateTime date,

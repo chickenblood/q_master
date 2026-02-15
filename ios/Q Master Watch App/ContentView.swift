@@ -11,6 +11,7 @@ internal import Combine
 
 fileprivate let listItemFontSize = 28.0;
 
+/// A workout to mirror the definition  in workout.dart
 struct Workout: Codable {
   var name: String
   var date: String
@@ -22,6 +23,22 @@ struct Workout: Codable {
   var warmup: [Exercise]
   var thang: [Exercise]
   var mary: [Exercise]
+  
+  /// Create Workout from a map of values (synced from device).
+  static func fromDict(dict: Dictionary<String, Any>) -> Workout {
+    let badData = "Bad data"
+    let name = dict["name"] as? String ?? badData
+    let date = dict["date"] as? String ?? badData
+    let warmup = dict["warmup"] as? [[String : String]] ?? []
+    let thang = dict["thang"] as? [[String : String]] ?? []
+    let mary = dict["mary"] as? [[String : String]] ?? []
+    return Workout(
+      name: name, date: date,
+      warmup: warmup.map { Workout.Exercise(name: $0["name"] ?? badData) },
+      thang: thang.map { Workout.Exercise(name: $0["name"] ?? badData) },
+      mary: mary.map { Workout.Exercise(name: $0["name"] ?? badData) }
+    )
+  }
 }
 
 extension Workout: Identifiable {
@@ -44,20 +61,18 @@ class WorkoutListViewModel: NSObject, ObservableObject {
   }
   
   private func parseApplicationContext(applicationContext: [String : Any]) {
-    guard let workoutsData = applicationContext["workouts"] as? String else { return }
-    let decoder = JSONDecoder()
-    do {
-      let data = Data(workoutsData.utf8)
-      let workouts = try decoder.decode(Array<Workout>.self, from:data)
-      if !workouts.isEmpty {
-        DispatchQueue.main.async {
-          self.workouts = workouts
-        }
-      } else {
-        debugPrint("No workouts")
+    guard let workoutsData = applicationContext["workouts"] as? Array<Dictionary<String, Any>> else { return }
+    var workouts = Array<Workout>()
+    for workoutData in workoutsData {
+      let workout = Workout.fromDict(dict: workoutData)
+      workouts.append(workout)
+    }
+    if !workouts.isEmpty {
+      DispatchQueue.main.async {
+        self.workouts = workouts
       }
-    } catch {
-      debugPrint("Parsing error \(error)")
+    } else {
+      debugPrint("No workouts")
     }
   }
 }
@@ -81,14 +96,14 @@ struct ContentView: View {
   var body: some View {
     NavigationStack {
       List(viewModel.workouts) { workout in
-         NavigationLink(destination: DetailView(workout: workout)) {
-             Text(workout.name)
-         }
-     }
+        NavigationLink(destination: DetailView(workout: workout)) {
+          Text(workout.name)
+        }
+      }
       .font(.system(size: listItemFontSize))
       .listStyle(.carousel)
-     .navigationTitle("Workouts") // Set the title for the list view
-   }
+      .navigationTitle("Workouts") // Set the title for the list view
+    }
   }
 }
 
@@ -103,7 +118,7 @@ struct DetailView: View {
       return warmups + thangs + marys
     }
   }
-
+  
   var body: some View {
     List {
       ForEach(workouts) { exercise in
