@@ -171,7 +171,7 @@ fun WearApp(greetingName: String, viewModel: WorkoutsViewModel = WorkoutsViewMod
 
                 // Screen 2: The Exercises List
                 composable("detail_list/{id}") { backStackEntry ->
-                    val index = backStackEntry.arguments?.getInt("id")
+                    val index = backStackEntry.arguments?.getString("id")?.toInt()
                     if (index == null || index >= viewModel.workouts.size) return@composable
                     val workout = viewModel.workouts[index]
                     DetailListScreen(workout)
