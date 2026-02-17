@@ -33,10 +33,10 @@
             android:theme="@style/WatchActivityTheme.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
-
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/watch_connectivity" />
             </intent-filter>
         </activity>
