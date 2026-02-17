@@ -190,6 +190,7 @@ fun MainListScreen(viewModel: WorkoutsViewModel, onItemSelected: (Int) -> Unit) 
         edgeButton = {
             EdgeButton(
                 onClick = { /*TODO*/ },
+                enabled = false,
                 colors =
                     ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -236,6 +237,7 @@ fun DetailListScreen(workout: Workout) {
         edgeButton = {
             EdgeButton(
                 onClick = { /*TODO*/ },
+                enabled = false,
                 colors =
                     ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
