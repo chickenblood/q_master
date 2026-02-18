@@ -62,7 +62,7 @@ fun Map<*, *>.toWorkout(): Workout {
         ?: emptyList<String>()).map { Exercise((it as Map<*, *>)["name"] as String) }
     val thang = (this["thang"] as? List<*>
         ?: emptyList<String>()).map { Exercise((it as Map<*, *>)["name"] as String) }
-    val mary = (this["warmup"] as? List<*>
+    val mary = (this["mary"] as? List<*>
         ?: emptyList<String>()).map { Exercise((it as Map<*, *>)["name"] as String) }
 
     return Workout(
