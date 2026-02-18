@@ -100,6 +100,8 @@ class WatchActivity : ComponentActivity(), DataClient.OnDataChangedListener {
         super.onResume()
         // Register the listener to start receiving data updates
         val dataClient = Wearable.getDataClient(this);
+        dataClient.addListener(this)
+
         // Get previously-synced data
         dataClient.dataItems.addOnSuccessListener { dataItemBuffer ->
             for (i in 0 until dataItemBuffer.count) {
