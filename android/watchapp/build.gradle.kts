@@ -25,7 +25,7 @@ configure<ApplicationExtension> {
         applicationId = "com.f3nation.q_master"
         minSdk = 30
         targetSdk = 36
-        versionCode = 1332
+        versionCode = 1333
         versionName = "1.0"
 
     }
@@ -50,6 +50,9 @@ configure<ApplicationExtension> {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
         }
     }
     compileOptions {
