@@ -104,16 +104,19 @@ class WatchActivity : ComponentActivity(), DataClient.OnDataChangedListener {
 
         // Get previously-synced data
         dataClient.dataItems.addOnSuccessListener { dataItemBuffer ->
-            for (i in 0 until dataItemBuffer.count) {
-                val item = dataItemBuffer.get(i)
+            try {
+                for (i in 0 until dataItemBuffer.count) {
+                    val item = dataItemBuffer.get(i)
 
-                // Check for your specific path
-                if (item.uri.path == "/watch_connectivity") {
-                    parseData(item)
+                    // Check for your specific path
+                    if (item.uri.path == "/watch_connectivity") {
+                        parseData(item)
+                    }
                 }
+            } finally {
+                // Important: Release the buffer to prevent memory leaks
+                dataItemBuffer.release()
             }
-            // Important: Release the buffer to prevent memory leaks
-            dataItemBuffer.release()
         }
     }
 
@@ -125,14 +128,19 @@ class WatchActivity : ComponentActivity(), DataClient.OnDataChangedListener {
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
         println("DATA CHANGED")
-        dataEvents.forEach { event ->
-            // Check if data was changed (rather than deleted)
-            if (event.type == DataEvent.TYPE_CHANGED) {
-                val path = event.dataItem.uri.path
-                if (path == "/watch_connectivity") {
-                    parseData(event.dataItem)
+        try {
+            dataEvents.forEach { event ->
+                // Check if data was changed (rather than deleted)
+                if (event.type == DataEvent.TYPE_CHANGED) {
+                    val path = event.dataItem.uri.path
+                    if (path == "/watch_connectivity") {
+                        parseData(event.dataItem)
+                    }
                 }
             }
+        } finally {
+            // Important: Release the buffer to prevent memory leaks
+            dataEvents.release()
         }
     }
 
