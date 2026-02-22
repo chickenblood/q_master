@@ -102,6 +102,7 @@ struct ContentView: View {
     } else {
       Text(.syncInstructionsText)
         .font(.callout .bold())
+        .multilineTextAlignment(.center)
     }
   }
 }
