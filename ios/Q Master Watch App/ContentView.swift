@@ -52,8 +52,6 @@ extension String : @retroactive Identifiable {
 class WorkoutListViewModel: NSObject, ObservableObject {
   @Published var workouts: [Workout] = []
   
-  let session = WKExtendedRuntimeSession()
-  
   override init() {
     super.init()
     if WCSession.isSupported() {
@@ -82,8 +80,6 @@ class WorkoutListViewModel: NSObject, ObservableObject {
 extension WorkoutListViewModel: WCSessionDelegate {
   internal func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
     parseApplicationContext(applicationContext: applicationContext)
-    // To keep the app in the foreround
-    self.session.start()
   }
   
   internal func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
