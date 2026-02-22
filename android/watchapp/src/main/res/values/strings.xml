@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Q Master</string>
-    <string name="exercises">Exercises</string>
-    <string name="workouts">Workouts</string>
+    <string name="exercisesTitle">Exercises</string>
+    <string name="workoutsTitle">Workouts</string>
+    <string name="syncInstructionsText">Sync some workouts to get started</string>
 </resources>

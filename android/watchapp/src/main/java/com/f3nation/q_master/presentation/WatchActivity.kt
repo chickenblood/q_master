@@ -14,6 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
@@ -157,7 +159,7 @@ class WatchActivity : ComponentActivity(), DataClient.OnDataChangedListener {
             viewModel.setWorkouts(workouts)
         } catch (e: Exception) {
             println("Error parsing data: $e")
-            viewModel.setWorkouts(stockContent)
+            viewModel.setWorkouts(emptyList())
         }
     }
 }
@@ -221,17 +223,25 @@ fun MainListScreen(viewModel: WorkoutsViewModel, onItemSelected: (Int) -> Unit) 
                             .transformedHeight(this, transformationSpec),
                     transformation = SurfaceTransformation(transformationSpec),
                 ) {
-                    Text(text = stringResource(R.string.workouts))
+                    Text(text = stringResource(R.string.workoutsTitle))
                 }
             }
-            viewModel.workouts.forEachIndexed { index, workout ->
-                item {
-                    Button(
-                        onClick = { onItemSelected(index) },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = workout.name)
+            if (viewModel.workouts.isNotEmpty()) {
+                viewModel.workouts.forEachIndexed { index, workout ->
+                    item {
+                        Button(
+                            onClick = { onItemSelected(index) },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(text = workout.name)
+                        }
                     }
+                }
+            } else {
+                item {
+                    Text(text = stringResource(R.string.syncInstructionsText),
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center)
                 }
             }
         }
@@ -268,7 +278,7 @@ fun DetailListScreen(workout: Workout) {
                             .transformedHeight(this, transformationSpec),
                     transformation = SurfaceTransformation(transformationSpec),
                 ) {
-                    Text(text = stringResource(R.string.exercises))
+                    Text(text = stringResource(R.string.exercisesTitle))
                 }
             }
             (workout.warmup + workout.thang + workout.mary).forEach { exercise ->
