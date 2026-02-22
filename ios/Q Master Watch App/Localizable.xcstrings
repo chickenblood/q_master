@@ -13,6 +13,18 @@
         }
       }
     },
+    "SyncInstructionsText" : {
+      "comment" : "Instructions to create and sync some workouts from your phone",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync some workouts to get started"
+          }
+        }
+      }
+    },
     "WorkoutsTitle" : {
       "comment" : "Title for the list of workouts",
       "extractionState" : "manual",

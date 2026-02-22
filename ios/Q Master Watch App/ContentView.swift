@@ -9,8 +9,6 @@ import WatchConnectivity
 import Dispatch
 internal import Combine
 
-fileprivate let listItemFontSize = 28.0;
-
 /// A workout to mirror the definition  in workout.dart
 struct Workout: Codable {
   var name: String
@@ -67,12 +65,8 @@ class WorkoutListViewModel: NSObject, ObservableObject {
       let workout = Workout.fromDict(dict: workoutData)
       workouts.append(workout)
     }
-    if !workouts.isEmpty {
-      DispatchQueue.main.async {
-        self.workouts = workouts
-      }
-    } else {
-      debugPrint("No workouts")
+    DispatchQueue.main.async {
+      self.workouts = workouts
     }
   }
 }
@@ -94,15 +88,20 @@ struct ContentView: View {
   @StateObject var viewModel = WorkoutListViewModel()
   
   var body: some View {
-    NavigationStack {
-      List(viewModel.workouts) { workout in
-        NavigationLink(destination: DetailView(workout: workout)) {
-          Text(workout.name)
+    if !viewModel.workouts.isEmpty {
+      NavigationStack {
+        List(viewModel.workouts) { workout in
+          NavigationLink(destination: DetailView(workout: workout)) {
+            Text(workout.name)
+          }
         }
+        .font(.title2)
+        .listStyle(.carousel)
+        .navigationTitle(.workoutsTitle) // Set the title for the list view
       }
-      .font(.system(size: listItemFontSize))
-      .listStyle(.carousel)
-      .navigationTitle(.workoutsTitle) // Set the title for the list view
+    } else {
+      Text(.syncInstructionsText)
+        .font(.callout .bold())
     }
   }
 }
@@ -120,14 +119,14 @@ struct DetailView: View {
   }
   
   var body: some View {
-    List {
-      ForEach(workouts) { exercise in
-        Text(exercise)
+      List {
+        ForEach(workouts) { exercise in
+          Text(exercise)
+        }
+        .font(.title2)
+        .listStyle(.carousel)
+        .navigationTitle(.exercisesTitle)
       }
-      .font(.system(size: listItemFontSize))
-      .listStyle(.carousel)
-      .navigationTitle(.exercisesTitle)
-    }
   }
 }
 
