@@ -102,7 +102,7 @@ struct ContentView: View {
       }
       .font(.system(size: listItemFontSize))
       .listStyle(.carousel)
-      .navigationTitle("Workouts") // Set the title for the list view
+      .navigationTitle(.workoutsTitle) // Set the title for the list view
     }
   }
 }
@@ -126,7 +126,7 @@ struct DetailView: View {
       }
       .font(.system(size: listItemFontSize))
       .listStyle(.carousel)
-      .navigationTitle("Exercises")
+      .navigationTitle(.exercisesTitle)
     }
   }
 }
