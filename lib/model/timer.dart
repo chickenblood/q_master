@@ -52,11 +52,6 @@ final class Timer extends _$Timer {
   late final allChimePlayers = [_countdownChimePlayer];
   final _stopWatch = Stopwatch();
 
-  // Track last played sound to avoid replaying
-  int _lastPrepareSecond = -1;
-  int _lastWorkSecond = -1;
-  int _lastRestSecond = -1;
-
   // Track countdown chimes per phase to ensure each plays only once
   final _countdownTrackers = <ExercisePhase, int?>{};
 
@@ -102,9 +97,6 @@ final class Timer extends _$Timer {
   Future<void> reset() async {
     _stopWatch.stop();
     _stopWatch.reset();
-    _lastPrepareSecond = -1;
-    _lastWorkSecond = -1;
-    _lastRestSecond = -1;
     _countdownTrackers.clear();
     _lastPrepareStart = -1;
     _lastWorkStart = -1;
@@ -142,55 +134,38 @@ final class Timer extends _$Timer {
 
     // Check if all rounds are completed
     final allRoundsCompleted =
-        runningTime >= (totalRoundTime * state.rounds * state.cycles);
-    if (allRoundsCompleted) {
-      _stop();
-      return;
-    }
+        runningTime > (totalRoundTime * state.rounds * state.cycles);
 
-    // Play phase sounds at the start of each phase
-    if (currentSecond == 0 && _lastPrepareStart != 0) {
-      _lastPrepareStart = 0;
-      await _playSound(_prepareSound);
-    } else if (currentRoundElapsedSeconds == 0 &&
-        runningTime > Duration.zero &&
-        _lastWorkStart != currentSecond) {
-      _lastWorkStart = currentSecond;
-      await _playSound(_workSound);
-    } else if (currentRoundElapsedSeconds == state.workInterval.inSeconds &&
-        currentRoundElapsedSeconds > 0 &&
-        _lastRestStart != currentSecond) {
-      _lastRestStart = currentSecond;
-      await _playSound(_restSound);
+    if (!allRoundsCompleted) {
+      // Play phase sounds at the start of each phase
+      if (currentSecond == 0 && _lastPrepareStart != 0) {
+        _lastPrepareStart = 0;
+        await _playSound(_prepareSound);
+      } else if (currentRoundElapsedSeconds == 0 &&
+          runningTime > Duration.zero &&
+          _lastWorkStart != currentSecond) {
+        _lastWorkStart = currentSecond;
+        await _playSound(_workSound);
+      } else if (currentRoundElapsedSeconds == state.workInterval.inSeconds &&
+          currentRoundElapsedSeconds > 0 &&
+          _lastRestStart != currentSecond) {
+        _lastRestStart = currentSecond;
+        await _playSound(_restSound);
+      }
     }
 
     // Play countdown chimes at exact times during the last 3 seconds of each phase
-    final prepareEndSeconds = state.prepareInterval.inSeconds;
-    await _playCountdownChimes(
-      ExercisePhase.preparing,
-      currentSecond,
-      prepareEndSeconds,
-    );
+    final prepareRemaining = remainingPrepareTime.inSeconds;
+    if (prepareRemaining > 0) {
+      await _playCountdownChimes(ExercisePhase.preparing, prepareRemaining);
+    } else {
+      final workRemaining = remainingWorkTime.inSeconds;
+      await _playCountdownChimes(ExercisePhase.working, workRemaining);
 
-    final totalRoundSeconds = totalRoundTime.inSeconds;
-    final completedRounds = runningTime.inSeconds ~/ totalRoundSeconds;
-    final currentWorkEndSeconds =
-        state.prepareInterval.inSeconds +
-        completedRounds * totalRoundSeconds +
-        state.workInterval.inSeconds;
-    await _playCountdownChimes(
-      ExercisePhase.working,
-      currentSecond,
-      currentWorkEndSeconds,
-    );
-
-    final currentRestEndSeconds =
-        currentWorkEndSeconds + state.restInterval.inSeconds;
-    await _playCountdownChimes(
-      ExercisePhase.resting,
-      currentSecond,
-      currentRestEndSeconds,
-    );
+      final restRemaining = remainingRestTime.inSeconds;
+      await _playCountdownChimes(ExercisePhase.resting, restRemaining);
+    }
+    if (allRoundsCompleted) _stop();
   }
 
   Future<void> _playSound(AudioPlayer player) async {
@@ -198,16 +173,16 @@ final class Timer extends _$Timer {
     player.play();
   }
 
-  /// Play countdown chimes (3, 2, 1) and final chime before/at phase end.
+  /// Play countdown chimes (3, 2, 1) and final chime based on remaining time.
   /// Seeks to different positions in the countdown sound file for each chime.
   /// i values: 3=first chime, 2=second, 1=third, 0=final chime
+  /// Works with remaining time in the current phase, so chimes play when 3, 2, 1, 0 seconds remain.
   Future<void> _playCountdownChimes(
     ExercisePhase phase,
-    int currentSecond,
-    int endSeconds,
+    int remainingSeconds,
   ) async {
     for (int i = 3; i >= 0; i--) {
-      if (currentSecond == endSeconds - i && _countdownTrackers[phase] != i) {
+      if (remainingSeconds == i && _countdownTrackers[phase] != i) {
         // Seek positions: 0=first chime, 1=second, 2=third, 3=final chime
         await _countdownChimePlayer.seek(Duration(seconds: 3 - i));
         await _countdownChimePlayer.play();
