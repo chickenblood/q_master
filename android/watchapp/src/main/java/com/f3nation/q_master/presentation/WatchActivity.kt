@@ -123,6 +123,8 @@ class WatchActivity : ComponentActivity(), DataClient.OnDataChangedListener {
                         parseData(item)
                     }
                 }
+            } catch (e: Exception) {
+                viewModel.setErrorMessage(e.message)
             } finally {
                 // Important: Release the buffer to prevent memory leaks
                 dataItemBuffer.release()
@@ -148,6 +150,8 @@ class WatchActivity : ComponentActivity(), DataClient.OnDataChangedListener {
                     }
                 }
             }
+        } catch (e: Exception) {
+            viewModel.setErrorMessage(e.message)
         } finally {
             // Important: Release the buffer to prevent memory leaks
             dataEvents.release()
