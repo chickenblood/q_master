@@ -41,11 +41,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   // bookkeeping for per-tick dt
   var _lastTick = 0.0;
 
-  // center label shown when face is selected (persists until next tap)
-  String? _centerLabel;
-  var _centerLabelStart = 0.0;
-  final double _centerLabelFadeDuration = 0.18;
-
   // label atlas used by shader (rendered once from strings)
   ui.Image? _labelAtlas;
 
@@ -87,11 +82,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   }
 
   void _initiateSpin() {
-    // If a center label is shown, clear it and continue to start a spin.
-    setState(() {
-      _centerLabel = null;
-    });
-
     // ignore taps while spinning
     if (_vx.abs() > _velocityEpsilon ||
         _vy.abs() > _velocityEpsilon ||
@@ -101,8 +91,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
 
     // add an impulse to angular velocity to kick off a spin scaled by user control
     setState(() {
-      // clear any previous selection when we start a new spin
-      _centerLabel = null;
       // Fold view offset into object rotation before starting new spin
       _ax += _viewAx;
       _ay += _viewAy;
@@ -227,12 +215,8 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
         _vx = _vy = _vz = 0.0;
         _isSpinning = false;
 
-        // Determine which face is most aligned and show its label
-        final faceIdx = _findFrontFaceIndex();
-        _centerLabel = dodFaceExercises[faceIdx];
-        _centerLabelStart = t;
-
         // Highlight the selected face momentarily
+        final faceIdx = _findFrontFaceIndex();
         _highlightFaceIndex = faceIdx;
         _highlightStartTime = t;
 
@@ -249,19 +233,12 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
       });
     }
 
-    // If we've come to rest (no angular velocity), snap is done, and any center-label fade-in
-    // has completed (or none exists), and highlight has finished, stop the ticker to save CPU.
+    // If we've come to rest (no angular velocity), snap is done, and highlight
+    // has finished, stop the ticker to save CPU.
     final noVelocities = _vx == 0.0 && _vy == 0.0 && _vz == 0.0;
-    final fadeInPending =
-        _centerLabel != null &&
-        ((t - _centerLabelStart) < _centerLabelFadeDuration);
     final highlightPending = _highlightFaceIndex >= 0;
     final snapPending = _snapFaceIndex >= 0;
-    if (noVelocities &&
-        !fadeInPending &&
-        !highlightPending &&
-        !snapPending &&
-        _ticker.isActive) {
+    if (noVelocities && !highlightPending && !snapPending && _ticker.isActive) {
       _ticker.stop();
     }
   }
@@ -524,12 +501,7 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   }
 
   @override
-  Widget build(BuildContext context) => Stack(
-    children: [
-      _buildShaderPainter(context),
-      if (_centerLabel != null) _buildCenterLabel(),
-    ],
-  );
+  Widget build(BuildContext context) => _buildShaderPainter(context);
 
   Widget _buildShaderPainter(BuildContext context) {
     // Calculate highlight progress (0 at start, 1 when done)
@@ -555,54 +527,6 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
                 _highlightFaceIndex,
                 highlightProgress,
               ),
-      ),
-    );
-  }
-
-  Widget _buildCenterLabel() {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 20),
-          child: IgnorePointer(
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 200),
-              opacity: ((_time - _centerLabelStart) / _centerLabelFadeDuration)
-                  .clamp(0.0, 1.0),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 28 * _labelSizeMultiplier,
-                  vertical: 14 * _labelSizeMultiplier,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color.fromRGBO(0, 0, 0, 0.92),
-                  borderRadius: BorderRadius.circular(8 * _labelSizeMultiplier),
-                ),
-                child: DefaultTextStyle(
-                  style:
-                      Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        shadows: const [
-                          Shadow(
-                            blurRadius: 8,
-                            color: Colors.black54,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ) ??
-                      const TextStyle(
-                        color: Colors.white,
-                        fontSize: 44,
-                        fontWeight: FontWeight.bold,
-                      ),
-                  child: Text(_centerLabel!, textAlign: TextAlign.center),
-                ),
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }

@@ -72,7 +72,7 @@
     "@deleteWorkoutConfirmAction": {},
     "cancelAction": "Cancel",
     "@cancelAction": {},
-    "dodShakeToRollDiceMessage": "Shake to roll",
+    "dodShakeToRollDiceMessage": "Shake or tap to roll",
     "@dodShakeToRollDiceMessage": {},
     "themeSettingsTitle": "Theme",
     "@themeSettingsTitle": {},
