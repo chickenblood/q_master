@@ -78,13 +78,21 @@ fun Map<*, *>.toWorkout(): Workout {
 
 class WorkoutsViewModel : ViewModel() {
     private val _workouts = mutableStateOf(emptyList<Workout>())
-
-    val workouts: List<Workout>
-        get() = _workouts.value
+    private val _errorMessage = mutableStateOf<String?>(null)
 
     fun setWorkouts(workouts: List<Workout>) {
         _workouts.value = workouts
     }
+
+    val workouts: List<Workout>
+        get() = _workouts.value
+
+    fun setErrorMessage(message: String?) {
+        _errorMessage.value = message
+    }
+
+    val errorMessage: String?
+        get() = _errorMessage.value
 }
 
 class WatchActivity : ComponentActivity(), DataClient.OnDataChangedListener {
@@ -155,10 +163,11 @@ class WatchActivity : ComponentActivity(), DataClient.OnDataChangedListener {
             val map = objectInputStream.readObject() as Map<*, *>
             val workouts =
                 (map["workouts"] as List<*>).map { it as Map<*, *> }.map { it.toWorkout() }
-
             viewModel.setWorkouts(workouts)
+            viewModel.setErrorMessage(null)
         } catch (e: Exception) {
             println("Error parsing data: $e")
+            viewModel.setErrorMessage(e.message)
             viewModel.setWorkouts(emptyList())
         }
     }
@@ -236,6 +245,10 @@ fun MainListScreen(viewModel: WorkoutsViewModel, onItemSelected: (Int) -> Unit) 
                             Text(text = workout.name)
                         }
                     }
+                }
+            } else if (viewModel.errorMessage != null) {
+                item {
+                    Text(text = viewModel.errorMessage!!)
                 }
             } else {
                 item {
