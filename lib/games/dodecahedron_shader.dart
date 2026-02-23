@@ -58,6 +58,13 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
   var _highlightStartTime = 0.0;
   final _highlightDuration = 0.4; // seconds
 
+  // snap-to-face animation state
+  int _snapFaceIndex = -1; // which face to snap to (-1 = not snapping)
+  var _snapStartTime = 0.0;
+  final _snapDuration = 0.5; // seconds to animate to face alignment
+  // Target rotation angles to align selected face
+  var _snapTargetAx = 0.0, _snapTargetAy = 0.0, _snapTargetAz = 0.0;
+
   late final ShakeDetector _shakeDetector;
 
   @override
@@ -67,46 +74,7 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
     _ticker = createTicker(_onTick)..start();
 
     _shakeDetector = ShakeDetector.autoStart(
-      onPhoneShake: (_) {
-        // If a center label is shown, clear it and continue to start a spin.
-        setState(() {
-          _centerLabel = null;
-        });
-
-        // ignore taps while spinning
-        if (_vx.abs() > _velocityEpsilon ||
-            _vy.abs() > _velocityEpsilon ||
-            _vz.abs() > _velocityEpsilon) {
-          return;
-        }
-
-        // add an impulse to angular velocity to kick off a spin scaled by user control
-        setState(() {
-          // clear any previous selection when we start a new spin
-          _centerLabel = null;
-          // Fold view offset into object rotation before starting new spin
-          _ax += _viewAx;
-          _ay += _viewAy;
-          _az += _viewAz;
-          _viewAx = _viewAy = _viewAz = 0.0;
-          // Randomize impulse direction and magnitude for highly varied results
-          final rng = math.Random();
-          // Wider ranges for more variation (3.0 to 9.0 range per axis)
-          final baseX = 3.0 + rng.nextDouble() * 6.0;
-          final baseY = 3.0 + rng.nextDouble() * 6.0;
-          final baseZ = 3.0 + rng.nextDouble() * 6.0;
-          final signX = rng.nextBool() ? 1.0 : -1.0;
-          final signY = rng.nextBool() ? 1.0 : -1.0;
-          final signZ = rng.nextBool() ? 1.0 : -1.0;
-          _vx += signX * baseX * _impulseStrength;
-          _vy += signY * baseY * _impulseStrength;
-          _vz += signZ * baseZ * _impulseStrength;
-        });
-
-        // reset tick bookkeeping and ensure the ticker is running so animation resumes
-        _lastTick = 0.0;
-        if (!_ticker.isActive) _ticker.start();
-      },
+      onPhoneShake: (_) => _initiateSpin(),
     );
   }
 
@@ -116,6 +84,47 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
     _labelAtlas?.dispose();
     _shakeDetector.stopListening();
     super.dispose();
+  }
+
+  void _initiateSpin() {
+    // If a center label is shown, clear it and continue to start a spin.
+    setState(() {
+      _centerLabel = null;
+    });
+
+    // ignore taps while spinning
+    if (_vx.abs() > _velocityEpsilon ||
+        _vy.abs() > _velocityEpsilon ||
+        _vz.abs() > _velocityEpsilon) {
+      return;
+    }
+
+    // add an impulse to angular velocity to kick off a spin scaled by user control
+    setState(() {
+      // clear any previous selection when we start a new spin
+      _centerLabel = null;
+      // Fold view offset into object rotation before starting new spin
+      _ax += _viewAx;
+      _ay += _viewAy;
+      _az += _viewAz;
+      _viewAx = _viewAy = _viewAz = 0.0;
+      // Randomize impulse direction and magnitude for highly varied results
+      final rng = math.Random();
+      // Wider ranges for more variation (3.0 to 9.0 range per axis)
+      final baseX = 3.0 + rng.nextDouble() * 6.0;
+      final baseY = 3.0 + rng.nextDouble() * 6.0;
+      final baseZ = 3.0 + rng.nextDouble() * 6.0;
+      final signX = rng.nextBool() ? 1.0 : -1.0;
+      final signY = rng.nextBool() ? 1.0 : -1.0;
+      final signZ = rng.nextBool() ? 1.0 : -1.0;
+      _vx += signX * baseX * _impulseStrength;
+      _vy += signY * baseY * _impulseStrength;
+      _vz += signZ * baseZ * _impulseStrength;
+    });
+
+    // reset tick bookkeeping and ensure the ticker is running so animation resumes
+    _lastTick = 0.0;
+    if (!_ticker.isActive) _ticker.start();
   }
 
   @override
@@ -185,6 +194,28 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
         _az += _vz * dt;
       }
 
+      // Animate snap-to-face if active
+      if (_snapFaceIndex >= 0) {
+        final elapsed = t - _snapStartTime;
+        if (elapsed < _snapDuration) {
+          // Progress: 0 at start, 1 at end (eased with smooth curve)
+          final progress = (elapsed / _snapDuration).clamp(0.0, 1.0);
+          // Ease-out cubic for smooth deceleration
+          final easeProgress = 1.0 - math.pow(1.0 - progress, 3.0);
+
+          // Interpolate from current rotation to target
+          _ax = _ax + (_snapTargetAx - _ax) * easeProgress;
+          _ay = _ay + (_snapTargetAy - _ay) * easeProgress;
+          _az = _az + (_snapTargetAz - _az) * easeProgress;
+        } else {
+          // Snap complete: set exactly to target
+          _ax = _snapTargetAx;
+          _ay = _snapTargetAy;
+          _az = _snapTargetAz;
+          _snapFaceIndex = -1;
+        }
+      }
+
       // detect spinning -> slowed below threshold: show label for aligned face
       final currentSpeed = math.max(_vx.abs(), math.max(_vy.abs(), _vz.abs()));
       final currentlySpinning = currentSpeed > _stopVelocityThreshold;
@@ -204,6 +235,11 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
         // Highlight the selected face momentarily
         _highlightFaceIndex = faceIdx;
         _highlightStartTime = t;
+
+        // Start snap-to-face animation
+        _snapFaceIndex = faceIdx;
+        _snapStartTime = t;
+        _calculateSnapTarget(faceIdx);
       }
     }
 
@@ -213,16 +249,18 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
       });
     }
 
-    // If we've come to rest (no angular velocity) and any center-label fade-in
+    // If we've come to rest (no angular velocity), snap is done, and any center-label fade-in
     // has completed (or none exists), and highlight has finished, stop the ticker to save CPU.
     final noVelocities = _vx == 0.0 && _vy == 0.0 && _vz == 0.0;
     final fadeInPending =
         _centerLabel != null &&
         ((t - _centerLabelStart) < _centerLabelFadeDuration);
     final highlightPending = _highlightFaceIndex >= 0;
+    final snapPending = _snapFaceIndex >= 0;
     if (noVelocities &&
         !fadeInPending &&
         !highlightPending &&
+        !snapPending &&
         _ticker.isActive) {
       _ticker.stop();
     }
@@ -341,6 +379,66 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
     return bestFaceIndex;
   }
 
+  // Calculate target rotation angles to align a specific face perpendicular to camera
+  void _calculateSnapTarget(int faceIndex) {
+    final targetNormal = _normalize(_faceNormals[faceIndex]);
+    // We want this normal to point toward camera [0, 0, 1] after inverse rotation
+    // That is: R^T * normal = [0, 0, 1], so R * [0, 0, 1] = normal
+    //
+    // We use an iterative approach: search for rotation angles that minimize error
+    // between current normal direction and target [0, 0, 1] direction.
+
+    // Start from current rotation
+    var bestAx = _ax, bestAy = _ay, bestAz = _az;
+    var minError = double.infinity;
+
+    // Search nearby angles (±π/2 to allow flipping)
+    const searchSteps = 9;
+    const searchRange = math.pi / 2;
+
+    for (int xi = 0; xi < searchSteps; xi++) {
+      for (int yi = 0; yi < searchSteps; yi++) {
+        for (int zi = 0; zi < searchSteps; zi++) {
+          final testAx =
+              _ax + (xi - (searchSteps ~/ 2)) * searchRange / (searchSteps / 2);
+          final testAy =
+              _ay + (yi - (searchSteps ~/ 2)) * searchRange / (searchSteps / 2);
+          final testAz =
+              _az + (zi - (searchSteps ~/ 2)) * searchRange / (searchSteps / 2);
+
+          // Build rotation and transform normal
+          final rX = _rotX(testAx);
+          final rY = _rotY(testAy);
+          final rZ = _rotZ(testAz);
+          final rZY = _mulMatMat(rZ, rY);
+          final rot = _mulMatMat(rZY, rX);
+          final rotInv = _transpose(rot);
+
+          // Apply inverse rotation to normal
+          final nWorld = _mulMatVec(rotInv, targetNormal);
+
+          // Target is [0, 0, 1]
+          const zAxis = [0.0, 0.0, 1.0];
+          final error =
+              (nWorld[0] - zAxis[0]) * (nWorld[0] - zAxis[0]) +
+              (nWorld[1] - zAxis[1]) * (nWorld[1] - zAxis[1]) +
+              (nWorld[2] - zAxis[2]) * (nWorld[2] - zAxis[2]);
+
+          if (error < minError) {
+            minError = error;
+            bestAx = testAx;
+            bestAy = testAy;
+            bestAz = testAz;
+          }
+        }
+      }
+    }
+
+    _snapTargetAx = bestAx;
+    _snapTargetAy = bestAy;
+    _snapTargetAz = bestAz;
+  }
+
   // build a label atlas texture containing each label rendered into a grid cell
   Future<ui.Image> _buildLabelAtlas(List<String> labels) async {
     const cols = 4;
@@ -439,22 +537,25 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
         ? ((_time - _highlightStartTime) / _highlightDuration).clamp(0.0, 1.0)
         : 1.0;
 
-    return CustomPaint(
-      size: Size.infinite,
-      painter: _program == null
-          ? _LoadingPainter()
-          : _ShaderPainter(
-              _program!,
-              _time,
-              MediaQuery.of(context).devicePixelRatio,
-              _ax + _viewAx,
-              _ay + _viewAy,
-              _az + _viewAz,
-              _labelSizeMultiplier,
-              _labelAtlas,
-              _highlightFaceIndex,
-              highlightProgress,
-            ),
+    return GestureDetector(
+      onTap: _initiateSpin,
+      child: CustomPaint(
+        size: Size.infinite,
+        painter: _program == null
+            ? _LoadingPainter()
+            : _ShaderPainter(
+                _program!,
+                _time,
+                MediaQuery.of(context).devicePixelRatio,
+                _ax + _viewAx,
+                _ay + _viewAy,
+                _az + _viewAz,
+                _labelSizeMultiplier,
+                _labelAtlas,
+                _highlightFaceIndex,
+                highlightProgress,
+              ),
+      ),
     );
   }
 
