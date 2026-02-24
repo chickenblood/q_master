@@ -126,7 +126,7 @@ struct DetailView: View {
         }
         .font(.title2)
         .listStyle(.carousel)
-        .navigationTitle(.exercisesTitle)
+        .navigationTitle(workout.name)
       }
   }
 }

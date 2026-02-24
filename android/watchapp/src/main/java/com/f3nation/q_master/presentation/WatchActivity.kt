@@ -295,7 +295,7 @@ fun DetailListScreen(workout: Workout) {
                             .transformedHeight(this, transformationSpec),
                     transformation = SurfaceTransformation(transformationSpec),
                 ) {
-                    Text(text = stringResource(R.string.exercisesTitle))
+                    Text(text = workout.name)
                 }
             }
             (workout.warmup + workout.thang + workout.mary).forEach { exercise ->
