@@ -28,7 +28,7 @@ const painExercises = {
     (exercise: 'Sprint 200m', value: 2, showRepCount: false),
     (exercise: 'Sprint 300m', value: 3, showRepCount: false),
     (exercise: 'Sprint 400m', value: 4, showRepCount: false),
-    (exercise: 'Karaoke (Q set distance)', value: 5, showRepCount: false),
+    (exercise: 'Carioca (Q set distance)', value: 5, showRepCount: false),
     (exercise: 'Backward run (Q set distance)', value: 6, showRepCount: false),
     (exercise: 'Bear crawl (Q set distance)', value: 7, showRepCount: false),
     (exercise: 'Squat thrust', value: 8, showRepCount: true),
