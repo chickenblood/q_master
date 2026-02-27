@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'pain_card.dart';
@@ -33,21 +31,19 @@ final class DeckOfPain extends _$DeckOfPain {
   List<PainCard> build() {
     final deck = <PainCard>[];
 
-    final exercises = <String>[];
-    final random = Random();
-
     // Initialize the deck with some PainCards
-    for (var suit in Suit.values) {
-      for (var i = 1; i <= 13; i++) {
-        if (exercises.isEmpty) {
-          // Temporary, until we have at least 52 exercises.
-          exercises.addAll(painExercises);
-        }
-        final removalIndex = random.nextInt(exercises.length);
+    for (final entry in painExercises.entries) {
+      final suit = entry.key;
+
+      for (final cardData in entry.value) {
         deck.add(
-          PainCard(suit: suit, value: i, exercise: exercises[removalIndex]),
+          PainCard(
+            suit: suit,
+            value: cardData.value,
+            exercise: cardData.exercise,
+            showRepCount: cardData.showRepCount,
+          ),
         );
-        exercises.removeAt(removalIndex);
       }
     }
     deck.shuffle();
