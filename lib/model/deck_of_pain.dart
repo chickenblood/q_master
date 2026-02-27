@@ -37,12 +37,7 @@ final class Deck {
   Deck(this.cards);
 
   /// Draws a card from the deck and returns it.
-  PainCard? drawCard() {
-    if (cards.isNotEmpty) {
-      return cards.removeAt(0);
-    }
-    return null;
-  }
+  PainCard? drawCard() => cards.isNotEmpty ? cards.removeAt(0) : null;
 
   /// Returns the top card without removing it from the deck.
   PainCard? currentCard() => cards.isNotEmpty ? cards[0] : null;
