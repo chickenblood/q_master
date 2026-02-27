@@ -78,7 +78,7 @@ const painExercises = {
     (exercise: 'Monkey humper', value: 7, showRepCount: true),
     (exercise: 'Backward lunge', value: 8, showRepCount: true),
     (exercise: 'Low, slow squat', value: 9, showRepCount: true),
-    (exercise: 'Lunege walk 100m', value: 10, showRepCount: false),
+    (exercise: 'Lunge walk 100m', value: 10, showRepCount: false),
     (exercise: 'Smurf jack', value: 11, showRepCount: true),
     (exercise: 'Monkey humper', value: 12, showRepCount: true),
     (exercise: 'Squat', value: 13, showRepCount: true),

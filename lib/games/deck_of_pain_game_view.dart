@@ -50,13 +50,15 @@ final class _Deck extends ConsumerStatefulWidget {
 }
 
 class _DeckState extends ConsumerState<_Deck> with TickerProviderStateMixin {
+  late final AnimationController _slideController;
+  late final Animation<Offset> _slideAnimation;
+  late final Deck _deck;
+
   // Always maintain exactly 2 cards in the stack
   PainCard? _topCard;
   PainCard? _bottomCard;
   bool _topCardFlipped = true; // true = face down
 
-  late AnimationController _slideController;
-  late Animation<Offset> _slideAnimation;
   bool _isSlidingOff = false;
 
   @override
@@ -75,9 +77,9 @@ class _DeckState extends ConsumerState<_Deck> with TickerProviderStateMixin {
     _slideController.addStatusListener(_onSlideComplete);
 
     // Initialize the two-card stack
-    final notifier = ref.read(deckOfPainProvider.notifier);
-    _topCard = notifier.currentCard();
-    _bottomCard = notifier.nextCard();
+    _deck = ref.read(deckOfPainProvider);
+    _topCard = _deck.currentCard();
+    _bottomCard = _deck.nextCard();
   }
 
   @override
@@ -94,8 +96,7 @@ class _DeckState extends ConsumerState<_Deck> with TickerProviderStateMixin {
         _topCardFlipped = true; // Ensure revealed card is face down
 
         // Draw new bottom card
-        final notifier = ref.read(deckOfPainProvider.notifier);
-        _bottomCard = notifier.drawCard();
+        _bottomCard = _deck.drawCard();
 
         // Reset slide animation
         _isSlidingOff = false;
