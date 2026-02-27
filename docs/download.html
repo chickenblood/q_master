@@ -181,7 +181,13 @@
 </head>
 <body>
 
-<div class="container">
+<video id="promoVideo" style="position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:9999;opacity:1;transition:opacity 1s ease;" autoplay muted>
+    <source src="apple_promo_video.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+
+<div id="mainContent" style="display:none;opacity:0;transition:opacity 1s ease;">
+  <div class="container">
     <div class="hero-wrapper">
         <img src="gloom.png" alt="The November Gloom" class="hero-image">
 
@@ -207,10 +213,10 @@
             </div>
 
             <div class="badge-item">
-                <span class="badge-label label-soon">Android (Coming Soon)</span>
-                <div class="badge-disabled">
+                <span class="badge-label label-active">Android</span>
+                <a href="https://play.google.com/store/apps/details?id=com.f3.qmaster" target="_blank" class="app-store-badge">
                     <img src="GetItOnGooglePlay_Badge_Web_color_English.svg" alt="Get it on Google Play">
-                </div>
+                </a>
             </div>
         </div>
 
@@ -219,6 +225,26 @@
         </div>
     </div>
 </div>
+</div>
+
+<script>
+    // when the promo video finishes, cross-fade to the main content
+    const video = document.getElementById('promoVideo');
+    const main = document.getElementById('mainContent');
+    video.addEventListener('ended', () => {
+        // start fading video out and content in
+        video.style.opacity = '0';
+        main.style.display = 'block';
+        // give the browser a moment to apply display before transitioning opacity
+        requestAnimationFrame(() => {
+            main.style.opacity = '1';
+        });
+        // after fade completes remove video element (1s transition)
+        setTimeout(() => {
+            video.remove();
+        }, 1000);
+    });
+</script>
 
 </body>
 </html>
