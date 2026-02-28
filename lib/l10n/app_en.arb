@@ -16,6 +16,8 @@
     "@dopGameTileTitle": {},
     "dopGameScreenTitle": "Tap to draw a new card",
     "@dopGameScreenTitle": {},
+    "dopAllDoneLabel": "All done!",
+    "@dopAllDoneLabel": {},
     "settingsDialogTitle": "Settings",
     "@settingsDialogTitle": {},
     "exercisesPerPageSettingsLabel": "Exercises per page",

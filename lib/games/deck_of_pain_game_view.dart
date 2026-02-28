@@ -132,7 +132,16 @@ class _DeckState extends ConsumerState<_Deck> with TickerProviderStateMixin {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Bottom card - always present.
+          // Revealed when last card is slid off and no more are available.
+          if (_topCard == null || _bottomCard == null)
+            PlatformText(
+              L10n.of(context)!.dopAllDoneLabel,
+              textAlign: .center,
+              style: TextTheme.of(
+                context,
+              ).displayLarge!.copyWith(color: Colors.white),
+              textScaler: .noScaling,
+            ),
           if (_bottomCard != null)
             _CardFlipView(
               key: ValueKey(_bottomCard),
