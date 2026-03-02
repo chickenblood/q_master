@@ -236,7 +236,7 @@
     // when the promo video finishes, cross-fade to the main content
     const video = document.getElementById('promoVideo');
     const main = document.getElementById('mainContent');
-    / Try to play on page load; if blocked, show main content immediately
+    // Try to play on page load; if blocked, show main content immediately
     video.play().catch(() => {
         // Autoplay blocked or failed - show main content
         transitionToMain();
