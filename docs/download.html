@@ -230,19 +230,25 @@
     // when the promo video finishes, cross-fade to the main content
     const video = document.getElementById('promoVideo');
     const main = document.getElementById('mainContent');
-    video.addEventListener('ended', () => {
-        // start fading video out and content in
+    / Try to play on page load; if blocked, show main content immediately
+    video.play().catch(() => {
+        // Autoplay blocked or failed - show main content
+        transitionToMain();
+    });
+    
+    // If video finishes normally, transition
+    video.addEventListener('ended', transitionToMain);
+    
+    function transitionToMain() {
         video.style.opacity = '0';
         main.style.display = 'block';
-        // give the browser a moment to apply display before transitioning opacity
         requestAnimationFrame(() => {
             main.style.opacity = '1';
         });
-        // after fade completes remove video element (1s transition)
         setTimeout(() => {
             video.remove();
         }, 1000);
-    });
+    }
 </script>
 
 </body>
