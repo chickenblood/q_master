@@ -92,11 +92,11 @@ class _DeckState extends ConsumerState<_Deck> with TickerProviderStateMixin {
     if (status == .completed) {
       setState(() {
         // Move bottom card to top position (keep it face down)
-        _topCard = _bottomCard;
+        _topCard = _deck.drawCard();
         _topCardFlipped = true; // Ensure revealed card is face down
 
         // Draw new bottom card
-        _bottomCard = _deck.drawCard();
+        _bottomCard = _deck.nextCard();
 
         // Reset slide animation
         _isSlidingOff = false;
