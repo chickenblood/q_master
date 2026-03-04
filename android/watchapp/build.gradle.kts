@@ -25,8 +25,8 @@ configure<ApplicationExtension> {
         applicationId = "com.f3nation.q_master"
         minSdk = 31
         targetSdk = 36
-        versionCode = 1363
-        versionName = "2.0"
+        versionCode = 1379
+        versionName = "2.0.1"
 
     }
     signingConfigs {
