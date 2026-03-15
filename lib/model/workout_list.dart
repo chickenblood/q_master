@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:watch_connectivity/watch_connectivity.dart';
@@ -12,6 +14,7 @@ part 'workout_list.g.dart';
 
 @riverpod
 final class WorkoutList extends _$WorkoutList {
+  static final _logger = Logger();
   final _watch = WatchConnectivity();
   String? _filename;
 
@@ -40,9 +43,13 @@ final class WorkoutList extends _$WorkoutList {
   void _syncToWatch() async {
     final workoutsArray = state.map((e) => e.toJson()).toList();
     final isPaired = await _watch.isPaired;
-    final isReachable = await _watch.isReachable;
-    if (isPaired && isReachable) {
-      await _watch.updateApplicationContext({'workouts': workoutsArray});
+    //final isReachable = await _watch.isReachable;
+    if (isPaired) {
+      try {
+        await _watch.updateApplicationContext({'workouts': workoutsArray});
+      } on PlatformException catch (e) {
+        _logger.e('Sync failure', error: e);
+      }
     }
   }
 
