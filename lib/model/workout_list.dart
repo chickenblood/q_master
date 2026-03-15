@@ -43,12 +43,12 @@ final class WorkoutList extends _$WorkoutList {
   void _syncToWatch() async {
     final workoutsArray = state.map((e) => e.toJson()).toList();
     final isPaired = await _watch.isPaired;
-    //final isReachable = await _watch.isReachable;
+    final isReachable = await _watch.isReachable;
     if (isPaired) {
       try {
         await _watch.updateApplicationContext({'workouts': workoutsArray});
       } on PlatformException catch (e) {
-        _logger.e('Sync failure', error: e);
+        _logger.e('Sync failure. Reachable: $isReachable', error: e);
       }
     }
   }
