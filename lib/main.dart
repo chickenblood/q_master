@@ -7,6 +7,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shake/shake.dart';
+import 'package:share_handler/share_handler.dart';
 
 import 'firebase_options.dart';
 import 'games/games_tab.dart';
@@ -35,6 +36,7 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
 
   MainApp({super.key}) {
     _configureAudioSession();
+    _configureReceivingShares();
     WidgetsBinding.instance.addObserver(this);
 
     // Easter egg sound effect on game action or shake.
@@ -79,6 +81,31 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
 
     return isTablet || !(isTimerTab && isLandscape);
   }
+
+  Future<void> _configureReceivingShares() async {
+    final handler = ShareHandlerPlatform.instance;
+    final media = await handler.getInitialSharedMedia();
+    if (media != null) {
+      _showDebugAlert('Received media: ${media.attachments?.first?.path}');
+    }
+
+    handler.sharedMediaStream.listen((media) {
+      _showDebugAlert('Received media: ${media.attachments?.first?.path}');
+    });
+  }
+
+  Future<void> _showDebugAlert(String message) => showAdaptiveDialog(
+    context: _navigatorKey.currentContext!,
+    builder: (BuildContext innerContext) => AlertDialog.adaptive(
+      content: PlatformText(message),
+      actions: [
+        PlatformDialogAction(
+          onPressed: () => Navigator.pop(innerContext),
+          child: PlatformText('OK'),
+        ),
+      ],
+    ),
+  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => PlatformProvider(
@@ -237,7 +264,7 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
   );
 }
 
-// Configure the audio session to not interruptother audio apps.
+// Configure the audio session to not interrupt other audio apps.
 Future<void> _configureAudioSession() async {
   final session = await AudioSession.instance;
   await session.configure(

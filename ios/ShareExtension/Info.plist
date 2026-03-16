@@ -12,9 +12,11 @@
     <dict>
         <key>NSExtensionAttributes</key>
         <dict>
-            <!-- Comment or delete the TRUEPREDICATE NSExtensionActivationRule that only works in development mode -->
-            <!-- <string>TRUEPREDICATE</string> -->
-            <!-- Add a new NSExtensionActivationRule. The rule below will allow sharing one or more file of any type, url, or text content, You can modify these rules to your liking for which types of share content, as well as how many your app can handle -->
+            <!-- TRUEPREDICATE NSExtensionActivationRule only works in development mode -->
+        	<!--key>NSExtensionActivationRule</key>
+		    <string>TRUEPREDICATE</string-->
+            <!-- The rule below will allow sharing one or more file of any type, url, or text content,
+                You can modify these rules to your liking for which types of share content, as well as how many your app can handle -->
            	<key>NSExtensionActivationRule</key>
 		    <string>SUBQUERY (
                 extensionItems,
@@ -24,6 +26,8 @@
                     $attachment,
                     (
                         ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.json"
+                        || ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.text"
+                        || ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.file-url"
                     )
                 ).@count > 0
             ).@count > 0
