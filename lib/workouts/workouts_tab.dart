@@ -116,11 +116,18 @@ class WorkoutsTab extends ConsumerWidget {
     final box = context.findRenderObject() as RenderBox;
     final sharePositionRect = box.localToGlobal(Offset.zero) & box.size;
 
+    // Share as plain text (for Slack) and json (for another Q Master user on
+    // Airdrop)
+    final plainText = workout.formattedText(context);
+    final text = XFile.fromData(utf8.encode(plainText), mimeType: 'text/plain');
+
+    final jsonText = workout.formattedJson;
+    final json = XFile.fromData(
+      utf8.encode(jsonText),
+      mimeType: 'application/json',
+    );
     SharePlus.instance.share(
-      ShareParams(
-        text: workout.formattedText,
-        sharePositionOrigin: sharePositionRect,
-      ),
+      ShareParams(files: [text, json], sharePositionOrigin: sharePositionRect),
     );
   }
 

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../utils/datetime_utils.dart';
 import 'workout.dart';
 
@@ -40,6 +42,8 @@ extension FormatttedOutput on Workout {
       ],
     },
   ];
+
+  String get formattedJson => jsonEncode(this);
 }
 
 Map<String, Object?> _slackRichTextSection({
