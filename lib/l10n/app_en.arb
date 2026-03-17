@@ -366,6 +366,8 @@
     "@deleteWorkoutConfirmAction": {
       "description": "Destructive confirm button in the delete workout alert."
     },
+    "okAction": "OK",
+    "@okAction": {},
     "cancelAction": "Cancel",
     "@cancelAction": {
       "description": "Cancel button used in alerts and dialogs throughout the app."

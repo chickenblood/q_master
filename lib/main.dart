@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:shake/shake.dart';
-import 'package:share_handler/share_handler.dart';
 
 import 'firebase_options.dart';
 import 'games/games_tab.dart';
@@ -19,6 +19,7 @@ import 'theme/theme.dart';
 import 'timer/timer_setup_tab.dart';
 import 'ui/adaptive_icons.dart';
 import 'ui/media_query.dart';
+import 'ui/simple_alert.dart';
 import 'utils/shared_app_prefs.dart';
 import 'workouts/workouts_tab.dart';
 
@@ -28,16 +29,18 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedAppPrefs.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await F3NationApiKey.ensureInitialized();
-  runApp(ProviderScope(child: MainApp()));
+  runApp(ProviderScope(child: _MainApp()));
 }
 
-class MainApp extends ConsumerWidget with WidgetsBindingObserver {
+class _MainApp extends ConsumerStatefulWidget with WidgetsBindingObserver {
   late final ShakeDetector _shakeDetector;
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  final _tabController = PlatformTabController(
+    initialIndex: Tab.workouts.index,
+  );
 
-  MainApp({super.key}) {
+  _MainApp() {
     _configureAudioSession();
-    _configureReceivingShares();
     WidgetsBinding.instance.addObserver(this);
 
     // Easter egg sound effect on game action or shake.
@@ -54,14 +57,6 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
     );
   }
 
-  final _navigatorKey = GlobalKey<NavigatorState>();
-  final _tabController = PlatformTabController(
-    initialIndex: Tab.workouts.index,
-  );
-
-  final _tabPages = [WorkoutsTab(), GamesTab(), TimerSetupTab(), NearMeTab()];
-  dynamic _listNotifier;
-
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
@@ -72,19 +67,20 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
     }
   }
 
-  // Determine whether to show the tab bar based on the selected tab, device
-  // and orientation.
-  bool _shouldShowTabBar(BuildContext context) {
-    final isTablet = MediaUtils.isTablet(context);
-    final selectedIndex = _tabController.index(context);
-    // We want a full screen timer on phones in landscape mode.
-    final isTimerTab = Tab.values[selectedIndex] == .timer;
-    final isLandscape = MediaQuery.orientationOf(context) == .landscape;
+  @override
+  _MainAppState createState() => _MainAppState();
+}
 
-    return isTablet || !(isTimerTab && isLandscape);
+final class _MainAppState extends ConsumerState<_MainApp> {
+  final tabPages = [WorkoutsTab(), GamesTab(), TimerSetupTab(), NearMeTab()];
+
+  @override
+  void initState() {
+    super.initState();
+    configureReceivingShares();
   }
 
-  Future<void> _configureReceivingShares() async {
+  Future<void> configureReceivingShares() async {
     final handler = ShareHandlerPlatform.instance;
     final media = await handler.getInitialSharedMedia();
 
@@ -93,38 +89,39 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
 
       for (final attachment in attachments ?? []) {
         if (attachment?.path.endsWith('.json') ?? false) {
-          _listNotifier.addFromFile(attachment!.path);
+          final listNotifier = ref.read(workoutListProvider.notifier);
+          listNotifier.addFromFile(attachment!.path);
           return;
         }
       }
-      _showDebugAlert('Invalid workout data received');
+      showSimpleAlert(
+        widget._navigatorKey.currentContext!,
+        message: 'Invalid workout data received',
+      );
     }
 
     if (media != null) {
       handleReceivedMedia(media);
     }
 
-    handler.sharedMediaStream.listen((media) {
-      handleReceivedMedia(media);
-    });
+    handler.sharedMediaStream.listen(handleReceivedMedia);
   }
 
-  Future<void> _showDebugAlert(String message) => showAdaptiveDialog(
-    context: _navigatorKey.currentContext!,
-    builder: (BuildContext innerContext) => AlertDialog.adaptive(
-      content: PlatformText(message),
-      actions: [
-        PlatformDialogAction(
-          onPressed: () => Navigator.pop(innerContext),
-          child: PlatformText('OK'),
-        ),
-      ],
-    ),
-  );
+  // Determine whether to show the tab bar based on the selected tab, device
+  // and orientation.
+  bool shouldShowTabBar(BuildContext context) {
+    final isTablet = MediaUtils.isTablet(context);
+    final selectedIndex = widget._tabController.index(context);
+    // We want a full screen timer on phones in landscape mode.
+    final isTimerTab = Tab.values[selectedIndex] == .timer;
+    final isLandscape =
+        MediaQuery.orientationOf(context) == Orientation.landscape;
+
+    return isTablet || !(isTimerTab && isLandscape);
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    _listNotifier = ref.watch(workoutListProvider.notifier);
+  Widget build(BuildContext context) {
     return PlatformProvider(
       settings: PlatformSettingsData(
         iosUsesMaterialWidgets: true,
@@ -147,7 +144,7 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
               title: 'Q Master',
               localizationsDelegates: L10n.localizationsDelegates,
               supportedLocales: L10n.supportedLocales,
-              navigatorKey: _navigatorKey,
+              navigatorKey: widget._navigatorKey,
               debugShowCheckedModeBanner: false,
               home: Builder(
                 builder: (context) {
@@ -206,10 +203,10 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
                   }
 
                   return PlatformTabScaffold(
-                    tabController: _tabController,
+                    tabController: widget._tabController,
                     bodyBuilder: (_, index) => _TabsContainer(
                       selectedIndex: index,
-                      children: _tabPages,
+                      children: tabPages,
                     ),
                     material3Tabs: (tabBarContext, _) {
                       // Removed unused isDark variable
@@ -234,8 +231,8 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
                     },
                     materialBuilder: (tabBarContext, _, index) =>
                         MaterialTabScaffoldData(
-                          height: _shouldShowTabBar(tabBarContext) ? null : 0,
-                          tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
+                          height: shouldShowTabBar(tabBarContext) ? null : 0,
+                          tabsBackgroundColor: shouldShowTabBar(tabBarContext)
                               ? null
                               : Colors.transparent,
                         ),
@@ -250,10 +247,10 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
                     },
                     cupertinoBuilder: (tabBarContext, _, index) =>
                         CupertinoTabScaffoldData(
-                          navBarHeight: _shouldShowTabBar(tabBarContext)
+                          navBarHeight: shouldShowTabBar(tabBarContext)
                               ? null
                               : 0,
-                          tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
+                          tabsBackgroundColor: shouldShowTabBar(tabBarContext)
                               ? null
                               : Colors.transparent,
                         ),
@@ -311,18 +308,18 @@ Future<void> _configureAudioSession() async {
 /// the navigation stack when switching tabs. On iOS, the CupertinoTabScaffold
 /// already provides this behavior.
 final class _TabsContainer extends StatelessWidget {
-  final List<Widget> _children;
+  final List<Widget> children;
   final int selectedIndex;
 
   _TabsContainer({required List<Widget> children, required this.selectedIndex})
-    : _children = children.map((child) => _TabWrapper(child: child)).toList();
+    : children = children.map((child) => _TabWrapper(child: child)).toList();
 
   @override
   Widget build(BuildContext context) {
     if (defaultTargetPlatform == .android) {
-      return IndexedStack(index: selectedIndex, children: _children);
+      return IndexedStack(index: selectedIndex, children: children);
     }
-    return _children[selectedIndex];
+    return children[selectedIndex];
   }
 }
 
