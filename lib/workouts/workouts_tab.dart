@@ -111,7 +111,7 @@ class WorkoutsTab extends ConsumerWidget {
     }
   }
 
-  void _shareWorkout(BuildContext context, Workout workout) {
+  Future<void> _shareWorkout(BuildContext context, Workout workout) async {
     // Get rect of button to present popovers from on iPad.
     final box = context.findRenderObject() as RenderBox;
     final sharePositionRect = box.localToGlobal(Offset.zero) & box.size;
@@ -126,8 +126,13 @@ class WorkoutsTab extends ConsumerWidget {
       utf8.encode(jsonText),
       mimeType: 'application/json',
     );
-    SharePlus.instance.share(
-      ShareParams(files: [text, json], sharePositionOrigin: sharePositionRect),
+    await SharePlus.instance.share(
+      ShareParams(
+        text: plainText,
+        files: [json],
+        fileNameOverrides: ['workout.qmw'],
+        sharePositionOrigin: sharePositionRect,
+      ),
     );
   }
 

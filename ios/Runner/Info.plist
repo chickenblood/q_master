@@ -102,20 +102,43 @@
 
 	<!-- Add/Customize for AirDrop support -->
 	<key>LSSupportsOpeningDocumentsInPlace</key>
-	<string>No</string>
+	<true />
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>ShareHandler</string>
+			<string>Q Master workout file</string>
 			<key>LSHandlerRank</key>
-			<string>Alternate</string>
+			<string>Owner</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>public.json</string>
+            	<string>com.f3nation.qmaster.workout</string>
 			</array>
 		</dict>
 	</array>
 	<!-- Add for share_handler end -->
+
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>com.f3nation.qmaster.workout</string>
+			<key>UTTypeDescription</key>
+			<string>Q Master workout file</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.json</string>
+				<string>public.content</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<!-- QMaster workout -->
+					<string>qmw</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
 </dict>
 </plist>

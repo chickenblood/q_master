@@ -88,7 +88,7 @@ final class _MainAppState extends ConsumerState<_MainApp> {
       final attachments = media.attachments;
 
       for (final attachment in attachments ?? []) {
-        if (attachment?.path.endsWith('.json') ?? false) {
+        if (attachment?.path.endsWith('.qmw') ?? false) {
           final listNotifier = ref.read(workoutListProvider.notifier);
           listNotifier.addFromFile(attachment!.path);
           return;
