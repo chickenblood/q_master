@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_annotation_target
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'workout.freezed.dart';
@@ -6,25 +8,25 @@ part 'workout.g.dart';
 /// Model class representing a workout.
 @freezed
 abstract class Workout with _$Workout {
-  // ignore: invalid_annotation_target
   @JsonSerializable(explicitToJson: true)
   const factory Workout({
     required String name,
     required DateTime date,
-    required List<Exercise> warmup,
-    required List<Exercise> thang,
-    required List<Exercise> mary,
+    required List<WorkoutSection> sections,
   }) = _Workout;
 
   factory Workout.fromJson(Map<String, Object?> json) =>
       _$WorkoutFromJson(json);
 }
 
-/// Model class representing a specific exercise within a workout.
+/// An ordered section of a workout (e.g. warmup, thang, mary) with its exercises.
 @freezed
-abstract class Exercise with _$Exercise {
-  const factory Exercise({required String name}) = _Exercise;
+abstract class WorkoutSection with _$WorkoutSection {
+  const factory WorkoutSection({
+    required String name,
+    required List<String> exercises,
+  }) = _WorkoutSection;
 
-  factory Exercise.fromJson(Map<String, Object?> json) =>
-      _$ExerciseFromJson(json);
+  factory WorkoutSection.fromJson(Map<String, Object?> json) =>
+      _$WorkoutSectionFromJson(json);
 }

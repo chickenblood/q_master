@@ -32,7 +32,7 @@ final class WorkoutList extends _$WorkoutList {
       }
       final json = file.readAsStringSync();
       final newWorkouts = (jsonDecode(json) as List)
-          .map((e) => Workout.fromJson(e))
+          .map((e) => Workout.fromJson(_migrateJson(e as Map<String, Object?>)))
           .toList();
       state = newWorkouts;
       _syncToWatch();
@@ -108,4 +108,58 @@ final class WorkoutList extends _$WorkoutList {
     updatedWorkouts.insert(0, newWorkout);
     _save(updatedWorkouts: updatedWorkouts);
   }
+}
+
+/// Migrates a workout JSON map from older formats to the current format
+/// (sections as an ordered list of section objects).
+///
+/// Handles:
+/// - v1 (legacy): warmup/thang/mary as top-level keys
+/// - v2 (current): ordered section list under 'sections'
+Map<String, Object?> _migrateJson(Map<String, Object?> json) {
+  // V1: flat keys warmup/thang/mary at top level
+  if (json.containsKey('warmup') ||
+      json.containsKey('thang') ||
+      json.containsKey('mary')) {
+    return {
+      'name': json['name'],
+      'date': json['date'],
+      'sections': [
+        {'name': 'warmup', 'exercises': _migrateExerciseList(json['warmup'])},
+        {'name': 'thang', 'exercises': _migrateExerciseList(json['thang'])},
+        {'name': 'mary', 'exercises': _migrateExerciseList(json['mary'])},
+      ],
+    };
+  }
+
+  final result = Map<String, Object?>.of(json);
+
+  // Current format: sanitize exercise entries within each section
+  if (result['sections'] is List) {
+    final sectionsList = result['sections'] as List;
+    result['sections'] = [
+      for (final section in sectionsList)
+        if (section is Map)
+          {
+            'name': section['name'] as String,
+            'exercises': _migrateExerciseList(section['exercises']),
+          },
+    ];
+  }
+
+  return result;
+}
+
+/// Converts a list of exercises — either plain strings or `{ name: '...' }` maps
+/// — into a plain `List<String>`.
+List<String> _migrateExerciseList(Object? exercises) {
+  if (exercises == null) return [];
+  return (exercises as List)
+      .map((e) {
+        if (e is String) return e;
+        if (e is Map) return (e['name'] as String?) ?? '';
+        return '';
+      })
+      .where((e) => e.isNotEmpty)
+      .toList();
 }

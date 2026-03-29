@@ -37,15 +37,11 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
     if (exercisesPerPage <= 0) return [];
     final pages = <({AutoSizeGroup group, List<String> lines})>[];
 
-    for (final exercises in {
-      widget.workout.warmup,
-      widget.workout.thang,
-      widget.workout.mary,
-    }) {
+    for (final section in widget.workout.sections) {
       final pageContent = <String>[];
 
-      for (final exercise in exercises.indexed) {
-        pageContent.add(exercise.$2.name);
+      for (final exercise in section.exercises.indexed) {
+        pageContent.add(exercise.$2);
         if (((exercise.$1 + 1) % exercisesPerPage) == 0) {
           pages.add((group: AutoSizeGroup(), lines: List.of(pageContent)));
           pageContent.clear();
@@ -65,18 +61,12 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
     required int exercisesPerPage,
   }) {
     if (exercisesPerPage <= 0) return '';
-    final lastWarmupPageIndex =
-        (widget.workout.warmup.length / exercisesPerPage).ceil() - 1;
-    if (pageIndex <= lastWarmupPageIndex) {
-      return L10n.of(context)!.workoutWarmupFieldLabel;
+    var cumulativePages = 0;
+    for (final section in widget.workout.sections) {
+      cumulativePages += (section.exercises.length / exercisesPerPage).ceil();
+      if (pageIndex < cumulativePages) return section.name;
     }
-    final lastThangPageIndex =
-        lastWarmupPageIndex +
-        (widget.workout.thang.length / exercisesPerPage).ceil();
-    if (pageIndex <= lastThangPageIndex) {
-      return L10n.of(context)!.workoutThangFieldLabel;
-    }
-    return L10n.of(context)!.workoutMaryFieldLabel;
+    return '';
   }
 
   void _onNextPage(

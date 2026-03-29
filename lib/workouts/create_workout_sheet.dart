@@ -9,8 +9,6 @@ import '../ui/adaptive_modal_sheet.dart';
 import '../ui/cupertino_sheet_fork.dart';
 import 'workout_auto_completions.dart';
 
-enum WorkoutGroup { warmup, thang, mary }
-
 class CreateWorkoutSheet extends StatefulWidget {
   final Workout? workout;
 
@@ -30,7 +28,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   final _mary = <String>[];
 
   // Track the group of the most recently added exercise for scrolling
-  WorkoutGroup? _lastAddedItemGroup;
+  String? _lastAddedItemGroup;
 
   @override
   void initState() {
@@ -39,15 +37,12 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     final workout = widget.workout;
     if (workout != null) {
       _nameTextController.text = workout.name;
-      for (final exercise in workout.warmup) {
-        _warmup.add(exercise.name);
-      }
-      for (final exercise in workout.thang) {
-        _thang.add(exercise.name);
-      }
-      for (final exercise in workout.mary) {
-        _mary.add(exercise.name);
-      }
+      final sectionMap = {
+        for (final s in workout.sections) s.name: s.exercises,
+      };
+      _warmup.addAll(sectionMap['warmup'] ?? []);
+      _thang.addAll(sectionMap['thang'] ?? []);
+      _mary.addAll(sectionMap['mary'] ?? []);
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _nameTextController.text = L10n.of(context)!.defaultWorkoutName;
@@ -136,7 +131,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
 
   Future<void> _pasteExercises({
     required List<String> exercises,
-    required WorkoutGroup sectionGroup,
+    required String sectionGroup,
   }) async {
     final data = await Clipboard.getData('text/plain');
     final text = data?.text;
@@ -156,7 +151,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   Widget _pasteExercisesButton(
     BuildContext context, {
     required List<String> exercises,
-    required WorkoutGroup sectionGroup,
+    required String sectionGroup,
   }) => PlatformIconButton(
     icon: Icon(AdaptiveIcons.paste),
     onPressed: () {
@@ -168,7 +163,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   Widget _addExerciseButton(
     BuildContext context, {
     required List<String> exercises,
-    required WorkoutGroup sectionGroup,
+    required String sectionGroup,
   }) => PlatformIconButton(
     icon: Icon(PlatformIcons(context).add),
     onPressed: () async {
@@ -188,7 +183,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     BuildContext context, {
     required List<String> exercises,
     required int index,
-    required WorkoutGroup sectionGroup,
+    required String sectionGroup,
   }) async {
     final existingExercise = exercises[index];
     final updatedExercise = await _showExercisePicker(
@@ -210,7 +205,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     BuildContext context, {
     required String title,
     required List<String> exercises,
-    required WorkoutGroup sectionGroup,
+    required String sectionGroup,
   }) => PlatformListTile(
     material: (context, platform) =>
         MaterialListTileData(contentPadding: _headerInsets),
@@ -241,9 +236,9 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
 
   List<Widget> _content(BuildContext context) {
     final groupedExercises = [
-      (WorkoutGroup.warmup, L10n.of(context)!.workoutWarmupFieldLabel, _warmup),
-      (WorkoutGroup.thang, L10n.of(context)!.workoutThangFieldLabel, _thang),
-      (WorkoutGroup.mary, L10n.of(context)!.workoutMaryFieldLabel, _mary),
+      ('warmup', L10n.of(context)!.workoutWarmupFieldLabel, _warmup),
+      ('thang', L10n.of(context)!.workoutThangFieldLabel, _thang),
+      ('mary', L10n.of(context)!.workoutMaryFieldLabel, _mary),
     ];
     return [
       SliverSafeArea(
@@ -268,8 +263,8 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
           ]),
         ),
       ),
-      for (final (sectionGroup, sectionTitle, exercises)
-          in groupedExercises) ...[
+      for (final (i, (sectionGroup, sectionTitle, exercises))
+          in groupedExercises.indexed) ...[
         SliverSafeArea(
           bottom: false,
           sliver: SliverToBoxAdapter(
@@ -283,7 +278,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
         ),
         SliverSafeArea(
           top: false,
-          bottom: sectionGroup == WorkoutGroup.mary,
+          bottom: i == groupedExercises.length - 1,
           sliver: SliverReorderableList(
             itemBuilder: (context, index) {
               final exercise = exercises[index];
@@ -362,9 +357,11 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     final workout = Workout(
       name: _nameTextController.text.trim(),
       date: DateTime.now(),
-      warmup: _warmup.map((e) => Exercise(name: e)).toList(),
-      thang: _thang.map((e) => Exercise(name: e)).toList(),
-      mary: _mary.map((e) => Exercise(name: e)).toList(),
+      sections: [
+        WorkoutSection(name: 'warmup', exercises: List.of(_warmup)),
+        WorkoutSection(name: 'thang', exercises: List.of(_thang)),
+        WorkoutSection(name: 'mary', exercises: List.of(_mary)),
+      ],
     );
     Navigator.pop(context, workout);
   }

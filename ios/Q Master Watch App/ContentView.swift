@@ -10,32 +10,33 @@ import Dispatch
 internal import Combine
 
 /// A workout to mirror the definition  in workout.dart
+/// An ordered section of a workout with its exercises.
+struct WorkoutSection: Codable {
+  var name: String
+  var exercises: [String]
+}
+
+/// A workout to mirror the definition  in workout.dart
 struct Workout: Codable {
   var name: String
   var date: String
-  
-  struct Exercise: Codable {
-    var name: String
-  }
-  
-  var warmup: [Exercise]
-  var thang: [Exercise]
-  var mary: [Exercise]
-  
+  var sections: [WorkoutSection]
+
   /// Create Workout from a map of values (synced from device).
   static func fromDict(dict: Dictionary<String, Any>) -> Workout {
     let badData = "Bad data"
     let name = dict["name"] as? String ?? badData
     let date = dict["date"] as? String ?? badData
-    let warmup = dict["warmup"] as? [[String : String]] ?? []
-    let thang = dict["thang"] as? [[String : String]] ?? []
-    let mary = dict["mary"] as? [[String : String]] ?? []
-    return Workout(
-      name: name, date: date,
-      warmup: warmup.map { Workout.Exercise(name: $0["name"] ?? badData) },
-      thang: thang.map { Workout.Exercise(name: $0["name"] ?? badData) },
-      mary: mary.map { Workout.Exercise(name: $0["name"] ?? badData) }
-    )
+    let sectionsData =
+      (dict["sections"] as? [[String: Any]]) ??
+      (dict["exercises"] as? [[String: Any]]) ??
+      []
+    let sections = sectionsData.compactMap { sectionDict -> WorkoutSection? in
+      guard let sectionName = sectionDict["name"] as? String,
+            let items = sectionDict["exercises"] as? [String] else { return nil }
+      return WorkoutSection(name: sectionName, exercises: items)
+    }
+    return Workout(name: name, date: date, sections: sections)
   }
 }
 
@@ -49,7 +50,7 @@ extension String : @retroactive Identifiable {
 
 class WorkoutListViewModel: NSObject, ObservableObject {
   @Published var workouts: [Workout] = []
-  
+
   override init() {
     super.init()
     if WCSession.isSupported() {
@@ -57,7 +58,7 @@ class WorkoutListViewModel: NSObject, ObservableObject {
       WCSession.default.activate()
     }
   }
-  
+
   private func parseApplicationContext(applicationContext: [String : Any]) {
     guard let workoutsData = applicationContext["workouts"] as? Array<Dictionary<String, Any>> else { return }
     var workouts = Array<Workout>()
@@ -75,7 +76,7 @@ extension WorkoutListViewModel: WCSessionDelegate {
   internal func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
     parseApplicationContext(applicationContext: applicationContext)
   }
-  
+
   internal func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
     if activationState == .activated {
       parseApplicationContext(applicationContext: WCSession.default.receivedApplicationContext)
@@ -86,7 +87,7 @@ extension WorkoutListViewModel: WCSessionDelegate {
 // Main view for the watch app.
 struct ContentView: View {
   @StateObject var viewModel = WorkoutListViewModel()
-  
+
   var body: some View {
     if !viewModel.workouts.isEmpty {
       NavigationStack {
@@ -109,16 +110,13 @@ struct ContentView: View {
 
 struct DetailView: View {
   let workout: Workout
-  
+
   var workouts: [String] {
     get {
-      let warmups = workout.warmup.compactMap { $0.name }
-      let thangs = workout.thang.compactMap { $0.name }
-      let marys = workout.mary.compactMap { $0.name }
-      return warmups + thangs + marys
+      workout.sections.flatMap { $0.exercises }
     }
   }
-  
+
   var body: some View {
       List {
         ForEach(workouts) { exercise in

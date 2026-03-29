@@ -33,3 +33,49 @@ In addition, I've added some helper classes that fills any gaps that the utiliti
 * showAdaptiveModalSheet that presents full-screen modals in the iOS modal sheet style (with a perspective transform, revealing the content below).
 
 Despite all this, iOS 26 brings [Liquid Glass](https://developer.apple.com/documentation/technologyoverviews/adopting-liquid-glass) which is a complete overhaul of the iOS design system, and which will unfortunately make things look a little dated, *for now* :/
+
+## Workout JSON Format
+
+Workouts are persisted to `workouts.json` in the app's documents directory and synced to the paired watch via WatchConnectivity / Wearable Data Layer. The file is a JSON array of workout objects.
+
+### Schema
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | `string` | Display name of the workout |
+| `date` | `string` | ISO-8601 timestamp, e.g. `2026-03-29T05:30:00.000` |
+| `sections` | `array` | Ordered list of section objects; each section has a `name` string and an `exercises` string array |
+
+Section names are arbitrary strings. By convention the three standard F3 sections are used (`warmup`, `thang`, `mary`), but any names are valid. Order is preserved through all serialization round-trips.
+
+### Example
+
+```json
+[
+  {
+    "name": "The Bear Crawl Beatdown",
+    "date": "2026-03-29T05:30:00.000",
+    "sections": [
+      {
+        "name": "warmup",
+        "exercises": ["SSH", "Imperial Walkers", "Arm Circles"]
+      },
+      {
+        "name": "thang",
+        "exercises": ["Bear Crawl", "Merkins", "Lunges"]
+      },
+      {
+        "name": "mary",
+        "exercises": ["LBCs", "Flutter Kicks"]
+      }
+    ]
+  }
+]
+```
+
+### Backward Compatibility
+
+The app can read files written by older versions of the app. Legacy layouts are migrated on read and re-written in the current format on next save:
+
+- **v1 (legacy)** — `warmup`, `thang`, and `mary` as top-level keys on the workout object, with section values as either `{ "name": "..." }` objects or plain strings.
+- **v2 (current)** — `sections` as an ordered array of section objects (`{ "name": "...", "exercises": ["..."] }`), preserving section order across all platforms.

@@ -46,33 +46,32 @@ import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 
 /// A workout to mirror the definition  in workout.dart
+/// An ordered section of a workout with its exercises.
+data class WorkoutSection(val name: String, val exercises: List<String>)
+
+/// A workout to mirror the definition  in workout.dart
 data class Workout(
     val name: String,
     val date: String,
-    val warmup: List<Exercise>,
-    val thang: List<Exercise>,
-    val mary: List<Exercise>
+    val sections: List<WorkoutSection>
 )
-
-data class Exercise(val name: String)
 
 /// Converts a map to a workout.
 fun Map<*, *>.toWorkout(): Workout {
     val badData = "Bad data"
-
-    val warmup = (this["warmup"] as? List<*>
-        ?: emptyList<String>()).map { Exercise((it as Map<*, *>)["name"] as String) }
-    val thang = (this["thang"] as? List<*>
-        ?: emptyList<String>()).map { Exercise((it as Map<*, *>)["name"] as String) }
-    val mary = (this["mary"] as? List<*>
-        ?: emptyList<String>()).map { Exercise((it as Map<*, *>)["name"] as String) }
-
+    val sections = ((this["sections"] as? List<*>) ?: emptyList<Any>())
+        .filterIsInstance<Map<*, *>>()
+        .map { sectionMap ->
+            WorkoutSection(
+                name = sectionMap["name"] as? String ?: "",
+                exercises = (sectionMap["exercises"] as? List<*> ?: emptyList<String>())
+                    .filterIsInstance<String>(),
+            )
+        }
     return Workout(
         name = this["name"] as? String ?: badData,
         date = this["date"] as? String ?: badData,
-        warmup = warmup,
-        thang = thang,
-        mary = mary,
+        sections = sections,
     )
 }
 
@@ -298,13 +297,13 @@ fun DetailListScreen(workout: Workout) {
                     Text(text = workout.name)
                 }
             }
-            (workout.warmup + workout.thang + workout.mary).forEach { exercise ->
+            workout.sections.flatMap { it.exercises }.forEach { exercise ->
                 item {
                     Button(
                         onClick = { },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(text = exercise.name)
+                        Text(text = exercise)
                     }
                 }
             }
@@ -322,46 +321,16 @@ fun DefaultPreview() {
     WearApp("Preview Android", viewModel)
 }
 
-val exercises = listOf(
-    Exercise("30 high knees"),
-    Exercise("10 Bonnie Blairs"),
-    Exercise("20 side-shuttle hops")
+val sampleExercises = listOf("30 high knees", "10 Bonnie Blairs", "20 side-shuttle hops")
+val sampleSections = listOf(
+    WorkoutSection("warmup", sampleExercises),
+    WorkoutSection("thang", sampleExercises),
+    WorkoutSection("mary", sampleExercises),
 )
-
 val stockContent = listOf(
-    Workout(
-        "Workout 1",
-        "Date 1",
-        exercises,
-        exercises,
-        exercises,
-    ),
-    Workout(
-        "Workout 2",
-        "Date 2",
-        exercises,
-        exercises,
-        exercises,
-    ),
-    Workout(
-        "Workout 3",
-        "Date 3",
-        exercises,
-        exercises,
-        exercises,
-    ),
-    Workout(
-        "Workout 4",
-        "Date 4",
-        exercises,
-        exercises,
-        exercises,
-    ),
-    Workout(
-        "Workout 5",
-        "Date 5",
-        exercises,
-        exercises,
-        exercises,
-    ),
+    Workout("Workout 1", "Date 1", sampleSections),
+    Workout("Workout 2", "Date 2", sampleSections),
+    Workout("Workout 3", "Date 3", sampleSections),
+    Workout("Workout 4", "Date 4", sampleSections),
+    Workout("Workout 5", "Date 5", sampleSections),
 )
