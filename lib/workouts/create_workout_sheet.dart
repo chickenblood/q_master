@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import '../l10n/l10n.dart';
@@ -133,6 +134,37 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     exercises.insert(toIndex > fromIndex ? toIndex - 1 : toIndex, exercise);
   }
 
+  Future<void> _pasteExercises({
+    required List<String> exercises,
+    required WorkoutGroup sectionGroup,
+  }) async {
+    final data = await Clipboard.getData('text/plain');
+    final text = data?.text;
+    if (text == null || text.trim().isEmpty) return;
+    final lines = text
+        .split('\n')
+        .map((line) => line.trim())
+        .where((line) => line.isNotEmpty)
+        .toList();
+    if (lines.isEmpty) return;
+    setState(() {
+      exercises.addAll(lines);
+      _lastAddedItemGroup = sectionGroup;
+    });
+  }
+
+  Widget _pasteExercisesButton(
+    BuildContext context, {
+    required List<String> exercises,
+    required WorkoutGroup sectionGroup,
+  }) => PlatformIconButton(
+    icon: Icon(AdaptiveIcons.paste),
+    onPressed: () {
+      _focusNode.unfocus();
+      _pasteExercises(exercises: exercises, sectionGroup: sectionGroup);
+    },
+  );
+
   Widget _addExerciseButton(
     BuildContext context, {
     required List<String> exercises,
@@ -188,10 +220,20 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
       title,
       style: Theme.of(context).textTheme.headlineSmall,
     ),
-    trailing: _addExerciseButton(
-      context,
-      exercises: exercises,
-      sectionGroup: sectionGroup,
+    trailing: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _pasteExercisesButton(
+          context,
+          exercises: exercises,
+          sectionGroup: sectionGroup,
+        ),
+        _addExerciseButton(
+          context,
+          exercises: exercises,
+          sectionGroup: sectionGroup,
+        ),
+      ],
     ),
   );
 

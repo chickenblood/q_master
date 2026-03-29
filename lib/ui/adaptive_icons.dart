@@ -24,4 +24,7 @@ final class AdaptiveIcons {
 
   static IconData get pauseCircle =>
       Platform.isIOS ? CupertinoIcons.pause_circle : Icons.pause_circle_filled;
+
+  static IconData get paste =>
+      Platform.isIOS ? CupertinoIcons.doc_on_clipboard : Icons.content_paste;
 }

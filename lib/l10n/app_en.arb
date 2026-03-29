@@ -58,6 +58,8 @@
     "@noWorkoutsPlaceholderText": {},
     "exerciseEntryPromptText": "Describe your exercise",
     "@exerciseEntryPromptText": {},
+    "pasteExercisesButtonLabel": "Paste exercises",
+    "@pasteExercisesButtonLabel": {},
     "editWorkoutText": "Edit",
     "@editWorkoutText": {},
     "duplicateWorkoutText": "Duplicate",
