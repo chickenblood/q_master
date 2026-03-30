@@ -61,6 +61,14 @@
     "@addSectionButtonText": {
       "description": "Outlined button at the bottom of the workout editor that opens the add-section picker."
     },
+    "addSectionDialogTitle": "Add section",
+    "@addSectionDialogTitle": {
+      "description": "Title of the add-section alert dialog, and label of its confirm action button."
+    },
+    "addSectionFieldHint": "e.g. “Thang”, “Repeat 5×”, etc.",
+    "@addSectionFieldHint": {
+      "description": "Placeholder hint text inside the section name text field in the add-section dialog."
+    },
     "startWorkoutButtonText": "Start",
     "@startWorkoutButtonText": {
       "description": "Button label that starts a beatdown from the workout list."

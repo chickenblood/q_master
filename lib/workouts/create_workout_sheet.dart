@@ -117,46 +117,34 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     );
   }
 
-  Future<String?> _showSectionPicker(BuildContext context) async {
-    final controller = TextEditingController();
-    return showAdaptiveModalSheet<String>(
-      context: context,
-      child: PlatformScaffold(
-        appBar: PlatformAppBar(
-          cupertino: (appBarContext, _) => CupertinoNavigationBarData(
-            backgroundColor: Colors.transparent,
-            leading: PlatformIconButton(
-              padding: EdgeInsets.only(right: 22),
-              icon: Icon(AdaptiveIcons.close),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ),
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              crossAxisAlignment: .stretch,
-              children: [
-                PlatformTextField(
-                  controller: controller,
-                  autofocus: true,
-                  textCapitalization: TextCapitalization.words,
-                  onSubmitted: (_) =>
-                      Navigator.of(context).pop(controller.text),
-                ),
-                Spacer(),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Future<void> _addSection(BuildContext context) async {
     _focusNode.unfocus();
-    final sectionName = await _showSectionPicker(context);
+    final controller = TextEditingController();
+    final sectionName = await showAdaptiveDialog<String>(
+      context: context,
+      builder: (innerContext) => AlertDialog.adaptive(
+        title: PlatformText(L10n.of(innerContext)!.addSectionDialogTitle),
+        content: PlatformTextField(
+          controller: controller,
+          autofocus: true,
+          textCapitalization: TextCapitalization.words,
+          hintText: L10n.of(innerContext)!.addSectionFieldHint,
+          onSubmitted: (_) => Navigator.of(innerContext).pop(controller.text),
+        ),
+        actions: [
+          PlatformDialogAction(
+            onPressed: () => Navigator.of(innerContext).pop(),
+            child: PlatformText(L10n.of(innerContext)!.cancelAction),
+          ),
+          PlatformDialogAction(
+            cupertino: (_, _) =>
+                CupertinoDialogActionData(isDefaultAction: true),
+            onPressed: () => Navigator.of(innerContext).pop(controller.text),
+            child: PlatformText(L10n.of(innerContext)!.addSectionDialogTitle),
+          ),
+        ],
+      ),
+    );
     final trimmedName = sectionName?.trim();
     if (trimmedName == null || trimmedName.isEmpty) return;
     final alreadyExists = _sections.keys.any(
@@ -294,19 +282,22 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
             border: Border.all(color: Theme.of(context).colorScheme.outline),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: PlatformListTile(
-            material: (context, platform) => MaterialListTileData(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: PlatformListTile(
+              material: (context, platform) => MaterialListTileData(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+              ),
+              cupertino: (context, platform) => CupertinoListTileData(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+              ),
+              leading: Icon(PlatformIcons(context).add, weight: 700),
+              title: PlatformText(
+                L10n.of(context)!.addSectionButtonText,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              onTap: () => _addSection(context),
             ),
-            cupertino: (context, platform) => CupertinoListTileData(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-            ),
-            leading: Icon(PlatformIcons(context).add, weight: 700),
-            title: PlatformText(
-              L10n.of(context)!.addSectionButtonText,
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            onTap: () => _addSection(context),
           ),
         ),
       ),
