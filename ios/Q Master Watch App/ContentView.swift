@@ -9,7 +9,6 @@ import WatchConnectivity
 import Dispatch
 internal import Combine
 
-/// A workout to mirror the definition  in workout.dart
 /// An ordered section of a workout with its exercises.
 struct WorkoutSection: Codable {
   var name: String
@@ -27,10 +26,8 @@ struct Workout: Codable {
     let badData = "Bad data"
     let name = dict["name"] as? String ?? badData
     let date = dict["date"] as? String ?? badData
-    let sectionsData =
-      (dict["sections"] as? [[String: Any]]) ??
-      (dict["exercises"] as? [[String: Any]]) ??
-      []
+    let sectionsData = (dict["sections"] as? [[String: Any]]) ?? []
+
     let sections = sectionsData.compactMap { sectionDict -> WorkoutSection? in
       guard let sectionName = sectionDict["name"] as? String,
             let items = sectionDict["exercises"] as? [String] else { return nil }
