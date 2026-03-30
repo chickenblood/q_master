@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:q_master/ui/media_query.dart';
 
 import '../l10n/l10n.dart';
@@ -42,17 +41,15 @@ final class DeckOfPainGameView extends StatelessWidget {
   }
 }
 
-final class _Deck extends ConsumerStatefulWidget {
-  const _Deck();
-
+final class _Deck extends StatefulWidget {
   @override
   _DeckState createState() => _DeckState();
 }
 
-class _DeckState extends ConsumerState<_Deck> with TickerProviderStateMixin {
+class _DeckState extends State<_Deck> with TickerProviderStateMixin {
+  final _deck = DeckOfPain();
   late final AnimationController _slideController;
   late final Animation<Offset> _slideAnimation;
-  late final Deck _deck;
 
   // Always maintain exactly 2 cards in the stack
   PainCard? _topCard;
@@ -77,7 +74,6 @@ class _DeckState extends ConsumerState<_Deck> with TickerProviderStateMixin {
     _slideController.addStatusListener(_onSlideComplete);
 
     // Initialize the two-card stack
-    _deck = ref.read(deckOfPainProvider);
     _topCard = _deck.currentCard();
     _bottomCard = _deck.nextCard();
   }

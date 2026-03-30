@@ -1,16 +1,10 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
 import 'pain_card.dart';
 import 'pain_exercise_constants.dart';
 
-part 'deck_of_pain.g.dart';
+final class DeckOfPain {
+  final cards = <PainCard>[];
 
-@riverpod
-final class DeckOfPain extends _$DeckOfPain {
-  @override
-  Deck build() {
-    final cards = <PainCard>[];
-
+  DeckOfPain() {
     // Initialize the deck with some PainCards
     for (final entry in painExercises.entries) {
       final suit = entry.key;
@@ -27,14 +21,7 @@ final class DeckOfPain extends _$DeckOfPain {
       }
     }
     cards.shuffle();
-    return Deck(cards);
   }
-}
-
-final class Deck {
-  final List<PainCard> cards;
-
-  Deck(this.cards);
 
   /// Draws a card from the deck and returns it.
   PainCard? drawCard() => cards.isNotEmpty ? cards.removeAt(0) : null;
