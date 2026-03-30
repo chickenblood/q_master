@@ -1,54 +1,101 @@
   {
     "@@locale": "en",
     "appBarTitle": "Q Master",
-    "@appBarTitle": {},
+    "@appBarTitle": {
+      "description": "Main app name shown in the navigation bar."
+    },
     "workoutsTabTitle": "Workouts",
-    "@workoutsTabTitle": {},
+    "@workoutsTabTitle": {
+      "description": "Label for the Workouts tab in bottom navigation."
+    },
     "gamesTabTitle": "Games",
-    "@gamesTabTitle": {},
+    "@gamesTabTitle": {
+      "description": "Label for the Games tab in bottom navigation."
+    },
     "timerTabTitle": "Timer",
-    "@timerTabTitle": {},
+    "@timerTabTitle": {
+      "description": "Label for the Timer tab in bottom navigation."
+    },
     "nearMeTabTitle": "Near me",
-    "@nearMeTabTitle": {},
+    "@nearMeTabTitle": {
+      "description": "Label for the Near Me tab (F3 location finder) in bottom navigation."
+    },
     "dodGameTileTitle": "Dodecahedron of Doom",
-    "@dodGameTileTitle": {},
+    "@dodGameTileTitle": {
+      "description": "Title of the Dodecahedron of Doom game tile on the Games tab."
+    },
     "dopGameTileTitle": "Deck of Pain",
-    "@dopGameTileTitle": {},
+    "@dopGameTileTitle": {
+      "description": "Title of the Deck of Pain game tile on the Games tab."
+    },
     "dopGameScreenTitle": "Tap to draw a new card",
-    "@dopGameScreenTitle": {},
+    "@dopGameScreenTitle": {
+      "description": "Instruction prompt shown on the Deck of Pain game screen."
+    },
     "dopAllDoneLabel": "All done!",
-    "@dopAllDoneLabel": {},
+    "@dopAllDoneLabel": {
+      "description": "Message shown when all cards in the Deck of Pain have been drawn."
+    },
     "settingsDialogTitle": "Settings",
-    "@settingsDialogTitle": {},
+    "@settingsDialogTitle": {
+      "description": "Title of the Settings modal sheet."
+    },
     "exercisesPerPageSettingsLabel": "Exercises per page",
-    "@exercisesPerPageSettingsLabel": {},
+    "@exercisesPerPageSettingsLabel": {
+      "description": "Settings label for the number of exercises displayed per page in the beatdown browser."
+    },
     "settingsAboutDialogDescription":
     "Developed by Vevo with help from the Pax of F3 Hangar 1.\n\nCredit to Smokey and F3 Greensboro for the original Deck of Pain.",
-    "@settingsAboutDialogDescription": {},
+    "@settingsAboutDialogDescription": {
+      "description": "Credits text shown in the About section of the Settings sheet."
+    },
     "createWorkoutDialogTitle": "Create Workout",
-    "@createWorkoutDialogTitle": {},
+    "@createWorkoutDialogTitle": {
+      "description": "Title of the bottom sheet for creating a new workout."
+    },
     "editWorkoutDialogTitle": "Edit Workout",
-    "@editWorkoutDialogTitle": {},
+    "@editWorkoutDialogTitle": {
+      "description": "Title of the bottom sheet for editing an existing workout."
+    },
     "addSectionButtonText": "Add section…",
-    "@addSectionButtonText": {},
+    "@addSectionButtonText": {
+      "description": "Outlined button at the bottom of the workout editor that opens the add-section picker."
+    },
     "startWorkoutButtonText": "Start",
-    "@startWorkoutButtonText": {},
+    "@startWorkoutButtonText": {
+      "description": "Button label that starts a beatdown from the workout list."
+    },
     "workoutNameFieldLabel": "Name",
-    "@workoutNameFieldLabel": {},
+    "@workoutNameFieldLabel": {
+      "description": "Label above the workout name text field in the workout editor."
+    },
     "defaultWorkoutName": "New workout",
-    "@defaultWorkoutName": {},
+    "@defaultWorkoutName": {
+      "description": "Default name pre-filled in the workout name field when creating a new workout."
+    },
     "workoutWarmupFieldLabel": "Warm up",
-    "@workoutWarmupFieldLabel": {},
+    "@workoutWarmupFieldLabel": {
+      "description": "Section header for the warm-up exercises in the workout editor and beatdown browser."
+    },
     "workoutThangFieldLabel": "Thang",
-    "@workoutThangFieldLabel": {},
+    "@workoutThangFieldLabel": {
+      "description": "Section header for the main workout (The Thang) exercises in the workout editor and beatdown browser."
+    },
     "workoutMaryFieldLabel": "Mary",
-    "@workoutMaryFieldLabel": {},
+    "@workoutMaryFieldLabel": {
+      "description": "Section header for the Mary/core exercises in the workout editor and beatdown browser."
+    },
     "beatdownBrowserTitle": "Beatdown",
-    "@beatdownBrowserTitle": {},
+    "@beatdownBrowserTitle": {
+      "description": "Title of the beatdown execution screen shown while running through a workout."
+    },
     "workoutCompleteText": "All done!",
-    "@workoutCompleteText": {},
+    "@workoutCompleteText": {
+      "description": "Message shown on the final page of the beatdown browser when all exercises are complete."
+    },
     "workoutNextUpText": "Next up: {name} ➜",
     "@workoutNextUpText": {
+      "description": "Footer preview shown in the beatdown browser indicating the next upcoming exercise.",
       "placeholders": {
         "name": {
           "type": "String",
@@ -57,73 +104,143 @@
       }
     },
     "noWorkoutsPlaceholderText": "No workouts yet.\n Tap the + button to create one",
-    "@noWorkoutsPlaceholderText": {},
+    "@noWorkoutsPlaceholderText": {
+      "description": "Placeholder text on the Workouts tab when no workouts have been created yet."
+    },
     "exerciseEntryPromptText": "Describe your exercise",
-    "@exerciseEntryPromptText": {},
+    "@exerciseEntryPromptText": {
+      "description": "Title of the modal sheet for entering or editing a single exercise name."
+    },
     "pasteExercisesButtonLabel": "Paste exercises",
-    "@pasteExercisesButtonLabel": {},
+    "@pasteExercisesButtonLabel": {
+      "description": "Accessibility label for the paste button in a section header, which pastes clipboard lines as individual exercises."
+    },
     "editWorkoutText": "Edit",
-    "@editWorkoutText": {},
+    "@editWorkoutText": {
+      "description": "Context menu item to open the edit sheet for a workout."
+    },
     "duplicateWorkoutText": "Duplicate",
-    "@duplicateWorkoutText": {},
+    "@duplicateWorkoutText": {
+      "description": "Context menu item to duplicate a workout."
+    },
     "shareWorkoutText": "Share",
-    "@shareWorkoutText": {},
+    "@shareWorkoutText": {
+      "description": "Context menu item to share a workout."
+    },
     "deleteWorkoutText": "Delete",
-    "@deleteWorkoutText": {},
+    "@deleteWorkoutText": {
+      "description": "Context menu item to delete a workout."
+    },
     "deleteWorkoutAlertTitle": "Delete workout?",
-    "@deleteWorkoutAlertTitle": {},
+    "@deleteWorkoutAlertTitle": {
+      "description": "Title of the confirmation alert shown before permanently deleting a workout."
+    },
     "deleteWorkoutAlertDescription": "This will permanently remove the workout",
-    "@deleteWorkoutAlertDescription": {},
+    "@deleteWorkoutAlertDescription": {
+      "description": "Body text of the delete workout confirmation alert."
+    },
     "deleteWorkoutConfirmAction": "Delete",
-    "@deleteWorkoutConfirmAction": {},
+    "@deleteWorkoutConfirmAction": {
+      "description": "Destructive confirm button in the delete workout alert."
+    },
     "cancelAction": "Cancel",
-    "@cancelAction": {},
+    "@cancelAction": {
+      "description": "Cancel button used in alerts and dialogs throughout the app."
+    },
     "dodShakeToRollDiceMessage": "Shake or tap to roll",
-    "@dodShakeToRollDiceMessage": {},
+    "@dodShakeToRollDiceMessage": {
+      "description": "Instruction shown on the Dodecahedron of Doom screen before rolling."
+    },
     "themeSettingsTitle": "Theme",
-    "@themeSettingsTitle": {},
+    "@themeSettingsTitle": {
+      "description": "Section header for theme options in Settings."
+    },
     "themeSettingsSystemLabel": "System",
-    "@themeSettingsSystemLabel": {},
+    "@themeSettingsSystemLabel": {
+      "description": "Option label for following the device system theme."
+    },
     "themeSettingsLightLabel": "Light",
-    "@themeSettingsLightLabel": {},
+    "@themeSettingsLightLabel": {
+      "description": "Option label for the light theme."
+    },
     "themeSettingsDarkLabel": "Dark",
-    "@themeSettingsDarkLabel": {},
+    "@themeSettingsDarkLabel": {
+      "description": "Option label for the dark theme."
+    },
     "motorboatSoundSettingsLabel": "Motorboat sound on shake",
-    "@motorboatSoundSettingsLabel": {},
+    "@motorboatSoundSettingsLabel": {
+      "description": "Settings toggle label for playing a motorboat sound when the device is shaken in the Dodecahedron of Doom game."
+    },
     "timerTypeStopwatchLabel": "Stopwatch",
-    "@timerTypeStopwatchLabel": {},
+    "@timerTypeStopwatchLabel": {
+      "description": "Segment control label for the stopwatch timer mode."
+    },
     "timerTypeTabataLabel": "Tabata",
-    "@timerTypeTabataLabel": {},
+    "@timerTypeTabataLabel": {
+      "description": "Segment control label for the Tabata interval timer mode."
+    },
     "timerPrepareLabel": "PREPARE",
-    "@timerPrepareLabel": {},
+    "@timerPrepareLabel": {
+      "description": "Large display label shown during the prepare/countdown phase before the timer starts."
+    },
     "timerWorkLabel": "WORK",
-    "@timerWorkLabel": {},
+    "@timerWorkLabel": {
+      "description": "Large display label shown during the active work interval of the Tabata timer."
+    },
     "timerStartLabel": "START",
-    "@timerStartLabel": {},
+    "@timerStartLabel": {
+      "description": "Button label to start the timer."
+    },
     "timerPauseLabel": "PAUSE",
-    "@timerPauseLabel": {},
+    "@timerPauseLabel": {
+      "description": "Button label to pause a running timer."
+    },
     "timerResumeLabel": "RESUME",
-    "@timerResumeLabel": {},
+    "@timerResumeLabel": {
+      "description": "Button label to resume a paused timer."
+    },
     "timerRestLabel": "RECOVER",
-    "@timerRestLabel": {},
+    "@timerRestLabel": {
+      "description": "Large display label shown during the rest/recovery interval of the Tabata timer."
+    },
     "timerRoundsLeftLabel": "ROUNDS LEFT",
-    "@timerRoundsLeftLabel": {},
+    "@timerRoundsLeftLabel": {
+      "description": "Counter label showing the number of remaining rounds in the Tabata timer."
+    },
     "timerCyclesLeftLabel": "CYCLES LEFT",
-    "@timerCyclesLeftLabel": {},
+    "@timerCyclesLeftLabel": {
+      "description": "Counter label showing the number of remaining cycles in the Tabata timer."
+    },
     "workoutsSettingsTitle": "Workouts",
-    "@workoutsSettingsTitle": {},
+    "@workoutsSettingsTitle": {
+      "description": "Section header for workout-related settings."
+    },
     "generalSettingsTitle": "General",
-    "@generalSettingsTitle": {},
+    "@generalSettingsTitle": {
+      "description": "Section header for general app settings."
+    },
     "timerSettingsTitle": "Timer",
-    "@timerSettingsTitle": {},
+    "@timerSettingsTitle": {
+      "description": "Section header for timer settings."
+    },
     "timerSettingsPrepareLabel": "Prepare",
-    "@timerSettingsPrepareLabel": {},
+    "@timerSettingsPrepareLabel": {
+      "description": "Settings input label for the prepare phase duration."
+    },
     "timerSettingsWorkLabel": "Work",
-    "@timerSettingsWorkLabel": {},
+    "@timerSettingsWorkLabel": {
+      "description": "Settings input label for the work interval duration."
+    },
     "timerSettingsRestLabel": "Rest",
-    "@timerSettingsRestLabel": {},
+    "@timerSettingsRestLabel": {
+      "description": "Settings input label for the rest/recovery duration."
+    },
     "timerSettingsRoundsLabel": "Rounds",
-    "@timerSettingsRoundsLabel": {},
+    "@timerSettingsRoundsLabel": {
+      "description": "Settings input label for the number of rounds."
+    },
     "timerSettingsCyclesLabel": "Cycles",
-    "@timerSettingsCyclesLabel": {}
+    "@timerSettingsCyclesLabel": {
+      "description": "Settings input label for the number of cycles."
+    }
   }
