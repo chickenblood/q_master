@@ -29,6 +29,8 @@
     "@createWorkoutDialogTitle": {},
     "editWorkoutDialogTitle": "Edit Workout",
     "@editWorkoutDialogTitle": {},
+    "addSectionButtonText": "Add section…",
+    "@addSectionButtonText": {},
     "startWorkoutButtonText": "Start",
     "@startWorkoutButtonText": {},
     "workoutNameFieldLabel": "Name",

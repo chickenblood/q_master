@@ -23,9 +23,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   final _nameTextController = TextEditingController();
   final _scrollController = ScrollController();
 
-  final _warmup = <String>[];
-  final _thang = <String>[];
-  final _mary = <String>[];
+  final _sections = <String, List<String>>{'warmup': []};
 
   // Track the group of the most recently added exercise for scrolling
   String? _lastAddedItemGroup;
@@ -38,11 +36,10 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     if (workout != null) {
       _nameTextController.text = workout.name;
       final sectionMap = {
-        for (final s in workout.sections) s.name: s.exercises,
+        for (final s in workout.sections) s.name: List.of(s.exercises),
       };
-      _warmup.addAll(sectionMap['warmup'] ?? []);
-      _thang.addAll(sectionMap['thang'] ?? []);
-      _mary.addAll(sectionMap['mary'] ?? []);
+      _sections.clear();
+      _sections.addAll(sectionMap);
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _nameTextController.text = L10n.of(context)!.defaultWorkoutName;
@@ -118,6 +115,58 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
         ),
       ),
     );
+  }
+
+  Future<String?> _showSectionPicker(BuildContext context) async {
+    final controller = TextEditingController();
+    return showAdaptiveModalSheet<String>(
+      context: context,
+      child: PlatformScaffold(
+        appBar: PlatformAppBar(
+          cupertino: (appBarContext, _) => CupertinoNavigationBarData(
+            backgroundColor: Colors.transparent,
+            leading: PlatformIconButton(
+              padding: EdgeInsets.only(right: 22),
+              icon: Icon(AdaptiveIcons.close),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
+              crossAxisAlignment: .stretch,
+              children: [
+                PlatformTextField(
+                  controller: controller,
+                  autofocus: true,
+                  textCapitalization: TextCapitalization.words,
+                  onSubmitted: (_) =>
+                      Navigator.of(context).pop(controller.text),
+                ),
+                Spacer(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _addSection(BuildContext context) async {
+    _focusNode.unfocus();
+    final sectionName = await _showSectionPicker(context);
+    final trimmedName = sectionName?.trim();
+    if (trimmedName == null || trimmedName.isEmpty) return;
+    final alreadyExists = _sections.keys.any(
+      (name) => name.toLowerCase() == trimmedName.toLowerCase(),
+    );
+    if (alreadyExists) return;
+
+    setState(() {
+      _sections[trimmedName] = [];
+    });
   }
 
   void _moveExercise(
@@ -234,24 +283,56 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
 
   static const _itemInsets = EdgeInsets.only(left: 32.0, right: 24.0);
 
+  Widget _addSectionFooter(BuildContext context) => SliverSafeArea(
+    top: false,
+    sliver: SliverToBoxAdapter(
+      child: Padding(
+        padding: _headerInsets,
+        child: DecoratedBox(
+          position: .foreground,
+          decoration: BoxDecoration(
+            border: Border.all(color: Theme.of(context).colorScheme.outline),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: PlatformListTile(
+            material: (context, platform) => MaterialListTileData(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+            ),
+            cupertino: (context, platform) => CupertinoListTileData(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+            ),
+            leading: Icon(PlatformIcons(context).add, weight: 700),
+            title: PlatformText(
+              L10n.of(context)!.addSectionButtonText,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            onTap: () => _addSection(context),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  String _sectionTitle(BuildContext context, String sectionName) {
+    switch (sectionName.toLowerCase()) {
+      case 'warmup':
+        return L10n.of(context)!.workoutWarmupFieldLabel;
+      case 'thang':
+        return L10n.of(context)!.workoutThangFieldLabel;
+      case 'mary':
+        return L10n.of(context)!.workoutMaryFieldLabel;
+      default:
+        return sectionName;
+    }
+  }
+
   List<Widget> _content(BuildContext context) {
-    final groupedExercises = [
-      ('warmup', L10n.of(context)!.workoutWarmupFieldLabel, _warmup),
-      ('thang', L10n.of(context)!.workoutThangFieldLabel, _thang),
-      ('mary', L10n.of(context)!.workoutMaryFieldLabel, _mary),
-    ];
+    final sectionOrder = _sections.keys.toList(growable: false);
     return [
       SliverSafeArea(
         bottom: false,
         sliver: SliverList(
           delegate: SliverChildListDelegate([
-            Padding(
-              padding: _headerInsets,
-              child: PlatformText(
-                L10n.of(context)!.workoutNameFieldLabel,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-            ),
             Padding(
               padding: _headerInsets,
               child: PlatformTextField(
@@ -263,33 +344,32 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
           ]),
         ),
       ),
-      for (final (i, (sectionGroup, sectionTitle, exercises))
-          in groupedExercises.indexed) ...[
+      for (final sectionGroup in sectionOrder) ...[
         SliverSafeArea(
           bottom: false,
           sliver: SliverToBoxAdapter(
             child: _sectionHeader(
               context,
-              title: sectionTitle,
-              exercises: exercises,
+              title: _sectionTitle(context, sectionGroup),
+              exercises: _sections[sectionGroup]!,
               sectionGroup: sectionGroup,
             ),
           ),
         ),
         SliverSafeArea(
           top: false,
-          bottom: i == groupedExercises.length - 1,
+          bottom: false,
           sliver: SliverReorderableList(
             itemBuilder: (context, index) {
-              final exercise = exercises[index];
-              final isLastItem = index == (exercises.length - 1);
+              final exercise = _sections[sectionGroup]![index];
+              final isLastItem = index == (_sections[sectionGroup]!.length - 1);
               return Dismissible(
                 key: ValueKey('dismissible_$exercise$index'),
                 background: Container(color: Colors.red),
                 direction: DismissDirection.endToStart,
                 onDismissed: (direction) {
                   setState(() {
-                    exercises.removeAt(index);
+                    _sections[sectionGroup]!.removeAt(index);
                   });
                 },
                 child: Builder(
@@ -312,7 +392,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                         child: PlatformListTile(
                           key: ValueKey('exercise_$exercise$index'),
                           title: Text(exercise),
-                          trailing: exercises.length > 1
+                          trailing: _sections[sectionGroup]!.length > 1
                               ? Icon(Icons.drag_handle)
                               : null,
                           material: (context, platform) =>
@@ -323,7 +403,7 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                       ),
                       onDoubleTap: () => _editExercise(
                         context,
-                        exercises: exercises,
+                        exercises: _sections[sectionGroup]!,
                         index: index,
                         sectionGroup: sectionGroup,
                       ),
@@ -332,11 +412,11 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                 ),
               );
             },
-            itemCount: exercises.length,
+            itemCount: _sections[sectionGroup]!.length,
             onReorder: (startIndex, endIndex) {
               setState(() {
                 _moveExercise(
-                  exercises,
+                  _sections[sectionGroup]!,
                   fromIndex: startIndex,
                   toIndex: endIndex,
                 );
@@ -345,12 +425,13 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
           ),
         ),
       ],
+      _addSectionFooter(context),
     ];
   }
 
   bool get _workoutCreationEnabled {
     return _nameTextController.text.trim().isNotEmpty &&
-        (_warmup.isNotEmpty || _thang.isNotEmpty || _mary.isNotEmpty);
+        _sections.values.any((exercises) => exercises.isNotEmpty);
   }
 
   void _createWorkout(BuildContext context) {
@@ -358,9 +439,8 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
       name: _nameTextController.text.trim(),
       date: DateTime.now(),
       sections: [
-        WorkoutSection(name: 'warmup', exercises: List.of(_warmup)),
-        WorkoutSection(name: 'thang', exercises: List.of(_thang)),
-        WorkoutSection(name: 'mary', exercises: List.of(_mary)),
+        for (final entry in _sections.entries)
+          WorkoutSection(name: entry.key, exercises: List.of(entry.value)),
       ],
     );
     Navigator.pop(context, workout);
