@@ -269,13 +269,19 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     ),
   );
 
+  static const _footerInsets = EdgeInsets.only(
+    left: 16.0,
+    top: 16.0,
+    right: 16.0,
+    bottom: 16.0,
+  );
   static const _itemInsets = EdgeInsets.only(left: 32.0, right: 24.0);
 
   Widget _addSectionFooter(BuildContext context) => SliverSafeArea(
     top: false,
     sliver: SliverToBoxAdapter(
       child: Padding(
-        padding: _headerInsets,
+        padding: _footerInsets,
         child: DecoratedBox(
           position: .foreground,
           decoration: BoxDecoration(
