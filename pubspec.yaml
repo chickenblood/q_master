@@ -11,6 +11,7 @@ dependencies: # keep sorted alphabetically
   auto_size_text: ^3.0.0
   cupertino_icons: ^1.0.2
   dots_indicator: ^4.0.1
+  firebase_ai: ^3.10.0
   firebase_core: ^4.6.0
   flutter:
     sdk: flutter
@@ -20,6 +21,7 @@ dependencies: # keep sorted alphabetically
   flutter_platform_widgets: ^9.0.0
   flutter_riverpod: ^3.0.3
   freezed_annotation: ^3.1.0
+  google_generative_ai: ^0.4.0
   intl: any
   json_annotation: ^4.9.0
   just_audio: ^0.10.5
