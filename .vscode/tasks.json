@@ -65,7 +65,7 @@
             "label": "Flutter Test",
             "type": "shell",
             "command": "flutter",
-            "args": ["test", "--reporter=compact"],
+            "args": ["test", "--reporter=compact", "--exclude-tags", "live_network"],
             "group": {
                 "kind": "test",
                 "isDefault": true

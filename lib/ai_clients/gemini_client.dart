@@ -14,26 +14,34 @@ preferences and goals as much as possible.
 
 Use the Exicon from f3nation.com as a reference for exercise names and
 descriptions. If the user provides preferences that are too vague, use your best
-judgment to create a workout that is balanced and effective
+judgment to create a workout that is balanced and effective.
+
+Create sections for the workout. Examples of good names are "Warmup",
+"Thang", and "Mary" or "Repeat 5x" (for repeated rounds). Each section should
+have a name and a list of exercises.
+Section names shoud be used for repeated circuits.
+*Never* use a repeat instruction as an exercise names.
+Do not include any empty sections.
 
 Assume 45 minutes overall duration if the user does not specify otherwise in
-their details.
+their details. Ensure there are enough exercises to fill the time, and adjust
+the number of sets/reps as needed.
 
 The response should be in json format and contain the current date. Example of
 how the response should be structured:
 {
   "name": "Monday Full Body Blast",
-  "date": "2024-06-01",
+  "date": "2026-01-12T15:53:54.510897",
   "sections": [
     {
-      "name": "Warm-up",
+      "name": "Warm-up (5 mins)",
       "exercises": [
         "20 Side-Shuttle Hops",
         "15 Windmills"
       ]
     },
     {
-      "name": "Thang",
+      "name": "Thang (30 mins, repeat 5x)",
       "exercises": [
         "15 Burpees",
         "12 Lunges",
@@ -41,7 +49,7 @@ how the response should be structured:
       ]
     },
     {
-      "name": "Mary",
+      "name": "Mary (10 mins)",
         "exercises": [
           "20 LBCs",
           "10 Side dips (each side)",
@@ -56,7 +64,7 @@ User details: {details}
 final class GeminiClient {
   GeminiClient({String? apiKey})
     : model = GenerativeModel(
-        model: 'gemini-2.0-flash',
+        model: 'gemini-2.5-flash',
         apiKey: apiKey ?? _apiKey,
       );
 
@@ -74,7 +82,7 @@ final class GeminiClient {
     final response = await model.generateContent([
       Content.multi([TextPart(queryText)]),
     ]);
-    _logger.i(response.text);
+    _logger.i('Workout response: ${response.text}');
     return Future.value(response.text);
   }
 }
