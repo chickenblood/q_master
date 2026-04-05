@@ -189,11 +189,22 @@ class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     BuildContext context, {
     required List<String> exercises,
     required String sectionGroup,
-  }) => PlatformIconButton(
-    icon: Icon(AdaptiveIcons.paste),
-    onPressed: () {
-      _focusNode.unfocus();
-      _pasteExercises(exercises: exercises, sectionGroup: sectionGroup);
+  }) => FutureBuilder(
+    future: Clipboard.hasStrings(),
+    builder: (context, snapshot) {
+      final hasStrings = snapshot.data ?? false;
+      return PlatformIconButton(
+        icon: Icon(AdaptiveIcons.paste),
+        onPressed: hasStrings
+            ? () async {
+                _focusNode.unfocus();
+                _pasteExercises(
+                  exercises: exercises,
+                  sectionGroup: sectionGroup,
+                );
+              }
+            : null,
+      );
     },
   );
 
