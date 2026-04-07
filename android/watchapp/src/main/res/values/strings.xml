@@ -2,5 +2,5 @@
     <string name="app_name">Q Master</string>
     <string name="exercisesTitle">Exercises</string>
     <string name="workoutsTitle">Workouts</string>
-    <string name="syncInstructionsText">Sync some workouts to get started</string>
+    <string name="syncInstructionsText">Add some workouts using Q Master on the phone to get started</string>
 </resources>
