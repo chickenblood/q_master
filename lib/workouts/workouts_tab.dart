@@ -16,6 +16,7 @@ import '../ui/adaptive_modal_sheet.dart';
 import '../utils/datetime_utils.dart';
 import 'beatdown_browser.dart';
 import 'create_workout_sheet.dart';
+import 'generate_workout_sheet.dart';
 
 class WorkoutsTab extends ConsumerWidget {
   const WorkoutsTab({super.key});
@@ -40,6 +41,22 @@ class WorkoutsTab extends ConsumerWidget {
     final workout = await showAdaptiveModalSheet(
       context: navigator.context,
       child: CreateWorkoutSheet(),
+    );
+    if (workout != null) {
+      final listNotifier = ref.read(workoutListProvider.notifier);
+      listNotifier.add(workout);
+    }
+  }
+
+  Future<void> _showGenerateWorkoutModal(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final navigator = Navigator.of(context, rootNavigator: true);
+
+    final workout = await showAdaptiveModalSheet(
+      context: navigator.context,
+      child: GenerateWorkoutSheet(),
     );
     if (workout != null) {
       final listNotifier = ref.read(workoutListProvider.notifier);
@@ -72,16 +89,20 @@ class WorkoutsTab extends ConsumerWidget {
               context,
             ).clamp(maxScaleFactor: 1.6),
           ),
-          cupertino: (appBarContext, _) => CupertinoNavigationBarData(
-            backgroundColor: Colors.transparent,
-
-            // Action buttons – iOS only
-            trailing: PlatformIconButton(
+          cupertino: (appBarContext, _) =>
+              CupertinoNavigationBarData(backgroundColor: Colors.transparent),
+          // Action buttons – iOS only
+          trailingActions: [
+            PlatformIconButton(
+              icon: Icon(Icons.auto_awesome),
+              onPressed: () => _showGenerateWorkoutModal(context, ref),
+            ),
+            PlatformIconButton(
               icon: Icon(PlatformIcons(context).add),
               padding: const EdgeInsets.only(right: 16.0),
               onPressed: () => _showComposeWorkoutModal(context, ref),
             ),
-          ),
+          ],
         ),
         body: workouts.isNotEmpty
             ? ReorderableListView.builder(

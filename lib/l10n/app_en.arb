@@ -53,6 +53,10 @@
     "@createWorkoutDialogTitle": {
       "description": "Title of the bottom sheet for creating a new workout."
     },
+    "generateWorkoutDialogTitle": "Generate Workout",
+    "@generateWorkoutDialogTitle": {
+      "description": "Title of the bottom sheet for creating a new workout using AI."
+    },
     "editWorkoutDialogTitle": "Edit Workout",
     "@editWorkoutDialogTitle": {
       "description": "Title of the bottom sheet for editing an existing workout."

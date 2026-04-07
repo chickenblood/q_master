@@ -9,7 +9,7 @@ import '../ui/adaptive_modal_sheet.dart';
 import '../ui/cupertino_sheet_fork.dart';
 import 'workout_auto_completions.dart';
 
-class CreateWorkoutSheet extends StatefulWidget {
+final class CreateWorkoutSheet extends StatefulWidget {
   final Workout? workout;
 
   const CreateWorkoutSheet({super.key, this.workout});
@@ -18,7 +18,7 @@ class CreateWorkoutSheet extends StatefulWidget {
   State<CreateWorkoutSheet> createState() => _CreateWorkoutSheetState();
 }
 
-class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
+final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   final _focusNode = FocusNode();
   final _nameTextController = TextEditingController();
   final _scrollController = ScrollController();
