@@ -5,6 +5,8 @@ PODS:
     - PromisesObjC (~> 2.4)
   - audio_session (0.0.1):
     - Flutter
+  - audio_waveform_recorder (0.1.2):
+    - Flutter
   - Firebase/Auth (12.9.0):
     - Firebase/CoreOnly
     - FirebaseAuth (~> 12.9.0)
@@ -101,6 +103,7 @@ PODS:
 
 DEPENDENCIES:
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
+  - audio_waveform_recorder (from `.symlinks/plugins/audio_waveform_recorder/ios`)
   - firebase_ai (from `.symlinks/plugins/firebase_ai/ios`)
   - firebase_app_check (from `.symlinks/plugins/firebase_app_check/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
@@ -135,6 +138,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   audio_session:
     :path: ".symlinks/plugins/audio_session/ios"
+  audio_waveform_recorder:
+    :path: ".symlinks/plugins/audio_waveform_recorder/ios"
   firebase_ai:
     :path: ".symlinks/plugins/firebase_ai/ios"
   firebase_app_check:
@@ -167,6 +172,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
   audio_session: 9bb7f6c970f21241b19f5a3658097ae459681ba0
+  audio_waveform_recorder: 263fd3c973385f2e49e734adfdee2b5554646afa
   Firebase: 065f2bb395062046623036d8e6dc857bc2521d56
   firebase_ai: db3e09570a9e9456d1c01c48c63fed46b770f511
   firebase_app_check: 4d509b2df4dc9ad0aa7260a74443b4d32d852bff
@@ -191,7 +197,7 @@ SPEC CHECKSUMS:
   shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
   url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b
   wakelock_plus: e29112ab3ef0b318e58cfa5c32326458be66b556
-  watch_connectivity: 88e5bea25b473e66ef8d3f960954d154ed0356d6
+  watch_connectivity: 208552a93286b3307a5359212a6bcaa44c4deaec
   webview_flutter_wkwebview: 8ebf4fded22593026f7dbff1fbff31ea98573c8d
 
 PODFILE CHECKSUM: 3c63482e143d1b91d2d2560aee9fb04ecc74ac7e

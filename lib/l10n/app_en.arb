@@ -69,7 +69,7 @@
     "@generateWorkoutErrorTitle": {
       "description": "Alert error title shown when AI workout generation fails."
     },
-    "generateWorkoutErrorMessage": "Failed to generate workout. Please try again.",
+    "generateWorkoutErrorMessage": "Failed to generate workout.\nPlease try again.",
     "@generateWorkoutErrorMessage": {
       "description": "Alert error message shown when AI workout generation fails."
     },

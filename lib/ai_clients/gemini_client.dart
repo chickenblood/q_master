@@ -83,6 +83,11 @@ final class GeminiClient {
       Content.multi([TextPart(queryText)]),
     ]);
     _logger.i('Workout response: ${response.text}');
-    return Future.value(response.text);
+    // Strip off any crap that may be around the json, like ```json``` or ```
+    // fences.
+    final result = response.text
+        ?.replaceAll('```json', '')
+        .replaceAll('```', '');
+    return Future.value(result);
   }
 }

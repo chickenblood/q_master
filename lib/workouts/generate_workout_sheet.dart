@@ -41,8 +41,7 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
         final jsonResponse = await _client.requestWorkout(prompt);
         setState(() => _isGenerating = false);
 
-        final jsonList = jsonDecode(jsonResponse) as List;
-        final jsonWorkout = jsonList.single as Map<String, Object?>;
+        final jsonWorkout = jsonDecode(jsonResponse) as Map<String, Object?>;
         workout = Workout.fromJson(jsonWorkout);
       } catch (e) {
         if (!mounted) return;
