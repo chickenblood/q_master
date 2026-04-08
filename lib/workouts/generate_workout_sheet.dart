@@ -1,11 +1,63 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:q_master/ai_clients/gemini_client.dart';
+import 'package:q_master/ui/simple_alert.dart';
 
 import '../l10n/l10n.dart';
+import '../model/workout.dart';
 import '../ui/adaptive_icons.dart';
 
-final class GenerateWorkoutSheet extends StatelessWidget {
+final class GenerateWorkoutSheet extends StatefulWidget {
   const GenerateWorkoutSheet({super.key});
+
+  @override
+  State<GenerateWorkoutSheet> createState() => _GenerateWorkoutSheetState();
+}
+
+final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
+  final _client = GeminiClient();
+  final _promptTextController = TextEditingController();
+  var _isGenerating = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _promptTextController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleGenerateWorkout() async {
+    final prompt = _promptTextController.text;
+    if (prompt.isNotEmpty) {
+      Workout? workout;
+      try {
+        setState(() => _isGenerating = true);
+        final jsonResponse = await _client.requestWorkout(prompt);
+        setState(() => _isGenerating = false);
+
+        final jsonList = jsonDecode(jsonResponse) as List;
+        final jsonWorkout = jsonList.single as Map<String, Object?>;
+        workout = Workout.fromJson(jsonWorkout);
+      } catch (e) {
+        if (!mounted) return;
+        showSimpleAlert(
+          context,
+          title: L10n.of(context)!.generateWorkoutErrorTitle,
+          message: L10n.of(context)!.generateWorkoutErrorMessage,
+        );
+        return;
+      }
+
+      if (!mounted) return;
+      Navigator.of(context).pop(workout);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +71,7 @@ final class GenerateWorkoutSheet extends StatelessWidget {
             icon: Icon(AdaptiveIcons.close),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          title: Text(
+          title: PlatformText(
             L10n.of(context)!.generateWorkoutDialogTitle,
             textScaler: MediaQuery.textScalerOf(
               context,
@@ -27,7 +79,27 @@ final class GenerateWorkoutSheet extends StatelessWidget {
           ),
         ),
       ),
-      body: const Center(child: Text('Generate Workout Sheet Content')),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: PlatformTextField(
+                controller: _promptTextController,
+                autofocus: true,
+                maxLines: 5,
+                hintText: L10n.of(context)!.generateWorkoutPromptHint,
+              ),
+            ),
+            PlatformElevatedButton(
+              onPressed: _isGenerating ? null : _handleGenerateWorkout,
+              child: _isGenerating
+                  ? PlatformCircularProgressIndicator()
+                  : PlatformText(L10n.of(context)!.generateWorkoutButtonLabel),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

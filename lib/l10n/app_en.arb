@@ -57,6 +57,22 @@
     "@generateWorkoutDialogTitle": {
       "description": "Title of the bottom sheet for creating a new workout using AI."
     },
+    "generateWorkoutPromptHint": "e.g. “A 30 minute full body workout with no equipment”",
+    "@generateWorkoutPromptHint": {
+      "description": "Placeholder hint text inside the AI prompt text field on the Generate Workout sheet."
+    },
+    "generateWorkoutButtonLabel": "Generate Workout",
+    "@generateWorkoutButtonLabel": {
+      "description": "Label for the button that submits the prompt and generates a workout via AI."
+    },
+    "generateWorkoutErrorTitle": "Generation failed",
+    "@generateWorkoutErrorTitle": {
+      "description": "Alert error title shown when AI workout generation fails."
+    },
+    "generateWorkoutErrorMessage": "Failed to generate workout. Please try again.",
+    "@generateWorkoutErrorMessage": {
+      "description": "Alert error message shown when AI workout generation fails."
+    },
     "editWorkoutDialogTitle": "Edit Workout",
     "@editWorkoutDialogTitle": {
       "description": "Title of the bottom sheet for editing an existing workout."
@@ -158,6 +174,10 @@
     "cancelAction": "Cancel",
     "@cancelAction": {
       "description": "Cancel button used in alerts and dialogs throughout the app."
+    },
+    "okAction": "OK",
+    "@okAction": {
+      "description": "OK button used in simple alert dialogs throughout the app."
     },
     "dodShakeToRollDiceMessage": "Shake or tap to roll",
     "@dodShakeToRollDiceMessage": {

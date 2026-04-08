@@ -58,9 +58,17 @@ class WorkoutsTab extends ConsumerWidget {
       context: navigator.context,
       child: GenerateWorkoutSheet(),
     );
+    if (!context.mounted) return;
+
     if (workout != null) {
-      final listNotifier = ref.read(workoutListProvider.notifier);
-      listNotifier.add(workout);
+      Workout? updatedWorkout = await showAdaptiveModalSheet(
+        context: context,
+        child: CreateWorkoutSheet(workout: workout),
+      );
+      if (updatedWorkout != null) {
+        final listNotifier = ref.read(workoutListProvider.notifier);
+        listNotifier.add(updatedWorkout);
+      }
     }
   }
 
