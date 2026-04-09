@@ -45,7 +45,7 @@
       "description": "Settings label for the number of exercises displayed per page in the beatdown browser."
     },
     "settingsAboutDialogDescription":
-    "Developed by Vevo with help from the Pax of F3 Hangar 1.\n\nCredit to Smokey and F3 Greensboro for the original Deck of Pain.",
+    "Developed by Vevo with help from the Pax of F3 Hangar 1.\nFeaturing the dulcet tones of Spinner.\nCredit to Smokey and F3 Greensboro for the original Deck of Pain.",
     "@settingsAboutDialogDescription": {
       "description": "Credits text shown in the About section of the Settings sheet."
     },
