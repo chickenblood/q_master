@@ -1,8 +1,6 @@
 PODS:
   - audio_session (0.0.1):
     - Flutter
-  - audio_waveform_recorder (0.1.2):
-    - Flutter
   - Firebase/CoreOnly (12.9.0):
     - FirebaseCore (~> 12.9.0)
   - firebase_core (4.6.0):
@@ -47,7 +45,6 @@ PODS:
 
 DEPENDENCIES:
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
-  - audio_waveform_recorder (from `.symlinks/plugins/audio_waveform_recorder/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - Flutter (from `Flutter`)
   - just_audio (from `.symlinks/plugins/just_audio/darwin`)
@@ -70,8 +67,6 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   audio_session:
     :path: ".symlinks/plugins/audio_session/ios"
-  audio_waveform_recorder:
-    :path: ".symlinks/plugins/audio_waveform_recorder/ios"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
   Flutter:
@@ -97,7 +92,6 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   audio_session: 9bb7f6c970f21241b19f5a3658097ae459681ba0
-  audio_waveform_recorder: 263fd3c973385f2e49e734adfdee2b5554646afa
   Firebase: 065f2bb395062046623036d8e6dc857bc2521d56
   firebase_core: 8e6f58412ca227827c366b92e7cee047a2148c60
   FirebaseCore: 428912f751178b06bef0a1793effeb4a5e09a9b8
