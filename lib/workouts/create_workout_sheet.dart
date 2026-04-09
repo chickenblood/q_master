@@ -262,6 +262,8 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     title: PlatformText(
       title,
       style: Theme.of(context).textTheme.headlineSmall,
+      maxLines: 2,
+      overflow: .ellipsis,
     ),
     trailing: Row(
       mainAxisSize: MainAxisSize.min,
