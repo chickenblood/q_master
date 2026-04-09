@@ -13,6 +13,7 @@ import '../settings/settings_sheet.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_menu.dart';
 import '../ui/adaptive_modal_sheet.dart';
+import '../ui/expandable_fab.dart';
 import '../utils/datetime_utils.dart';
 import 'beatdown_browser.dart';
 import 'create_workout_sheet.dart';
@@ -72,15 +73,25 @@ class WorkoutsTab extends ConsumerWidget {
     }
   }
 
-  // The FAB is only for Android. We use app bar actions on iOS.
+  // The FAB is only for Android. We use the app bar trailing menu on iOS.
   Widget? _androidAddWorkoutFAB(
     BuildContext context, {
     required WidgetRef ref,
-  }) => FloatingActionButton(
-    heroTag: 'AddWorkoutFAB',
+  }) => ExpandableFab(
+    distance: 112,
     backgroundColor: Colors.red,
-    onPressed: () => _showComposeWorkoutModal(context, ref),
-    child: Icon(PlatformIcons(context).add),
+    children: [
+      ActionButton(
+        onPressed: () => _showComposeWorkoutModal(context, ref),
+        icon: Icon(AdaptiveIcons.create),
+        label: L10n.of(context)!.createWorkoutDialogTitle,
+      ),
+      ActionButton(
+        onPressed: () => _showGenerateWorkoutModal(context, ref),
+        icon: Icon(AdaptiveIcons.sparkles),
+        label: L10n.of(context)!.generateWorkoutDialogTitle,
+      ),
+    ],
   );
 
   @override
@@ -97,20 +108,25 @@ class WorkoutsTab extends ConsumerWidget {
               context,
             ).clamp(maxScaleFactor: 1.6),
           ),
-          cupertino: (appBarContext, _) =>
-              CupertinoNavigationBarData(backgroundColor: Colors.transparent),
-          // Action buttons – iOS only
-          trailingActions: [
-            PlatformIconButton(
-              icon: Icon(Icons.auto_awesome),
-              onPressed: () => _showGenerateWorkoutModal(context, ref),
-            ),
-            PlatformIconButton(
+          cupertino: (appBarContext, _) => CupertinoNavigationBarData(
+            backgroundColor: Colors.transparent,
+            // Add menu only on iOS since FAB is used on Android.
+            trailing: AdaptiveMenu(
               icon: Icon(PlatformIcons(context).add),
-              padding: const EdgeInsets.only(right: 16.0),
-              onPressed: () => _showComposeWorkoutModal(context, ref),
+              menuChildren: [
+                AdaptiveMenuItem(
+                  text: L10n.of(context)!.createWorkoutDialogTitle,
+                  icon: AdaptiveIcons.create,
+                  onPressed: () => _showComposeWorkoutModal(context, ref),
+                ),
+                AdaptiveMenuItem(
+                  text: L10n.of(context)!.generateWorkoutDialogTitle,
+                  icon: AdaptiveIcons.sparkles,
+                  onPressed: () => _showGenerateWorkoutModal(context, ref),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
         body: workouts.isNotEmpty
             ? ReorderableListView.builder(

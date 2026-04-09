@@ -4,11 +4,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 final class AdaptiveIcons {
+  static IconData get create =>
+      Platform.isIOS ? CupertinoIcons.create : Icons.note_add;
+
   static IconData get timer =>
       Platform.isIOS ? CupertinoIcons.stopwatch : Icons.timer;
 
   static IconData get history =>
-      /*Platform.isIOS ? CupertinoIcons.speedometer :*/ Icons.history;
+      /*Platform.isIOS ? CupertinoIcons.speedometer :*/ Icons.fitness_center;
 
   static IconData get sports =>
       /*Platform.isIOS ? CupertinoIcons.sportscourt :*/ Icons.sports_soccer;
@@ -17,7 +20,7 @@ final class AdaptiveIcons {
       Platform.isIOS ? CupertinoIcons.xmark : Icons.close;
 
   static IconData get more =>
-      Platform.isIOS ? CupertinoIcons.ellipsis : Icons.more_vert;
+      Platform.isIOS ? CupertinoIcons.ellipsis_circle : Icons.more_vert;
 
   static IconData get location =>
       Platform.isIOS ? CupertinoIcons.compass : Icons.location_on;
@@ -27,4 +30,7 @@ final class AdaptiveIcons {
 
   static IconData get paste =>
       Platform.isIOS ? CupertinoIcons.doc_on_clipboard : Icons.content_paste;
+
+  static IconData get sparkles =>
+      Platform.isIOS ? CupertinoIcons.sparkles : Icons.auto_awesome;
 }

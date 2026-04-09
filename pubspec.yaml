@@ -1,7 +1,7 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 2.0.2+413
+version: 2.0.2+416
 
 environment:
   sdk: ^3.10.0
@@ -12,7 +12,6 @@ dependencies: # keep sorted alphabetically
   auto_size_text: ^3.0.0
   cupertino_icons: ^1.0.2
   dots_indicator: ^4.0.1
-  firebase_ai: ^3.10.0
   firebase_core: ^4.6.0
   flutter:
     sdk: flutter

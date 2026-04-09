@@ -33,7 +33,7 @@ final class AdaptiveMenu extends StatelessWidget {
     cupertino: (context, platform) => PullDownButton(
       buttonBuilder: (_, showMenu) => CupertinoButton(
         onPressed: showMenu,
-        child: const Icon(CupertinoIcons.ellipsis_circle),
+        child: icon,
       ),
       itemBuilder: (context) => menuChildren
           .map(
