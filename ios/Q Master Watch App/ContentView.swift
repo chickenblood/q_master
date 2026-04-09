@@ -41,6 +41,10 @@ extension Workout: Identifiable {
   var id: UUID { get { UUID() } }
 }
 
+extension WorkoutSection: Identifiable {
+  var id: UUID { get { UUID() } }
+}
+
 extension String : @retroactive Identifiable {
   public var id: UUID { get { UUID() } }
 }
@@ -89,7 +93,7 @@ struct ContentView: View {
     if !viewModel.workouts.isEmpty {
       NavigationStack {
         List(viewModel.workouts) { workout in
-          NavigationLink(destination: DetailView(workout: workout)) {
+          NavigationLink(destination: WorkoutView(workout: workout)) {
             Text(workout.name)
           }
         }
@@ -105,23 +109,34 @@ struct ContentView: View {
   }
 }
 
-struct DetailView: View {
+struct WorkoutView: View {
   let workout: Workout
-
-  var workouts: [String] {
-    get {
-      workout.sections.flatMap { $0.exercises }
-    }
-  }
 
   var body: some View {
       List {
-        ForEach(workouts) { exercise in
-          Text(exercise)
+        ForEach(workout.sections) { section in
+          NavigationLink(destination: SectionView(section: section)) {
+            Text(section.name)
+          }
         }
         .font(.title2)
         .listStyle(.carousel)
         .navigationTitle(workout.name)
+      }
+  }
+}
+
+struct SectionView: View {
+  let section: WorkoutSection
+
+  var body: some View {
+      List {
+        ForEach(section.exercises) { exercise in
+          Text(exercise)
+        }
+        .font(.title2)
+        .listStyle(.carousel)
+        .navigationTitle(section.name)
       }
   }
 }

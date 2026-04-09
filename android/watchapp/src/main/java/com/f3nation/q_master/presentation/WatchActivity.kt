@@ -188,17 +188,33 @@ fun WearApp(greetingName: String, viewModel: WorkoutsViewModel = WorkoutsViewMod
             ) {
                 // Screen 1: The Workouts List
                 composable("main_list") {
-                    MainListScreen(viewModel, onItemSelected = { id ->
-                        navController.navigate("detail_list/$id")
+                    MainListScreen(viewModel, onItemSelected = { index ->
+                        navController.navigate("workout_list/$index")
                     })
                 }
 
-                // Screen 2: The Exercises List
-                composable("detail_list/{id}") { backStackEntry ->
-                    val index = backStackEntry.arguments?.getString("id")?.toInt()
+                // Screen 2: The Section List
+                composable("workout_list/{index}") { backStackEntry ->
+                    val index = backStackEntry.arguments?.getString("index")?.toInt()
                     if (index == null || index >= viewModel.workouts.size) return@composable
                     val workout = viewModel.workouts[index]
-                    DetailListScreen(workout)
+
+                    WorkoutListScreen(workout, onItemSelected = { section ->
+                        navController.navigate("$index/section_list/$section")
+                    })
+                }
+
+                // Screen 3: The Exercises List
+                composable("{index}/section_list/{section}") { backStackEntry ->
+                    val index = backStackEntry.arguments?.getString("index")?.toInt()
+                    if (index == null || index >= viewModel.workouts.size) return@composable
+                    val workout = viewModel.workouts[index]
+
+                    val sectionIndex = backStackEntry.arguments?.getString("section")?.toInt()
+                    if (sectionIndex == null || sectionIndex >= workout.sections.size) return@composable
+                    val section = workout.sections[sectionIndex];
+
+                    SectionListScreen(section)
                 }
             }
         }
@@ -265,7 +281,7 @@ fun MainListScreen(viewModel: WorkoutsViewModel, onItemSelected: (Int) -> Unit) 
 }
 
 @Composable
-fun DetailListScreen(workout: Workout) {
+fun WorkoutListScreen(workout: Workout, onItemSelected: (Int) -> Unit) {
     val listState = rememberTransformingLazyColumnState()
     val transformationSpec = rememberTransformationSpec()
     ScreenScaffold(
@@ -297,7 +313,54 @@ fun DetailListScreen(workout: Workout) {
                     Text(text = workout.name)
                 }
             }
-            workout.sections.flatMap { it.exercises }.forEach { exercise ->
+            workout.sections.forEachIndexed { index, section ->
+                item {
+                    Button(
+                        onClick = { onItemSelected(index) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = section.name)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SectionListScreen(section: WorkoutSection) {
+    val listState = rememberTransformingLazyColumnState()
+    val transformationSpec = rememberTransformationSpec()
+    ScreenScaffold(
+        scrollState = listState,
+        edgeButton = {
+            EdgeButton(
+                onClick = { /*TODO*/ },
+                enabled = false,
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    ),
+
+                ) {
+                Text(text = stringResource(R.string.app_name))
+            }
+        }
+    ) { contentPadding -> // ScreenScaffold provides default padding; adjust as needed
+        TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
+            item {
+                ListHeader(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .transformedHeight(this, transformationSpec),
+                    transformation = SurfaceTransformation(transformationSpec),
+                ) {
+                    Text(text = section.name)
+                }
+            }
+            section.exercises.forEach { exercise ->
                 item {
                     Button(
                         onClick = { },
