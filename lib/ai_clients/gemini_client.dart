@@ -64,7 +64,7 @@ User details: {details}
 final class GeminiClient {
   GeminiClient({String? apiKey})
     : model = GenerativeModel(
-        model: 'gemini-2.5-flash',
+        model: 'gemini-2.5-flash-lite',
         apiKey: apiKey ?? _apiKey,
       );
 
