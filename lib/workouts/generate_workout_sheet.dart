@@ -63,7 +63,6 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
       appBar: PlatformAppBar(
         cupertino: (appBarContext, _) => CupertinoNavigationBarData(
           backgroundColor: Colors.transparent,
-
           leading: PlatformIconButton(
             padding: EdgeInsets.only(right: 22),
             icon: Icon(AdaptiveIcons.close),
@@ -85,8 +84,11 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
               child: PlatformTextField(
                 controller: _promptTextController,
                 autofocus: true,
+                textInputAction: .done,
                 maxLines: 5,
                 hintText: L10n.of(context)!.generateWorkoutPromptHint,
+                keyboardType: .multiline,
+                onSubmitted: (_) => _handleGenerateWorkout(),
               ),
             ),
             Stack(
