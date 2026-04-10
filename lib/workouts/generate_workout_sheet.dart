@@ -35,26 +35,25 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
   Future<void> _handleGenerateWorkout() async {
     final prompt = _promptTextController.text;
     if (prompt.isNotEmpty) {
+      setState(() => _isGenerating = true);
       Workout? workout;
       try {
-        setState(() => _isGenerating = true);
         final jsonResponse = await _client.requestWorkout(prompt);
-        setState(() => _isGenerating = false);
 
         final jsonWorkout = jsonDecode(jsonResponse) as Map<String, Object?>;
         workout = Workout.fromJson(jsonWorkout);
+
+        if (!mounted) return;
+        Navigator.of(context).pop(workout);
       } catch (e) {
         if (!mounted) return;
         showSimpleAlert(
           context,
           title: L10n.of(context)!.generateWorkoutErrorTitle,
-          message: L10n.of(context)!.generateWorkoutErrorMessage,
+          message: e.toString(),
         );
-        return;
       }
-
-      if (!mounted) return;
-      Navigator.of(context).pop(workout);
+      setState(() => _isGenerating = false);
     }
   }
 
@@ -90,11 +89,17 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
                 hintText: L10n.of(context)!.generateWorkoutPromptHint,
               ),
             ),
-            PlatformElevatedButton(
-              onPressed: _isGenerating ? null : _handleGenerateWorkout,
-              child: _isGenerating
-                  ? PlatformCircularProgressIndicator()
-                  : PlatformText(L10n.of(context)!.generateWorkoutButtonLabel),
+            Stack(
+              children: [
+                PlatformElevatedButton(
+                  onPressed: _isGenerating ? null : _handleGenerateWorkout,
+                  child: _isGenerating
+                      ? PlatformCircularProgressIndicator()
+                      : PlatformText(
+                          L10n.of(context)!.generateWorkoutButtonLabel,
+                        ),
+                ),
+              ],
             ),
           ],
         ),

@@ -88,6 +88,6 @@ final class GeminiClient {
     final result = response.text
         ?.replaceAll('```json', '')
         .replaceAll('```', '');
-    return Future.value(result);
+    return result ?? '';
   }
 }
