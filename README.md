@@ -79,3 +79,13 @@ The app can read files written by older versions of the app. Legacy layouts are 
 
 - **v1 (legacy)** — `warmup`, `thang`, and `mary` as top-level keys on the workout object, with section values as either `{ "name": "..." }` objects or plain strings.
 - **v2 (current)** — `sections` as an ordered array of section objects (`{ "name": "...", "exercises": ["..."] }`), preserving section order across all platforms.
+
+### Building the app for the Play Store
+
+Build Android app:
+  `flutter build appbundle`
+  The output AAB will be under
+
+Build Wear app:
+  `cd android && ./gradlew :watchapp:bundleRelease`
+  The output AAB will be under android/watchapp/build/outputs/bundle/release
