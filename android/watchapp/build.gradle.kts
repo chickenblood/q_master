@@ -6,6 +6,7 @@ import com.android.build.api.dsl.ApplicationExtension
 
 plugins {
     id("com.android.application")
+    id("kotlin-android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.kotlin.plugin.serialization") version "2.3.10"
 }
@@ -21,10 +22,10 @@ configure<ApplicationExtension> {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.f3nation.q_master"
+        applicationId = "com.f3nation.q_master.watch"
         minSdk = 31
         targetSdk = 36
-        versionCode = 1421
+        versionCode = 1424
         versionName = "2.0.2"
 
     }
@@ -64,7 +65,7 @@ configure<ApplicationExtension> {
     }
 }
 
-kotlin {
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_11)
     }
