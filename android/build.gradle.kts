@@ -1,6 +1,7 @@
 buildscript {
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.10")
+        classpath("com.google.gms:google-services:4.4.4")
     }
 }
 plugins {
@@ -24,6 +25,18 @@ rootProject.layout.buildDirectory.value(newBuildDir)
 subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
+}
+subprojects {
+    // firebase_ai 3.10.0 skips applying kotlin-android on AGP 9+, relying on built-in Kotlin.
+    // Since we opt out of built-in Kotlin globally (for compatibility with plugins that apply
+    // kotlin-android themselves), we inject it here before firebase_ai's build script runs.
+    if (name == "firebase_ai") {
+        apply(plugin = "org.jetbrains.kotlin.android")
+        // firebase_ai's local-config.gradle sets javaVersion = 17; align Kotlin JVM target to match.
+        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+            compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17 }
+        }
+    }
 }
 subprojects {
     project.evaluationDependsOn(":app")

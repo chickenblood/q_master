@@ -59,13 +59,13 @@ User details: {details}
 ''';
 
 final class GeminiClient {
+  final _logger = Logger();
+  final GenerativeModel model;
+
   GeminiClient({String? apiKey})
     : model = FirebaseAI.googleAI().generativeModel(
         model: 'gemini-2.5-flash-lite',
       );
-
-  final _logger = Logger();
-  final GenerativeModel model;
 
   /// Requests a workout plan based on the provided user details.
   ///
