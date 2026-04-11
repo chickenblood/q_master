@@ -22,10 +22,10 @@ configure<ApplicationExtension> {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.f3nation.q_master.watch"
+        applicationId = "com.f3nation.q_master"
         minSdk = 31
         targetSdk = 36
-        versionCode = 1424
+        versionCode = 1426
         versionName = "2.0.2"
 
     }
@@ -51,7 +51,7 @@ configure<ApplicationExtension> {
                 "proguard-rules.pro"
             )
             ndk {
-                debugSymbolLevel = "SYMBOL_TABLE"
+                debugSymbolLevel = "FULL"
             }
         }
     }
