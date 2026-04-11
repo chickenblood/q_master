@@ -89,4 +89,4 @@ Build Android app:
 
 Build Wear app:
   `./android/gradlew -p android :watchapp:bundleRelease`
-  The output AAB will be under build/watchapp/build/outputs/bundle/release/watchapp-release.aab
+  The output AAB will be under build/watchapp/outputs/bundle/release/watchapp-release.aab
