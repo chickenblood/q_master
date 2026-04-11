@@ -81,11 +81,12 @@ The app can read files written by older versions of the app. Legacy layouts are 
 - **v2 (current)** — `sections` as an ordered array of section objects (`{ "name": "...", "exercises": ["..."] }`), preserving section order across all platforms.
 
 ### Building the app for the Play Store
+(In the top-level q_master directory)
 
 Build Android app:
   `flutter build appbundle`
-  The output AAB will be under
+  The output AAB will be under build/app/outputs/bundle/release/app-release.aab
 
 Build Wear app:
-  `cd android && ./gradlew :watchapp:bundleRelease`
-  The output AAB will be under android/watchapp/build/outputs/bundle/release
+  `./android/gradlew -p android :watchapp:bundleRelease`
+  The output AAB will be under build/watchapp/build/outputs/bundle/release/watchapp-release.aab
