@@ -1,4 +1,5 @@
 import 'package:audio_session/audio_session.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shake/shake.dart';
 
+import 'firebase_options.dart';
 import 'games/games_tab.dart';
 import 'l10n/l10n.dart';
 import 'near_me/near_me_tab.dart';
@@ -22,6 +24,7 @@ enum Tab { workouts, games, timer, location }
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedAppPrefs.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(ProviderScope(child: MainApp()));
 }
 

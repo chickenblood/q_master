@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "931233541161",
+    "project_id": "q-master-7346a",
+    "storage_bucket": "q-master-7346a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:931233541161:android:ba76bdf126aaa0427ac038",
+        "android_client_info": {
+          "package_name": "com.f3nation.q_master"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSRbZB2XpDqgcSGwU6Lw90la8wUNghKt4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

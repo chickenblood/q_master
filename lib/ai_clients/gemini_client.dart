@@ -1,9 +1,6 @@
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:firebase_ai/firebase_ai.dart';
 import 'package:logger/logger.dart';
 
-// TODO: Don't hardcode the API key in the app. Use a secure vault or
-// backend proxy.
-const _apiKey = 'AIzaSyDiMOG9DqnV9t7_XVnLKNmJDKseBXWwKSI';
 const _promptText = '''
 You are a helpful assistant that creates F3-based workouts based on user input
 details.  The user will provide details about their workout preferences and
@@ -63,9 +60,8 @@ User details: {details}
 
 final class GeminiClient {
   GeminiClient({String? apiKey})
-    : model = GenerativeModel(
+    : model = FirebaseAI.googleAI().generativeModel(
         model: 'gemini-2.5-flash-lite',
-        apiKey: apiKey ?? _apiKey,
       );
 
   final _logger = Logger();
@@ -79,9 +75,7 @@ final class GeminiClient {
   Future<String> requestWorkout(String details) async {
     final queryText = _promptText.replaceAll('{details}', details);
     _logger.i('Full prompt: $queryText');
-    final response = await model.generateContent([
-      Content.multi([TextPart(queryText)]),
-    ]);
+    final response = await model.generateContent([Content.text(queryText)]);
     _logger.i('Workout response: ${response.text}');
     // Strip off any crap that may be around the json, like ```json``` or ```
     // fences.
