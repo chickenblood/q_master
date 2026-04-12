@@ -73,6 +73,30 @@
     "@generateWorkoutErrorMessage": {
       "description": "Alert error message shown when AI workout generation fails."
     },
+    "captureVoiceInputDialogTitle": "Capture Voice Input",
+    "@captureVoiceInputDialogTitle": {
+      "description": "Title of the full-screen dialog used to record and transcribe a spoken workout prompt."
+    },
+    "captureVoiceInputPrompt": "Capture your workout prompt",
+    "@captureVoiceInputPrompt": {
+      "description": "Instruction text shown above the waveform recorder in the voice capture dialog."
+    },
+    "captureVoiceInputRecordingHint": "Recording... tap stop when done",
+    "@captureVoiceInputRecordingHint": {
+      "description": "Hint text shown while actively recording voice input."
+    },
+    "captureVoiceInputTapToRecordHint": "Tap to record",
+    "@captureVoiceInputTapToRecordHint": {
+      "description": "Hint text shown when recording has not started yet."
+    },
+    "captureVoiceInputTranscriptPlaceholder": "Your transcript will appear here.",
+    "@captureVoiceInputTranscriptPlaceholder": {
+      "description": "Placeholder shown in the transcript area before speech has been recognized."
+    },
+    "captureVoiceInputSpeechUnavailable": "Speech recognition unavailable on this device.",
+    "@captureVoiceInputSpeechUnavailable": {
+      "description": "Message shown when speech-to-text initialization is not available on the current device."
+    },
     "editWorkoutDialogTitle": "Edit Workout",
     "@editWorkoutDialogTitle": {
       "description": "Title of the bottom sheet for editing an existing workout."

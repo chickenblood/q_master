@@ -8,7 +8,6 @@ import 'package:q_master/ui/simple_alert.dart';
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
 import '../ui/adaptive_icons.dart';
-import '../ui/adaptive_modal_sheet.dart';
 import 'capture_voice_input_dialog.dart';
 
 final class GenerateWorkoutSheet extends StatefulWidget {
@@ -61,9 +60,19 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
 
   Future<void> _handleCaptureVoiceInput() async {
     final navigator = Navigator.of(context, rootNavigator: true);
-    await showAdaptiveModalSheet<void>(
-      context: navigator.context,
-      child: const CaptureVoiceInputDialog(),
+    final transcript = await navigator.push(
+      platformPageRoute(
+        context: context,
+        fullscreenDialog: true,
+        builder: (_) => const CaptureVoiceInputDialog(),
+      ),
+    );
+    if (!mounted) return;
+    if (transcript == null || transcript.trim().isEmpty) return;
+
+    _promptTextController.text = transcript.trim();
+    _promptTextController.selection = TextSelection.collapsed(
+      offset: _promptTextController.text.length,
     );
   }
 
