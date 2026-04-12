@@ -89,6 +89,10 @@
     "@addSectionFieldHint": {
       "description": "Placeholder hint text inside the section name text field in the add-section dialog."
     },
+    "updateSectionDialogTitle": "Update section",
+    "@updateSectionDialogTitle": {
+      "description": "Title of the edit section title alert dialog, and label of its confirm action button."
+    },
     "startWorkoutButtonText": "Start",
     "@startWorkoutButtonText": {
       "description": "Button label that starts a beatdown from the workout list."

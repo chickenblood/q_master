@@ -188,7 +188,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   Widget _pasteExercisesButton(
     BuildContext context, {
     required List<String> exercises,
-    required String groupTitle,
+    required String sectionTitle,
   }) => FutureBuilder(
     future: Clipboard.hasStrings(),
     builder: (context, snapshot) {
@@ -198,17 +198,76 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
         onPressed: hasStrings
             ? () async {
                 _focusNode.unfocus();
-                _pasteExercises(exercises: exercises, sectionGroup: groupTitle);
+                _pasteExercises(
+                  exercises: exercises,
+                  sectionGroup: sectionTitle,
+                );
               }
             : null,
       );
     },
   );
 
+  void _editSectionTitle(
+    BuildContext context, {
+    required String sectionTitle,
+  }) async {
+    final controller = TextEditingController()
+      ..text = sectionTitle
+      ..selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: sectionTitle.length,
+      );
+    final updatedTitle = await showAdaptiveDialog<String>(
+      context: context,
+      builder: (innerContext) => AlertDialog.adaptive(
+        title: PlatformText(L10n.of(innerContext)!.updateSectionDialogTitle),
+        content: PlatformTextField(
+          controller: controller,
+          autofocus: true,
+          textCapitalization: TextCapitalization.words,
+          hintText: L10n.of(innerContext)!.addSectionFieldHint,
+          onSubmitted: (_) => Navigator.of(innerContext).pop(controller.text),
+        ),
+        actions: [
+          PlatformDialogAction(
+            onPressed: () => Navigator.of(innerContext).pop(),
+            child: PlatformText(L10n.of(innerContext)!.cancelAction),
+          ),
+          PlatformDialogAction(
+            cupertino: (_, _) =>
+                CupertinoDialogActionData(isDefaultAction: true),
+            onPressed: () => Navigator.of(innerContext).pop(controller.text),
+            child: PlatformText(
+              L10n.of(innerContext)!.updateSectionDialogTitle,
+            ),
+          ),
+        ],
+      ),
+    );
+    final trimmedName = updatedTitle?.trim();
+    if (trimmedName == null || trimmedName.isEmpty) return;
+
+    // Copy sections in the order they were created, but with the updated title
+    // for the edited section.
+    final updatedSections = <String, List<String>>{};
+    for (final name in _sections.keys) {
+      if (name == sectionTitle) {
+        updatedSections[trimmedName] = _sections[name] ?? [];
+      } else {
+        updatedSections[name] = _sections[name] ?? [];
+      }
+    }
+    setState(() {
+      _sections.clear();
+      _sections.addAll(updatedSections);
+    });
+  }
+
   Widget _addExerciseButton(
     BuildContext context, {
     required List<String> exercises,
-    required String groupTitle,
+    required String sectionTitle,
   }) => PlatformIconButton(
     icon: Icon(PlatformIcons(context).add),
     onPressed: () async {
@@ -218,7 +277,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
       if (exercise?.trim().isNotEmpty ?? false) {
         setState(() {
           exercises.add(exercise!);
-          _lastAddedItemGroup = groupTitle;
+          _lastAddedItemGroup = sectionTitle;
         });
       }
     },
@@ -248,40 +307,43 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
 
   Widget _sectionHeader(
     BuildContext context, {
-    required String groupTitle,
+    required String sectionTitle,
     required List<String> exercises,
   }) => DismissibleRow(
-    key: ValueKey('dismissible_$groupTitle'),
+    key: ValueKey('dismissible_$sectionTitle'),
     onDismissed: (direction) {
       setState(() {
-        _sections.remove(groupTitle);
+        _sections.remove(sectionTitle);
       });
     },
-    child: PlatformListTile(
-      material: (context, platform) =>
-          MaterialListTileData(contentPadding: _headerInsets),
-      cupertino: (context, platform) =>
-          CupertinoListTileData(padding: _headerInsets),
-      title: PlatformText(
-        groupTitle,
-        style: Theme.of(context).textTheme.headlineSmall,
-        maxLines: 2,
-        overflow: .ellipsis,
-      ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _pasteExercisesButton(
-            context,
-            exercises: exercises,
-            groupTitle: groupTitle,
-          ),
-          _addExerciseButton(
-            context,
-            exercises: exercises,
-            groupTitle: groupTitle,
-          ),
-        ],
+    child: GestureDetector(
+      onDoubleTap: () => _editSectionTitle(context, sectionTitle: sectionTitle),
+      child: PlatformListTile(
+        material: (context, platform) =>
+            MaterialListTileData(contentPadding: _headerInsets),
+        cupertino: (context, platform) =>
+            CupertinoListTileData(padding: _headerInsets),
+        title: PlatformText(
+          sectionTitle,
+          style: Theme.of(context).textTheme.headlineSmall,
+          maxLines: 2,
+          overflow: .ellipsis,
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _pasteExercisesButton(
+              context,
+              exercises: exercises,
+              sectionTitle: sectionTitle,
+            ),
+            _addExerciseButton(
+              context,
+              exercises: exercises,
+              sectionTitle: sectionTitle,
+            ),
+          ],
+        ),
       ),
     ),
   );
@@ -327,19 +389,6 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     ),
   );
 
-  String _sectionTitle(BuildContext context, String sectionName) {
-    switch (sectionName.toLowerCase()) {
-      case 'warmup':
-        return L10n.of(context)!.workoutWarmupFieldLabel;
-      case 'thang':
-        return L10n.of(context)!.workoutThangFieldLabel;
-      case 'mary':
-        return L10n.of(context)!.workoutMaryFieldLabel;
-      default:
-        return sectionName;
-    }
-  }
-
   List<Widget> _content(BuildContext context) {
     final sectionOrder = _sections.keys.toList(growable: false);
     return [
@@ -364,7 +413,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
           sliver: SliverToBoxAdapter(
             child: _sectionHeader(
               context,
-              groupTitle: sectionGroup,
+              sectionTitle: sectionGroup,
               exercises: _sections[sectionGroup]!,
             ),
           ),
@@ -398,6 +447,12 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                       }
                     });
                     return GestureDetector(
+                      onDoubleTap: () => _editExercise(
+                        context,
+                        exercises: _sections[sectionGroup]!,
+                        index: index,
+                        sectionGroup: sectionGroup,
+                      ),
                       child: ReorderableDelayedDragStartListener(
                         index: index,
                         child: PlatformListTile(
@@ -411,12 +466,6 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                           cupertino: (context, platform) =>
                               CupertinoListTileData(padding: _itemInsets),
                         ),
-                      ),
-                      onDoubleTap: () => _editExercise(
-                        context,
-                        exercises: _sections[sectionGroup]!,
-                        index: index,
-                        sectionGroup: sectionGroup,
                       ),
                     );
                   },
