@@ -31,6 +31,9 @@ final class AdaptiveIcons {
   static IconData get paste =>
       Platform.isIOS ? CupertinoIcons.doc_on_clipboard : Icons.content_paste;
 
+  static IconData get microphone =>
+      Platform.isIOS ? CupertinoIcons.mic_fill : Icons.mic;
+
   static IconData get sparkles =>
       Platform.isIOS ? CupertinoIcons.sparkles : Icons.auto_awesome;
 }

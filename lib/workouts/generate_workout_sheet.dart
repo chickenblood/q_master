@@ -8,6 +8,8 @@ import 'package:q_master/ui/simple_alert.dart';
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
 import '../ui/adaptive_icons.dart';
+import '../ui/adaptive_modal_sheet.dart';
+import 'capture_voice_input_dialog.dart';
 
 final class GenerateWorkoutSheet extends StatefulWidget {
   const GenerateWorkoutSheet({super.key});
@@ -57,6 +59,14 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
     }
   }
 
+  Future<void> _handleCaptureVoiceInput() async {
+    final navigator = Navigator.of(context, rootNavigator: true);
+    await showAdaptiveModalSheet<void>(
+      context: navigator.context,
+      child: const CaptureVoiceInputDialog(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
@@ -89,6 +99,25 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
                 hintText: L10n.of(context)!.generateWorkoutPromptHint,
                 keyboardType: .multiline,
                 onSubmitted: (_) => _handleGenerateWorkout(),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: Center(
+                child: SizedBox(
+                  width: 64,
+                  height: 64,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade700,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      onPressed: _handleCaptureVoiceInput,
+                      icon: Icon(AdaptiveIcons.microphone, color: Colors.white),
+                    ),
+                  ),
+                ),
               ),
             ),
             Stack(
