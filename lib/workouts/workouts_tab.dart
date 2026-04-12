@@ -13,6 +13,7 @@ import '../settings/settings_sheet.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_menu.dart';
 import '../ui/adaptive_modal_sheet.dart';
+import '../ui/dismissible_row.dart';
 import '../ui/expandable_fab.dart';
 import '../utils/datetime_utils.dart';
 import 'beatdown_browser.dart';
@@ -239,10 +240,9 @@ final class _WorkoutTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const padding = EdgeInsets.fromLTRB(16.0, 14.0, 16.0, 4.0);
-    return Dismissible(
-      direction: .endToStart,
+    return DismissibleRow(
       key: ValueKey(workout),
-      background: Container(color: Colors.red),
+      backgroundPadding: const EdgeInsets.fromLTRB(36, 0, 36, 0),
       confirmDismiss: (direction) {
         if (direction == .endToStart) return _confirmDelete(context);
         return Future.value(true);

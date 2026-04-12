@@ -1,0 +1,37 @@
+import 'package:flutter/material.dart';
+
+/// A helper class to create a dismissible row with a red background for
+/// deletion when swiped.
+final class DismissibleRow extends StatelessWidget {
+  const DismissibleRow({
+    required super.key,
+    required this.onDismissed,
+    this.backgroundPadding = const EdgeInsets.fromLTRB(24, 0, 24, 0),
+    this.confirmDismiss,
+    required this.child,
+  });
+
+  final EdgeInsets backgroundPadding;
+  final ConfirmDismissCallback? confirmDismiss;
+  final void Function(DismissDirection) onDismissed;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Dismissible(
+      key: key!,
+      confirmDismiss: confirmDismiss,
+      onDismissed: (direction) => onDismissed(direction),
+      background: Container(
+        padding: backgroundPadding,
+        color: Colors.red,
+        child: Row(
+          mainAxisAlignment: .end,
+          children: [const Icon(Icons.delete, color: Colors.white)],
+        ),
+      ),
+      direction: DismissDirection.endToStart,
+      child: child,
+    );
+  }
+}

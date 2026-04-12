@@ -7,6 +7,7 @@ import '../model/workout.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_modal_sheet.dart';
 import '../ui/cupertino_sheet_fork.dart';
+import '../ui/dismissible_row.dart';
 import 'workout_auto_completions.dart';
 
 final class CreateWorkoutSheet extends StatefulWidget {
@@ -107,7 +108,6 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                   maxLines: 1,
                   onSubmitted: () => Navigator.of(context).pop(controller.text),
                 ),
-
                 Spacer(),
               ],
             ),
@@ -188,7 +188,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   Widget _pasteExercisesButton(
     BuildContext context, {
     required List<String> exercises,
-    required String sectionGroup,
+    required String groupTitle,
   }) => FutureBuilder(
     future: Clipboard.hasStrings(),
     builder: (context, snapshot) {
@@ -198,10 +198,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
         onPressed: hasStrings
             ? () async {
                 _focusNode.unfocus();
-                _pasteExercises(
-                  exercises: exercises,
-                  sectionGroup: sectionGroup,
-                );
+                _pasteExercises(exercises: exercises, sectionGroup: groupTitle);
               }
             : null,
       );
@@ -211,7 +208,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   Widget _addExerciseButton(
     BuildContext context, {
     required List<String> exercises,
-    required String sectionGroup,
+    required String groupTitle,
   }) => PlatformIconButton(
     icon: Icon(PlatformIcons(context).add),
     onPressed: () async {
@@ -221,7 +218,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
       if (exercise?.trim().isNotEmpty ?? false) {
         setState(() {
           exercises.add(exercise!);
-          _lastAddedItemGroup = sectionGroup;
+          _lastAddedItemGroup = groupTitle;
         });
       }
     },
@@ -251,34 +248,41 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
 
   Widget _sectionHeader(
     BuildContext context, {
-    required String title,
+    required String groupTitle,
     required List<String> exercises,
-    required String sectionGroup,
-  }) => PlatformListTile(
-    material: (context, platform) =>
-        MaterialListTileData(contentPadding: _headerInsets),
-    cupertino: (context, platform) =>
-        CupertinoListTileData(padding: _headerInsets),
-    title: PlatformText(
-      title,
-      style: Theme.of(context).textTheme.headlineSmall,
-      maxLines: 2,
-      overflow: .ellipsis,
-    ),
-    trailing: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _pasteExercisesButton(
-          context,
-          exercises: exercises,
-          sectionGroup: sectionGroup,
-        ),
-        _addExerciseButton(
-          context,
-          exercises: exercises,
-          sectionGroup: sectionGroup,
-        ),
-      ],
+  }) => DismissibleRow(
+    key: ValueKey('dismissible_$groupTitle'),
+    onDismissed: (direction) {
+      setState(() {
+        _sections.remove(groupTitle);
+      });
+    },
+    child: PlatformListTile(
+      material: (context, platform) =>
+          MaterialListTileData(contentPadding: _headerInsets),
+      cupertino: (context, platform) =>
+          CupertinoListTileData(padding: _headerInsets),
+      title: PlatformText(
+        groupTitle,
+        style: Theme.of(context).textTheme.headlineSmall,
+        maxLines: 2,
+        overflow: .ellipsis,
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _pasteExercisesButton(
+            context,
+            exercises: exercises,
+            groupTitle: groupTitle,
+          ),
+          _addExerciseButton(
+            context,
+            exercises: exercises,
+            groupTitle: groupTitle,
+          ),
+        ],
+      ),
     ),
   );
 
@@ -360,9 +364,8 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
           sliver: SliverToBoxAdapter(
             child: _sectionHeader(
               context,
-              title: _sectionTitle(context, sectionGroup),
+              groupTitle: sectionGroup,
               exercises: _sections[sectionGroup]!,
-              sectionGroup: sectionGroup,
             ),
           ),
         ),
@@ -373,10 +376,8 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
             itemBuilder: (context, index) {
               final exercise = _sections[sectionGroup]![index];
               final isLastItem = index == (_sections[sectionGroup]!.length - 1);
-              return Dismissible(
+              return DismissibleRow(
                 key: ValueKey('dismissible_$exercise$index'),
-                background: Container(color: Colors.red),
-                direction: DismissDirection.endToStart,
                 onDismissed: (direction) {
                   setState(() {
                     _sections[sectionGroup]!.removeAt(index);
