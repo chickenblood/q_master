@@ -81,7 +81,7 @@
     "@captureVoiceInputPrompt": {
       "description": "Instruction text shown above the waveform recorder in the voice capture dialog."
     },
-    "captureVoiceInputRecordingHint": "Recording... tap stop when done",
+    "captureVoiceInputRecordingHint": "Recording… tap stop when done",
     "@captureVoiceInputRecordingHint": {
       "description": "Hint text shown while actively recording voice input."
     },

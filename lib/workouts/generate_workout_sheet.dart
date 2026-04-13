@@ -34,7 +34,7 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
   }
 
   Future<void> _handleGenerateWorkout() async {
-    final prompt = _promptTextController.text;
+    final prompt = _promptTextController.text.trim();
     if (prompt.isNotEmpty) {
       setState(() => _isGenerating = true);
       Workout? workout;
@@ -140,13 +140,21 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
             ),
             Stack(
               children: [
-                PlatformElevatedButton(
-                  onPressed: _isGenerating ? null : _handleGenerateWorkout,
-                  child: _isGenerating
-                      ? PlatformCircularProgressIndicator()
-                      : PlatformText(
-                          L10n.of(context)!.generateWorkoutButtonLabel,
-                        ),
+                ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: _promptTextController,
+                  builder: (context, value, child) {
+                    final hasPrompt = value.text.trim().isNotEmpty;
+                    return PlatformElevatedButton(
+                      onPressed: (_isGenerating || !hasPrompt)
+                          ? null
+                          : _handleGenerateWorkout,
+                      child: _isGenerating
+                          ? PlatformCircularProgressIndicator()
+                          : PlatformText(
+                              L10n.of(context)!.generateWorkoutButtonLabel,
+                            ),
+                    );
+                  },
                 ),
               ],
             ),
