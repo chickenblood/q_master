@@ -20,6 +20,7 @@ final class GenerateWorkoutSheet extends StatefulWidget {
 final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
   final _client = GeminiClient();
   final _promptTextController = TextEditingController();
+  final _promptFocusNode = FocusNode();
   var _isGenerating = false;
 
   @override
@@ -29,6 +30,7 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
 
   @override
   void dispose() {
+    _promptFocusNode.dispose();
     _promptTextController.dispose();
     super.dispose();
   }
@@ -59,6 +61,13 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
   }
 
   Future<void> _handleCaptureVoiceInput() async {
+    // Clear focus from the text field to dismiss the keyboard before opening
+    // the voice input dialog.
+    _promptFocusNode.unfocus();
+    // Wait for keyboard to hide.
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    if (!mounted) return;
     final navigator = Navigator.of(context, rootNavigator: true);
     final transcript = await navigator.push<String?>(
       PageRouteBuilder(
@@ -73,10 +82,15 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
     if (!mounted) return;
     if (transcript == null || transcript.trim().isEmpty) return;
 
-    _promptTextController.text = transcript.trim();
-    _promptTextController.selection = TextSelection.collapsed(
-      offset: _promptTextController.text.length,
+    final normalizedTranscript = transcript.trim();
+    _promptTextController.value = TextEditingValue(
+      text: normalizedTranscript,
+      selection: TextSelection(
+        baseOffset: 0,
+        extentOffset: normalizedTranscript.length,
+      ),
     );
+    _promptFocusNode.requestFocus();
   }
 
   @override
@@ -105,6 +119,7 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
               padding: const EdgeInsets.all(16.0),
               child: PlatformTextField(
                 controller: _promptTextController,
+                focusNode: _promptFocusNode,
                 autofocus: true,
                 textInputAction: .done,
                 maxLines: 5,
