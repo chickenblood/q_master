@@ -203,22 +203,25 @@ final class _CaptureVoiceInputDialogState
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.12),
+              Hero(
+                tag: 'voiceInputButton',
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.12),
+                    ),
                   ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: _SpeechWaveform(
-                    levels: _soundLevels,
-                    elapsed: _elapsed,
-                    maxDuration: _maxRecordDuration,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: _SpeechWaveform(
+                      levels: _soundLevels,
+                      elapsed: _elapsed,
+                      maxDuration: _maxRecordDuration,
+                    ),
                   ),
                 ),
               ),

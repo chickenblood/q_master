@@ -60,11 +60,14 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
 
   Future<void> _handleCaptureVoiceInput() async {
     final navigator = Navigator.of(context, rootNavigator: true);
-    final transcript = await navigator.push(
-      platformPageRoute(
-        context: context,
+    final transcript = await navigator.push<String?>(
+      PageRouteBuilder(
         fullscreenDialog: true,
-        builder: (_) => const CaptureVoiceInputDialog(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const CaptureVoiceInputDialog(),
       ),
     );
     if (!mounted) return;
@@ -113,17 +116,23 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: Center(
-                child: SizedBox(
-                  width: 64,
-                  height: 64,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Colors.red.shade700,
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      onPressed: _handleCaptureVoiceInput,
-                      icon: Icon(AdaptiveIcons.microphone, color: Colors.white),
+                child: Hero(
+                  tag: 'voiceInputButton',
+                  child: SizedBox(
+                    width: 64,
+                    height: 64,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade700,
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        onPressed: _handleCaptureVoiceInput,
+                        icon: Icon(
+                          AdaptiveIcons.microphone,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                 ),
