@@ -1,2 +1,3 @@
 "NSLocationWhenInUseUsageDescription" = "Q Master needs access to your location to show nearby workouts.";
 "NSMicrophoneUsageDescription" = "Q Master needs microphone access to capture spoken workout prompts.";
+"NSSpeechRecognitionUsageDescription" = "Q Master needs to recognize spoken text to transcribe workout prompts.";
