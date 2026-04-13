@@ -129,17 +129,9 @@
     "@defaultWorkoutName": {
       "description": "Default name pre-filled in the workout name field when creating a new workout."
     },
-    "workoutWarmupFieldLabel": "Warm up",
-    "@workoutWarmupFieldLabel": {
+    "warmupSectionTitle": "Warm up",
+    "@warmupSectionTitle": {
       "description": "Section header for the warm-up exercises in the workout editor and beatdown browser."
-    },
-    "workoutThangFieldLabel": "Thang",
-    "@workoutThangFieldLabel": {
-      "description": "Section header for the main workout (The Thang) exercises in the workout editor and beatdown browser."
-    },
-    "workoutMaryFieldLabel": "Mary",
-    "@workoutMaryFieldLabel": {
-      "description": "Section header for the Mary/core exercises in the workout editor and beatdown browser."
     },
     "beatdownBrowserTitle": "Beatdown",
     "@beatdownBrowserTitle": {

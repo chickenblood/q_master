@@ -24,7 +24,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   final _nameTextController = TextEditingController();
   final _scrollController = ScrollController();
 
-  final _sections = <String, List<String>>{'warmup': []};
+  final _sections = <String, List<String>>{};
 
   // Track the group of the most recently added exercise for scrolling
   String? _lastAddedItemGroup;
@@ -32,6 +32,8 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   @override
   void initState() {
     super.initState();
+
+    _sections[L10n.of(context)!.warmupSectionTitle] = [];
 
     final workout = widget.workout;
     if (workout != null) {
