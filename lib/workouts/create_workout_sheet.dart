@@ -33,8 +33,6 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   void initState() {
     super.initState();
 
-    _sections[L10n.of(context)!.warmupSectionTitle] = [];
-
     final workout = widget.workout;
     if (workout != null) {
       _nameTextController.text = workout.name;
@@ -43,13 +41,15 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
       };
       _sections.clear();
       _sections.addAll(sectionMap);
-    } else {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _sections[L10n.of(context)!.warmupSectionTitle] = [];
+      if (widget.workout == null) {
         _nameTextController.text = L10n.of(context)!.defaultWorkoutName;
         _focusNode.requestFocus();
         _selectNameText();
-      });
-    }
+      }
+    });
   }
 
   @override

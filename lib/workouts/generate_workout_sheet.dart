@@ -64,7 +64,8 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
     // Clear focus from the text field to dismiss the keyboard before opening
     // the voice input dialog.
     _promptFocusNode.unfocus();
-    // Wait for keyboard to hide.
+    // iOS workaround: wait for keyboard dismissal to avoid transition glitches
+    // when presenting the full-screen voice capture route.
     await Future.delayed(const Duration(milliseconds: 300));
 
     if (!mounted) return;
