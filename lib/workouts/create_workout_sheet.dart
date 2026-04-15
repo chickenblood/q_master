@@ -56,7 +56,9 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
       _sections.addAll(sectionMap);
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _sections[L10n.of(context)!.warmupSectionTitle] = [];
+      setState(() {
+        _sections[L10n.of(context)!.warmupSectionTitle] = [];
+      });
       if (widget.workout == null) {
         _nameTextController.text = L10n.of(context)!.defaultWorkoutName;
         _focusNode.requestFocus();
