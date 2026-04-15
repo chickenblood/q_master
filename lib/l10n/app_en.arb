@@ -81,11 +81,11 @@
     "@editWorkoutDialogTitle": {
       "description": "Title of the bottom sheet for editing an existing workout."
     },
-    "addSectionButtonText": "Add section…",
+    "addSectionButtonText": "Add section",
     "@addSectionButtonText": {
       "description": "Outlined button at the bottom of the workout editor that opens the add-section picker."
     },
-    "pasteSectionButtonText": "Paste section…",
+    "pasteSectionButtonText": "Paste section",
     "@pasteSectionButtonText": {
       "description": "Outlined button at the bottom of the workout editor that pastes a section from the clipboard."
     },
