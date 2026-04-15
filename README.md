@@ -27,7 +27,6 @@ Since I'm a UX purist, I prefer to have the UI look native to the platform where
 
 In addition, I've added some helper classes that fills any gaps that the utilities above don't fill. See the following in the ui/ directory:
 
-* adaptiveAlertAction for use with Flutter's AlertDialog.adaptive to style the buttons correctly.
 * AdaptiveIcons for those not covered by Flutter Icons.adaptive and PlatformIcon.
 * AdaptiveMenu (uses the [pull_down_button](https://pub.dev/packages/pull_down_button) package) for a better iOS-styled popup menu.
 * showAdaptiveModalSheet that presents full-screen modals in the iOS modal sheet style (with a perspective transform, revealing the content below).

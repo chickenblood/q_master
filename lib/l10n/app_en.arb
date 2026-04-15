@@ -109,6 +109,14 @@
     "@addSectionButtonText": {
       "description": "Outlined button at the bottom of the workout editor that opens the add-section picker."
     },
+    "pasteSectionButtonText": "Paste section…",
+    "@pasteSectionButtonText": {
+      "description": "Outlined button at the bottom of the workout editor that pastes a section from the clipboard."
+    },
+    "pasteSectionInitialText": "New name",
+    "@pasteSectionInitialText": {
+      "description": "Initial text shown in the section name field when pasting a section from the clipboard."
+    },
     "addSectionDialogTitle": "Add section",
     "@addSectionDialogTitle": {
       "description": "Title of the add-section alert dialog, and label of its confirm action button."

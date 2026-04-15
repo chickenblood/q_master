@@ -20,6 +20,15 @@ final class CreateWorkoutSheet extends StatefulWidget {
 }
 
 final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
+  static final _footerButtonInsets = EdgeInsets.only(
+    left: 16.0,
+    top: 16.0,
+    right: 16.0,
+    bottom: 16.0,
+  );
+  static const _headerInsets = EdgeInsets.only(left: 16.0, right: 8.0);
+  static const _itemInsets = EdgeInsets.only(left: 32.0, right: 24.0);
+
   final _focusNode = FocusNode();
   final _nameTextController = TextEditingController();
   final _scrollController = ScrollController();
@@ -32,6 +41,10 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   @override
   void initState() {
     super.initState();
+
+    // Rebuild when app is resumed to update the UI if the pasteboard contents
+    // have changed.
+    AppLifecycleListener(onResume: () => setState(() {}));
 
     final workout = widget.workout;
     if (workout != null) {
@@ -68,6 +81,32 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     );
   }
 
+  void _moveExercise(
+    List<String> exercises, {
+    required int fromIndex,
+    required int toIndex,
+  }) {
+    final exercise = exercises.removeAt(fromIndex);
+    exercises.insert(toIndex > fromIndex ? toIndex - 1 : toIndex, exercise);
+  }
+
+  bool get _workoutCreationEnabled {
+    return _nameTextController.text.trim().isNotEmpty &&
+        _sections.values.any((exercises) => exercises.isNotEmpty);
+  }
+
+  void _createWorkout(BuildContext context) {
+    final workout = Workout(
+      name: _nameTextController.text.trim(),
+      date: DateTime.now(),
+      sections: [
+        for (final entry in _sections.entries)
+          WorkoutSection(name: entry.key, exercises: List.of(entry.value)),
+      ],
+    );
+    Navigator.pop(context, workout);
+  }
+
   Future<String?> _showExercisePicker(
     BuildContext context, {
     String? text,
@@ -89,7 +128,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
               icon: Icon(AdaptiveIcons.close),
               onPressed: () => Navigator.of(context).pop(),
             ),
-            title: Text(
+            title: PlatformText(
               L10n.of(context)!.exerciseEntryPromptText,
               textScaler: MediaQuery.textScalerOf(
                 context,
@@ -119,19 +158,28 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     );
   }
 
-  Future<void> _addSection(BuildContext context) async {
-    _focusNode.unfocus();
-    final controller = TextEditingController();
-    final sectionName = await showAdaptiveDialog<String>(
+  /// Shows a dialog for editing the title of a section.
+  Future<String?> _showSectionTitleDialog(
+    BuildContext context, {
+    required String title,
+    String? initialText,
+  }) async {
+    final controller = TextEditingController(text: initialText);
+    controller.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: initialText?.length ?? 0,
+    );
+    return showAdaptiveDialog<String>(
       context: context,
       builder: (innerContext) => AlertDialog.adaptive(
-        title: PlatformText(L10n.of(innerContext)!.addSectionDialogTitle),
+        title: PlatformText(title),
         content: PlatformTextField(
           controller: controller,
           autofocus: true,
           textCapitalization: TextCapitalization.words,
           hintText: L10n.of(innerContext)!.addSectionFieldHint,
-          onSubmitted: (_) => Navigator.of(innerContext).pop(controller.text),
+          onSubmitted: (_) =>
+              Navigator.of(innerContext).pop(controller.text.trim()),
         ),
         actions: [
           PlatformDialogAction(
@@ -142,10 +190,18 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
             cupertino: (_, _) =>
                 CupertinoDialogActionData(isDefaultAction: true),
             onPressed: () => Navigator.of(innerContext).pop(controller.text),
-            child: PlatformText(L10n.of(innerContext)!.addSectionDialogTitle),
+            child: PlatformText(title),
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _addSection(BuildContext context) async {
+    _focusNode.unfocus();
+    final sectionName = await _showSectionTitleDialog(
+      context,
+      title: L10n.of(context)!.addSectionDialogTitle,
     );
     final trimmedName = sectionName?.trim();
     if (trimmedName == null || trimmedName.isEmpty) return;
@@ -159,19 +215,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     });
   }
 
-  void _moveExercise(
-    List<String> exercises, {
-    required int fromIndex,
-    required int toIndex,
-  }) {
-    final exercise = exercises.removeAt(fromIndex);
-    exercises.insert(toIndex > fromIndex ? toIndex - 1 : toIndex, exercise);
-  }
-
-  Future<void> _pasteExercises({
-    required List<String> exercises,
-    required String sectionGroup,
-  }) async {
+  Future<void> _pasteExercises({required String sectionGroup}) async {
     final data = await Clipboard.getData('text/plain');
     final text = data?.text;
     if (text == null || text.trim().isEmpty) return;
@@ -181,71 +225,21 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
         .where((line) => line.isNotEmpty)
         .toList();
     if (lines.isEmpty) return;
+    final exercises = _sections[sectionGroup]!;
     setState(() {
       exercises.addAll(lines);
       _lastAddedItemGroup = sectionGroup;
     });
   }
 
-  Widget _pasteExercisesButton(
-    BuildContext context, {
-    required List<String> exercises,
-    required String sectionTitle,
-  }) => FutureBuilder(
-    future: Clipboard.hasStrings(),
-    builder: (context, snapshot) {
-      final hasStrings = snapshot.data ?? false;
-      return PlatformIconButton(
-        icon: Icon(AdaptiveIcons.paste),
-        onPressed: hasStrings
-            ? () async {
-                _focusNode.unfocus();
-                _pasteExercises(
-                  exercises: exercises,
-                  sectionGroup: sectionTitle,
-                );
-              }
-            : null,
-      );
-    },
-  );
-
   void _editSectionTitle(
     BuildContext context, {
     required String sectionTitle,
   }) async {
-    final controller = TextEditingController()
-      ..text = sectionTitle
-      ..selection = TextSelection(
-        baseOffset: 0,
-        extentOffset: sectionTitle.length,
-      );
-    final updatedTitle = await showAdaptiveDialog<String>(
-      context: context,
-      builder: (innerContext) => AlertDialog.adaptive(
-        title: PlatformText(L10n.of(innerContext)!.updateSectionDialogTitle),
-        content: PlatformTextField(
-          controller: controller,
-          autofocus: true,
-          textCapitalization: TextCapitalization.words,
-          hintText: L10n.of(innerContext)!.addSectionFieldHint,
-          onSubmitted: (_) => Navigator.of(innerContext).pop(controller.text),
-        ),
-        actions: [
-          PlatformDialogAction(
-            onPressed: () => Navigator.of(innerContext).pop(),
-            child: PlatformText(L10n.of(innerContext)!.cancelAction),
-          ),
-          PlatformDialogAction(
-            cupertino: (_, _) =>
-                CupertinoDialogActionData(isDefaultAction: true),
-            onPressed: () => Navigator.of(innerContext).pop(controller.text),
-            child: PlatformText(
-              L10n.of(innerContext)!.updateSectionDialogTitle,
-            ),
-          ),
-        ],
-      ),
+    final updatedTitle = await _showSectionTitleDialog(
+      context,
+      title: L10n.of(context)!.updateSectionDialogTitle,
+      initialText: sectionTitle,
     );
     final trimmedName = updatedTitle?.trim();
     if (trimmedName == null || trimmedName.isEmpty) return;
@@ -304,92 +298,6 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
       });
     }
   }
-
-  static const _headerInsets = EdgeInsets.only(left: 16.0, right: 8.0);
-
-  Widget _sectionHeader(
-    BuildContext context, {
-    required String sectionTitle,
-    required List<String> exercises,
-  }) => DismissibleRow(
-    key: ValueKey('dismissible_$sectionTitle'),
-    onDismissed: (direction) {
-      setState(() {
-        _sections.remove(sectionTitle);
-      });
-    },
-    child: GestureDetector(
-      onDoubleTap: () => _editSectionTitle(context, sectionTitle: sectionTitle),
-      child: PlatformListTile(
-        material: (context, platform) =>
-            MaterialListTileData(contentPadding: _headerInsets),
-        cupertino: (context, platform) =>
-            CupertinoListTileData(padding: _headerInsets),
-        title: PlatformText(
-          sectionTitle,
-          style: Theme.of(context).textTheme.headlineSmall,
-          maxLines: 2,
-          overflow: .ellipsis,
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _pasteExercisesButton(
-              context,
-              exercises: exercises,
-              sectionTitle: sectionTitle,
-            ),
-            _addExerciseButton(
-              context,
-              exercises: exercises,
-              sectionTitle: sectionTitle,
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-
-  static const _footerInsets = EdgeInsets.only(
-    left: 16.0,
-    top: 16.0,
-    right: 16.0,
-    bottom: 16.0,
-  );
-  static const _itemInsets = EdgeInsets.only(left: 32.0, right: 24.0);
-
-  Widget _addSectionFooter(BuildContext context) => SliverSafeArea(
-    top: false,
-    sliver: SliverToBoxAdapter(
-      child: Padding(
-        padding: _footerInsets,
-        child: DecoratedBox(
-          position: .foreground,
-          decoration: BoxDecoration(
-            border: Border.all(color: Theme.of(context).colorScheme.outline),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: PlatformListTile(
-              material: (context, platform) => MaterialListTileData(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-              ),
-              cupertino: (context, platform) => CupertinoListTileData(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-              ),
-              leading: Icon(PlatformIcons(context).add, weight: 700),
-              title: PlatformText(
-                L10n.of(context)!.addSectionButtonText,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              onTap: () => _addSection(context),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
 
   List<Widget> _content(BuildContext context) {
     final sectionOrder = _sections.keys.toList(growable: false);
@@ -459,7 +367,12 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                         index: index,
                         child: PlatformListTile(
                           key: ValueKey('exercise_$exercise$index'),
-                          title: Text(exercise),
+                          title: PlatformText(
+                            exercise,
+                            softWrap: true,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                           trailing: _sections[sectionGroup]!.length > 1
                               ? Icon(Icons.drag_handle)
                               : null,
@@ -491,28 +404,126 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     ];
   }
 
-  bool get _workoutCreationEnabled {
-    return _nameTextController.text.trim().isNotEmpty &&
-        _sections.values.any((exercises) => exercises.isNotEmpty);
-  }
-
-  void _createWorkout(BuildContext context) {
-    final workout = Workout(
-      name: _nameTextController.text.trim(),
-      date: DateTime.now(),
-      sections: [
-        for (final entry in _sections.entries)
-          WorkoutSection(name: entry.key, exercises: List.of(entry.value)),
-      ],
-    );
-    Navigator.pop(context, workout);
-  }
-
   Widget _rightAppBarButtonAction(BuildContext context) => ListenableBuilder(
     listenable: Listenable.merge([_nameTextController]),
     builder: (_, _) => PlatformIconButton(
       onPressed: _workoutCreationEnabled ? () => _createWorkout(context) : null,
       icon: Icon(PlatformIcons(context).checkMark),
+    ),
+  );
+
+  Widget _addSectionButton(BuildContext context) => PlatformTextButton(
+    onPressed: () => _addSection(context),
+    child: DecoratedBox(
+      position: .foreground,
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: _footerButtonInsets,
+        child: Row(
+          children: [
+            Icon(PlatformIcons(context).add),
+            SizedBox(width: 8),
+            PlatformText(
+              L10n.of(context)!.addSectionButtonText,
+              style: Theme.of(
+                context,
+              ).textTheme.labelLarge!.copyWith(fontWeight: .w500),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  Widget _pasteExercisesButton(BuildContext context) => FutureBuilder(
+    future: Clipboard.hasStrings(),
+    builder: (context, snapshot) {
+      final hasStrings = snapshot.data ?? false;
+      return PlatformTextButton(
+        onPressed: hasStrings
+            ? () async {
+                _focusNode.unfocus();
+                final sectionTitle = L10n.of(context)!.addSectionDialogTitle;
+                final newSectionName = await _showSectionTitleDialog(
+                  context,
+                  title: sectionTitle,
+                  initialText: L10n.of(context)!.pasteSectionInitialText,
+                );
+                if (newSectionName == null) return;
+                setState(() => _sections[newSectionName] = []);
+                _pasteExercises(sectionGroup: newSectionName);
+              }
+            : null,
+        child: DecoratedBox(
+          position: .foreground,
+          decoration: BoxDecoration(
+            border: Border.all(color: Theme.of(context).colorScheme.outline),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Padding(
+            padding: _footerButtonInsets,
+            child: Row(
+              children: [
+                Icon(AdaptiveIcons.paste),
+                SizedBox(width: 8),
+                PlatformText(
+                  L10n.of(context)!.pasteSectionButtonText,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelLarge!.copyWith(fontWeight: .w500),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
+
+  Widget _sectionHeader(
+    BuildContext context, {
+    required String sectionTitle,
+    required List<String> exercises,
+  }) => DismissibleRow(
+    key: ValueKey('dismissible_$sectionTitle'),
+    onDismissed: (_) {
+      setState(() {
+        _sections.remove(sectionTitle);
+      });
+    },
+    child: GestureDetector(
+      onDoubleTap: () => _editSectionTitle(context, sectionTitle: sectionTitle),
+      child: PlatformListTile(
+        material: (context, platform) =>
+            MaterialListTileData(contentPadding: _headerInsets),
+        cupertino: (context, platform) =>
+            CupertinoListTileData(padding: _headerInsets),
+        title: PlatformText(
+          sectionTitle,
+          style: Theme.of(context).textTheme.headlineSmall,
+          maxLines: 2,
+          overflow: .ellipsis,
+        ),
+        trailing: _addExerciseButton(
+          context,
+          exercises: exercises,
+          sectionTitle: sectionTitle,
+        ),
+      ),
+    ),
+  );
+
+  Widget _addSectionFooter(BuildContext context) => SliverSafeArea(
+    top: false,
+    sliver: SliverToBoxAdapter(
+      child: Row(
+        mainAxisSize: .min,
+        mainAxisAlignment: .spaceBetween,
+        children: [_addSectionButton(context), _pasteExercisesButton(context)],
+      ),
     ),
   );
 
@@ -531,7 +542,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
             icon: Icon(AdaptiveIcons.close),
             onPressed: () => Navigator.pop(context),
           ),
-          title: Text(
+          title: PlatformText(
             widget.workout == null
                 ? L10n.of(context)!.createWorkoutDialogTitle
                 : L10n.of(context)!.editWorkoutDialogTitle,
