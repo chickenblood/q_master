@@ -69,33 +69,9 @@
     "@generateWorkoutErrorTitle": {
       "description": "Alert error title shown when AI workout generation fails."
     },
-    "generateWorkoutErrorMessage": "Failed to generate workout.\nPlease try again.",
-    "@generateWorkoutErrorMessage": {
-      "description": "Alert error message shown when AI workout generation fails."
-    },
-    "captureVoiceInputDialogTitle": "Record Voice Input",
-    "@captureVoiceInputDialogTitle": {
-      "description": "Title of the full-screen dialog used to record and transcribe a spoken workout prompt."
-    },
     "captureVoiceInputPrompt": "Record your workout prompt",
     "@captureVoiceInputPrompt": {
       "description": "Instruction text shown above the waveform recorder in the voice capture dialog."
-    },
-    "captureVoiceInputRecordingHint": "Recording… tap stop when done",
-    "@captureVoiceInputRecordingHint": {
-      "description": "Hint text shown while actively recording voice input."
-    },
-    "captureVoiceInputTapToRecordHint": "Tap to record",
-    "@captureVoiceInputTapToRecordHint": {
-      "description": "Hint text shown when recording has not started yet."
-    },
-    "captureVoiceInputTranscriptPlaceholder": "Your transcript will appear here.",
-    "@captureVoiceInputTranscriptPlaceholder": {
-      "description": "Placeholder shown in the transcript area before speech has been recognized."
-    },
-    "captureVoiceInputSpeechUnavailable": "Speech recognition unavailable on this device.",
-    "@captureVoiceInputSpeechUnavailable": {
-      "description": "Message shown when speech-to-text initialization is not available on the current device."
     },
     "captureVoiceInputStopButton": "Stop",
     "@captureVoiceInputStopButton": {
@@ -129,14 +105,6 @@
     "@updateSectionDialogTitle": {
       "description": "Title of the edit section title alert dialog, and label of its confirm action button."
     },
-    "startWorkoutButtonText": "Start",
-    "@startWorkoutButtonText": {
-      "description": "Button label that starts a beatdown from the workout list."
-    },
-    "workoutNameFieldLabel": "Name",
-    "@workoutNameFieldLabel": {
-      "description": "Label above the workout name text field in the workout editor."
-    },
     "defaultWorkoutName": "New workout",
     "@defaultWorkoutName": {
       "description": "Default name pre-filled in the workout name field when creating a new workout."
@@ -144,10 +112,6 @@
     "warmupSectionTitle": "Warm up",
     "@warmupSectionTitle": {
       "description": "Section header for the warm-up exercises in the workout editor and beatdown browser."
-    },
-    "beatdownBrowserTitle": "Beatdown",
-    "@beatdownBrowserTitle": {
-      "description": "Title of the beatdown execution screen shown while running through a workout."
     },
     "workoutCompleteText": "All done!",
     "@workoutCompleteText": {
