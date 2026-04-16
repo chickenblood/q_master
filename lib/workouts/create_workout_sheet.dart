@@ -462,7 +462,11 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
         child: DecoratedBox(
           position: .foreground,
           decoration: BoxDecoration(
-            border: Border.all(color: Theme.of(context).colorScheme.outline),
+            border: Border.all(
+              color: Theme.of(
+                context,
+              ).colorScheme.outline.withAlpha(hasStrings ? 255 : 135),
+            ),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Padding(
@@ -473,9 +477,12 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                 SizedBox(width: 8),
                 PlatformText(
                   L10n.of(context)!.pasteSectionButtonText,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.labelLarge!.copyWith(fontWeight: .w500),
+                  style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                    fontWeight: .w500,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withAlpha(hasStrings ? 255 : 135),
+                  ),
                 ),
               ],
             ),
@@ -522,7 +529,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     top: false,
     sliver: SliverToBoxAdapter(
       child: Row(
-        mainAxisSize: .min,
+        mainAxisSize: .max,
         mainAxisAlignment: .spaceBetween,
         children: [_addSectionButton(context), _pasteExercisesButton(context)],
       ),
