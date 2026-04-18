@@ -19,3 +19,9 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep all classes that extend WearableListenerService (Broad rule)
+-keep class * extends com.google.android.gms.wearable.WearableListenerService { *; }
+
+# Keep the Play Services Wearable classes themselves
+-keep class com.google.android.gms.wearable.** { *; }
