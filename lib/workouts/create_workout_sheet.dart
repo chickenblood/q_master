@@ -529,9 +529,11 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     top: false,
     sliver: SliverToBoxAdapter(
       child: Row(
-        mainAxisSize: .max,
-        mainAxisAlignment: .spaceBetween,
-        children: [_addSectionButton(context), _pasteExercisesButton(context)],
+        mainAxisAlignment: .spaceEvenly,
+        children: [
+          Expanded(child: _addSectionButton(context)),
+          Expanded(child: _pasteExercisesButton(context)),
+        ],
       ),
     ),
   );
