@@ -35,7 +35,8 @@ final class _CaptureVoiceInputDialogState
   static final _logger = Logger();
 
   late final SpeechToText _speechToText;
-  final _micBeepPlayer = AudioPlayer();
+  final _startCuePlayer = AudioPlayer();
+  final _stopCuePlayer = AudioPlayer();
   final _soundLevels = List<double>.filled(
     _waveformBarCount,
     _waveformMinLevel,
@@ -62,7 +63,8 @@ final class _CaptureVoiceInputDialogState
   void dispose() {
     _waveformTicker?.cancel();
     unawaited(_shutdownSpeechToText());
-    unawaited(_micBeepPlayer.dispose());
+    unawaited(_startCuePlayer.dispose());
+    unawaited(_stopCuePlayer.dispose());
     super.dispose();
   }
 
@@ -84,7 +86,7 @@ final class _CaptureVoiceInputDialogState
 
   Future<void> _initSpeech() async {
     _speechToText = SpeechToText();
-    await _prepareMicBeep();
+    await _prepareMicBeeps();
 
     final ready = await _speechToText.initialize(
       onStatus: _handleSpeechStatus,
@@ -101,15 +103,17 @@ final class _CaptureVoiceInputDialogState
     await _startListening(resetTranscript: true, playStartBeep: true);
   }
 
-  Future<void> _prepareMicBeep() async {
-    await _micBeepPlayer.setAsset('assets/sounds/mic-beep.wav');
-    await _micBeepPlayer.setVolume(6.0);
+  Future<void> _prepareMicBeeps() async {
+    await _startCuePlayer.setAsset('assets/sounds/mic-beep-start.wav');
+    await _startCuePlayer.setVolume(6.0);
+    await _stopCuePlayer.setAsset('assets/sounds/mic-beep-end.wav');
+    await _stopCuePlayer.setVolume(6.0);
   }
 
-  Future<void> _playMicBeep() async {
+  Future<void> _playCue(AudioPlayer player) async {
     try {
-      await _micBeepPlayer.seek(Duration.zero);
-      await _micBeepPlayer.play();
+      await player.seek(Duration.zero);
+      await player.play();
     } catch (_) {
       // Non-critical UX cue: ignore playback failures.
     }
@@ -173,7 +177,7 @@ final class _CaptureVoiceInputDialogState
     _lifecycle = .finishing;
     final transcript = _recognizedText.trim();
     await _stopSpeechSafely();
-    await _playMicBeep();
+    await _playCue(_stopCuePlayer);
     if (!mounted) return;
     Navigator.of(context).pop(transcript.isEmpty ? null : transcript);
   }
@@ -202,7 +206,7 @@ final class _CaptureVoiceInputDialogState
       _resetWaveform();
 
       if (playStartBeep) {
-        await _playMicBeep();
+        await _playCue(_startCuePlayer);
       }
       if (!mounted || _isFinishing) return;
 
@@ -318,7 +322,7 @@ final class _CaptureVoiceInputDialogState
     _stopWaveformTicker();
     await _stopSpeechSafely();
     if (shouldPlayStopBeep) {
-      await _playMicBeep();
+      await _playCue(_stopCuePlayer);
     }
     if (!mounted) return;
     Navigator.of(context).pop(null);
@@ -330,7 +334,7 @@ final class _CaptureVoiceInputDialogState
     _lifecycle = .finishing;
     _stopWaveformTicker();
     await _stopSpeechSafely();
-    await _playMicBeep();
+    await _playCue(_stopCuePlayer);
 
     final transcript = _recognizedText.trim();
     if (!mounted) return;
