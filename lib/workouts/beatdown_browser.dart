@@ -183,7 +183,7 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                                 ),
                               ),
                             ),
-                            PlatformTextButton(
+                            PlatformElevatedButton(
                               onPressed: () => _onNextPage(
                                 context,
                                 pageIndex: index,
