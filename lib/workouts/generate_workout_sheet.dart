@@ -160,16 +160,21 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
                   valueListenable: _promptTextController,
                   builder: (context, value, child) {
                     final hasPrompt = value.text.trim().isNotEmpty;
-                    return PlatformElevatedButton(
-                      onPressed: (_isGenerating || !hasPrompt)
-                          ? null
-                          : _handleGenerateWorkout,
-                      child: _isGenerating
-                          ? PlatformCircularProgressIndicator()
-                          : PlatformText(
+                    if (!hasPrompt && !_isGenerating) {
+                      return Container();
+                    }
+
+                    return _isGenerating
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            child: PlatformCircularProgressIndicator(),
+                          )
+                        : PlatformElevatedButton(
+                            onPressed: _handleGenerateWorkout,
+                            child: PlatformText(
                               L10n.of(context)!.generateWorkoutButtonLabel,
                             ),
-                    );
+                          );
                   },
                 ),
               ],

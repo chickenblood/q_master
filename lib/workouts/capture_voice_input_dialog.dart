@@ -152,7 +152,7 @@ final class _CaptureVoiceInputDialogState
 
     if (!mounted || _isFinishing) return;
 
-    _resetRecordingState();
+    unawaited(_dismissOnSpeechError());
   }
 
   void _handleSoundLevelChange(double level) {
@@ -176,6 +176,16 @@ final class _CaptureVoiceInputDialogState
     await _playMicBeep();
     if (!mounted) return;
     Navigator.of(context).pop(transcript.isEmpty ? null : transcript);
+  }
+
+  Future<void> _dismissOnSpeechError() async {
+    if (_isFinishing) return;
+
+    _lifecycle = .finishing;
+    _stopWaveformTicker();
+    await _stopSpeechSafely();
+    if (!mounted) return;
+    Navigator.of(context).pop(null);
   }
 
   Future<void> _startListening({
