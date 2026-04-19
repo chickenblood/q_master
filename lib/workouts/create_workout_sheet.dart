@@ -5,10 +5,9 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
 import '../ui/adaptive_icons.dart';
-import '../ui/adaptive_modal_sheet.dart';
 import '../ui/cupertino_sheet_fork.dart';
 import '../ui/dismissible_row.dart';
-import 'workout_auto_completions.dart';
+import 'exercise_picker_sheet.dart';
 
 final class CreateWorkoutSheet extends StatefulWidget {
   final Workout? workout;
@@ -117,57 +116,6 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
       ],
     );
     Navigator.pop(context, workout);
-  }
-
-  Future<String?> _showExercisePicker(
-    BuildContext context, {
-    String? text,
-  }) async {
-    final controller = TextEditingController(text: text);
-    controller.selection = TextSelection(
-      baseOffset: 0,
-      extentOffset: text?.length ?? 0,
-    );
-    return showAdaptiveModalSheet<String>(
-      context: context,
-      child: PlatformScaffold(
-        appBar: PlatformAppBar(
-          cupertino: (appBarContext, _) => CupertinoNavigationBarData(
-            backgroundColor: Colors.transparent,
-
-            leading: PlatformIconButton(
-              padding: EdgeInsets.only(right: 22),
-              icon: Icon(AdaptiveIcons.close),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            title: PlatformText(
-              L10n.of(context)!.exerciseEntryPromptText,
-              textScaler: MediaQuery.textScalerOf(
-                context,
-              ).clamp(maxScaleFactor: 1.6),
-            ),
-          ),
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              crossAxisAlignment: .stretch,
-              children: [
-                WorkoutAutocompleteTextField(
-                  textEditingController: controller,
-                  autofocus: true,
-                  minLines: 1,
-                  maxLines: 1,
-                  onSubmitted: () => Navigator.of(context).pop(controller.text),
-                ),
-                Spacer(),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   /// Shows a dialog for editing the title of a section.
@@ -280,7 +228,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     icon: Icon(PlatformIcons(context).add),
     onPressed: () async {
       _focusNode.unfocus();
-      final exercise = await _showExercisePicker(context);
+      final exercise = await showExercisePicker(context);
       // Maybe add new empty exercise
       if (exercise?.trim().isNotEmpty ?? false) {
         setState(() {
@@ -298,7 +246,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     required String sectionGroup,
   }) async {
     final existingExercise = exercises[index];
-    final updatedExercise = await _showExercisePicker(
+    final updatedExercise = await showExercisePicker(
       context,
       text: existingExercise,
     );
