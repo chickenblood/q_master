@@ -92,6 +92,16 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     exercises.insert(toIndex > fromIndex ? toIndex - 1 : toIndex, exercise);
   }
 
+  void _moveSection({required int fromIndex, required int toIndex}) {
+    final sectionEntries = _sections.entries.toList(growable: true);
+    final section = sectionEntries.removeAt(fromIndex);
+    sectionEntries.insert(toIndex > fromIndex ? toIndex - 1 : toIndex, section);
+
+    _sections
+      ..clear()
+      ..addEntries(sectionEntries);
+  }
+
   bool get _workoutCreationEnabled {
     return _nameTextController.text.trim().isNotEmpty &&
         _sections.values.any((exercises) => exercises.isNotEmpty);
@@ -319,89 +329,108 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
           ]),
         ),
       ),
-      for (final sectionGroup in sectionOrder) ...[
-        SliverSafeArea(
-          bottom: false,
-          sliver: SliverToBoxAdapter(
-            child: _sectionHeader(
-              context,
-              sectionTitle: sectionGroup,
-              exercises: _sections[sectionGroup]!,
-            ),
-          ),
-        ),
-        SliverSafeArea(
-          top: false,
-          bottom: false,
-          sliver: SliverReorderableList(
-            itemBuilder: (context, index) {
-              final exercise = _sections[sectionGroup]![index];
-              final isLastItem = index == (_sections[sectionGroup]!.length - 1);
-              return DismissibleRow(
-                key: ValueKey('dismissible_$exercise$index'),
-                onDismissed: (direction) {
-                  setState(() {
-                    _sections[sectionGroup]!.removeAt(index);
-                  });
-                },
-                child: Builder(
-                  builder: (itemContext) {
-                    // Scroll to the newly added item after the frame is rendered
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (isLastItem && _lastAddedItemGroup == sectionGroup) {
-                        Scrollable.ensureVisible(
-                          itemContext,
-                          duration: const Duration(milliseconds: 300),
-                          alignment: 0.5,
-                          alignmentPolicy: .explicit,
-                        );
-                        _lastAddedItemGroup = null;
-                      }
-                    });
-                    return GestureDetector(
-                      onDoubleTap: () => _editExercise(
-                        context,
-                        exercises: _sections[sectionGroup]!,
-                        index: index,
-                        sectionGroup: sectionGroup,
-                      ),
-                      child: ReorderableDelayedDragStartListener(
-                        index: index,
-                        child: PlatformListTile(
-                          key: ValueKey('exercise_$exercise$index'),
-                          title: PlatformText(
-                            exercise,
-                            softWrap: true,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          trailing: _sections[sectionGroup]!.length > 1
-                              ? Icon(Icons.drag_handle)
-                              : null,
-                          material: (context, platform) =>
-                              MaterialListTileData(contentPadding: _itemInsets),
-                          cupertino: (context, platform) =>
-                              CupertinoListTileData(padding: _itemInsets),
-                        ),
+      SliverSafeArea(
+        top: false,
+        bottom: false,
+        sliver: SliverReorderableList(
+          itemCount: sectionOrder.length,
+          itemBuilder: (context, sectionIndex) {
+            final sectionGroup = sectionOrder[sectionIndex];
+            final exercises = _sections[sectionGroup]!;
+            return Column(
+              key: ValueKey('section_$sectionGroup'),
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _sectionHeader(
+                  context,
+                  sectionTitle: sectionGroup,
+                  exercises: exercises,
+                  sectionIndex: sectionIndex,
+                ),
+                ReorderableListView.builder(
+                  shrinkWrap: true,
+                  buildDefaultDragHandles: false,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: exercises.length,
+                  itemBuilder: (context, exerciseIndex) {
+                    final exercise = exercises[exerciseIndex];
+                    final isLastItem = exerciseIndex == (exercises.length - 1);
+                    return DismissibleRow(
+                      key: ValueKey('dismissible_$exercise$exerciseIndex'),
+                      onDismissed: (direction) {
+                        setState(() {
+                          exercises.removeAt(exerciseIndex);
+                        });
+                      },
+                      child: Builder(
+                        builder: (itemContext) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (isLastItem &&
+                                _lastAddedItemGroup == sectionGroup) {
+                              Scrollable.ensureVisible(
+                                itemContext,
+                                duration: const Duration(milliseconds: 300),
+                                alignment: 0.5,
+                                alignmentPolicy: .explicit,
+                              );
+                              _lastAddedItemGroup = null;
+                            }
+                          });
+                          return GestureDetector(
+                            onDoubleTap: () => _editExercise(
+                              context,
+                              exercises: exercises,
+                              index: exerciseIndex,
+                              sectionGroup: sectionGroup,
+                            ),
+                            child: ReorderableDelayedDragStartListener(
+                              index: exerciseIndex,
+                              child: PlatformListTile(
+                                key: ValueKey(
+                                  'exercise_$exercise$exerciseIndex',
+                                ),
+                                title: PlatformText(
+                                  exercise,
+                                  softWrap: true,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                trailing: exercises.length > 1
+                                    ? Icon(Icons.drag_handle)
+                                    : null,
+                                material: (context, platform) =>
+                                    MaterialListTileData(
+                                      contentPadding: _itemInsets,
+                                    ),
+                                cupertino: (context, platform) =>
+                                    CupertinoListTileData(padding: _itemInsets),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     );
                   },
+                  onReorder: (startIndex, endIndex) {
+                    setState(() {
+                      _moveExercise(
+                        exercises,
+                        fromIndex: startIndex,
+                        toIndex: endIndex,
+                      );
+                    });
+                  },
                 ),
-              );
-            },
-            itemCount: _sections[sectionGroup]!.length,
-            onReorder: (startIndex, endIndex) {
-              setState(() {
-                _moveExercise(
-                  _sections[sectionGroup]!,
-                  fromIndex: startIndex,
-                  toIndex: endIndex,
-                );
-              });
-            },
-          ),
+              ],
+            );
+          },
+          onReorder: (startIndex, endIndex) {
+            setState(() {
+              _moveSection(fromIndex: startIndex, toIndex: endIndex);
+            });
+          },
         ),
-      ],
+      ),
       _addSectionFooter(context),
     ];
   }
@@ -496,6 +525,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     BuildContext context, {
     required String sectionTitle,
     required List<String> exercises,
+    required int sectionIndex,
   }) => DismissibleRow(
     key: ValueKey('dismissible_$sectionTitle'),
     onDismissed: (_) {
@@ -505,21 +535,24 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     },
     child: GestureDetector(
       onDoubleTap: () => _editSectionTitle(context, sectionTitle: sectionTitle),
-      child: PlatformListTile(
-        material: (context, platform) =>
-            MaterialListTileData(contentPadding: _headerInsets),
-        cupertino: (context, platform) =>
-            CupertinoListTileData(padding: _headerInsets),
-        title: PlatformText(
-          sectionTitle,
-          style: Theme.of(context).textTheme.headlineSmall,
-          maxLines: 2,
-          overflow: .ellipsis,
-        ),
-        trailing: _addExerciseButton(
-          context,
-          exercises: exercises,
-          sectionTitle: sectionTitle,
+      child: ReorderableDelayedDragStartListener(
+        index: sectionIndex,
+        child: PlatformListTile(
+          material: (context, platform) =>
+              MaterialListTileData(contentPadding: _headerInsets),
+          cupertino: (context, platform) =>
+              CupertinoListTileData(padding: _headerInsets),
+          title: PlatformText(
+            sectionTitle,
+            style: Theme.of(context).textTheme.headlineSmall,
+            maxLines: 2,
+            overflow: .ellipsis,
+          ),
+          trailing: _addExerciseButton(
+            context,
+            exercises: exercises,
+            sectionTitle: sectionTitle,
+          ),
         ),
       ),
     ),
