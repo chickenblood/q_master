@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -31,6 +32,7 @@ class _ExercisePickerSheet extends StatefulWidget {
 
 class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   final selectedCategories = <ExerciseCategory>{};
+  String? pressedExerciseName;
 
   static const orderedCategories = <ExerciseCategory>[
     .core,
@@ -49,11 +51,21 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     });
   }
 
-  void _selectExercise(String exerciseName) {
+  void _selectExercise(BuildContext context, String exerciseName) {
     widget.controller.value = TextEditingValue(
       text: exerciseName,
       selection: TextSelection.collapsed(offset: exerciseName.length),
     );
+    FocusScope.of(context).unfocus();
+  }
+
+  void _setPressedExercise(String? exerciseName) {
+    if (pressedExerciseName == exerciseName) {
+      return;
+    }
+    setState(() {
+      pressedExerciseName = exerciseName;
+    });
   }
 
   bool get _canSubmitSelection => widget.controller.text.trim().isNotEmpty;
@@ -82,6 +94,9 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final filteredExercises = _filteredExercises;
+    final isLandscape =
+        MediaQuery.orientationOf(context) == Orientation.landscape;
+    final gridColumnCount = isLandscape ? 4 : 2;
 
     return PlatformScaffold(
       appBar: PlatformAppBar(
@@ -198,15 +213,94 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                 ),
                                 const SizedBox(height: 12),
                                 Expanded(
-                                  child: ListView.builder(
+                                  child: GridView.builder(
                                     itemCount: filteredExercises.length,
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: gridColumnCount,
+                                          crossAxisSpacing: 8,
+                                          mainAxisSpacing: 8,
+                                          mainAxisExtent: 72,
+                                        ),
                                     itemBuilder: (context, index) {
                                       final exerciseName =
                                           filteredExercises[index];
-                                      return PlatformListTile(
-                                        title: Text(exerciseName),
-                                        onTap: () =>
-                                            _selectExercise(exerciseName),
+                                      final isSelected =
+                                          widget.controller.text ==
+                                          exerciseName;
+                                      final isPressed =
+                                          pressedExerciseName == exerciseName;
+
+                                      return GestureDetector(
+                                        onTapDown: (_) =>
+                                            _setPressedExercise(exerciseName),
+                                        onTapCancel: () =>
+                                            _setPressedExercise(null),
+                                        onTapUp: (_) =>
+                                            _setPressedExercise(null),
+                                        onTap: () => _selectExercise(
+                                          context,
+                                          exerciseName,
+                                        ),
+                                        child: AnimatedScale(
+                                          duration: const Duration(
+                                            milliseconds: 100,
+                                          ),
+                                          scale: isPressed ? 0.97 : 1,
+                                          child: AnimatedContainer(
+                                            duration: const Duration(
+                                              milliseconds: 100,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: isPressed
+                                                  ? (isSelected
+                                                        ? colorScheme.primary
+                                                              .withValues(
+                                                                alpha: 0.22,
+                                                              )
+                                                        : colorScheme.primary
+                                                              .withValues(
+                                                                alpha: 0.08,
+                                                              ))
+                                                  : (isSelected
+                                                        ? colorScheme
+                                                              .primaryContainer
+                                                        : colorScheme
+                                                              .surfaceContainerHighest),
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              border: Border.all(
+                                                color: isSelected
+                                                    ? colorScheme.primary
+                                                    : colorScheme
+                                                          .outlineVariant,
+                                              ),
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(12),
+                                              child: Align(
+                                                alignment: Alignment.topLeft,
+                                                child: AutoSizeText(
+                                                  exerciseName,
+                                                  maxLines: 2,
+                                                  minFontSize: 10,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyLarge
+                                                      ?.copyWith(
+                                                        color: isSelected
+                                                            ? colorScheme
+                                                                  .onPrimaryContainer
+                                                            : colorScheme
+                                                                  .onSurface,
+                                                      ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       );
                                     },
                                   ),
