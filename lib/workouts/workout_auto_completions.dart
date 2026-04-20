@@ -11,6 +11,7 @@ class WorkoutAutocompleteTextField extends StatefulWidget {
   final TextEditingController textEditingController;
   final OptionsViewOpenDirection optionsViewOpenDirection;
   final bool autofocus;
+  final Set<ExerciseCategory> categoryFilter;
   final int? _minLines;
   final int? _maxLines;
   final bool? expands;
@@ -22,6 +23,7 @@ class WorkoutAutocompleteTextField extends StatefulWidget {
     required this.textEditingController,
     this.optionsViewOpenDirection = .down,
     this.autofocus = false,
+    this.categoryFilter = const <ExerciseCategory>{},
     int? minLines,
     int? maxLines,
     this.expands,
@@ -92,8 +94,21 @@ class _WorkoutAutocompleteTextFieldState
       if (precedingText.isEmpty) return [];
 
       // Otherwise, filter options based on user input
-      final completions = workoutCompletions.where((String option) {
-        return option.toLowerCase().contains(precedingText.toLowerCase());
+      final completions = workoutCompletions.keys.where((String option) {
+        final optionMatchesText = option.toLowerCase().contains(
+          precedingText.toLowerCase(),
+        );
+        if (!optionMatchesText) {
+          return false;
+        }
+
+        if (widget.categoryFilter.isEmpty) {
+          return true;
+        }
+
+        final categories = workoutCompletions[option];
+        return categories != null &&
+            categories.any(widget.categoryFilter.contains);
       });
       if (precedingText.isNotEmpty && completions.isNotEmpty) {
         _replacementRange = replacementRange;

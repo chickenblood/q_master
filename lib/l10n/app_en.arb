@@ -135,6 +135,30 @@
     "@exerciseEntryPromptText": {
       "description": "Title of the modal sheet for entering or editing a single exercise name."
     },
+    "exerciseCategoryCoreLabel": "Core",
+    "@exerciseCategoryCoreLabel": {
+      "description": "Filter pill label for core exercises in the exercise picker."
+    },
+    "exerciseCategoryCardioLabel": "Cardio",
+    "@exerciseCategoryCardioLabel": {
+      "description": "Filter pill label for cardio exercises in the exercise picker."
+    },
+    "exerciseCategoryStrengthLabel": "Strength",
+    "@exerciseCategoryStrengthLabel": {
+      "description": "Filter pill label for strength exercises in the exercise picker."
+    },
+    "exerciseCategoryLegsLabel": "Legs",
+    "@exerciseCategoryLegsLabel": {
+      "description": "Filter pill label for leg exercises in the exercise picker."
+    },
+    "exerciseCategoryArmsLabel": "Arms",
+    "@exerciseCategoryArmsLabel": {
+      "description": "Filter pill label for arm exercises in the exercise picker."
+    },
+    "exerciseCategoryFullBodyLabel": "Full Body",
+    "@exerciseCategoryFullBodyLabel": {
+      "description": "Filter pill label for full-body exercises in the exercise picker."
+    },
     "pasteExercisesButtonLabel": "Paste exercises",
     "@pasteExercisesButtonLabel": {
       "description": "Accessibility label for the paste button in a section header, which pastes clipboard lines as individual exercises."
