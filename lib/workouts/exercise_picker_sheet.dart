@@ -38,8 +38,11 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     .core,
     .cardio,
     .strength,
+    .chest,
+    .shoulders,
     .legs,
     .arms,
+    .coupon,
     .fullBody,
   ];
 

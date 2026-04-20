@@ -147,6 +147,14 @@
     "@exerciseCategoryStrengthLabel": {
       "description": "Filter pill label for strength exercises in the exercise picker."
     },
+    "exerciseCategoryChestLabel": "Chest",
+    "@exerciseCategoryChestLabel": {
+      "description": "Filter pill label for chest-focused exercises in the exercise picker."
+    },
+    "exerciseCategoryShouldersLabel": "Shoulders",
+    "@exerciseCategoryShouldersLabel": {
+      "description": "Filter pill label for shoulder-focused exercises in the exercise picker."
+    },
     "exerciseCategoryLegsLabel": "Legs",
     "@exerciseCategoryLegsLabel": {
       "description": "Filter pill label for leg exercises in the exercise picker."
@@ -154,6 +162,10 @@
     "exerciseCategoryArmsLabel": "Arms",
     "@exerciseCategoryArmsLabel": {
       "description": "Filter pill label for arm exercises in the exercise picker."
+    },
+    "exerciseCategoryCouponLabel": "Coupon",
+    "@exerciseCategoryCouponLabel": {
+      "description": "Filter pill label for coupon or weighted-object exercises in the exercise picker."
     },
     "exerciseCategoryFullBodyLabel": "Full Body",
     "@exerciseCategoryFullBodyLabel": {

@@ -19,11 +19,11 @@ final class CreateWorkoutSheet extends StatefulWidget {
 }
 
 final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
-  static final _footerButtonInsets = EdgeInsets.only(
-    left: 16.0,
-    top: 16.0,
-    right: 16.0,
-    bottom: 16.0,
+  static final _footerButtonInsets = EdgeInsets.fromLTRB(
+    16.0,
+    16.0,
+    16.0,
+    16.0,
   );
   static const _headerInsets = EdgeInsets.only(left: 16.0, right: 8.0);
   static const _itemInsets = EdgeInsets.only(left: 32.0, right: 24.0);
