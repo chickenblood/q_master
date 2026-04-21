@@ -26,7 +26,7 @@ configure<ApplicationExtension> {
         minSdk = 31
         targetSdk = 36
         versionCode = 1460
-        versionName = "3.0.0"
+        versionName = "3.0.1"
 
     }
     signingConfigs {
