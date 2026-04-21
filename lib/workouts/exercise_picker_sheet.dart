@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/l10n.dart';
 import '../ui/adaptive_icons.dart';
@@ -81,13 +82,17 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     Navigator.of(context).pop(selection);
   }
 
+  Future<void> _openExerciseVideo(Uri videoUrl) async {
+    await launchUrl(videoUrl, mode: LaunchMode.externalApplication);
+  }
+
   List<String> get _filteredExercises {
     return workoutCompletions.entries
         .where((entry) {
           if (selectedCategories.isEmpty) {
             return true;
           }
-          return entry.value.any(selectedCategories.contains);
+          return entry.value.categories.any(selectedCategories.contains);
         })
         .map((entry) => entry.key)
         .toList(growable: false);
@@ -228,6 +233,9 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                     itemBuilder: (context, index) {
                                       final exerciseName =
                                           filteredExercises[index];
+                                      final exerciseEntry =
+                                          workoutCompletions[exerciseName]!;
+                                      final videoUrl = exerciseEntry.videoUrl;
                                       final isSelected =
                                           widget.controller.text ==
                                           exerciseName;
@@ -279,28 +287,75 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                                           .outlineVariant,
                                               ),
                                             ),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(12),
-                                              child: Align(
-                                                alignment: Alignment.topLeft,
-                                                child: AutoSizeText(
-                                                  exerciseName,
-                                                  maxLines: 2,
-                                                  minFontSize: 10,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodyLarge
-                                                      ?.copyWith(
-                                                        color: isSelected
+                                            child: Stack(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.fromLTRB(
+                                                    12,
+                                                    12,
+                                                    videoUrl == null ? 12 : 34,
+                                                    12,
+                                                  ),
+                                                  child: Align(
+                                                    alignment:
+                                                        Alignment.topLeft,
+                                                    child: AutoSizeText(
+                                                      exerciseName,
+                                                      maxLines: 2,
+                                                      minFontSize: 10,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyLarge
+                                                          ?.copyWith(
+                                                            color: isSelected
+                                                                ? colorScheme
+                                                                      .onPrimaryContainer
+                                                                : colorScheme
+                                                                      .onSurface,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                if (videoUrl != null)
+                                                  Positioned(
+                                                    top: 4,
+                                                    right: 4,
+                                                    child: IconButton(
+                                                      onPressed: () =>
+                                                          _openExerciseVideo(
+                                                            videoUrl,
+                                                          ),
+                                                      constraints:
+                                                          const BoxConstraints(
+                                                            minWidth: 28,
+                                                            minHeight: 28,
+                                                          ),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                            4,
+                                                          ),
+                                                      visualDensity:
+                                                          VisualDensity.compact,
+                                                      style: IconButton.styleFrom(
+                                                        tapTargetSize:
+                                                            MaterialTapTargetSize
+                                                                .shrinkWrap,
+                                                        foregroundColor:
+                                                            isSelected
                                                             ? colorScheme
                                                                   .onPrimaryContainer
                                                             : colorScheme
-                                                                  .onSurface,
+                                                                  .primary,
                                                       ),
-                                                ),
-                                              ),
+                                                      icon: const Icon(
+                                                        Icons.ondemand_video,
+                                                        size: 16,
+                                                      ),
+                                                    ),
+                                                  ),
+                                              ],
                                             ),
                                           ),
                                         ),

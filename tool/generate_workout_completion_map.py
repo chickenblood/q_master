@@ -3,10 +3,12 @@ from __future__ import annotations
 import ast
 import csv
 import html
+import json
 import re
 from pathlib import Path
 
 SOURCE_CSV = Path('.tmp/exicon_export.csv')
+SOURCE_VIDEO_URLS = Path('.tmp/exicon_video_urls.json')
 TARGET_DART = Path('lib/workouts/workout_constants.dart')
 
 BAD_NAMES = {
@@ -46,6 +48,13 @@ enum ExerciseCategory {
     }
 }
 
+final class ExerciseEntry {
+    final Set<ExerciseCategory> categories;
+    final Uri? videoUrl;
+
+    const ExerciseEntry({required this.categories, this.videoUrl});
+}
+
 '''
 
 
@@ -63,12 +72,46 @@ def read_current_names() -> list[str]:
     return ast.literal_eval(text[start : end + 1])
 
 
+def read_existing_entries() -> dict[str, tuple[set[str], str | None]]:
+    text = TARGET_DART.read_text()
+    pattern = re.compile(
+        r"^  '((?:\\'|[^'])*)': ExerciseEntry\((.*?)\),(?=\n  '(?:\\'|[^'])*': ExerciseEntry|\n};)",
+        flags=re.MULTILINE | re.DOTALL,
+    )
+    entry_map: dict[str, tuple[set[str], str | None]] = {}
+
+    for escaped_name, entry_body in pattern.findall(text):
+        name = ast.literal_eval(f"'{escaped_name}'")
+        categories_match = re.search(r'categories:\s*\{([^}]*)\}', entry_body)
+        if not categories_match:
+            continue
+        raw_categories = categories_match.group(1)
+        categories = {
+            category.strip().lstrip('.')
+            for category in raw_categories.split(',')
+            if category.strip()
+        }
+
+        video_match = re.search(r"videoUrl:\s*Uri\.parse\('((?:\\'|[^'])*)'\)", entry_body)
+        video_url = None
+        if video_match:
+            video_url = ast.literal_eval(f"'{video_match.group(1)}'")
+
+        entry_map[name] = (categories, video_url)
+
+    return entry_map
+
+
 def clean_text(value: str) -> str:
     value = html.unescape(value)
     value = re.sub(r'<[^>]+>', ' ', value)
     value = value.replace('@', ' ')
     value = re.sub(r'\s+', ' ', value)
     return value.strip()
+
+
+def normalize_name(value: str) -> str:
+    return re.sub(r'\s+', ' ', value).strip().casefold()
 
 
 def infer_categories(name: str, description: str) -> set[str]:
@@ -175,27 +218,58 @@ def infer_categories(name: str, description: str) -> set[str]:
 
 def build_category_map() -> dict[str, set[str]]:
     names = read_current_names()
+    existing_entries = read_existing_entries()
     descriptions: dict[str, str] = {}
 
-    with SOURCE_CSV.open(newline='') as f:
-        for row in csv.DictReader(f):
-            name = row['Name'].strip()
-            if not name or name in BAD_NAMES:
-                continue
-            descriptions[name.casefold()] = clean_text(row['Description'])
+    if SOURCE_CSV.exists():
+        with SOURCE_CSV.open(newline='') as f:
+            for row in csv.DictReader(f):
+                name = row['Name'].strip()
+                if not name or name in BAD_NAMES:
+                    continue
+                descriptions[name.casefold()] = clean_text(row['Description'])
 
     result: dict[str, set[str]] = {}
     for name in names:
-        description = descriptions.get(name.casefold(), '')
+        description = descriptions.get(name.casefold())
+        if description is None:
+            result[name] = existing_entries.get(name, ({'fullBody'}, None))[0]
+            continue
         result[name] = infer_categories(name, description)
     return result
 
 
-def write_dart(category_map: dict[str, set[str]]) -> None:
+def read_video_urls() -> dict[str, str]:
+    current_name_lookup = {
+        normalize_name(name): name
+        for name in read_current_names()
+    }
+    existing_entries = read_existing_entries()
+    video_urls = {
+        current_name_lookup.get(normalize_name(name), name): video_url
+        for name, (_, video_url) in existing_entries.items()
+        if video_url is not None
+    }
+
+    if SOURCE_VIDEO_URLS.exists():
+        loaded = json.loads(SOURCE_VIDEO_URLS.read_text())
+        video_urls.update({
+            current_name_lookup.get(normalize_name(str(name)), str(name)): str(url)
+            for name, url in loaded.items()
+            if isinstance(name, str)
+            and isinstance(url, str)
+            and url
+            and normalize_name(str(name)) in current_name_lookup
+        })
+
+    return video_urls
+
+
+def write_dart(category_map: dict[str, set[str]], video_urls: dict[str, str]) -> None:
     lines = [
         FILE_HEADER,
-        '/// A map of workout token completion strings to inferred exercise categories.\n',
-        'const Map<String, Set<ExerciseCategory>> workoutCompletions = {\n',
+        '/// A map of workout token completion strings to exercise metadata.\n',
+        'final Map<String, ExerciseEntry> workoutCompletions = {\n',
     ]
 
     for name in sorted(category_map, key=lambda value: (value.casefold(), value)):
@@ -204,11 +278,21 @@ def write_dart(category_map: dict[str, set[str]]) -> None:
             f'.{category}'
             for category in sorted(category_map[name], key=lambda value: value)
         )
-        lines.append(f"  '{escaped_name}': {{{categories}}},\n")
+        video_url = video_urls.get(name)
+        if video_url is None:
+            lines.append(
+                f"  '{escaped_name}': ExerciseEntry(categories: {{{categories}}}),\n"
+            )
+            continue
+
+        escaped_video_url = video_url.replace('\\', '\\\\').replace("'", "\\'")
+        lines.append(
+            f"  '{escaped_name}': ExerciseEntry(categories: {{{categories}}}, videoUrl: Uri.parse('{escaped_video_url}')),\n"
+        )
 
     lines.append('};\n')
     TARGET_DART.write_text(''.join(lines))
 
 
 if __name__ == '__main__':
-    write_dart(build_category_map())
+    write_dart(build_category_map(), read_video_urls())
