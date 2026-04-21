@@ -293,7 +293,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                                   padding: EdgeInsets.fromLTRB(
                                                     12,
                                                     12,
-                                                    videoUrl == null ? 12 : 34,
+                                                    videoUrl == null ? 12 : 45,
                                                     12,
                                                   ),
                                                   child: Align(
@@ -329,12 +329,12 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                                           ),
                                                       constraints:
                                                           const BoxConstraints(
-                                                            minWidth: 28,
-                                                            minHeight: 28,
+                                                            minWidth: 42,
+                                                            minHeight: 42,
                                                           ),
                                                       padding:
                                                           const EdgeInsets.all(
-                                                            4,
+                                                            6,
                                                           ),
                                                       visualDensity:
                                                           VisualDensity.compact,
@@ -351,7 +351,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                                       ),
                                                       icon: const Icon(
                                                         Icons.ondemand_video,
-                                                        size: 16,
+                                                        size: 24,
                                                       ),
                                                     ),
                                                   ),
