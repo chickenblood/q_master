@@ -259,7 +259,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 12),
+                                const Divider(),
                                 Expanded(
                                   child: GridView.builder(
                                     itemCount: filteredExercises.length,
