@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart'
+    show YoutubePlayer;
 
 import '../l10n/l10n.dart';
 import '../ui/adaptive_icons.dart';
@@ -88,7 +90,11 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   Future<void> _openExerciseVideo(BuildContext context, Uri videoUrl) async {
     if (defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.android) {
-      final videoId = videoUrl.pathSegments.last;
+      final videoId = YoutubePlayer.convertUrlToId(videoUrl.toString());
+      if (videoId == null) {
+        await launchUrl(videoUrl, mode: LaunchMode.externalApplication);
+        return;
+      }
       await Navigator.of(context, rootNavigator: true).push(
         platformPageRoute(
           context: context,
