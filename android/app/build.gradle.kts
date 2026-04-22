@@ -1,5 +1,6 @@
 import java.util.Properties
 import java.io.FileInputStream
+import com.android.build.api.dsl.ApplicationExtension
 
 plugins {
     id("com.android.application")
@@ -17,7 +18,7 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
-android {
+configure<ApplicationExtension> {
     namespace = "com.example.q_master"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
@@ -74,4 +75,12 @@ android {
 
 flutter {
     source = "../.."
+}
+
+configurations {
+    create("wearApp")
+}
+
+dependencies {
+    add("wearApp", project(":app:watchapp"))
 }

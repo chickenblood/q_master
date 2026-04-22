@@ -27,4 +27,5 @@ plugins {
 }
 
 include(":app")
-include(":watchapp")
+include(":app:watchapp")
+project(":app:watchapp").projectDir = file("watchapp")
