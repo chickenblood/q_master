@@ -21,11 +21,7 @@ class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
     super.initState();
     _controller = YoutubePlayerController(
       initialVideoId: widget.videoId,
-      flags: const YoutubePlayerFlags(
-        autoPlay: false,
-        hideControls: true,
-        showLiveFullscreenButton: false,
-      ),
+      flags: const YoutubePlayerFlags(autoPlay: false),
     );
   }
 
@@ -33,14 +29,6 @@ class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
-
-  void _togglePlayPause() {
-    if (_controller.value.isPlaying) {
-      _controller.pause();
-    } else {
-      _controller.play();
-    }
   }
 
   @override
@@ -54,35 +42,16 @@ class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Stack(
-        children: [
-          Center(
-            child: YoutubePlayer(
-              controller: _controller,
-              showVideoProgressIndicator: true,
-              progressIndicatorColor: Colors.white,
-              progressColors: const ProgressBarColors(
-                playedColor: Colors.white,
-                handleColor: Colors.white,
-              ),
-            ),
+      body: Center(
+        child: YoutubePlayer(
+          controller: _controller,
+          showVideoProgressIndicator: true,
+          progressIndicatorColor: Colors.white,
+          progressColors: const ProgressBarColors(
+            playedColor: Colors.white,
+            handleColor: Colors.white,
           ),
-          Center(
-            child: ValueListenableBuilder<YoutubePlayerValue>(
-              valueListenable: _controller,
-              builder: (context, value, _) => PlatformIconButton(
-                icon: Icon(
-                  value.isPlaying
-                      ? Icons.pause_circle_filled
-                      : Icons.play_circle_filled,
-                  color: Colors.white.withValues(alpha: 0.8),
-                  size: 64,
-                ),
-                onPressed: _togglePlayPause,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
