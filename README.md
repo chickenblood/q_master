@@ -79,6 +79,18 @@ The app can read files written by older versions of the app. Legacy layouts are 
 - **v1 (legacy)** — `warmup`, `thang`, and `mary` as top-level keys on the workout object, with section values as either `{ "name": "..." }` objects or plain strings.
 - **v2 (current)** — `sections` as an ordered array of section objects (`{ "name": "...", "exercises": ["..."] }`), preserving section order across all platforms.
 
+### Git Hooks
+
+The project ships a pre-commit hook that automatically increments the build number in `pubspec.yaml` on every commit (e.g. `3.0.1+460` → `3.0.1+461`).
+
+After cloning, run once to activate it:
+
+```sh
+sh tool/setup_hooks.sh
+```
+
+This sets `core.hooksPath` to `.githooks/` so git picks up the hook from version control.
+
 ### Building the app for the Play Store
 (In the top-level q_master directory)
 
