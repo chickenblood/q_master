@@ -171,6 +171,10 @@
     "@exerciseCategoryFullBodyLabel": {
       "description": "Filter pill label for full-body exercises in the exercise picker."
     },
+    "exerciseFilterVideoLabel": "Video",
+    "@exerciseFilterVideoLabel": {
+      "description": "Filter pill label that filters exercises to only those with an associated video in the exercise picker."
+    },
     "pasteExercisesButtonLabel": "Paste exercises",
     "@pasteExercisesButtonLabel": {
       "description": "Accessibility label for the paste button in a section header, which pastes clipboard lines as individual exercises."
