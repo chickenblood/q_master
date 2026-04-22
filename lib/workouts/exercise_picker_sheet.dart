@@ -33,6 +33,7 @@ class _ExercisePickerSheet extends StatefulWidget {
 
 class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   final selectedCategories = <ExerciseCategory>{};
+  bool videoFilter = false;
   String? pressedExerciseName;
 
   static const orderedCategories = <ExerciseCategory>[
@@ -89,6 +90,9 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   List<String> get _filteredExercises {
     return workoutCompletions.entries
         .where((entry) {
+          if (videoFilter && entry.value.videoUrl == null) {
+            return false;
+          }
           if (selectedCategories.isEmpty) {
             return true;
           }
@@ -217,6 +221,42 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                         materialTapTargetSize:
                                             MaterialTapTargetSize.shrinkWrap,
                                       ),
+                                    FilterChip(
+                                      label: Text(
+                                        L10n.of(context)!.exerciseFilterVideoLabel,
+                                      ),
+                                      selected: videoFilter,
+                                      onSelected: (_) => setState(
+                                        () => videoFilter = !videoFilter,
+                                      ),
+                                      showCheckmark: false,
+                                      avatar: Icon(
+                                        Icons.ondemand_video,
+                                        size: 18,
+                                        color: videoFilter
+                                            ? colorScheme.onPrimary
+                                            : colorScheme.onSurface,
+                                      ),
+                                      labelStyle: Theme.of(context)
+                                          .textTheme
+                                          .labelLarge
+                                          ?.copyWith(
+                                            color: videoFilter
+                                                ? colorScheme.onPrimary
+                                                : colorScheme.onSurface,
+                                          ),
+                                      backgroundColor:
+                                          colorScheme.surfaceContainerHighest,
+                                      selectedColor: colorScheme.primary,
+                                      side: BorderSide(
+                                        color: videoFilter
+                                            ? colorScheme.primary
+                                            : colorScheme.outlineVariant,
+                                      ),
+                                      shape: const StadiumBorder(),
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                    ),
                                   ],
                                 ),
                                 const SizedBox(height: 12),
