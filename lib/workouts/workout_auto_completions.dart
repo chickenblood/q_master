@@ -108,7 +108,7 @@ class _WorkoutAutocompleteTextFieldState
 
         final entry = workoutCompletions[option];
         return entry != null &&
-            entry.categories.any(widget.categoryFilter.contains);
+            widget.categoryFilter.every(entry.categories.contains);
       });
       if (precedingText.isNotEmpty && completions.isNotEmpty) {
         _replacementRange = replacementRange;

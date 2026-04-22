@@ -92,7 +92,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
           if (selectedCategories.isEmpty) {
             return true;
           }
-          return entry.value.categories.any(selectedCategories.contains);
+          return selectedCategories.every(entry.value.categories.contains);
         })
         .map((entry) => entry.key)
         .toList(growable: false);
