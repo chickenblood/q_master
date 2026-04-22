@@ -1,0 +1,31 @@
+#!/bin/sh
+# Increment the build number in pubspec.yaml on every commit.
+
+PUBSPEC="pubspec.yaml"
+
+# Extract current version line, e.g. "version: 3.0.1+460"
+VERSION_LINE=$(grep -E '^version:' "$PUBSPEC")
+if [ -z "$VERSION_LINE" ]; then
+  echo "pre-commit: could not find version in $PUBSPEC" >&2
+  exit 1
+fi
+
+# Split into semantic version and build number
+SEMVER=$(echo "$VERSION_LINE" | sed -E 's/^version:[[:space:]]+([^+]+)\+.*/\1/')
+BUILD=$(echo "$VERSION_LINE" | sed -E 's/^version:[^+]+\+([0-9]+).*/\1/')
+
+if [ -z "$SEMVER" ] || [ -z "$BUILD" ]; then
+  echo "pre-commit: version format must be <semver>+<build>, got: $VERSION_LINE" >&2
+  exit 1
+fi
+
+NEW_BUILD=$((BUILD + 1))
+NEW_VERSION="${SEMVER}+${NEW_BUILD}"
+
+# Update pubspec.yaml in-place (portable sed)
+sed -i.bak -E "s/^version:[[:space:]]+.*/version: ${NEW_VERSION}/" "$PUBSPEC" && rm -f "${PUBSPEC}.bak"
+
+echo "pre-commit: build number bumped to ${NEW_VERSION}"
+
+# Stage the updated pubspec.yaml so the bump is included in this commit
+git add "$PUBSPEC"
