@@ -87,22 +87,20 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   }
 
   Future<void> _openExerciseVideo(BuildContext context, Uri videoUrl) async {
-    if (defaultTargetPlatform == TargetPlatform.iOS ||
-        defaultTargetPlatform == TargetPlatform.android) {
+    if (defaultTargetPlatform == .iOS || defaultTargetPlatform == .android) {
       final videoId = YoutubePlayer.convertUrlToId(videoUrl.toString());
       if (videoId == null) {
-        await launchUrl(videoUrl, mode: LaunchMode.externalApplication);
+        await launchUrl(videoUrl, mode: .externalApplication);
         return;
       }
       await Navigator.of(context, rootNavigator: true).push<void>(
-        platformPageRoute(
-          context: context,
+        MaterialPageRoute(
           fullscreenDialog: true,
           builder: (_) => YoutubeVideoScreen(videoId: videoId),
         ),
       );
     } else {
-      await launchUrl(videoUrl, mode: LaunchMode.externalApplication);
+      await launchUrl(videoUrl, mode: .externalApplication);
     }
   }
 
@@ -125,8 +123,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final filteredExercises = _filteredExercises;
-    final isLandscape =
-        MediaQuery.orientationOf(context) == Orientation.landscape;
+    final isLandscape = MediaQuery.orientationOf(context) == .landscape;
     final gridColumnCount = isLandscape ? 4 : 2;
 
     return PlatformScaffold(
@@ -185,7 +182,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                   final showPickerContent = value.text.isEmpty;
 
                   return Flexible(
-                    fit: FlexFit.loose,
+                    fit: .loose,
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 200),
                       switchInCurve: Curves.easeOut,
@@ -237,8 +234,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                               : colorScheme.outlineVariant,
                                         ),
                                         shape: const StadiumBorder(),
-                                        materialTapTargetSize:
-                                            MaterialTapTargetSize.shrinkWrap,
+                                        materialTapTargetSize: .shrinkWrap,
                                       ),
                                     FilterChip(
                                       label: Text(

@@ -9,8 +9,8 @@ ThemeData lightTheme() => ThemeData(
     primary:
         Colors.black, // Used for primary app elements (e.g., AppBar background)
     onPrimary: Colors.white, // Text/Icons on primary color
-    secondary: Colors
-        .black, // Used for secondary elements (e.g., Floating Action Button)
+    secondary: Colors.black,
+    // Used for secondary elements (e.g., Floating Action Button)
     onSecondary: Colors.white, // Text/Icons on secondary color
     surface: Colors.white, // Background for cards, sheets, etc.
     onSurface: Colors.black, // Text/Icons on surface color

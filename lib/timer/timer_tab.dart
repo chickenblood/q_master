@@ -112,7 +112,7 @@ final class TimerTab extends ConsumerWidget {
     final notifier = ref.read(timerProvider.notifier);
     final timerType = notifier.timerType;
     final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
+        MediaQuery.of(context).orientation == .portrait;
     final isTablet = MediaUtils.isTablet(context);
     final workTime = timerType == .tabata
         ? notifier.remainingWorkTime
@@ -283,7 +283,7 @@ final class _SecondaryTile extends StatelessWidget {
       color: tileSpec.bgColor,
       child: Flex(
         mainAxisAlignment: .spaceBetween,
-        direction: isPortrait ? Axis.vertical : Axis.horizontal,
+        direction: isPortrait ? .vertical : .horizontal,
         spacing: 8,
         children: [
           PlatformText(

@@ -70,3 +70,6 @@ else { /* Navigator.push with platformPageRoute */ }
 2. Use `get_runtime_errors` to capture stack traces
 3. Inspect widget tree for state mismatches
 4. Check logs via `get_app_logs` for platform channel errors
+
+### Dart Dot Shorthand (Enum Leading Dots)
+⚠️ **Important**: Dart dot shorthand (`.white`, `.black`, `.easeOut`) only works when type is **explicitly declared in parameters**. Avoid for `Colors.*` and `Curves.*` — they almost never work due to type inference limitations. See [dart-dot-shorthand skill](https://github.com/F3-Community/q_master/blob/main/.github/skills/dart-dot-shorthand/SKILL.md) for safe usage patterns.

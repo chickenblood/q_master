@@ -74,7 +74,7 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
     // We want a full screen timer on phones in landscape mode.
     final isTimerTab = Tab.values[selectedIndex] == .timer;
     final isLandscape =
-        MediaQuery.orientationOf(context) == Orientation.landscape;
+        MediaQuery.orientationOf(context) == .landscape;
 
     return isTablet || !(isTimerTab && isLandscape);
   }

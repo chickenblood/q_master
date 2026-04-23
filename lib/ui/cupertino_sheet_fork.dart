@@ -6,6 +6,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Smoothing factor applied to the device's top padding (which approximates the corner radius)
@@ -566,7 +567,7 @@ class CupertinoSheetRoute<T> extends PageRoute<T>
   }
 
   @override
-  Color? get barrierColor => CupertinoColors.transparent;
+  Color? get barrierColor => Colors.transparent;
 
   @override
   bool get barrierDismissible => false;

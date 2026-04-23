@@ -341,7 +341,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                                   exercise,
                                   softWrap: true,
                                   maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
+                                  overflow: .ellipsis,
                                 ),
                                 trailing: exercises.length > 1
                                     ? Icon(Icons.drag_handle)

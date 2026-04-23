@@ -56,7 +56,7 @@ class GamesTab extends StatelessWidget {
                 ? const EdgeInsets.all(16.0)
                 : const EdgeInsets.fromLTRB(80.0, 16.0, 80.0, 16.0),
             child: Flex(
-              direction: isLandscape ? Axis.horizontal : Axis.vertical,
+              direction: isLandscape ? .horizontal : .vertical,
               mainAxisAlignment: .center,
               children: [
                 Expanded(
