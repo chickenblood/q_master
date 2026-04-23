@@ -16,7 +16,9 @@ class YoutubeVideoScreen extends StatefulWidget {
 class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
   late final YoutubePlayerController _controller;
   double _dragOffset = 0;
+  // Threshold in logical pixels — generous for gloved hands in the gloom.
   static const double _dismissThreshold = 120;
+  // Velocity in px/s — forgiving for cold weather usage.
   static const double _dismissVelocity = 800;
 
   @override
@@ -35,11 +37,9 @@ class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
   }
 
   void _onVerticalDragUpdate(DragUpdateDetails details) {
-    if (details.delta.dy > 0) {
-      setState(() {
-        _dragOffset += details.delta.dy;
-      });
-    }
+    setState(() {
+      _dragOffset = (_dragOffset + details.delta.dy).clamp(0, double.infinity);
+    });
   }
 
   void _onVerticalDragEnd(DragEndDetails details) {
