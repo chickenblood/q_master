@@ -1,13 +1,16 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../l10n/l10n.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_modal_sheet.dart';
 import 'workout_auto_completions.dart';
 import 'workout_constants.dart';
+import 'youtube_video_screen.dart';
 
 Future<String?> showExercisePicker(BuildContext context, {String? text}) async {
   final controller = TextEditingController(text: text);
@@ -83,8 +86,24 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     Navigator.of(context).pop(selection);
   }
 
-  Future<void> _openExerciseVideo(Uri videoUrl) async {
-    await launchUrl(videoUrl, mode: LaunchMode.externalApplication);
+  Future<void> _openExerciseVideo(BuildContext context, Uri videoUrl) async {
+    if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.android) {
+      final videoId = YoutubePlayer.convertUrlToId(videoUrl.toString());
+      if (videoId == null) {
+        await launchUrl(videoUrl, mode: LaunchMode.externalApplication);
+        return;
+      }
+      await Navigator.of(context, rootNavigator: true).push(
+        platformPageRoute(
+          context: context,
+          fullscreenDialog: true,
+          builder: (_) => YoutubeVideoScreen(videoId: videoId),
+        ),
+      );
+    } else {
+      await launchUrl(videoUrl, mode: LaunchMode.externalApplication);
+    }
   }
 
   List<String> get _filteredExercises {
@@ -365,6 +384,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                                     child: IconButton(
                                                       onPressed: () =>
                                                           _openExerciseVideo(
+                                                            context,
                                                             videoUrl,
                                                           ),
                                                       constraints:
