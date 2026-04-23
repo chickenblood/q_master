@@ -15,13 +15,16 @@ class YoutubeVideoScreen extends StatefulWidget {
 
 class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
   late final YoutubePlayerController _controller;
+  double _dragOffset = 0;
+  static const double _dismissThreshold = 120;
+  static const double _dismissVelocity = 800;
 
   @override
   void initState() {
     super.initState();
     _controller = YoutubePlayerController(
       initialVideoId: widget.videoId,
-      flags: const YoutubePlayerFlags(autoPlay: false),
+      flags: const YoutubePlayerFlags(autoPlay: true),
     );
   }
 
@@ -31,25 +34,51 @@ class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
     super.dispose();
   }
 
+  void _onVerticalDragUpdate(DragUpdateDetails details) {
+    if (details.delta.dy > 0) {
+      setState(() {
+        _dragOffset += details.delta.dy;
+      });
+    }
+  }
+
+  void _onVerticalDragEnd(DragEndDetails details) {
+    final velocity = details.primaryVelocity ?? 0;
+    if (_dragOffset > _dismissThreshold || velocity > _dismissVelocity) {
+      Navigator.of(context).pop();
+    } else {
+      setState(() {
+        _dragOffset = 0;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return PlatformScaffold(
-      backgroundColor: Colors.black,
-      appBar: PlatformAppBar(
-        backgroundColor: Colors.transparent,
-        leading: PlatformIconButton(
-          icon: Icon(AdaptiveIcons.close, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
-      body: Center(
-        child: YoutubePlayer(
-          controller: _controller,
-          showVideoProgressIndicator: true,
-          progressIndicatorColor: Colors.white,
-          progressColors: const ProgressBarColors(
-            playedColor: Colors.white,
-            handleColor: Colors.white,
+    return GestureDetector(
+      onVerticalDragUpdate: _onVerticalDragUpdate,
+      onVerticalDragEnd: _onVerticalDragEnd,
+      child: Transform.translate(
+        offset: Offset(0, _dragOffset),
+        child: PlatformScaffold(
+          backgroundColor: Colors.black,
+          appBar: PlatformAppBar(
+            backgroundColor: Colors.transparent,
+            leading: PlatformIconButton(
+              icon: Icon(AdaptiveIcons.close, color: Colors.white),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
+          body: Center(
+            child: YoutubePlayer(
+              controller: _controller,
+              showVideoProgressIndicator: true,
+              progressIndicatorColor: Colors.white,
+              progressColors: const ProgressBarColors(
+                playedColor: Colors.white,
+                handleColor: Colors.white,
+              ),
+            ),
           ),
         ),
       ),
