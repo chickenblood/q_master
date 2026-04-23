@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -42,9 +43,12 @@ class _WorkoutAutocompleteTextFieldState
   final focusNode = FocusNode();
   var _replacementRange = TextRange.collapsed(-1);
 
+  bool get _showClearButton => widget.textEditingController.text.isNotEmpty;
+
   @override
   void initState() {
     super.initState();
+    widget.textEditingController.addListener(_onTextChanged);
 
     if (widget.autofocus) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -54,7 +58,28 @@ class _WorkoutAutocompleteTextFieldState
   }
 
   @override
+  void didUpdateWidget(covariant WorkoutAutocompleteTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.textEditingController != widget.textEditingController) {
+      oldWidget.textEditingController.removeListener(_onTextChanged);
+      widget.textEditingController.addListener(_onTextChanged);
+    }
+  }
+
+  void _onTextChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _clearText() {
+    widget.textEditingController.clear();
+    focusNode.requestFocus();
+  }
+
+  @override
   void dispose() {
+    widget.textEditingController.removeListener(_onTextChanged);
     focusNode.dispose();
     super.dispose();
   }
@@ -133,6 +158,22 @@ class _WorkoutAutocompleteTextFieldState
             controller: textEditingController,
             focusNode: focusNode,
             onTap: widget.onTap,
+            cupertino: (_, _) => CupertinoTextFieldData(
+              clearButtonMode: OverlayVisibilityMode.editing,
+            ),
+            material: (_, _) => MaterialTextFieldData(
+              decoration: InputDecoration(
+                suffixIcon: _showClearButton
+                    ? IconButton(
+                        onPressed: _clearText,
+                        icon: const Icon(Icons.clear),
+                        tooltip: MaterialLocalizations.of(
+                          context,
+                        ).deleteButtonTooltip,
+                      )
+                    : null,
+              ),
+            ),
             // Important for form submission
             onSubmitted: (_) => onFieldSubmitted,
             onEditingComplete: () {

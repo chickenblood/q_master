@@ -94,7 +94,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
         await launchUrl(videoUrl, mode: LaunchMode.externalApplication);
         return;
       }
-      await Navigator.of(context, rootNavigator: true).push(
+      await Navigator.of(context, rootNavigator: true).push<void>(
         platformPageRoute(
           context: context,
           fullscreenDialog: true,
@@ -242,7 +242,9 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                       ),
                                     FilterChip(
                                       label: Text(
-                                        L10n.of(context)!.exerciseFilterVideoLabel,
+                                        L10n.of(
+                                          context,
+                                        )!.exerciseFilterVideoLabel,
                                       ),
                                       selected: videoFilter,
                                       onSelected: (_) => setState(
@@ -346,42 +348,40 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                                           .outlineVariant,
                                               ),
                                             ),
-                                            child: Stack(
-                                              children: [
-                                                Padding(
-                                                  padding: EdgeInsets.fromLTRB(
-                                                    12,
-                                                    12,
-                                                    videoUrl == null ? 12 : 45,
-                                                    12,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 10,
                                                   ),
-                                                  child: Align(
-                                                    alignment:
-                                                        Alignment.topLeft,
-                                                    child: AutoSizeText(
-                                                      exerciseName,
-                                                      maxLines: 2,
-                                                      minFontSize: 10,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .bodyLarge
-                                                          ?.copyWith(
-                                                            color: isSelected
-                                                                ? colorScheme
-                                                                      .onPrimaryContainer
-                                                                : colorScheme
-                                                                      .onSurface,
-                                                          ),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Expanded(
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.centerLeft,
+                                                      child: AutoSizeText(
+                                                        exerciseName,
+                                                        maxLines: 2,
+                                                        minFontSize: 10,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodyLarge
+                                                            ?.copyWith(
+                                                              color: isSelected
+                                                                  ? colorScheme
+                                                                        .onPrimaryContainer
+                                                                  : colorScheme
+                                                                        .onSurface,
+                                                            ),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                                if (videoUrl != null)
-                                                  Positioned(
-                                                    top: 4,
-                                                    right: 4,
-                                                    child: IconButton(
+                                                  if (videoUrl != null)
+                                                    IconButton(
                                                       onPressed: () =>
                                                           _openExerciseVideo(
                                                             context,
@@ -389,13 +389,10 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                                           ),
                                                       constraints:
                                                           const BoxConstraints(
-                                                            minWidth: 63,
-                                                            minHeight: 63,
+                                                            minWidth: 52,
+                                                            minHeight: 52,
                                                           ),
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                            9,
-                                                          ),
+                                                      padding: EdgeInsets.zero,
                                                       visualDensity:
                                                           VisualDensity.compact,
                                                       style: IconButton.styleFrom(
@@ -411,11 +408,11 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                                       ),
                                                       icon: const Icon(
                                                         Icons.ondemand_video,
-                                                        size: 36,
+                                                        size: 29,
                                                       ),
                                                     ),
-                                                  ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),

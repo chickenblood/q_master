@@ -56,10 +56,10 @@ PODS:
   - flutter_inappwebview_ios (0.0.1):
     - Flutter
     - flutter_inappwebview_ios/Core (= 0.0.1)
-    - OrderedSet (~> 6.0.3)
+    - swift-collections (~> 1.1.1)
   - flutter_inappwebview_ios/Core (0.0.1):
     - Flutter
-    - OrderedSet (~> 6.0.3)
+    - swift-collections (~> 1.1.1)
   - GoogleUtilities/AppDelegateSwizzler (8.1.0):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
@@ -85,10 +85,10 @@ PODS:
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
   - GTMSessionFetcher/Core (5.2.0)
+  - InternalCollectionsUtilities (1.1.1)
   - just_audio (0.0.1):
     - Flutter
     - FlutterMacOS
-  - OrderedSet (6.0.3)
   - package_info_plus (0.4.5):
     - Flutter
   - PromisesObjC (2.4.0)
@@ -104,6 +104,22 @@ PODS:
     - CwlCatchException
     - Flutter
     - FlutterMacOS
+  - swift-collections (1.1.1):
+    - swift-collections/BitCollections (= 1.1.1)
+    - swift-collections/DequeModule (= 1.1.1)
+    - swift-collections/HashTreeCollections (= 1.1.1)
+    - swift-collections/HeapModule (= 1.1.1)
+    - swift-collections/OrderedCollections (= 1.1.1)
+  - swift-collections/BitCollections (1.1.1):
+    - InternalCollectionsUtilities (= 1.1.1)
+  - swift-collections/DequeModule (1.1.1):
+    - InternalCollectionsUtilities (= 1.1.1)
+  - swift-collections/HashTreeCollections (1.1.1):
+    - InternalCollectionsUtilities (= 1.1.1)
+  - swift-collections/HeapModule (1.1.1):
+    - InternalCollectionsUtilities (= 1.1.1)
+  - swift-collections/OrderedCollections (1.1.1):
+    - InternalCollectionsUtilities (= 1.1.1)
   - url_launcher_ios (0.0.1):
     - Flutter
   - wakelock_plus (0.0.1):
@@ -148,9 +164,10 @@ SPEC REPOS:
     - FirebaseCoreInternal
     - GoogleUtilities
     - GTMSessionFetcher
-    - OrderedSet
+    - InternalCollectionsUtilities
     - PromisesObjC
     - RecaptchaInterop
+    - swift-collections
 
 EXTERNAL SOURCES:
   audio_session:
@@ -206,11 +223,11 @@ SPEC CHECKSUMS:
   FirebaseCoreExtension: e911052d59cd0da237a45d706fc0f81654f035c1
   FirebaseCoreInternal: b321eafae5362113bc182956fafc9922cfc77b72
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  flutter_inappwebview_ios: b89ba3482b96fb25e00c967aae065701b66e9b99
+  flutter_inappwebview_ios: 9cde7869829d54b4110df350f3eedd192c5a4aea
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   GTMSessionFetcher: 904bdd2a82c635bcd6f44edf94cc8775c5d1d6e6
+  InternalCollectionsUtilities: af3f471602c4a67cbcb0bee0a80f6f55a33ae453
   just_audio: 4e391f57b79cad2b0674030a00453ca5ce817eed
-  OrderedSet: e539b66b644ff081c73a262d24ad552a69be3a94
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
@@ -218,6 +235,7 @@ SPEC CHECKSUMS:
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
   speech_to_text: 3b313d98516d3d0406cea424782ec25470c59d19
+  swift-collections: ba248ecaf44ef500b27d5cf94d304218c89892ff
   url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b
   wakelock_plus: e29112ab3ef0b318e58cfa5c32326458be66b556
   watch_connectivity: 208552a93286b3307a5359212a6bcaa44c4deaec
