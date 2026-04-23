@@ -389,12 +389,12 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                                           ),
                                                       constraints:
                                                           const BoxConstraints(
-                                                            minWidth: 42,
-                                                            minHeight: 42,
+                                                            minWidth: 63,
+                                                            minHeight: 63,
                                                           ),
                                                       padding:
                                                           const EdgeInsets.all(
-                                                            6,
+                                                            9,
                                                           ),
                                                       visualDensity:
                                                           VisualDensity.compact,
@@ -411,7 +411,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                                       ),
                                                       icon: const Icon(
                                                         Icons.ondemand_video,
-                                                        size: 24,
+                                                        size: 36,
                                                       ),
                                                     ),
                                                   ),
