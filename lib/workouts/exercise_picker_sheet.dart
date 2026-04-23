@@ -1,13 +1,16 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../l10n/l10n.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_modal_sheet.dart';
 import 'workout_auto_completions.dart';
 import 'workout_constants.dart';
+import 'youtube_video_screen.dart';
 
 Future<String?> showExercisePicker(BuildContext context, {String? text}) async {
   final controller = TextEditingController(text: text);
@@ -33,6 +36,7 @@ class _ExercisePickerSheet extends StatefulWidget {
 
 class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   final selectedCategories = <ExerciseCategory>{};
+  bool videoFilter = false;
   String? pressedExerciseName;
 
   static const orderedCategories = <ExerciseCategory>[
@@ -82,17 +86,36 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     Navigator.of(context).pop(selection);
   }
 
-  Future<void> _openExerciseVideo(Uri videoUrl) async {
-    await launchUrl(videoUrl, mode: LaunchMode.externalApplication);
+  Future<void> _openExerciseVideo(BuildContext context, Uri videoUrl) async {
+    if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.android) {
+      final videoId = YoutubePlayer.convertUrlToId(videoUrl.toString());
+      if (videoId == null) {
+        await launchUrl(videoUrl, mode: LaunchMode.externalApplication);
+        return;
+      }
+      await Navigator.of(context, rootNavigator: true).push(
+        platformPageRoute(
+          context: context,
+          fullscreenDialog: true,
+          builder: (_) => YoutubeVideoScreen(videoId: videoId),
+        ),
+      );
+    } else {
+      await launchUrl(videoUrl, mode: LaunchMode.externalApplication);
+    }
   }
 
   List<String> get _filteredExercises {
     return workoutCompletions.entries
         .where((entry) {
+          if (videoFilter && entry.value.videoUrl == null) {
+            return false;
+          }
           if (selectedCategories.isEmpty) {
             return true;
           }
-          return entry.value.categories.any(selectedCategories.contains);
+          return selectedCategories.every(entry.value.categories.contains);
         })
         .map((entry) => entry.key)
         .toList(growable: false);
@@ -217,9 +240,45 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                         materialTapTargetSize:
                                             MaterialTapTargetSize.shrinkWrap,
                                       ),
+                                    FilterChip(
+                                      label: Text(
+                                        L10n.of(context)!.exerciseFilterVideoLabel,
+                                      ),
+                                      selected: videoFilter,
+                                      onSelected: (_) => setState(
+                                        () => videoFilter = !videoFilter,
+                                      ),
+                                      showCheckmark: false,
+                                      avatar: Icon(
+                                        Icons.ondemand_video,
+                                        size: 18,
+                                        color: videoFilter
+                                            ? colorScheme.onPrimary
+                                            : colorScheme.onSurface,
+                                      ),
+                                      labelStyle: Theme.of(context)
+                                          .textTheme
+                                          .labelLarge
+                                          ?.copyWith(
+                                            color: videoFilter
+                                                ? colorScheme.onPrimary
+                                                : colorScheme.onSurface,
+                                          ),
+                                      backgroundColor:
+                                          colorScheme.surfaceContainerHighest,
+                                      selectedColor: colorScheme.primary,
+                                      side: BorderSide(
+                                        color: videoFilter
+                                            ? colorScheme.primary
+                                            : colorScheme.outlineVariant,
+                                      ),
+                                      shape: const StadiumBorder(),
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                    ),
                                   ],
                                 ),
-                                const SizedBox(height: 12),
+                                const Divider(),
                                 Expanded(
                                   child: GridView.builder(
                                     itemCount: filteredExercises.length,
@@ -325,6 +384,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                                     child: IconButton(
                                                       onPressed: () =>
                                                           _openExerciseVideo(
+                                                            context,
                                                             videoUrl,
                                                           ),
                                                       constraints:
