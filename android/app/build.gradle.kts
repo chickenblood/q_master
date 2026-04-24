@@ -77,10 +77,6 @@ flutter {
     source = "../.."
 }
 
-configurations {
-    create("wearApp")
-}
-
 dependencies {
-    add("wearApp", project(":app:watchapp"))
+    wearApp(project(":app:watchapp"))
 }
