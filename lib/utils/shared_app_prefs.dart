@@ -33,6 +33,7 @@ final class SharedAppPrefs extends ChangeNotifier {
   late final ValueNotifier<bool> motorboatSoundEnabled;
 
   late final ValueNotifier<List<String>> selectedCategoryFilters;
+  late final ValueNotifier<bool> exerciseVideoFilter;
 
   SharedAppPrefs._(this._prefs) {
     exercisesPerPage = _valueSetup<int>('exercises_per_page', 8);
@@ -49,6 +50,8 @@ final class SharedAppPrefs extends ChangeNotifier {
 
     selectedCategoryFilters =
         _valueSetup<List<String>>('selected_category_filters', const []);
+    exerciseVideoFilter =
+        _valueSetup<bool>('exercise_video_filter', false);
   }
 
   ValueNotifier<T> _valueSetup<T>(String key, T defaultValue) {
