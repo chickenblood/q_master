@@ -32,6 +32,8 @@ final class SharedAppPrefs extends ChangeNotifier {
   late final ValueNotifier<int> theme;
   late final ValueNotifier<bool> motorboatSoundEnabled;
 
+  late final ValueNotifier<List<String>> selectedCategoryFilters;
+
   SharedAppPrefs._(this._prefs) {
     exercisesPerPage = _valueSetup<int>('exercises_per_page', 8);
 
@@ -44,6 +46,9 @@ final class SharedAppPrefs extends ChangeNotifier {
 
     theme = _valueSetup<int>('theme', ThemeMode.system.index);
     motorboatSoundEnabled = _valueSetup<bool>('motorboat_sound', true);
+
+    selectedCategoryFilters =
+        _valueSetup<List<String>>('selected_category_filters', const []);
   }
 
   ValueNotifier<T> _valueSetup<T>(String key, T defaultValue) {
@@ -62,6 +67,9 @@ final class SharedAppPrefs extends ChangeNotifier {
     } else if (type == 'String') {
       getter = _prefs.getString as T? Function(String);
       setter = _prefs.setString as Function(String, T);
+    } else if (type == 'List<String>') {
+      getter = _prefs.getStringList as T? Function(String);
+      setter = _prefs.setStringList as Function(String, T);
     } else {
       throw UnsupportedError('Unsupported type for SharedAppPrefs: $T');
     }
