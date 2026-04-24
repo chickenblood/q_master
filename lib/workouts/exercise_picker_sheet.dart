@@ -8,6 +8,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../l10n/l10n.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_modal_sheet.dart';
+import '../utils/shared_app_prefs.dart';
 import 'workout_auto_completions.dart';
 import 'workout_constants.dart';
 import 'youtube_video_screen.dart';
@@ -35,7 +36,7 @@ class _ExercisePickerSheet extends StatefulWidget {
 }
 
 class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
-  final selectedCategories = <ExerciseCategory>{};
+  late final Set<ExerciseCategory> selectedCategories;
   bool videoFilter = false;
   String? pressedExerciseName;
 
@@ -51,12 +52,27 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     .fullBody,
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    final savedNames = SharedAppPrefs.instance.selectedCategoryFilters.value;
+    selectedCategories = savedNames.map((name) {
+      try {
+        return ExerciseCategory.values.byName(name);
+      } on ArgumentError {
+        return null;
+      }
+    }).whereType<ExerciseCategory>().toSet();
+  }
+
   void _toggleCategory(ExerciseCategory category) {
     setState(() {
       if (!selectedCategories.add(category)) {
         selectedCategories.remove(category);
       }
     });
+    SharedAppPrefs.instance.selectedCategoryFilters.value =
+        selectedCategories.map((e) => e.name).toList();
   }
 
   void _selectExercise(BuildContext context, String exerciseName) {
