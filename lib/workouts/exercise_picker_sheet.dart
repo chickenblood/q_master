@@ -37,7 +37,7 @@ class _ExercisePickerSheet extends StatefulWidget {
 
 class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   late final Set<ExerciseCategory> selectedCategories;
-  bool videoFilter = false;
+  late bool videoFilter;
   String? pressedExerciseName;
 
   static const orderedCategories = <ExerciseCategory>[
@@ -55,7 +55,8 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   @override
   void initState() {
     super.initState();
-    final savedNames = SharedAppPrefs.instance.selectedCategoryFilters.value;
+    final prefs = SharedAppPrefs.instance;
+    final savedNames = prefs.selectedCategoryFilters.value;
     selectedCategories = savedNames.map((name) {
       try {
         return ExerciseCategory.values.byName(name);
@@ -63,6 +64,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
         return null;
       }
     }).whereType<ExerciseCategory>().toSet();
+    videoFilter = prefs.exerciseVideoFilter.value;
   }
 
   void _toggleCategory(ExerciseCategory category) {
@@ -259,9 +261,13 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                         )!.exerciseFilterVideoLabel,
                                       ),
                                       selected: videoFilter,
-                                      onSelected: (_) => setState(
-                                        () => videoFilter = !videoFilter,
-                                      ),
+                                      onSelected: (_) => setState(() {
+                                        videoFilter = !videoFilter;
+                                        SharedAppPrefs
+                                            .instance
+                                            .exerciseVideoFilter
+                                            .value = videoFilter;
+                                      }),
                                       showCheckmark: false,
                                       avatar: Icon(
                                         Icons.ondemand_video,
