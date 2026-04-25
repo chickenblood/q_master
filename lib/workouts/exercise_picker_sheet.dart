@@ -192,7 +192,6 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                 autofocus: true,
                 minLines: 1,
                 maxLines: 1,
-                categoryFilter: selectedCategories,
               ),
               ValueListenableBuilder<TextEditingValue>(
                 valueListenable: widget.controller,
