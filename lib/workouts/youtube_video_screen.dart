@@ -33,29 +33,30 @@ class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformScaffold(
-      backgroundColor: Colors.transparent,
-      material: (_, _) => MaterialScaffoldData(extendBodyBehindAppBar: true),
-      appBar: PlatformAppBar(
+    return SafeArea(
+      child: PlatformScaffold(
         backgroundColor: Colors.transparent,
-        cupertino: (_, _) => CupertinoNavigationBarData(
+        material: (_, _) => MaterialScaffoldData(extendBodyBehindAppBar: true),
+        appBar: PlatformAppBar(
           backgroundColor: Colors.transparent,
-          enableBackgroundFilterBlur: false,
+          cupertino: (_, _) => CupertinoNavigationBarData(
+            backgroundColor: Colors.transparent,
+            enableBackgroundFilterBlur: false,
+          ),
+          leading: PlatformIconButton(
+            icon: Icon(AdaptiveIcons.close, color: Colors.white),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
         ),
-        leading: PlatformIconButton(
-          icon: Icon(AdaptiveIcons.close, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
-      body: SizedBox.expand(
-        child: YoutubePlayer(
-          controller: _controller,
-          aspectRatio: MediaQuery.sizeOf(context).aspectRatio,
-          showVideoProgressIndicator: true,
-          progressIndicatorColor: Colors.white,
-          progressColors: const ProgressBarColors(
-            playedColor: Colors.white,
-            handleColor: Colors.white,
+        body: Center(
+          child: YoutubePlayer(
+            controller: _controller,
+            showVideoProgressIndicator: true,
+            progressIndicatorColor: Colors.white,
+            progressColors: const ProgressBarColors(
+              playedColor: Colors.white,
+              handleColor: Colors.white,
+            ),
           ),
         ),
       ),
