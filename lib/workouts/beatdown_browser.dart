@@ -127,6 +127,7 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                 pageIndex: _pageIndex.value,
                 exercisesPerPage: exercisesPerPage,
               ),
+              style: Theme.of(context).textTheme.titleLarge,
               textScaler: MediaQuery.textScalerOf(
                 context,
               ).clamp(maxScaleFactor: 1.6),

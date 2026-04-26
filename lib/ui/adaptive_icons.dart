@@ -20,7 +20,7 @@ final class AdaptiveIcons {
       Platform.isIOS ? CupertinoIcons.xmark : Icons.close;
 
   static IconData get more =>
-      Platform.isIOS ? CupertinoIcons.ellipsis_circle : Icons.more_vert;
+      Platform.isIOS ? CupertinoIcons.ellipsis : Icons.more_vert;
 
   static IconData get location =>
       Platform.isIOS ? CupertinoIcons.compass : Icons.location_on;

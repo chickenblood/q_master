@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -78,22 +77,29 @@ class WorkoutsTab extends ConsumerWidget {
   Widget? _androidAddWorkoutFAB(
     BuildContext context, {
     required WidgetRef ref,
-  }) => ExpandableFab(
-    distance: 112,
-    backgroundColor: Colors.red,
-    children: [
-      ActionButton(
-        onPressed: () => _showComposeWorkoutModal(context, ref),
-        icon: Icon(AdaptiveIcons.create),
-        label: L10n.of(context)!.createWorkoutDialogTitle,
-      ),
-      ActionButton(
-        onPressed: () => _showGenerateWorkoutModal(context, ref),
-        icon: Icon(AdaptiveIcons.sparkles),
-        label: L10n.of(context)!.generateWorkoutDialogTitle,
-      ),
-    ],
-  );
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark
+        ? const Color(0xFFF0F0F0)
+        : const Color(0xFF121212);
+
+    return ExpandableFab(
+      distance: 112,
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      children: [
+        ActionButton(
+          onPressed: () => _showComposeWorkoutModal(context, ref),
+          icon: Icon(AdaptiveIcons.create, color: iconColor),
+          label: L10n.of(context)!.createWorkoutDialogTitle,
+        ),
+        ActionButton(
+          onPressed: () => _showGenerateWorkoutModal(context, ref),
+          icon: Icon(AdaptiveIcons.sparkles, color: iconColor),
+          label: L10n.of(context)!.generateWorkoutDialogTitle,
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -105,6 +111,7 @@ class WorkoutsTab extends ConsumerWidget {
           leading: SettingsActionButton(),
           title: Text(
             L10n.of(context)!.workoutsTabTitle,
+            style: Theme.of(context).textTheme.titleLarge,
             textScaler: MediaQuery.textScalerOf(
               context,
             ).clamp(maxScaleFactor: 1.6),
@@ -113,7 +120,10 @@ class WorkoutsTab extends ConsumerWidget {
             backgroundColor: Colors.transparent,
             // Add menu only on iOS since FAB is used on Android.
             trailing: AdaptiveMenu(
-              icon: Icon(PlatformIcons(context).add),
+              icon: Icon(
+                PlatformIcons(context).add,
+                color: Theme.of(appBarContext).colorScheme.onSurface,
+              ),
               menuChildren: [
                 AdaptiveMenuItem(
                   text: L10n.of(context)!.createWorkoutDialogTitle,
@@ -239,48 +249,101 @@ final class _WorkoutTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const padding = EdgeInsets.fromLTRB(16.0, 14.0, 16.0, 4.0);
-    return DismissibleRow(
-      key: ValueKey(workout),
-      backgroundPadding: const EdgeInsets.fromLTRB(36, 0, 36, 0),
-      confirmDismiss: (direction) {
-        if (direction == .endToStart) return _confirmDelete(context);
-        return Future.value(true);
-      },
-      onDismissed: (direction) {
-        if (direction == .endToStart) listNotifier.remove(workout);
-      },
-      child: PlatformListTile(
-        material: (context, platform) =>
-            MaterialListTileData(contentPadding: padding),
-        cupertino: (context, platform) =>
-            CupertinoListTileData(padding: padding),
-        title: PlatformText(
-          workout.name,
-          style: TextTheme.of(
-            context,
-          ).headlineLarge!.copyWith(fontWeight: .bold),
-          overflow: .ellipsis,
-          textScaler: MediaQuery.textScalerOf(
-            context,
-          ).clamp(maxScaleFactor: 1.3),
+    const padding = EdgeInsets.symmetric(horizontal: 16, vertical: 14);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        DismissibleRow(
+          key: ValueKey(workout),
+          backgroundPadding: const EdgeInsets.fromLTRB(36, 0, 36, 0),
+          confirmDismiss: (direction) {
+            if (direction == .endToStart) return _confirmDelete(context);
+            return Future.value(true);
+          },
+          onDismissed: (direction) {
+            if (direction == .endToStart) listNotifier.remove(workout);
+          },
+          child: PlatformListTile(
+            material: (context, platform) =>
+                MaterialListTileData(contentPadding: padding),
+            cupertino: (context, platform) =>
+                CupertinoListTileData(padding: padding),
+            title: PlatformText(
+              workout.name,
+              style: TextTheme.of(context).titleMedium,
+              overflow: .ellipsis,
+              textScaler: MediaQuery.textScalerOf(
+                context,
+              ).clamp(maxScaleFactor: 1.3),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (workout.sections.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 5, bottom: 3),
+                    child: Wrap(
+                      spacing: 5,
+                      runSpacing: 4,
+                      children: [
+                        for (final section in workout.sections)
+                          _SectionChip(name: section.name),
+                      ],
+                    ),
+                  ),
+                Text(
+                  workout.date.formattedForDisplay(),
+                  style: TextTheme.of(context).bodyMedium,
+                ),
+              ],
+            ),
+            trailing: _OverflowMenu(
+              onEdit: () => _editWorkout(context, workout),
+              onDuplicate: () => _duplicateWorkout(workout),
+              onShare: (buttonContext) => _shareWorkout(buttonContext, workout),
+              onDelete: () => _deleteWorkout(context, workout),
+            ),
+            onTap: () => _showBeatdownBrowser(context, workout),
+          ),
         ),
-        subtitle: AutoSizeText(
-          workout.date.formattedForDisplay(),
-          style: TextTheme.of(context).bodyMedium,
+        const Divider(),
+      ],
+    );
+  }
+}
 
-          textScaleFactor: MediaQuery.textScalerOf(
-            context,
-            // ignore: deprecated_member_use
-          ).clamp(maxScaleFactor: 1.3).textScaleFactor,
+final class _SectionChip extends StatelessWidget {
+  final String name;
+
+  const _SectionChip({required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final chipBg = isDark ? const Color(0xFF111111) : const Color(0xFFF0F0F0);
+    final chipBorder = isDark
+        ? const Color(0xFF303030)
+        : const Color(0xFFE0E0E0);
+    final chipFg = isDark ? const Color(0xFF707070) : const Color(0xFF666666);
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: chipBg,
+        border: Border.all(color: chipBorder),
+        borderRadius: BorderRadius.circular(3),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        child: Text(
+          name.toUpperCase(),
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.5,
+            color: chipFg,
+            height: 1.4,
+          ),
         ),
-        trailing: _OverflowMenu(
-          onEdit: () => _editWorkout(context, workout),
-          onDuplicate: () => _duplicateWorkout(workout),
-          onShare: (buttonContext) => _shareWorkout(buttonContext, workout),
-          onDelete: () => _deleteWorkout(context, workout),
-        ),
-        onTap: () => _showBeatdownBrowser(context, workout),
       ),
     );
   }
@@ -303,7 +366,10 @@ final class _OverflowMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return Builder(
       builder: (menuContext) => AdaptiveMenu(
-        icon: Icon(AdaptiveIcons.more),
+        icon: Icon(
+          AdaptiveIcons.more,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
         menuChildren: [
           AdaptiveMenuItem(
             onPressed: onEdit,

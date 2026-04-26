@@ -82,7 +82,9 @@ class _SettingsSheet extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: 16.0),
               child: PlatformText(
                 l10n.workoutsSettingsTitle,
-                style: Theme.of(context).textTheme.headlineSmall,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
             ),
             PlatformListTile(
@@ -114,7 +116,9 @@ class _SettingsSheet extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: 16.0),
               child: PlatformText(
                 l10n.timerSettingsTitle,
-                style: Theme.of(context).textTheme.headlineSmall,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
             ),
             SegmentedButton(
@@ -189,7 +193,9 @@ class _SettingsSheet extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: 16.0),
               child: PlatformText(
                 l10n.generalSettingsTitle,
-                style: Theme.of(context).textTheme.headlineSmall,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
             ),
             PlatformListTile(

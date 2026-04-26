@@ -73,8 +73,7 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
     final selectedIndex = _tabController.index(context);
     // We want a full screen timer on phones in landscape mode.
     final isTimerTab = Tab.values[selectedIndex] == .timer;
-    final isLandscape =
-        MediaQuery.orientationOf(context) == .landscape;
+    final isLandscape = MediaQuery.orientationOf(context) == .landscape;
 
     return isTablet || !(isTimerTab && isLandscape);
   }
@@ -104,43 +103,112 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
           navigatorKey: _navigatorKey,
           debugShowCheckedModeBanner: false,
           home: Builder(
-            builder: (context) => PlatformTabScaffold(
-              tabController: _tabController,
-              bodyBuilder: (_, index) =>
-                  _TabsContainer(selectedIndex: index, children: _tabPages),
-              materialBuilder: (tabBarContext, _, index) =>
-                  MaterialTabScaffoldData(
-                    height: _shouldShowTabBar(tabBarContext) ? null : 0,
-                    tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
-                        ? null
-                        : Colors.transparent,
+            builder: (context) {
+              // Red 2px top-of-tab indicator for active tab — Option 3 identity.
+              BottomNavigationBarItem tabItem(IconData icon, String label) {
+                final indicator = Container(
+                  width: 28,
+                  height: 2,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
+                    borderRadius: const BorderRadius.vertical(
+                      bottom: Radius.circular(2),
+                    ),
                   ),
-              cupertinoBuilder: (tabBarContext, _, index) =>
-                  CupertinoTabScaffoldData(
-                    navBarHeight: _shouldShowTabBar(tabBarContext) ? null : 0,
-                    tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
-                        ? null
-                        : Colors.transparent,
+                );
+                return BottomNavigationBarItem(
+                  icon: Icon(icon, size: 24),
+                  activeIcon: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      indicator,
+                      const SizedBox(height: 8),
+                      Icon(icon, size: 24),
+                    ],
                   ),
-              items: [
-                BottomNavigationBarItem(
-                  icon: Icon(AdaptiveIcons.history),
-                  label: L10n.of(context)!.workoutsTabTitle,
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(AdaptiveIcons.sports),
-                  label: L10n.of(context)!.gamesTabTitle,
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(AdaptiveIcons.timer),
-                  label: L10n.of(context)!.timerTabTitle,
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(AdaptiveIcons.location),
-                  label: L10n.of(context)!.nearMeTabTitle,
-                ),
-              ],
-            ),
+                  label: label,
+                );
+              }
+
+              return PlatformTabScaffold(
+                tabController: _tabController,
+                bodyBuilder: (_, index) =>
+                    _TabsContainer(selectedIndex: index, children: _tabPages),
+                materialTabs: (tabBarContext, _) {
+                  final isDark =
+                      Theme.of(tabBarContext).brightness == Brightness.dark;
+                  return MaterialNavBarData(
+                    selectedItemColor: isDark
+                        ? const Color(0xFFF0F0F0)
+                        : const Color(0xFF121212),
+                    unselectedItemColor: isDark
+                        ? const Color(0xFF808080)
+                        : const Color(0xFF6F6F6F),
+                  );
+                },
+                material3Tabs: (tabBarContext, _) {
+                  final isDark =
+                      Theme.of(tabBarContext).brightness == Brightness.dark;
+                  return MaterialNavigationBarData(
+                    indicatorColor: Colors.transparent,
+                    labelTextStyle: WidgetStateProperty.resolveWith((states) {
+                      final isSelected = states.contains(WidgetState.selected);
+                      final color = isSelected
+                          ? (isDark
+                                ? const Color(0xFFF0F0F0)
+                                : const Color(0xFF121212))
+                          : (isDark
+                                ? const Color(0xFF808080)
+                                : const Color(0xFF6F6F6F));
+                      return Theme.of(
+                        tabBarContext,
+                      ).textTheme.labelMedium?.copyWith(color: color);
+                    }),
+                  );
+                },
+                materialBuilder: (tabBarContext, _, index) =>
+                    MaterialTabScaffoldData(
+                      height: _shouldShowTabBar(tabBarContext) ? null : 0,
+                      tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
+                          ? null
+                          : Colors.transparent,
+                    ),
+                cupertinoTabs: (tabBarContext, _) {
+                  final isDark =
+                      Theme.of(tabBarContext).brightness == Brightness.dark;
+                  return CupertinoTabBarData(
+                    activeColor: isDark
+                        ? const Color(0xFFF0F0F0)
+                        : const Color(0xFF121212),
+                    inactiveColor: isDark
+                        ? const Color(0xFF808080)
+                        : const Color(0xFF6F6F6F),
+                  );
+                },
+                cupertinoBuilder: (tabBarContext, _, index) =>
+                    CupertinoTabScaffoldData(
+                      navBarHeight: _shouldShowTabBar(tabBarContext) ? null : 0,
+                      tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
+                          ? null
+                          : Colors.transparent,
+                    ),
+                items: [
+                  tabItem(
+                    AdaptiveIcons.history,
+                    L10n.of(context)!.workoutsTabTitle,
+                  ),
+                  tabItem(
+                    AdaptiveIcons.sports,
+                    L10n.of(context)!.gamesTabTitle,
+                  ),
+                  tabItem(AdaptiveIcons.timer, L10n.of(context)!.timerTabTitle),
+                  tabItem(
+                    AdaptiveIcons.location,
+                    L10n.of(context)!.nearMeTabTitle,
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),

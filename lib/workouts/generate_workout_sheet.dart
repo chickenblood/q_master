@@ -139,14 +139,14 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
                     height: 64,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: Colors.red.shade700,
+                        color: Theme.of(context).colorScheme.primary,
                         shape: BoxShape.circle,
                       ),
                       child: IconButton(
                         onPressed: _handleCaptureVoiceInput,
                         icon: Icon(
                           AdaptiveIcons.microphone,
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onPrimary,
                         ),
                       ),
                     ),

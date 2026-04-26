@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/l10n.dart';
 import '../model/timer.dart';
 import '../settings/settings_sheet.dart';
+import '../theme/theme.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/media_query.dart';
 import '../utils/datetime_utils.dart';
@@ -23,7 +24,7 @@ final class TimerTab extends ConsumerWidget {
   Widget? _androidResetFAB(BuildContext context, {required WidgetRef ref}) {
     return FloatingActionButton(
       heroTag: 'ResetTimerFAB',
-      backgroundColor: Colors.red,
+      backgroundColor: TimerColors.restFg(context),
       onPressed: () => _resetTimer(ref),
       child: Icon(PlatformIcons(context).refresh),
     );
@@ -111,8 +112,7 @@ final class TimerTab extends ConsumerWidget {
     final l10n = L10n.of(context)!;
     final notifier = ref.read(timerProvider.notifier);
     final timerType = notifier.timerType;
-    final isPortrait =
-        MediaQuery.of(context).orientation == .portrait;
+    final isPortrait = MediaQuery.of(context).orientation == .portrait;
     final isTablet = MediaUtils.isTablet(context);
     final workTime = timerType == .tabata
         ? notifier.remainingWorkTime
@@ -126,6 +126,7 @@ final class TimerTab extends ConsumerWidget {
               leading: const SettingsActionButton(),
               title: Text(
                 L10n.of(context)!.timerTabTitle,
+                style: Theme.of(context).textTheme.titleLarge,
                 textScaler: MediaQuery.textScalerOf(
                   context,
                 ).clamp(maxScaleFactor: 1.6),
@@ -150,15 +151,17 @@ final class TimerTab extends ConsumerWidget {
             firstTile: _TileSpec(
               label: l10n.timerPrepareLabel,
               timeLabel: formatter(notifier.remainingPrepareTime),
-              fgColor: Colors.black,
-              bgColor: Colors.orange,
+              labelColor: TimerColors.prepareLabel(context),
+              fgColor: TimerColors.prepareFg(context),
+              bgColor: TimerColors.prepareBg(context),
             ),
             secondTile: timerType == .tabata
                 ? _TileSpec(
                     label: l10n.timerWorkLabel,
                     timeLabel: formatter(workTime),
-                    fgColor: Colors.black,
-                    bgColor: Colors.green,
+                    labelColor: TimerColors.workLabel(context),
+                    fgColor: TimerColors.workFg(context),
+                    bgColor: TimerColors.workBg(context),
                   )
                 : null,
           ),
@@ -169,15 +172,17 @@ final class TimerTab extends ConsumerWidget {
             firstTile: _TileSpec(
               label: l10n.timerWorkLabel,
               timeLabel: formatter(workTime),
-              fgColor: Colors.black,
-              bgColor: Colors.green,
+              labelColor: TimerColors.workLabel(context),
+              fgColor: TimerColors.workFg(context),
+              bgColor: TimerColors.workBg(context),
             ),
             secondTile: timerType == .tabata
                 ? _TileSpec(
                     label: l10n.timerRestLabel,
                     timeLabel: formatter(notifier.remainingRestTime),
-                    fgColor: Colors.white,
-                    bgColor: Colors.red,
+                    labelColor: TimerColors.restLabel(context),
+                    fgColor: TimerColors.restFg(context),
+                    bgColor: TimerColors.restBg(context),
                   )
                 : null,
           ),
@@ -188,8 +193,9 @@ final class TimerTab extends ConsumerWidget {
             firstTile: _TileSpec(
               label: l10n.timerRestLabel,
               timeLabel: formatter(notifier.remainingRestTime),
-              fgColor: Colors.white,
-              bgColor: Colors.red,
+              labelColor: TimerColors.restLabel(context),
+              fgColor: TimerColors.restFg(context),
+              bgColor: TimerColors.restBg(context),
             ),
             secondTile: timerType == .tabata
                 ? _TileSpec(
@@ -197,8 +203,9 @@ final class TimerTab extends ConsumerWidget {
                     // Upcoming work is for the next round (not the current one),
                     // so show the full interval.
                     timeLabel: formatter(notifier.workInterval),
-                    fgColor: Colors.black,
-                    bgColor: Colors.green,
+                    labelColor: TimerColors.workLabel(context),
+                    fgColor: TimerColors.workFg(context),
+                    bgColor: TimerColors.workBg(context),
                   )
                 : null,
           ),
@@ -214,12 +221,14 @@ final class TimerTab extends ConsumerWidget {
 final class _TileSpec {
   final String label;
   final String timeLabel;
+  final Color labelColor;
   final Color fgColor;
   final Color bgColor;
 
   const _TileSpec({
     required this.label,
     required this.timeLabel,
+    required this.labelColor,
     required this.fgColor,
     required this.bgColor,
   });
@@ -245,7 +254,7 @@ final class _PrimaryTile extends StatelessWidget {
           textAlign: .center,
           style: Theme.of(
             context,
-          ).textTheme.displayLarge!.copyWith(color: tileSpec.fgColor),
+          ).textTheme.displayLarge!.copyWith(color: tileSpec.labelColor),
           textScaler: TextScaler.noScaling,
         ),
         Expanded(
@@ -291,7 +300,7 @@ final class _SecondaryTile extends StatelessWidget {
             textAlign: .center,
             style: Theme.of(
               context,
-            ).textTheme.displaySmall!.copyWith(color: tileSpec.fgColor),
+            ).textTheme.displaySmall!.copyWith(color: tileSpec.labelColor),
             textScaler: TextScaler.noScaling,
           ),
           Expanded(
@@ -330,7 +339,7 @@ final class _StatusTile extends StatelessWidget {
     final isTablet = MediaQuery.of(context).size.shortestSide >= 600;
     final isTabata = timerNotifier.timerType == .tabata;
     return Container(
-      color: Colors.black,
+      color: TimerColors.statusBg(context),
       padding: EdgeInsets.all(4),
       child: Row(
         mainAxisAlignment: .spaceEvenly,
@@ -354,7 +363,7 @@ final class _StatusTile extends StatelessWidget {
                         ? AdaptiveIcons.pauseCircle
                         : context.platformIcons.playCircle,
                     size: isPortrait ? 80 : 52,
-                    color: Colors.white,
+                    color: TimerColors.controlFg(context),
                   ),
                   onPressed: () {
                     if (timerNotifier.executionState == .playing) {
@@ -371,9 +380,9 @@ final class _StatusTile extends StatelessWidget {
                         : (timerHasStarted
                               ? l10n.timerResumeLabel
                               : l10n.timerStartLabel),
-                    style: Theme.of(
-                      context,
-                    ).textTheme.titleMedium!.copyWith(color: Colors.white),
+                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                      color: TimerColors.controlFg(context),
+                    ),
                     textScaler: TextScaler.noScaling,
                   ),
               ],
@@ -411,7 +420,7 @@ final class _StatusElement extends StatelessWidget {
           child: AutoSizeText(
             value,
             style: Theme.of(context).textTheme.displayLarge!.copyWith(
-              color: Colors.blue,
+              color: TimerColors.counterFg(context),
               fontSize: 54,
               fontWeight: .bold,
             ),
@@ -427,9 +436,9 @@ final class _StatusElement extends StatelessWidget {
             label,
             softWrap: true,
             maxLines: 1,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium!.copyWith(color: Colors.white),
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
+              color: TimerColors.controlFg(context),
+            ),
             textScaleFactor: 1,
             minFontSize: 10,
           ),

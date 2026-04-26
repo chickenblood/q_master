@@ -492,7 +492,9 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
               CupertinoListTileData(padding: _headerInsets),
           title: PlatformText(
             sectionTitle,
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+            ),
             maxLines: 2,
             overflow: .ellipsis,
           ),
