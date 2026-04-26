@@ -36,5 +36,8 @@
       "source.fixAll": "always",
       "source.organizeImports": "always"
     }
+  },
+  "chat.tools.terminal.autoApprove": {
+    "open": true
   }
 }

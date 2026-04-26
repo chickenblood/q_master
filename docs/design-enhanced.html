@@ -1541,9 +1541,12 @@
             <div class="timer-tile-label">Work</div>
             <div class="timer-tile-time" style="font-size:80px;">23:14</div>
           </div>
-          <!-- Status row -->
-          <div style="flex:1;background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:12px;">
-            <div style="color:#888;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Round 1 of 3</div>
+          <!-- Control row -->
+          <div style="flex:1;background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px 20px;">
+            <div style="color:#666;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Round 1 of 3</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:20px;">
+              <button style="width:64px;height:64px;background:#fff;border:none;border-radius:50%;color:#000;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(255,255,255,.18);"><span class="material-icons" style="font-size:34px;">pause</span></button>
+            </div>
           </div>
         </div>
         <div class="tabbar" style="background:#000;border-color:#222;">
@@ -1584,8 +1587,9 @@
           <div class="timer-tile-label">Rest</div>
           <div class="timer-tile-time" style="font-size:48px;">00:15</div>
         </div>
-        <div style="background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px;">
-          <div style="color:#888;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Cycle 2 / 4 · Round 3 / 5</div>
+        <div style="background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px 20px;">
+          <div style="color:#666;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Cycle 2 / 4 · Round 3 / 5</div>
+            <button style="width:64px;height:64px;background:#fff;border:none;border-radius:50%;color:#000;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(255,255,255,.18);"><span class="material-icons" style="font-size:34px;">pause</span></button>
         </div>
       </div>
       <div class="tabbar" style="background:#000;border-color:#222;">
@@ -1616,7 +1620,8 @@
           <div class="timer-tile-time" style="font-size:48px;">00:45</div>
         </div>
         <div style="background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px;">
-          <div style="color:#888;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Round 1 of 5</div>
+          <div style="color:#666;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Round 1 of 5</div>
+            <button style="width:64px;height:64px;background:#fff;border:none;border-radius:50%;color:#000;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(255,255,255,.18);"><span class="material-icons" style="font-size:34px;">pause</span></button>
         </div>
       </div>
       <div class="tabbar" style="background:#000;border-color:#222;">
@@ -1625,6 +1630,56 @@
         <div class="tab active" style="color:#fff;"><div class="tab-icon"><span class="material-icons">timer</span></div>Timer</div>
         <div class="tab"><div class="tab-icon"><span class="material-icons">location_on</span></div>Near Me</div>
       </div>
+    </div>
+  </div>
+
+  <!-- Paused state -->
+  <div class="pair">
+    <div class="frame-wrap">
+      <div class="frame-label">Paused</div>
+      <div class="frame-sublabel">Tiles dim, play button prominent</div>
+      <div class="phone dark">
+        <div class="statusbar">9:41<div class="statusbar-right" style="display:flex;align-items:center;gap:2px;"><span class="material-icons" style="font-size:12px;">signal_cellular_alt</span><span class="material-icons" style="font-size:12px;">wifi</span><span class="material-icons" style="font-size:12px;">battery_full</span></div></div>
+        <div class="navbar" style="background:#000;border-color:#222;">
+          <button class="btn-text" style="color:#fff;font-size:22px;padding:0;width:44px;height:44px;"><span class="material-icons">settings</span></button>
+          <div class="navbar-title" style="color:#fff;">Timer</div>
+          <button class="btn-text" style="color:#fff;font-size:22px;padding:0;width:44px;height:44px;"><span class="material-icons">refresh</span></button>
+        </div>
+        <div class="screen-body" style="background:#000;display:flex;flex-direction:column;">
+          <div class="timer-tile green" style="flex:2;opacity:.3;">
+            <div class="timer-tile-label">Work</div>
+            <div class="timer-tile-time" style="font-size:72px;">00:45</div>
+          </div>
+          <div class="timer-tile red" style="flex:1;opacity:.3;">
+            <div class="timer-tile-label">Rest</div>
+            <div class="timer-tile-time" style="font-size:48px;">00:15</div>
+          </div>
+          <div style="background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px 20px;">
+            <div style="color:#aaa;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;">⏸ Paused · Cycle 2 / 4</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:20px;">
+              <button style="width:64px;height:64px;background:#fff;border:none;border-radius:50%;color:#000;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(255,255,255,.25);"><span class="material-icons" style="font-size:34px;">play_arrow</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="tabbar" style="background:#000;border-color:#222;">
+          <div class="tab"><div class="tab-icon"><span class="material-icons">fitness_center</span></div>Workouts</div>
+          <div class="tab"><div class="tab-icon"><span class="material-icons">sports_soccer</span></div>Games</div>
+          <div class="tab active" style="color:#fff;"><div class="tab-icon"><span class="material-icons">timer</span></div>Timer</div>
+          <div class="tab"><div class="tab-icon"><span class="material-icons">location_on</span></div>Near Me</div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <span class="note-badge">PLAY/PAUSE</span>
+      <ul>
+        <li><span class="change">⏸ Pause: 64×64 white circle, center-bottom — glove-safe, can't miss it</span></li>
+        <li><span class="change">▶ Resume: same button, same spot — no hunting when timer is paused</span></li>
+        <li><span class="change">⏮ Skip back: returns to start of current interval or previous interval</span></li>
+        <li><span class="change">⏭ Skip next: advance to next interval (skip rest, skip prepare)</span></li>
+        <li><span class="change">Tiles dim to 30% opacity on pause — clear frozen state</span></li>
+        <li><span class="change">"⏸ Paused" label replaces round counter while paused</span></li>
+        <li><span class="same">↺ Reset in navbar resets to zero — separate from pause</span></li>
+      </ul>
     </div>
   </div>
 

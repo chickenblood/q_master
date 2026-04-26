@@ -55,7 +55,7 @@
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: .12em;
-    color: #404040;
+    color: #7c7c7c;
     padding: 28px 32px 10px;
   }
   .screens-row {
@@ -83,12 +83,12 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: .08em;
-    color: #505050;
+    color: #7c7c7c;
     text-align: center;
   }
   .frame-sublabel {
     font-size: 10px;
-    color: #383838;
+    color: #7e7e7e;
     text-align: center;
     margin-top: -6px;
   }
@@ -158,7 +158,7 @@
     align-items: center;
     padding: 10px 0 12px;
     font-size: 10px;
-    color: #3a3a3a;
+    color: #787878;
     gap: 3px;
     cursor: pointer;
     position: relative;
@@ -203,7 +203,7 @@
     text-overflow: ellipsis;
     letter-spacing: -.2px;
   }
-  .item-subtitle { font-size: 12px; color: #505050; margin-top: 3px; }
+  .item-subtitle { font-size: 12px; color: #787878; margin-top: 3px; }
 
   /* Section preview chips on list items */
   .section-preview { display: flex; gap: 5px; margin-top: 5px; flex-wrap: wrap; }
@@ -397,7 +397,7 @@
   .settings-row-label { flex: 1; font-size: 16px; color: #d0d0d0; }
   .settings-row-value { font-size: 22px; font-weight: 800; color: #f0f0f0; font-variant-numeric: tabular-nums; }
   .seg-btn { display: flex; border: 1.5px solid #252525; border-radius: 6px; overflow: hidden; font-size: 12px; }
-  .seg-item { padding: 7px 11px; background: transparent; cursor: pointer; font-weight: 700; border: none; color: #555; }
+  .seg-item { padding: 7px 11px; background: transparent; cursor: pointer; font-weight: 700; border: none; color: #7a7a7a; }
   .seg-item.active { background: #e53935; color: #fff; }
 
   /* ─── Timer setup rows ────────────────────────────────────────────────── */
@@ -470,6 +470,57 @@
     align-items: center;
     justify-content: center;
   }
+
+  /* ─── Light theme phone ───────────────────────────────────────────────── */
+  .phone.light {
+    background: #f8f8f8;
+    border-color: #c8c8c8;
+    box-shadow: 0 24px 64px rgba(0,0,0,.14), 0 0 0 1px rgba(0,0,0,.06);
+  }
+  .phone.light .statusbar { background: #f8f8f8; color: #1a1a1a; }
+  .phone.light .navbar { background: #ffffff; border-bottom-color: #e8e8e8; }
+  .phone.light .navbar-title { color: #121212; }
+  .phone.light .icon-btn { color: #606060; }
+  .phone.light .btn-text { color: #606060; }
+  .phone.light .tabbar { background: #f8f8f8; border-top-color: #e8e8e8; }
+  .phone.light .tab { color: #6d6d6d; }
+  .phone.light .tab.active { color: #121212; }
+  .phone.light .screen-body { background: #f5f5f5; }
+  .phone.light .list-item { background: #ffffff; border-bottom-color: #f0f0f0; }
+  .phone.light .item-title { color: #121212; }
+  .phone.light .item-subtitle { color: #6f6f6f; }
+  .phone.light .section-chip { background: #f0f0f0; border-color: #e0e0e0; color: #666666; }
+  .phone.light .section-header-row { background: #f0f0f0; border-bottom-color: #e4e4e4; color: #d32f2f; }
+  .phone.light .btn-secondary { color: #444; border-color: #ccc; }
+  .phone.light .setup-row { background: #ffffff; border-bottom-color: #f0f0f0; }
+  .phone.light .setup-row-label { color: #666; }
+  .phone.light .setup-row-value { color: #121212; }
+  .phone.light .settings-card { background: #ffffff; border-color: #e8e8e8; }
+  .phone.light .settings-card-header { background: #f5f5f5; border-bottom-color: #e8e8e8; color: #d32f2f; }
+  .phone.light .settings-row { border-bottom-color: #f0f0f0; }
+  .phone.light .settings-row-label { color: #333; }
+  .phone.light .settings-row-value { color: #121212; }
+  .phone.light .seg-btn { border-color: #ddd; }
+  .phone.light .seg-item { color: #6f6f6f; }
+  .phone.light .seg-item.active { background: #d32f2f; color: #fff; }
+  .phone.light .chip { background: #f0f0f0; border-color: #e0e0e0; color: #666; }
+  .phone.light .text-field { color: #121212; border-bottom-color: #ccc; }
+  .phone.light .text-field::placeholder { color: #6f6f6f; }
+  .phone.light .text-field-sm { background: #f5f5f5; border-color: #e0e0e0; color: #121212; }
+  .phone.light .text-field-sm::placeholder { color: #6f6f6f; }
+  .phone.light .drag-handle { color: #6f6f6f; }
+  .phone.light .empty-state { color: #6f6f6f; }
+  .phone.light .timer-tile.green  { background: #e8f5e9; }
+  .phone.light .timer-tile.green  .timer-tile-label { color: #2e7d32; }
+  .phone.light .timer-tile.green  .timer-tile-time  { color: #2e7d32; }
+  .phone.light .timer-tile.orange { background: #fff3e0; }
+  .phone.light .timer-tile.orange .timer-tile-label { color: #bf360c; }
+  .phone.light .timer-tile.orange .timer-tile-time  { color: #bf360c; }
+  .phone.light .timer-tile.red    { background: #ffebee; }
+  .phone.light .timer-tile.red    .timer-tile-label { color: #c62828; }
+  .phone.light .timer-tile.red    .timer-tile-time  { color: #c62828; }
+  .phone.light [style*="color:#e53935"] { color: #d32f2f !important; }
+  .phone.light [style*="background:#e53935"] { background: #d32f2f !important; }
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
@@ -526,7 +577,7 @@
     <div class="token-group">
       <h3>Design Philosophy</h3>
       <div style="font-size:12px;color:#666;line-height:1.8;max-width:200px;">
-        <div><span style="color:#e53935;font-weight:700;">Dark-only.</span> No light mode. Designed for pre-dawn eyes.</div>
+        <div><span style="color:#e53935;font-weight:700;">Dark-first.</span> Designed for pre-dawn eyes. Light mode available via Settings.</div>
         <div><span style="color:#e53935;font-weight:700;">One accent.</span> F3 Red for all actions, states, labels.</div>
         <div><span style="color:#e53935;font-weight:700;">Angular.</span> 8 px radius — utility over decoration.</div>
         <div><span style="color:#e53935;font-weight:700;">Larger.</span> 18 px list, 19 px navbar, 68 px setup rows.</div>
@@ -624,7 +675,7 @@
         <li><span class="change">List row 72 px — cold/gloved hands, pre-dawn</span></li>
         <li><span class="change">Section preview chips inline on each item — Q can see workout content without tapping</span></li>
         <li><span class="change">Title: 18 px weight 800 — max legibility at glance</span></li>
-        <li><span class="change">Dark-only — no light mode exists</span></li>
+        <li><span class="change">Dark-first — light mode available via Settings → Theme</span></li>
         <li><span class="change">Red tab underline indicator for active tab</span></li>
         <li><span class="same">Overflow menu (⋯), reorder, swipe-to-delete</span> — unchanged</li>
         <li><span class="same">Tap row → Workout Detail card</span> (new standard flow)</li>
@@ -1239,8 +1290,9 @@
           <div class="timer-tile-label">Work</div>
           <div class="timer-tile-time" style="font-size:82px;">23:14</div>
         </div>
-        <div style="flex:1;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;">
-          <div style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#e53935;">Round 1 of 3</div>
+        <div style="flex:1;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px 20px;">
+          <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#e53935;">Round 1 of 3</div>
+            <button style="width:64px;height:64px;background:#e53935;border:none;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(229,57,53,.45);"><span class="material-icons" style="font-size:34px;">pause</span></button>
         </div>
       </div>
       <div class="tabbar">
@@ -1271,8 +1323,9 @@
           <div class="timer-tile-label">Rest</div>
           <div class="timer-tile-time" style="font-size:48px;">00:15</div>
         </div>
-        <div style="background:#0a0a0a;display:flex;align-items:center;justify-content:center;padding:10px;">
+        <div style="background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px 20px;">
           <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#e53935;">Cycle 2 / 4 · Round 3 / 5</div>
+            <button style="width:64px;height:64px;background:#e53935;border:none;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(229,57,53,.45);"><span class="material-icons" style="font-size:34px;">pause</span></button>
         </div>
       </div>
       <div class="tabbar">
@@ -1303,8 +1356,9 @@
           <div class="timer-tile-label">Work</div>
           <div class="timer-tile-time" style="font-size:48px;">00:45</div>
         </div>
-        <div style="background:#0a0a0a;display:flex;align-items:center;justify-content:center;padding:10px;">
+        <div style="background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px 20px;">
           <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#e53935;">Round 1 of 5</div>
+            <button style="width:64px;height:64px;background:#e53935;border:none;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(229,57,53,.45);"><span class="material-icons" style="font-size:34px;">pause</span></button>
         </div>
       </div>
       <div class="tabbar">
@@ -1313,6 +1367,54 @@
         <div class="tab active"><div class="tab-icon"><span class="material-icons">timer</span></div>Timer</div>
         <div class="tab"><div class="tab-icon"><span class="material-icons">location_on</span></div>Near Me</div>
       </div>
+    </div>
+  </div>
+
+  <!-- Paused state -->
+  <div class="pair">
+    <div class="frame-wrap">
+      <div class="frame-label">Paused</div>
+      <div class="frame-sublabel">Tiles dim, red play button</div>
+      <div class="phone">
+        <div class="statusbar">9:41<div class="statusbar-right"><span class="material-icons" style="font-size:11px;">signal_cellular_alt</span><span class="material-icons" style="font-size:11px;">wifi</span><span class="material-icons" style="font-size:11px;">battery_full</span></div></div>
+        <div class="navbar">
+          <div style="width:44px;"></div>
+          <div class="navbar-title">Timer</div>
+          <button class="icon-btn" style="color:#e53935;"><span class="material-icons">refresh</span></button>
+        </div>
+        <div class="screen-body" style="display:flex;flex-direction:column;">
+          <div class="timer-tile green" style="flex:2;opacity:.25;">
+            <div class="timer-tile-label">Work</div>
+            <div class="timer-tile-time" style="font-size:72px;">00:45</div>
+          </div>
+          <div class="timer-tile red" style="flex:1;opacity:.25;">
+            <div class="timer-tile-label">Rest</div>
+            <div class="timer-tile-time" style="font-size:48px;">00:15</div>
+          </div>
+          <div style="background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px 20px;">
+            <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e53935;">⏸ Paused · Cycle 2 / 4</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:20px;">
+              <button style="width:64px;height:64px;background:#e53935;border:none;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(229,57,53,.5);"><span class="material-icons" style="font-size:34px;">play_arrow</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="tabbar">
+          <div class="tab"><div class="tab-icon"><span class="material-icons">fitness_center</span></div>Workouts</div>
+          <div class="tab"><div class="tab-icon"><span class="material-icons">sports_soccer</span></div>Games</div>
+          <div class="tab active"><div class="tab-icon"><span class="material-icons">timer</span></div>Timer</div>
+          <div class="tab"><div class="tab-icon"><span class="material-icons">location_on</span></div>Near Me</div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <span class="note-badge">Play/Pause Design</span>
+      <ul>
+        <li><span class="change">Pause: 64×64 F3 Red circle — consistent accent, unmissable in dark</span></li>
+        <li><span class="change">Resume: same button, same position — no hunting after glancing away</span></li>
+        <li><span class="change">Tiles dim to 25% opacity on pause — frozen state is obvious</span></li>
+        <li><span class="change">"⏸ Paused" in F3 Red replaces round counter label</span></li>
+        <li><span class="same">↺ Reset in navbar resets to zero and returns to setup card</span></li>
+      </ul>
     </div>
   </div>
 
@@ -1501,6 +1603,253 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
+     10. LIGHT THEME VARIANTS
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="section-title">10 — Light Theme Variants</div>
+<div style="padding:0 32px 10px;">
+  <div style="display:inline-flex;align-items:center;gap:8px;background:#0e0e0e;border:1px solid #252525;border-radius:6px;padding:8px 12px;color:#808080;font-size:12px;font-weight:600;">
+    <span class="material-icons" style="font-size:15px;color:#e53935;">wb_sunny</span>
+    Same design language, same F3 Red accent — white/gray surfaces replace dark. Dark remains the default.
+  </div>
+</div>
+<div class="screens-row">
+
+  <!-- Workouts list — light -->
+  <div class="pair">
+    <div class="frame-wrap">
+      <div class="frame-label">Workouts · Light</div>
+      <div class="phone light">
+        <div class="statusbar">9:41<div class="statusbar-right"><span class="material-icons" style="font-size:11px;">signal_cellular_alt</span><span class="material-icons" style="font-size:11px;">wifi</span><span class="material-icons" style="font-size:11px;">battery_full</span></div></div>
+        <div class="navbar">
+          <button class="icon-btn"><span class="material-icons">settings</span></button>
+          <div class="navbar-title">Workouts</div>
+          <button class="icon-btn"><span class="material-icons">add</span></button>
+        </div>
+        <div class="screen-body scroll-content">
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">Bear Crawl Beatdown</div>
+              <div class="section-preview">
+                <span class="section-chip">Warmup</span>
+                <span class="section-chip">Thang</span>
+                <span class="section-chip">Mary</span>
+              </div>
+              <div class="item-subtitle">Sat 29 Mar 2026 · 05:30</div>
+            </div>
+            <button class="icon-btn"><span class="material-icons">more_horiz</span></button>
+          </div>
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">Murph Prep</div>
+              <div class="section-preview">
+                <span class="section-chip">Run</span>
+                <span class="section-chip">Merkins</span>
+                <span class="section-chip">Run</span>
+              </div>
+              <div class="item-subtitle">Mon 21 Apr 2026 · 05:30</div>
+            </div>
+            <button class="icon-btn"><span class="material-icons">more_horiz</span></button>
+          </div>
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">Deck of Death</div>
+              <div class="section-preview">
+                <span class="section-chip">Warmup</span>
+                <span class="section-chip">Cards</span>
+              </div>
+              <div class="item-subtitle">Wed 23 Apr 2026 · 05:30</div>
+            </div>
+            <button class="icon-btn"><span class="material-icons">more_horiz</span></button>
+          </div>
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">Coupon Carrier</div>
+              <div class="section-preview">
+                <span class="section-chip">Mosey</span>
+                <span class="section-chip">Coupons</span>
+                <span class="section-chip">Mary</span>
+              </div>
+              <div class="item-subtitle">Fri 25 Apr 2026 · 05:30</div>
+            </div>
+            <button class="icon-btn"><span class="material-icons">more_horiz</span></button>
+          </div>
+        </div>
+        <div class="tabbar">
+          <div class="tab active"><div class="tab-icon"><span class="material-icons">fitness_center</span></div>Workouts</div>
+          <div class="tab"><div class="tab-icon"><span class="material-icons">sports_soccer</span></div>Games</div>
+          <div class="tab"><div class="tab-icon"><span class="material-icons">timer</span></div>Timer</div>
+          <div class="tab"><div class="tab-icon"><span class="material-icons">location_on</span></div>Near Me</div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <span class="note-badge">Light Theme</span>
+      <ul>
+        <li><span class="change">#ffffff cards on #f5f5f5 page — familiar daylight reading surface</span></li>
+        <li><span class="change">F3 Red accent unchanged — tab indicator, badges, labels all stay red</span></li>
+        <li><span class="change">Section chips: light gray fill, darker border text — readable in sunlight</span></li>
+        <li><span class="same">All sizing unchanged — 72 px rows, 800-weight titles, 44 px targets</span></li>
+        <li><span class="same">Dark is the default; light activated via Settings → Theme or system preference</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Timer setup — light -->
+  <div class="frame-wrap">
+    <div class="frame-label">Timer Setup · Light</div>
+    <div class="phone light">
+      <div class="statusbar">9:41<div class="statusbar-right"><span class="material-icons" style="font-size:11px;">signal_cellular_alt</span><span class="material-icons" style="font-size:11px;">wifi</span><span class="material-icons" style="font-size:11px;">battery_full</span></div></div>
+      <div class="navbar">
+        <div style="width:44px;"></div>
+        <div class="navbar-title">Timer</div>
+        <div style="width:44px;"></div>
+      </div>
+      <div class="screen-body" style="display:flex;flex-direction:column;padding:12px;gap:10px;overflow:hidden;">
+        <div style="background:#ffffff;border:1px solid #e8e8e8;border-radius:8px;padding:14px;">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e53935;margin-bottom:10px;">Mode</div>
+          <div class="seg-btn" style="width:100%;">
+            <button class="seg-item" style="flex:1;">Stopwatch</button>
+            <button class="seg-item active" style="flex:1;">Tabata</button>
+          </div>
+        </div>
+        <div style="background:#ffffff;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;">
+          <div style="padding:8px 16px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e53935;background:#f5f5f5;border-bottom:1px solid #e8e8e8;">Intervals — tap to change</div>
+          <div class="setup-row">
+            <span class="setup-row-label">Prepare</span>
+            <span class="setup-row-value" style="color:#d84315;">0:10</span>
+            <span class="material-icons" style="font-size:18px;color:#ccc;margin-left:6px;">chevron_right</span>
+          </div>
+          <div class="setup-row">
+            <span class="setup-row-label">Work</span>
+            <span class="setup-row-value" style="color:#2e7d32;">0:45</span>
+            <span class="material-icons" style="font-size:18px;color:#ccc;margin-left:6px;">chevron_right</span>
+          </div>
+          <div class="setup-row">
+            <span class="setup-row-label">Rest</span>
+            <span class="setup-row-value" style="color:#c62828;">0:15</span>
+            <span class="material-icons" style="font-size:18px;color:#ccc;margin-left:6px;">chevron_right</span>
+          </div>
+          <div class="setup-row">
+            <span class="setup-row-label">Rounds</span>
+            <span class="setup-row-value">5</span>
+            <span class="material-icons" style="font-size:18px;color:#ccc;margin-left:6px;">chevron_right</span>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;align-items:flex-end;padding-bottom:4px;">
+          <button class="btn-primary" style="min-height:62px;font-size:20px;font-weight:900;gap:10px;letter-spacing:-.2px;">
+            <span class="material-icons" style="font-size:26px;">play_arrow</span> Start Timer
+          </button>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="tab"><div class="tab-icon"><span class="material-icons">fitness_center</span></div>Workouts</div>
+        <div class="tab"><div class="tab-icon"><span class="material-icons">sports_soccer</span></div>Games</div>
+        <div class="tab active"><div class="tab-icon"><span class="material-icons">timer</span></div>Timer</div>
+        <div class="tab"><div class="tab-icon"><span class="material-icons">location_on</span></div>Near Me</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timer running — light -->
+  <div class="frame-wrap">
+    <div class="frame-label">Timer Running · Light</div>
+    <div class="phone light">
+      <div class="statusbar">9:41<div class="statusbar-right"><span class="material-icons" style="font-size:11px;">signal_cellular_alt</span><span class="material-icons" style="font-size:11px;">wifi</span><span class="material-icons" style="font-size:11px;">battery_full</span></div></div>
+      <div class="navbar">
+        <div style="width:44px;"></div>
+        <div class="navbar-title">Timer</div>
+        <button class="icon-btn"><span class="material-icons">refresh</span></button>
+      </div>
+      <div class="screen-body" style="display:flex;flex-direction:column;">
+        <div class="timer-tile green" style="flex:2;">
+          <div class="timer-tile-label">Work</div>
+          <div class="timer-tile-time" style="font-size:72px;">00:45</div>
+        </div>
+        <div class="timer-tile red" style="flex:1;">
+          <div class="timer-tile-label">Rest</div>
+          <div class="timer-tile-time" style="font-size:48px;">00:15</div>
+        </div>
+        <div style="background:#eeeeee;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px 20px;">
+          <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#e53935;">Cycle 2 / 4 · Round 3 / 5</div>
+          <button style="width:64px;height:64px;background:#e53935;border:none;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(229,57,53,.35);"><span class="material-icons" style="font-size:34px;">pause</span></button>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="tab"><div class="tab-icon"><span class="material-icons">fitness_center</span></div>Workouts</div>
+        <div class="tab"><div class="tab-icon"><span class="material-icons">sports_soccer</span></div>Games</div>
+        <div class="tab active"><div class="tab-icon"><span class="material-icons">timer</span></div>Timer</div>
+        <div class="tab"><div class="tab-icon"><span class="material-icons">location_on</span></div>Near Me</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings — light -->
+  <div class="frame-wrap">
+    <div class="frame-label">Settings · Light</div>
+    <div class="phone light">
+      <div class="statusbar">9:41<div class="statusbar-right"><span class="material-icons" style="font-size:11px;">signal_cellular_alt</span><span class="material-icons" style="font-size:11px;">wifi</span><span class="material-icons" style="font-size:11px;">battery_full</span></div></div>
+      <div class="navbar">
+        <button class="icon-btn"><span class="material-icons">close</span></button>
+        <div class="navbar-title">Settings</div>
+        <div style="width:44px;"></div>
+      </div>
+      <div class="screen-body scroll-content" style="overflow:hidden;padding-top:8px;">
+        <div class="settings-card">
+          <div class="settings-card-header">Workouts</div>
+          <div class="settings-row">
+            <span class="settings-row-label">Exercises per page</span>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="range" style="width:64px;accent-color:#e53935;" value="5" min="1" max="20" />
+              <span class="settings-row-value" style="font-size:22px;min-width:22px;">5</span>
+            </div>
+          </div>
+        </div>
+        <div class="settings-card">
+          <div class="settings-card-header">Timer</div>
+          <div class="settings-row">
+            <span class="settings-row-label" style="margin-right:8px;">Type</span>
+            <div class="seg-btn">
+              <button class="seg-item active">Stopwatch</button>
+              <button class="seg-item">Tabata</button>
+            </div>
+          </div>
+          <div class="settings-row">
+            <span class="settings-row-label">Work</span>
+            <span class="settings-row-value" style="color:#2e7d32;">0:45</span>
+          </div>
+          <div class="settings-row">
+            <span class="settings-row-label">Rest</span>
+            <span class="settings-row-value" style="color:#c62828;">0:15</span>
+          </div>
+          <div class="settings-row">
+            <span class="settings-row-label">Rounds</span>
+            <span class="settings-row-value">5</span>
+          </div>
+        </div>
+        <div class="settings-card">
+          <div class="settings-card-header">General</div>
+          <div class="settings-row">
+            <span class="settings-row-label">Theme</span>
+            <div class="seg-btn">
+              <button class="seg-item">System</button>
+              <button class="seg-item active">Light</button>
+              <button class="seg-item">Dark</button>
+            </div>
+          </div>
+          <div class="settings-row">
+            <span class="settings-row-label">Motorboat sound</span>
+            <div style="width:44px;height:26px;background:#e53935;border-radius:13px;display:flex;align-items:center;padding:2px;">
+              <div style="width:22px;height:22px;background:#fff;border-radius:50%;margin-left:auto;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
      COMPARISON: ALL THREE OPTIONS
 ═══════════════════════════════════════════════════════════════════════════ -->
 <div class="section-title">All Three Options — Comparison</div>
@@ -1525,7 +1874,7 @@
         <td style="padding:12px 16px;font-weight:700;color:#666;">Theme</td>
         <td style="padding:12px 16px;color:#888;">Light primary, dark supported</td>
         <td style="padding:12px 16px;color:#888;">Light primary, dark supported</td>
-        <td style="padding:12px 16px;color:#f0f0f0;font-weight:600;">Dark only — The Gloom is the design</td>
+        <td style="padding:12px 16px;color:#f0f0f0;font-weight:600;">Dark-first — light mode available via Settings</td>
       </tr>
       <tr style="border-bottom:1px solid #141414;">
         <td style="padding:12px 16px;font-weight:700;color:#666;">Color palette</td>
