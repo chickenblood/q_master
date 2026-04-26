@@ -324,7 +324,10 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                     DotsIndicator(
                       animate: true,
                       dotsCount: pages.length,
-                      decorator: const DotsDecorator(
+                      decorator: DotsDecorator(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.24),
                         activeColor: _beatdownAccent,
                       ),
                       position: _pageIndex.value.toDouble(),

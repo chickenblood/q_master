@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -250,6 +251,7 @@ final class _WorkoutTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const padding = EdgeInsets.symmetric(horizontal: 16, vertical: 14);
+    final isIOS = Theme.of(context).platform == TargetPlatform.iOS;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -298,12 +300,32 @@ final class _WorkoutTile extends StatelessWidget {
                 ),
               ],
             ),
-            trailing: _OverflowMenu(
-              onEdit: () => _editWorkout(context, workout),
-              onDuplicate: () => _duplicateWorkout(workout),
-              onShare: (buttonContext) => _shareWorkout(buttonContext, workout),
-              onDelete: () => _deleteWorkout(context, workout),
-            ),
+            trailing: isIOS
+                ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _OverflowMenu(
+                        onEdit: () => _editWorkout(context, workout),
+                        onDuplicate: () => _duplicateWorkout(workout),
+                        onShare: (buttonContext) =>
+                            _shareWorkout(buttonContext, workout),
+                        onDelete: () => _deleteWorkout(context, workout),
+                      ),
+                      const SizedBox(width: 6),
+                      Icon(
+                        CupertinoIcons.chevron_forward,
+                        size: 18,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ],
+                  )
+                : _OverflowMenu(
+                    onEdit: () => _editWorkout(context, workout),
+                    onDuplicate: () => _duplicateWorkout(workout),
+                    onShare: (buttonContext) =>
+                        _shareWorkout(buttonContext, workout),
+                    onDelete: () => _deleteWorkout(context, workout),
+                  ),
             onTap: () => _showBeatdownBrowser(context, workout),
           ),
         ),
