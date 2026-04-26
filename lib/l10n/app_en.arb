@@ -310,5 +310,13 @@
     "timerSettingsCyclesLabel": "Cycles",
     "@timerSettingsCyclesLabel": {
       "description": "Settings input label for the number of cycles."
+    },
+    "beatdownBrowserBackButton": "Back",
+    "@beatdownBrowserBackButton": {
+      "description": "Tooltip for the back button in the beatdown browser section bar."
+    },
+    "beatdownBrowserNextLabel": "Next:",
+    "@beatdownBrowserNextLabel": {
+      "description": "Label for the next exercise button in the beatdown browser."
     }
   }
