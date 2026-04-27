@@ -26,7 +26,7 @@ final class TimerScreen extends ConsumerWidget {
       backgroundColor: Theme.of(context).colorScheme.primary,
       onPressed: () => _resetTimer(ref),
       child: Icon(
-        PlatformIcons(context).refresh,
+        PlatformIcons(context).refreshBold,
         color: Theme.of(context).colorScheme.onPrimary, // White from theme
       ),
     );

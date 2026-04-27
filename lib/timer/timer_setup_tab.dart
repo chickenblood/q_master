@@ -117,11 +117,15 @@ class TimerSetupTab extends ConsumerWidget {
                           children: [
                             // Mode selector
                             Card(
-                              color: const Color(0xFF0d0d0d),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHighest,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                side: const BorderSide(
-                                  color: Color(0xFF1c1c1c),
+                                side: BorderSide(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.outlineVariant,
                                 ),
                               ),
                               child: Padding(
@@ -215,11 +219,15 @@ class TimerSetupTab extends ConsumerWidget {
                             const SizedBox(height: 10),
                             // Interval card
                             Card(
-                              color: const Color(0xFF0d0d0d),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHighest,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                side: const BorderSide(
-                                  color: Color(0xFF1c1c1c),
+                                side: BorderSide(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.outlineVariant,
                                 ),
                               ),
                               child: Column(
@@ -230,11 +238,15 @@ class TimerSetupTab extends ConsumerWidget {
                                       vertical: 8,
                                       horizontal: 16,
                                     ),
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF0a0a0a),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.surface,
                                       border: Border(
                                         bottom: BorderSide(
-                                          color: Color(0xFF1a1a1a),
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.outlineVariant,
                                         ),
                                       ),
                                     ),
@@ -359,10 +371,16 @@ class TimerSetupTab extends ConsumerWidget {
                       Icon(
                         context.platformIcons.playArrowSolid,
                         size: 26,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
                       const SizedBox(width: 10),
-                      Text(l10n.timerStartButtonLabel),
+                      Text(
+                        l10n.timerStartButtonLabel,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
                     ],
                   ),
                 ),

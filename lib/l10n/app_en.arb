@@ -49,6 +49,22 @@
     "@settingsAboutDialogDescription": {
       "description": "Credits text shown in the About section of the Settings sheet."
     },
+    "workoutCreationPickerTitle": "How would you like to create a workout?",
+    "@workoutCreationPickerTitle": {
+      "description": "Title for the unified workout creation picker modal sheet."
+    },
+    "workoutCreationPickerManual": "Create manually",
+    "@workoutCreationPickerManual": {
+      "description": "Button label for manual workout creation in the picker."
+    },
+    "workoutCreationPickerGenerate": "Generate with AI",
+    "@workoutCreationPickerGenerate": {
+      "description": "Button label for AI-generated workout creation in the picker."
+    },
+    "workoutCreationPickerFromTemplate": "From template",
+    "@workoutCreationPickerFromTemplate": {
+      "description": "Button label for creating a workout from a template in the picker."
+    },
     "createWorkoutDialogTitle": "Create Workout",
     "@createWorkoutDialogTitle": {
       "description": "Title of the bottom sheet for creating a new workout."

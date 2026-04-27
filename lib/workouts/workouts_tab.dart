@@ -14,11 +14,11 @@ import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_menu.dart';
 import '../ui/adaptive_modal_sheet.dart';
 import '../ui/dismissible_row.dart';
-import '../ui/expandable_fab.dart';
 import '../utils/datetime_utils.dart';
 import 'beatdown_browser_screen.dart';
 import 'create_workout_sheet.dart';
 import 'generate_workout_sheet.dart';
+import 'workout_creation_picker.dart';
 
 class WorkoutsTab extends ConsumerWidget {
   const WorkoutsTab({super.key});
@@ -33,22 +33,6 @@ class WorkoutsTab extends ConsumerWidget {
       ),
     ),
   );
-
-  Future<void> _showComposeWorkoutModal(
-    BuildContext context,
-    WidgetRef ref,
-  ) async {
-    final navigator = Navigator.of(context, rootNavigator: true);
-
-    final workout = await showAdaptiveModalSheet(
-      context: navigator.context,
-      child: CreateWorkoutSheet(),
-    );
-    if (workout != null) {
-      final listNotifier = ref.read(workoutListProvider.notifier);
-      listNotifier.add(workout);
-    }
-  }
 
   Future<void> _showGenerateWorkoutModal(
     BuildContext context,
@@ -74,32 +58,31 @@ class WorkoutsTab extends ConsumerWidget {
     }
   }
 
-  // The FAB is only for Android. We use the app bar trailing menu on iOS.
-  Widget? _androidAddWorkoutFAB(
-    BuildContext context, {
-    required WidgetRef ref,
-  }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark
-        ? const Color(0xFFF0F0F0)
-        : const Color(0xFF121212);
+  Future<void> _showWorkoutCreationPicker(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final navigator = Navigator.of(context, rootNavigator: true);
 
-    return ExpandableFab(
-      distance: 112,
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      children: [
-        ActionButton(
-          onPressed: () => _showComposeWorkoutModal(context, ref),
-          icon: Icon(AdaptiveIcons.create, color: iconColor),
-          label: L10n.of(context)!.createWorkoutDialogTitle,
-        ),
-        ActionButton(
-          onPressed: () => _showGenerateWorkoutModal(context, ref),
-          icon: Icon(AdaptiveIcons.sparkles, color: iconColor),
-          label: L10n.of(context)!.generateWorkoutDialogTitle,
-        ),
-      ],
+    final result = await showModalBottomSheet<WorkoutCreationType>(
+      context: navigator.context,
+      showDragHandle: true,
+      builder: (context) => const WorkoutCreationPicker(),
     );
+    if (result == .manual) {
+      final workout = await showAdaptiveModalSheet(
+        // ignore: use_build_context_synchronously
+        context: navigator.context,
+        child: CreateWorkoutSheet(),
+      );
+      if (workout != null) {
+        final listNotifier = ref.read(workoutListProvider.notifier);
+        listNotifier.add(workout);
+      }
+    } else if (result == .generate) {
+      // ignore: use_build_context_synchronously
+      await _showGenerateWorkoutModal(navigator.context, ref);
+    }
   }
 
   @override
@@ -119,24 +102,12 @@ class WorkoutsTab extends ConsumerWidget {
           ),
           cupertino: (appBarContext, _) => CupertinoNavigationBarData(
             backgroundColor: Colors.transparent,
-            // Add menu only on iOS since FAB is used on Android.
-            trailing: AdaptiveMenu(
+            trailing: PlatformIconButton(
               icon: Icon(
                 PlatformIcons(context).add,
                 color: Theme.of(appBarContext).colorScheme.onSurface,
               ),
-              menuChildren: [
-                AdaptiveMenuItem(
-                  text: L10n.of(context)!.createWorkoutDialogTitle,
-                  icon: AdaptiveIcons.create,
-                  onPressed: () => _showComposeWorkoutModal(context, ref),
-                ),
-                AdaptiveMenuItem(
-                  text: L10n.of(context)!.generateWorkoutDialogTitle,
-                  icon: AdaptiveIcons.sparkles,
-                  onPressed: () => _showGenerateWorkoutModal(context, ref),
-                ),
-              ],
+              onPressed: () => _showWorkoutCreationPicker(context, ref),
             ),
           ),
         ),
@@ -158,7 +129,17 @@ class WorkoutsTab extends ConsumerWidget {
               )
             : _emptyContentPlaceholder(context),
         material: (innerContext, _) => MaterialScaffoldData(
-          floatingActionButton: _androidAddWorkoutFAB(innerContext, ref: ref),
+          floatingActionButton: Builder(
+            builder: (fabContext) => FloatingActionButton(
+              backgroundColor: Theme.of(fabContext).colorScheme.primary,
+              foregroundColor: Theme.of(fabContext).colorScheme.onPrimary,
+              child: Icon(
+                PlatformIcons(fabContext).add,
+                color: Theme.of(fabContext).colorScheme.onPrimary,
+              ),
+              onPressed: () => _showWorkoutCreationPicker(fabContext, ref),
+            ),
+          ),
         ),
       ),
     );
