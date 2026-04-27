@@ -1,6 +1,3 @@
-import 'dart:math';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,11 +5,9 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 import '../l10n/l10n.dart';
 import '../model/timer.dart';
-import '../theme/theme.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_modal_sheet.dart';
 import '../ui/cupertino_sheet_fork.dart';
-import '../utils/datetime_utils.dart';
 import '../utils/shared_app_prefs.dart';
 
 final class SettingsActionButton extends StatelessWidget {
@@ -36,7 +31,6 @@ final class SettingsActionButton extends StatelessWidget {
 
 class _SettingsSheet extends ConsumerWidget {
   const _SettingsSheet();
-  static const _minimumTimePeriodSeconds = 5;
 
   Future<void> _showAboutDialog(BuildContext context) async {
     final l10n = L10n.of(context)!;
@@ -99,23 +93,7 @@ class _SettingsSheet extends ConsumerWidget {
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
 
-    final timeIntervalSettings = [
-      (
-        prefs.prepareIntervalSeconds,
-        L10n.of(context)!.timerSettingsPrepareLabel,
-        TimerColors.prepareFg(context),
-      ),
-      (
-        prefs.workIntervalSeconds,
-        L10n.of(context)!.timerSettingsWorkLabel,
-        TimerColors.workFg(context),
-      ),
-      (
-        prefs.restIntervalSeconds,
-        L10n.of(context)!.timerSettingsRestLabel,
-        TimerColors.restFg(context),
-      ),
-    ];
+    // Timer settings removed
 
     return ListenableBuilder(
       listenable: prefs,
@@ -142,45 +120,54 @@ class _SettingsSheet extends ConsumerWidget {
                                 data: SliderTheme.of(
                                   context,
                                 ).copyWith(trackHeight: 7),
-                                child: Slider(
+                                child: SliderTheme(
+                                  data: SliderTheme.of(context).copyWith(
+                                    activeTrackColor: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                    inactiveTrackColor: Theme.of(
+                                      context,
+                                    ).colorScheme.primary.withOpacity(0.24),
+                                    thumbColor: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
+                                  child: Slider(
+                                    value: prefs.exercisesPerPage.value
+                                        .toDouble(),
+                                    min: 1,
+                                    max: SharedAppPrefs.maxExercisesPerPage
+                                        .toDouble(),
+                                    divisions: 30,
+                                    onChanged: (value) =>
+                                        prefs.exercisesPerPage.value = value
+                                            .round(),
+                                  ),
+                                ),
+                              )
+                            : SliderTheme(
+                                data: SliderTheme.of(context).copyWith(
+                                  activeTrackColor: Theme.of(
+                                    context,
+                                  ).colorScheme.primary,
+                                  inactiveTrackColor: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.24),
+                                  thumbColor: Theme.of(
+                                    context,
+                                  ).colorScheme.primary,
+                                ),
+                                child: Slider.adaptive(
                                   value: prefs.exercisesPerPage.value
                                       .toDouble(),
                                   min: 1,
                                   max: SharedAppPrefs.maxExercisesPerPage
                                       .toDouble(),
                                   divisions: 30,
-                                  activeColor: Theme.of(
-                                    context,
-                                  ).colorScheme.primary,
-                                  inactiveColor: Theme.of(
-                                    context,
-                                  ).colorScheme.primary.withOpacity(0.24),
-                                  thumbColor: Theme.of(
-                                    context,
-                                  ).colorScheme.primary,
                                   onChanged: (value) =>
                                       prefs.exercisesPerPage.value = value
                                           .round(),
                                 ),
-                              )
-                            : Slider.adaptive(
-                                value: prefs.exercisesPerPage.value.toDouble(),
-                                min: 1,
-                                max: SharedAppPrefs.maxExercisesPerPage
-                                    .toDouble(),
-                                divisions: 30,
-                                activeColor: Theme.of(
-                                  context,
-                                ).colorScheme.primary,
-                                inactiveColor: Theme.of(
-                                  context,
-                                ).colorScheme.primary.withOpacity(0.24),
-                                thumbColor: Theme.of(
-                                  context,
-                                ).colorScheme.primary,
-                                onChanged: (value) =>
-                                    prefs.exercisesPerPage.value = value
-                                        .round(),
                               ),
                       ),
                       const SizedBox(width: 8),
@@ -199,77 +186,7 @@ class _SettingsSheet extends ConsumerWidget {
                 ),
               ),
             ),
-            _SettingsCard(
-              header: l10n.timerSettingsTitle,
-              child: Column(
-                children: [
-                  _SettingsRow(
-                    label: l10n.timerTypeSettingsLabel,
-                    labelStyle: rowLabelStyle,
-                    trailing: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 190),
-                      child: SegmentedButton<int>(
-                        style: segmentedStyle,
-                        showSelectedIcon: false,
-                        segments: [
-                          ButtonSegment(
-                            value: 0,
-                            label: Text(l10n.timerTypeStopwatchLabel),
-                          ),
-                          ButtonSegment(
-                            value: 1,
-                            label: Text(l10n.timerTypeTabataLabel),
-                          ),
-                        ],
-                        selected: {prefs.timerType.value},
-                        onSelectionChanged: (newSelection) {
-                          prefs.timerType.value = newSelection.single;
-                          timer.reset();
-                        },
-                      ),
-                    ),
-                  ),
-                  for (final (intervalNotifier, label, color)
-                      in timeIntervalSettings)
-                    _SettingsRow(
-                      label: label,
-                      labelStyle: rowLabelStyle,
-                      value: formatDuration(
-                        Duration(seconds: intervalNotifier.value),
-                      ),
-                      valueStyle: rowValueStyle?.copyWith(color: color),
-                      onTap: () => _showTimeIntervalPicker(
-                        context,
-                        timeNotifier: intervalNotifier,
-                        timer: timer,
-                      ),
-                    ),
-                  _SettingsRow(
-                    label: l10n.timerSettingsRoundsLabel,
-                    labelStyle: rowLabelStyle,
-                    value: prefs.rounds.value.toString(),
-                    valueStyle: rowValueStyle,
-                    onTap: () => _showRoundsPicker(
-                      context,
-                      roundsNotifier: prefs.rounds,
-                      timer: timer,
-                    ),
-                  ),
-                  _SettingsRow(
-                    label: l10n.timerSettingsCyclesLabel,
-                    labelStyle: rowLabelStyle,
-                    value: prefs.cycles.value.toString(),
-                    valueStyle: rowValueStyle,
-                    showDivider: false,
-                    onTap: () => _showRoundsPicker(
-                      context,
-                      roundsNotifier: prefs.cycles,
-                      timer: timer,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Timer settings card removed
             _SettingsCard(
               header: l10n.generalSettingsTitle,
               child: Column(
@@ -309,8 +226,16 @@ class _SettingsSheet extends ConsumerWidget {
                     labelStyle: rowLabelStyle,
                     trailing: Switch.adaptive(
                       value: prefs.motorboatSoundEnabled.value,
-                      activeTrackColor: Theme.of(context).colorScheme.primary,
-                      activeColor: Colors.white,
+                      trackColor: WidgetStateProperty.resolveWith(
+                        (states) => states.contains(WidgetState.selected)
+                            ? Theme.of(context).colorScheme.primary
+                            : null,
+                      ),
+                      thumbColor: WidgetStateProperty.resolveWith(
+                        (states) => states.contains(WidgetState.selected)
+                            ? Colors.white
+                            : null,
+                      ),
                       onChanged: (value) =>
                           prefs.motorboatSoundEnabled.value = value,
                     ),
@@ -333,69 +258,6 @@ class _SettingsSheet extends ConsumerWidget {
       ),
     );
   }
-
-  void _showTimeIntervalPicker(
-    BuildContext context, {
-    required ValueNotifier<int> timeNotifier,
-    required Timer timer,
-  }) => showPlatformModalSheet(
-    context: context,
-    material: MaterialModalSheetData(
-      constraints: BoxConstraints.tight(Size.fromHeight(250)),
-    ),
-    builder: (context) => SafeArea(
-      child: CupertinoTimerPicker(
-        mode: .ms,
-        alignment: .bottomCenter,
-        itemExtent: 60,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        initialTimerDuration: Duration(seconds: timeNotifier.value),
-        onTimerDurationChanged: (newDuration) {
-          timeNotifier.value = max(
-            newDuration.inSeconds,
-            _minimumTimePeriodSeconds,
-          );
-          timer.reset();
-        },
-      ),
-    ),
-  );
-
-  void _showRoundsPicker(
-    BuildContext context, {
-    required ValueNotifier<int> roundsNotifier,
-    required Timer timer,
-  }) => showPlatformModalSheet(
-    context: context,
-    material: MaterialModalSheetData(
-      constraints: BoxConstraints.tight(Size.fromHeight(250)),
-    ),
-    builder: (context) => SafeArea(
-      child: SizedBox(
-        height: 250,
-        child: CupertinoPicker(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          itemExtent: 60,
-          scrollController: FixedExtentScrollController(
-            initialItem: roundsNotifier.value - 1,
-          ),
-          onSelectedItemChanged: (index) {
-            roundsNotifier.value = index + 1;
-            timer.reset();
-          },
-          children: List.generate(
-            10,
-            (index) => Center(
-              child: Text(
-                (index + 1).toString(),
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -477,18 +339,14 @@ final class _SettingsCard extends StatelessWidget {
 
 final class _SettingsRow extends StatelessWidget {
   final String label;
-  final String? value;
   final TextStyle? labelStyle;
-  final TextStyle? valueStyle;
   final Widget? trailing;
   final bool showDivider;
   final VoidCallback? onTap;
 
   const _SettingsRow({
     required this.label,
-    this.value,
     this.labelStyle,
-    this.valueStyle,
     this.trailing,
     this.showDivider = true,
     this.onTap,
@@ -521,8 +379,6 @@ final class _SettingsRow extends StatelessWidget {
               ),
             ),
             ?trailing,
-            if (trailing == null && value != null)
-              Text(value!, style: valueStyle),
           ],
         ),
       ),

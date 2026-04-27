@@ -13,7 +13,7 @@ import 'games/games_tab.dart';
 import 'l10n/l10n.dart';
 import 'near_me/near_me_tab.dart';
 import 'theme/theme.dart';
-import 'timer/timer_tab.dart';
+import 'timer/timer_setup_tab.dart';
 import 'ui/adaptive_icons.dart';
 import 'ui/media_query.dart';
 import 'utils/shared_app_prefs.dart';
@@ -54,7 +54,7 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
     initialIndex: Tab.workouts.index,
   );
 
-  final _tabPages = [WorkoutsTab(), GamesTab(), TimerTab(), NearMeTab()];
+  final _tabPages = [WorkoutsTab(), GamesTab(), TimerSetupTab(), NearMeTab()];
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {

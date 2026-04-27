@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../l10n/l10n.dart';
 import '../model/timer.dart';
-import '../settings/settings_sheet.dart';
 import '../theme/theme.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/media_query.dart';
@@ -24,9 +23,12 @@ final class TimerTab extends ConsumerWidget {
   Widget? _androidResetFAB(BuildContext context, {required WidgetRef ref}) {
     return FloatingActionButton(
       heroTag: 'ResetTimerFAB',
-      backgroundColor: TimerColors.restFg(context),
+      backgroundColor: Theme.of(context).colorScheme.primary,
       onPressed: () => _resetTimer(ref),
-      child: Icon(PlatformIcons(context).refresh),
+      child: Icon(
+        PlatformIcons(context).refresh,
+        color: Theme.of(context).colorScheme.onPrimary, // White from theme
+      ),
     );
   }
 
@@ -123,7 +125,7 @@ final class TimerTab extends ConsumerWidget {
     return PlatformScaffold(
       appBar: isPortrait || isTablet
           ? PlatformAppBar(
-              leading: const SettingsActionButton(),
+              automaticallyImplyLeading: true,
               title: Text(
                 L10n.of(context)!.timerTabTitle,
                 style: Theme.of(context).textTheme.titleLarge,
@@ -136,7 +138,12 @@ final class TimerTab extends ConsumerWidget {
                 backgroundColor: Colors.transparent,
                 // Action buttons – iOS only
                 trailing: PlatformIconButton(
-                  icon: Icon(PlatformIcons(context).refresh),
+                  icon: Icon(
+                    PlatformIcons(context).refresh,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.secondary, // Red from theme
+                  ),
                   onPressed: () => _resetTimer(ref),
                 ),
               ),

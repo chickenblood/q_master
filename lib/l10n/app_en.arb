@@ -247,6 +247,18 @@
     "@timerTypeTabataLabel": {
       "description": "Segment control label for the Tabata interval timer mode."
     },
+    "timerModeLabel": "Mode",
+    "@timerModeLabel": {
+      "description": "Label for the timer mode selector (e.g., Stopwatch/Tabata)."
+    },
+    "timerIntervalsLabel": "Intervals — tap to change",
+    "@timerIntervalsLabel": {
+      "description": "Label for the intervals section in timer setup."
+    },
+    "timerStartButtonLabel": "Start Timer",
+    "@timerStartButtonLabel": {
+      "description": "Button label to navigate to the timer screen."
+    },
     "timerPrepareLabel": "PREPARE",
     "@timerPrepareLabel": {
       "description": "Large display label shown during the prepare/countdown phase before the timer starts."

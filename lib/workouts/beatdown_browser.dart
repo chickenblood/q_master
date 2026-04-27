@@ -261,7 +261,9 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                                     cupertino: (_, _) =>
                                         CupertinoElevatedButtonData(
                                           color: _beatdownAccent,
-                                          minSize: 58,
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 18,
+                                          ),
                                         ),
                                     onPressed: () => _onNextPage(
                                       context,
@@ -328,7 +330,7 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                         color: Theme.of(
                           context,
                         ).colorScheme.onSurface.withOpacity(0.24),
-                        activeColor: _beatdownAccent,
+                        activeDotColor: _beatdownAccent,
                       ),
                       position: _pageIndex.value.toDouble(),
                     ),

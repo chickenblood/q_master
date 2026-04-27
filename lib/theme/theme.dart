@@ -249,8 +249,9 @@ ThemeData darkTheme() {
       indicatorColor: Colors.transparent,
       elevation: 0,
       iconTheme: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.selected))
+        if (states.contains(WidgetState.selected)) {
           return const IconThemeData(color: textPrimary);
+        }
         return const IconThemeData(color: textSecondary);
       }),
       labelTextStyle: WidgetStatePropertyAll(
@@ -413,8 +414,9 @@ ThemeData lightTheme() {
       indicatorColor: Colors.transparent,
       elevation: 0,
       iconTheme: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.selected))
+        if (states.contains(WidgetState.selected)) {
           return const IconThemeData(color: textPrimary);
+        }
         return const IconThemeData(color: textSecondary);
       }),
       labelTextStyle: WidgetStatePropertyAll(
