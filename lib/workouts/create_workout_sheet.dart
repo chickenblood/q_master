@@ -234,7 +234,10 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     required List<String> exercises,
     required String sectionTitle,
   }) => PlatformIconButton(
-    icon: Icon(PlatformIcons(context).add, color: Theme.of(context).colorScheme.primary),
+    icon: Icon(
+      PlatformIcons(context).add,
+      color: Theme.of(context).colorScheme.primary,
+    ),
     onPressed: () async {
       _focusNode.unfocus();
       final exercise = await showExercisePicker(context);
@@ -404,7 +407,9 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                                               .bodyLarge
                                               ?.copyWith(
                                                 fontWeight: FontWeight.w700,
-                                                color: Theme.of(context).textTheme.bodyLarge?.color,
+                                                color: Theme.of(
+                                                  context,
+                                                ).textTheme.bodyLarge?.color,
                                                 fontSize: 16,
                                               ),
                                           maxLines: 2,
@@ -436,7 +441,9 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                                       ),
                                       child: Icon(
                                         Icons.drag_handle,
-                                        color: Theme.of(context).colorScheme.outlineVariant,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.outlineVariant,
                                         size: 24,
                                       ),
                                     ),
@@ -487,46 +494,6 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     ),
   );
 
-  Widget _addSectionButton(BuildContext context) => PlatformTextButton(
-    onPressed: () => _addSection(context),
-    padding: EdgeInsets.zero,
-    child: Padding(
-      padding: const EdgeInsets.only(left: 16, right: 8),
-      child: Container(
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.35),
-              blurRadius: 20,
-              offset: Offset(0, 6),
-            ),
-          ],
-        ),
-        constraints: const BoxConstraints(minHeight: 54),
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary, size: 20),
-            const SizedBox(width: 8),
-            Text(
-              L10n.of(context)!.addSectionButtonText,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: Theme.of(context).colorScheme.onPrimary,
-                fontSize: 16,
-                letterSpacing: -0.1,
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-
   Widget _pasteExercisesButton(BuildContext context) => FutureBuilder(
     future: Clipboard.hasStrings(),
     builder: (context, snapshot) {
@@ -556,9 +523,13 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
             child: Container(
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                color: Theme.of(
+                  context,
+                ).colorScheme.surface.withValues(alpha: 0),
                 border: Border.all(
-                  color: hasStrings ? Theme.of(context).colorScheme.outline : Theme.of(context).colorScheme.surface,
+                  color: hasStrings
+                      ? Theme.of(context).colorScheme.outline
+                      : Theme.of(context).colorScheme.surface,
                   width: 1.5,
                 ),
                 borderRadius: BorderRadius.circular(8),
@@ -570,7 +541,9 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                 children: [
                   Icon(
                     Icons.content_paste,
-                    color: hasStrings ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.onSurface,
+                    color: hasStrings
+                        ? Theme.of(context).colorScheme.onSurfaceVariant
+                        : Theme.of(context).colorScheme.onSurface,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
@@ -579,7 +552,9 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
-                      color: hasStrings ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.onSurface,
+                      color: hasStrings
+                          ? Theme.of(context).colorScheme.onSurfaceVariant
+                          : Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ],
@@ -661,10 +636,57 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 16),
-          _addSectionButton(context),
+          ActionButton(
+            onPressed: () => _addSection(context),
+            label: L10n.of(context)!.addSectionButtonText,
+            icon: PlatformIcons(context).add,
+          ),
           const SizedBox(height: 8),
           _pasteExercisesButton(context),
         ],
+      ),
+    ),
+  );
+
+  Widget _displayFooter(BuildContext context) => SliverSafeArea(
+    top: false,
+    sliver: SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        child: Column(
+          spacing: 12,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Row(
+              spacing: 8,
+              children: [
+                Expanded(
+                  child: ActionButton(
+                    label: L10n.of(context)!.editWorkoutButtonText,
+                    icon: PlatformIcons(context).edit,
+                    outlined: true,
+                    onPressed: () =>
+                        setState(() => _displayMode = DisplayMode.edit),
+                  ),
+                ),
+                Expanded(
+                  child: ActionButton(
+                    label: L10n.of(context)!.shareWorkoutButtonText,
+                    icon: PlatformIcons(context).share,
+                    outlined: true,
+                    onPressed: () =>
+                        setState(() => _displayMode = DisplayMode.edit),
+                  ),
+                ),
+              ],
+            ),
+            ActionButton(
+              label: L10n.of(context)!.startBeatdownButtonText,
+              icon: PlatformIcons(context).playArrowSolid,
+              onPressed: () => setState(() => _displayMode = DisplayMode.edit),
+            ),
+          ],
+        ),
       ),
     ),
   );
@@ -701,7 +723,76 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
           pinned: true,
         ),
         ..._content(context),
+        if (_displayMode == DisplayMode.display) _displayFooter(context),
       ],
     ),
   );
+}
+
+class ActionButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  final String label;
+  final IconData icon;
+  final bool outlined;
+  const ActionButton({
+    super.key,
+    required this.onPressed,
+    required this.label,
+    required this.icon,
+    this.outlined = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return PlatformTextButton(
+      onPressed: onPressed,
+      padding: EdgeInsets.zero,
+      child: Container(
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: outlined
+              ? Colors.transparent
+              : Theme.of(context).colorScheme.primary,
+          border: outlined
+              ? Border.all(
+                  color: Theme.of(context).colorScheme.outline,
+                  width: 2,
+                )
+              : null,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: outlined
+                  ? Colors.transparent
+                  : Theme.of(context).colorScheme.primary.withOpacity(0.35),
+              blurRadius: 20,
+              offset: Offset(0, 6),
+            ),
+          ],
+        ),
+        constraints: const BoxConstraints(minHeight: 54),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: Theme.of(context).colorScheme.onPrimary,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontSize: 16,
+                letterSpacing: -0.1,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

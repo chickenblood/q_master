@@ -1,4 +1,4 @@
-  {
+{
     "@@locale": "en",
     "appBarTitle": "Q Master",
     "@appBarTitle": {
@@ -354,5 +354,17 @@
     "beatdownBrowserNextLabel": "Next:",
     "@beatdownBrowserNextLabel": {
       "description": "Label for the next exercise button in the beatdown browser."
+    },
+    "editWorkoutButtonText": "Edit",
+    "@editWorkoutButtonText": {
+      "description": "Button label for editing a workout in the workout detail footer."
+    },
+    "shareWorkoutButtonText": "Share",
+    "@shareWorkoutButtonText": {
+      "description": "Button label for sharing a workout in the workout detail footer."
+    },
+    "startBeatdownButtonText": "Start Beatdown",
+    "@startBeatdownButtonText": {
+      "description": "Button label for starting the beatdown in the workout detail footer."
     }
   }
