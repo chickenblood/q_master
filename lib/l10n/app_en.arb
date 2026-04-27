@@ -311,6 +311,10 @@
     "@timerSettingsCyclesLabel": {
       "description": "Settings input label for the number of cycles."
     },
+    "timerTypeSettingsLabel": "Type",
+    "@timerTypeSettingsLabel": {
+      "description": "Settings row label for selecting timer mode type."
+    },
     "beatdownBrowserBackButton": "Back",
     "@beatdownBrowserBackButton": {
       "description": "Tooltip for the back button in the beatdown browser section bar."

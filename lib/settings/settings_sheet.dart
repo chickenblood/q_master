@@ -8,6 +8,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 import '../l10n/l10n.dart';
 import '../model/timer.dart';
+import '../theme/theme.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_modal_sheet.dart';
 import '../ui/cupertino_sheet_fork.dart';
@@ -64,193 +65,268 @@ class _SettingsSheet extends ConsumerWidget {
   }) {
     final l10n = L10n.of(context)!;
     final timer = ref.read(timerProvider.notifier);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final labelColor = isDark
+        ? const Color(0xFFD0D0D0)
+        : const Color(0xFF333333);
+    final valueColor = Theme.of(context).colorScheme.onSurface;
+    final inactiveSegmentColor = isDark
+        ? const Color(0xFF7A7A7A)
+        : const Color(0xFF6F6F6F);
+    final segmentBorderColor = isDark
+        ? const Color(0xFF252525)
+        : const Color(0xFFDADADA);
+    final rowValueStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
+      fontSize: 22,
+      fontWeight: FontWeight.w800,
+      color: valueColor,
+      fontFeatures: [FontFeature.tabularFigures()],
+    );
+    final rowLabelStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
+      fontSize: 16,
+      color: labelColor,
+      fontWeight: FontWeight.w500,
+    );
+    final segmentedStyle = SegmentedButton.styleFrom(
+      backgroundColor: Colors.transparent,
+      foregroundColor: inactiveSegmentColor,
+      selectedForegroundColor: Colors.white,
+      selectedBackgroundColor: Theme.of(context).colorScheme.primary,
+      side: BorderSide(color: segmentBorderColor, width: 1.5),
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+      textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+      visualDensity: VisualDensity.compact,
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    );
+
     final timeIntervalSettings = [
       (
         prefs.prepareIntervalSeconds,
         L10n.of(context)!.timerSettingsPrepareLabel,
+        TimerColors.prepareFg(context),
       ),
-      (prefs.workIntervalSeconds, L10n.of(context)!.timerSettingsWorkLabel),
-      (prefs.restIntervalSeconds, L10n.of(context)!.timerSettingsRestLabel),
+      (
+        prefs.workIntervalSeconds,
+        L10n.of(context)!.timerSettingsWorkLabel,
+        TimerColors.workFg(context),
+      ),
+      (
+        prefs.restIntervalSeconds,
+        L10n.of(context)!.timerSettingsRestLabel,
+        TimerColors.restFg(context),
+      ),
     ];
+
     return ListenableBuilder(
       listenable: prefs,
       builder: (_, _) => SliverPadding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
         sliver: SliverList(
           delegate: SliverChildListDelegate([
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: PlatformText(
-                l10n.workoutsSettingsTitle,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-            ),
-            PlatformListTile(
-              title: Text(
-                L10n.of(context)!.exercisesPerPageSettingsLabel,
-
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              subtitle: Slider.adaptive(
-                value: prefs.exercisesPerPage.value.toDouble(),
-                min: 1,
-                max: SharedAppPrefs.maxExercisesPerPage.toDouble(),
-                divisions: 30,
-                onChanged: (value) =>
-                    prefs.exercisesPerPage.value = value.round(),
-              ),
-              trailing: Text(
-                prefs.exercisesPerPage.value.toString(),
-                style: Theme.of(
-                  context,
-                ).textTheme.labelLarge!.copyWith(fontSize: 20),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: const Divider(),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: PlatformText(
-                l10n.timerSettingsTitle,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-            ),
-            SegmentedButton(
-              showSelectedIcon: false,
-              segments: [
-                ButtonSegment(
-                  value: 0,
-                  label: Text(l10n.timerTypeStopwatchLabel),
-                ),
-                ButtonSegment(value: 1, label: Text(l10n.timerTypeTabataLabel)),
-              ],
-              selected: {prefs.timerType.value},
-              onSelectionChanged: (newSelection) {
-                prefs.timerType.value = newSelection.single;
-                timer.reset();
-              },
-            ),
-            SizedBox(height: 8),
-            for (final (intervalNotifier, label) in timeIntervalSettings)
-              PlatformListTile(
-                title: PlatformText(
-                  label,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                trailing: PlatformText(
-                  formatDuration(Duration(seconds: intervalNotifier.value)),
-                  style: Theme.of(context).textTheme.displaySmall!.copyWith(
-                    fontFeatures: [FontFeature.tabularFigures()],
+            _SettingsCard(
+              header: l10n.workoutsSettingsTitle,
+              child: _SettingsRow(
+                label: l10n.exercisesPerPageSettingsLabel,
+                labelStyle: rowLabelStyle,
+                trailing: SizedBox(
+                  width: 164,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child:
+                            Theme.of(context).platform ==
+                                    TargetPlatform.android ||
+                                Theme.of(context).platform ==
+                                    TargetPlatform.fuchsia
+                            ? SliderTheme(
+                                data: SliderTheme.of(
+                                  context,
+                                ).copyWith(trackHeight: 7),
+                                child: Slider(
+                                  value: prefs.exercisesPerPage.value
+                                      .toDouble(),
+                                  min: 1,
+                                  max: SharedAppPrefs.maxExercisesPerPage
+                                      .toDouble(),
+                                  divisions: 30,
+                                  activeColor: Theme.of(
+                                    context,
+                                  ).colorScheme.primary,
+                                  inactiveColor: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.24),
+                                  thumbColor: Theme.of(
+                                    context,
+                                  ).colorScheme.primary,
+                                  onChanged: (value) =>
+                                      prefs.exercisesPerPage.value = value
+                                          .round(),
+                                ),
+                              )
+                            : Slider.adaptive(
+                                value: prefs.exercisesPerPage.value.toDouble(),
+                                min: 1,
+                                max: SharedAppPrefs.maxExercisesPerPage
+                                    .toDouble(),
+                                divisions: 30,
+                                activeColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
+                                inactiveColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withOpacity(0.24),
+                                thumbColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
+                                onChanged: (value) =>
+                                    prefs.exercisesPerPage.value = value
+                                        .round(),
+                              ),
+                      ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 30,
+                        child: Text(
+                          prefs.exercisesPerPage.value.toString(),
+                          maxLines: 1,
+                          softWrap: false,
+                          textAlign: TextAlign.right,
+                          style: rowValueStyle,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                onTap: () => _showTimeIntervalPicker(
-                  context,
-                  timeNotifier: intervalNotifier,
-                  timer: timer,
-                ),
-              ),
-            PlatformListTile(
-              title: PlatformText(
-                l10n.timerSettingsRoundsLabel,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              trailing: PlatformText(
-                prefs.rounds.value.toString(),
-                style: Theme.of(context).textTheme.displaySmall,
-              ),
-              onTap: () => _showRoundsPicker(
-                context,
-                roundsNotifier: prefs.rounds,
-                timer: timer,
               ),
             ),
-            PlatformListTile(
-              title: PlatformText(
-                l10n.timerSettingsCyclesLabel,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              trailing: PlatformText(
-                prefs.cycles.value.toString(),
-                style: Theme.of(context).textTheme.displaySmall,
-              ),
-              onTap: () => _showRoundsPicker(
-                context,
-                roundsNotifier: prefs.cycles,
-                timer: timer,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: const Divider(),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: PlatformText(
-                l10n.generalSettingsTitle,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-            ),
-            PlatformListTile(
-              title: PlatformText(
-                l10n.themeSettingsTitle,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              trailing: Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: SegmentedButton<ThemeMode>(
-                  showSelectedIcon: false,
-                  segments: [
-                    ButtonSegment(
-                      value: ThemeMode.system,
-                      label: Text(l10n.themeSettingsSystemLabel),
+            _SettingsCard(
+              header: l10n.timerSettingsTitle,
+              child: Column(
+                children: [
+                  _SettingsRow(
+                    label: l10n.timerTypeSettingsLabel,
+                    labelStyle: rowLabelStyle,
+                    trailing: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 190),
+                      child: SegmentedButton<int>(
+                        style: segmentedStyle,
+                        showSelectedIcon: false,
+                        segments: [
+                          ButtonSegment(
+                            value: 0,
+                            label: Text(l10n.timerTypeStopwatchLabel),
+                          ),
+                          ButtonSegment(
+                            value: 1,
+                            label: Text(l10n.timerTypeTabataLabel),
+                          ),
+                        ],
+                        selected: {prefs.timerType.value},
+                        onSelectionChanged: (newSelection) {
+                          prefs.timerType.value = newSelection.single;
+                          timer.reset();
+                        },
+                      ),
                     ),
-                    ButtonSegment(
-                      value: ThemeMode.light,
-                      label: Text(l10n.themeSettingsLightLabel),
+                  ),
+                  for (final (intervalNotifier, label, color)
+                      in timeIntervalSettings)
+                    _SettingsRow(
+                      label: label,
+                      labelStyle: rowLabelStyle,
+                      value: formatDuration(
+                        Duration(seconds: intervalNotifier.value),
+                      ),
+                      valueStyle: rowValueStyle?.copyWith(color: color),
+                      onTap: () => _showTimeIntervalPicker(
+                        context,
+                        timeNotifier: intervalNotifier,
+                        timer: timer,
+                      ),
                     ),
-                    ButtonSegment(
-                      value: ThemeMode.dark,
-                      label: Text(l10n.themeSettingsDarkLabel),
+                  _SettingsRow(
+                    label: l10n.timerSettingsRoundsLabel,
+                    labelStyle: rowLabelStyle,
+                    value: prefs.rounds.value.toString(),
+                    valueStyle: rowValueStyle,
+                    onTap: () => _showRoundsPicker(
+                      context,
+                      roundsNotifier: prefs.rounds,
+                      timer: timer,
                     ),
-                  ],
-                  selected: {ThemeMode.values[prefs.theme.value]},
-                  onSelectionChanged: (newSelection) {
-                    prefs.theme.value = newSelection.single.index;
-                    timer.reset();
-                  },
-                ),
+                  ),
+                  _SettingsRow(
+                    label: l10n.timerSettingsCyclesLabel,
+                    labelStyle: rowLabelStyle,
+                    value: prefs.cycles.value.toString(),
+                    valueStyle: rowValueStyle,
+                    showDivider: false,
+                    onTap: () => _showRoundsPicker(
+                      context,
+                      roundsNotifier: prefs.cycles,
+                      timer: timer,
+                    ),
+                  ),
+                ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: PlatformListTile(
-                title: PlatformText(
-                  l10n.motorboatSoundSettingsLabel,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                trailing: Switch.adaptive(
-                  value: prefs.motorboatSoundEnabled.value,
-                  onChanged: (value) =>
-                      prefs.motorboatSoundEnabled.value = value,
-                ),
+            _SettingsCard(
+              header: l10n.generalSettingsTitle,
+              child: Column(
+                children: [
+                  _SettingsRow(
+                    label: l10n.themeSettingsTitle,
+                    labelStyle: rowLabelStyle,
+                    trailing: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 250),
+                      child: SegmentedButton<ThemeMode>(
+                        style: segmentedStyle,
+                        showSelectedIcon: false,
+                        segments: [
+                          ButtonSegment(
+                            value: ThemeMode.system,
+                            label: Text(l10n.themeSettingsSystemLabel),
+                          ),
+                          ButtonSegment(
+                            value: ThemeMode.light,
+                            label: Text(l10n.themeSettingsLightLabel),
+                          ),
+                          ButtonSegment(
+                            value: ThemeMode.dark,
+                            label: Text(l10n.themeSettingsDarkLabel),
+                          ),
+                        ],
+                        selected: {ThemeMode.values[prefs.theme.value]},
+                        onSelectionChanged: (newSelection) {
+                          prefs.theme.value = newSelection.single.index;
+                          timer.reset();
+                        },
+                      ),
+                    ),
+                  ),
+                  _SettingsRow(
+                    label: l10n.motorboatSoundSettingsLabel,
+                    labelStyle: rowLabelStyle,
+                    trailing: Switch.adaptive(
+                      value: prefs.motorboatSoundEnabled.value,
+                      activeTrackColor: Theme.of(context).colorScheme.primary,
+                      activeColor: Colors.white,
+                      onChanged: (value) =>
+                          prefs.motorboatSoundEnabled.value = value,
+                    ),
+                  ),
+                  _SettingsRow(
+                    label: l10n.appBarTitle,
+                    labelStyle: rowLabelStyle,
+                    showDivider: false,
+                    trailing: Icon(
+                      context.platformIcons.info,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    onTap: () => _showAboutDialog(context),
+                  ),
+                ],
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: const Divider(),
-            ),
-            PlatformListTile(
-              title: PlatformText(l10n.appBarTitle),
-              leading: Icon(context.platformIcons.info),
-              onTap: () => _showAboutDialog(context),
             ),
           ]),
         ),
@@ -341,6 +417,112 @@ class _SettingsSheet extends ConsumerWidget {
               title: Text(L10n.of(context)!.settingsDialogTitle),
             ),
             _content(context, prefs: prefs, ref: ref),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+final class _SettingsCard extends StatelessWidget {
+  final String header;
+  final Widget child;
+
+  const _SettingsCard({required this.header, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? const Color(0xFF0D0D0D) : const Color(0xFFFFFFFF);
+    final cardBorder = isDark
+        ? const Color(0xFF1C1C1C)
+        : const Color(0xFFE8E8E8);
+    final headerBg = isDark ? const Color(0xFF0A0A0A) : const Color(0xFFF5F5F5);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: cardBorder),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: headerBg,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(8),
+              ),
+              border: Border(bottom: BorderSide(color: cardBorder)),
+            ),
+            child: Text(
+              header.toUpperCase(),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.0,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+final class _SettingsRow extends StatelessWidget {
+  final String label;
+  final String? value;
+  final TextStyle? labelStyle;
+  final TextStyle? valueStyle;
+  final Widget? trailing;
+  final bool showDivider;
+  final VoidCallback? onTap;
+
+  const _SettingsRow({
+    required this.label,
+    this.value,
+    this.labelStyle,
+    this.valueStyle,
+    this.trailing,
+    this.showDivider = true,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final rowBorder = isDark
+        ? const Color(0xFF141414)
+        : const Color(0xFFF0F0F0);
+
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 60),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          border: showDivider
+              ? Border(bottom: BorderSide(color: rowBorder))
+              : null,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: labelStyle,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            ?trailing,
+            if (trailing == null && value != null)
+              Text(value!, style: valueStyle),
           ],
         ),
       ),
