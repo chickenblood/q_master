@@ -157,22 +157,12 @@ class TimerSetupTab extends ConsumerWidget {
                                             value: 0,
                                             label: Text(
                                               l10n.timerTypeStopwatchLabel,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w700,
-                                                letterSpacing: 0.1,
-                                              ),
                                             ),
                                           ),
                                           ButtonSegment(
                                             value: 1,
                                             label: Text(
                                               l10n.timerTypeTabataLabel,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w700,
-                                                letterSpacing: 0.1,
-                                              ),
                                             ),
                                           ),
                                         ],
@@ -183,27 +173,6 @@ class TimerSetupTab extends ConsumerWidget {
                                           timer.reset();
                                         },
                                         showSelectedIcon: false,
-                                        style: SegmentedButton.styleFrom(
-                                          backgroundColor: Colors.transparent,
-                                          foregroundColor: TimerColors.controlFg(context),
-                                          selectedForegroundColor: Colors.white,
-                                          selectedBackgroundColor: Theme.of(context).colorScheme.primary,
-                                          side: BorderSide(
-                                            color: Theme.of(context).colorScheme.outlineVariant,
-                                            width: 1.5,
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 0,
-                                            vertical: 10,
-                                          ),
-                                          textStyle: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w700,
-                                            letterSpacing: 0.1,
-                                          ),
-                                          visualDensity: VisualDensity.compact,
-                                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                        ),
                                       ),
                                     ),
                                   ],
@@ -376,7 +345,11 @@ class _IntervalSetupRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           border: showDivider
-              ? Border(bottom: BorderSide(color: Theme.of(context).colorScheme.outlineVariant))
+              ? Border(
+                  bottom: BorderSide(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                )
               : null,
         ),
         child: Row(

@@ -228,12 +228,17 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w900,
                                               fontSize: 60,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface
-                                                  .withAlpha(
-                                                    (0.24 * 255).round(),
-                                                  ),
+                                              color:
+                                                  Theme.of(
+                                                        context,
+                                                      ).brightness ==
+                                                      Brightness.dark
+                                                  ? Theme.of(
+                                                      context,
+                                                    ).colorScheme.onPrimary
+                                                  : Theme.of(
+                                                      context,
+                                                    ).colorScheme.onSurface,
                                               letterSpacing: -2,
                                               height: 1.05,
                                             ),

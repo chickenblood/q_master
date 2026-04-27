@@ -203,7 +203,7 @@ ThemeData darkTheme() {
   const bgPage = Color(0xFF080808);
   const bgSurface = Color(0xFF0D0D0D);
   const bgRaised = Color(0xFF141414);
-  const border = Color(0xFF1E1E1E);
+  const border = Color(0xFF353535); // Slightly darker for better balance
   const textPrimary = Color(0xFFF0F0F0);
   const textSecondary = Color(0xFF808080);
   const iconColor = textPrimary;
@@ -219,7 +219,7 @@ ThemeData darkTheme() {
       surface: bgSurface,
       onSurface: textPrimary,
       onSurfaceVariant: textSecondary,
-      outline: border,
+      outline: border, // Now lighter for pill outlines
       outlineVariant: bgRaised,
       error: _errorRed,
       onError: Colors.white,
@@ -337,6 +337,11 @@ ThemeData darkTheme() {
         textStyle: const WidgetStatePropertyAll(
           TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
         ),
+        padding: const WidgetStatePropertyAll(
+          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        ),
+        visualDensity: VisualDensity.compact,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     ),
     chipTheme: ChipThemeData(

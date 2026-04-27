@@ -86,18 +86,53 @@ class WorkoutsTab extends ConsumerWidget {
     }
   }
 
+  void shareWorkout(BuildContext context, Workout workout) {
+    // Get rect of button to present popovers from on iPad.
+    final box = context.findRenderObject() as RenderBox;
+    final sharePositionRect = box.localToGlobal(Offset.zero) & box.size;
+
+    SharePlus.instance.share(
+      ShareParams(
+        text: workout.formattedText(context),
+        sharePositionOrigin: sharePositionRect,
+      ),
+    );
+  }
+
   Future<Workout?> _invokeWorkoutEditor(
     BuildContext context, {
     Workout? workout,
     required DisplayMode displayMode,
-  }) => Navigator.of(context, rootNavigator: true).push(
+  }) => Navigator.of(context, rootNavigator: false).push(
     platformPageRoute(
-      fullscreenDialog: true,
+      //fullscreenDialog: true,
       context: context,
-      builder: (context) =>
-          CreateWorkoutSheet(workout: workout, initialDisplayMode: displayMode),
+      builder: (_) => CreateWorkoutSheet(
+        workout: workout,
+        initialDisplayMode: displayMode,
+        onShare: shareWorkout,
+        onShowBeatdownBrowser: (workout) =>
+            _showBeatdownBrowser(context, workout),
+      ),
     ),
   );
+
+  Future<void> _showBeatdownBrowser(
+    BuildContext context,
+    Workout workout,
+  ) async {
+    // Stop the screen from sleeping while the beatdown browser is shown.
+    WakelockPlus.enable();
+
+    await Navigator.of(context).pushReplacement(
+      platformPageRoute(
+        context: context,
+        builder: (context) => BeatdownBrowser(workout: workout),
+      ),
+    );
+
+    WakelockPlus.disable();
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -138,6 +173,7 @@ class WorkoutsTab extends ConsumerWidget {
                   listNotifier: listNotifier,
                   workout: workouts[index],
                   onInvokeWorkoutEditor: _invokeWorkoutEditor,
+                  onShareWorkout: shareWorkout,
                 ),
                 onReorder: (oldIndex, newIndex) =>
                     listNotifier.move(oldIndex, newIndex),
@@ -170,30 +206,15 @@ final class _WorkoutTile extends StatelessWidget {
     required DisplayMode displayMode,
   })
   onInvokeWorkoutEditor;
+  final void Function(BuildContext context, Workout workout) onShareWorkout;
 
   const _WorkoutTile({
     required super.key,
     required this.listNotifier,
     required this.workout,
     required this.onInvokeWorkoutEditor,
+    required this.onShareWorkout,
   });
-
-  Future<void> _showBeatdownBrowser(
-    BuildContext context,
-    Workout workout,
-  ) async {
-    // Stop the screen from sleeping while the beatdown browser is shown.
-    WakelockPlus.enable();
-
-    await Navigator.of(context).push(
-      platformPageRoute(
-        context: context,
-        builder: (context) => BeatdownBrowser(workout: workout),
-      ),
-    );
-
-    WakelockPlus.disable();
-  }
 
   Future<void> _editWorkout(BuildContext context, Workout workout) async {
     Workout? updatedWorkout = await onInvokeWorkoutEditor(
@@ -205,19 +226,6 @@ final class _WorkoutTile extends StatelessWidget {
     if (updatedWorkout != null) {
       listNotifier.replace(workout, updatedWorkout);
     }
-  }
-
-  void _shareWorkout(BuildContext context, Workout workout) {
-    // Get rect of button to present popovers from on iPad.
-    final box = context.findRenderObject() as RenderBox;
-    final sharePositionRect = box.localToGlobal(Offset.zero) & box.size;
-
-    SharePlus.instance.share(
-      ShareParams(
-        text: workout.formattedText(context),
-        sharePositionOrigin: sharePositionRect,
-      ),
-    );
   }
 
   Future<bool?> _confirmDelete(BuildContext context) => showAdaptiveDialog(
@@ -311,7 +319,7 @@ final class _WorkoutTile extends StatelessWidget {
                 _OverflowMenu(
                   onDuplicate: () => _duplicateWorkout(workout),
                   onShare: (buttonContext) =>
-                      _shareWorkout(buttonContext, workout),
+                      onShareWorkout(buttonContext, workout),
                   onDelete: () => _deleteWorkout(context, workout),
                 ),
                 if (isIOS) ...[
@@ -346,7 +354,8 @@ final class _SectionChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final chipBg = theme.colorScheme.surfaceContainerHighest;
-    final chipBorder = theme.colorScheme.outlineVariant;
+    final chipBorder =
+        theme.colorScheme.outline; // Use outline for lighter border
     final chipFg = theme.colorScheme.onSurfaceVariant;
     return DecoratedBox(
       decoration: BoxDecoration(

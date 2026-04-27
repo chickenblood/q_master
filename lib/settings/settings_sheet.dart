@@ -65,7 +65,10 @@ class _SettingsSheet extends ConsumerWidget {
     final inactiveSegmentColor = isDark
         ? Theme.of(context).colorScheme.onSurfaceVariant
         : Theme.of(context).colorScheme.onSurface;
-    final segmentBorderColor = Theme.of(context).colorScheme.outline;
+    // Use a much lighter border in dark mode for segmented control
+    final segmentBorderColor = isDark
+        ? const Color(0xFF484848) // Slightly darker for better balance
+        : Theme.of(context).colorScheme.outline;
     final rowValueStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
       fontSize: 16,
       fontWeight: FontWeight.w700,

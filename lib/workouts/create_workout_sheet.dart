@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
@@ -9,6 +10,8 @@ import '../ui/action_button.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/cupertino_sheet_fork.dart';
 import '../ui/dismissible_row.dart';
+import '../utils/datetime_utils.dart';
+import 'beatdown_browser_screen.dart';
 import 'exercise_picker_sheet.dart';
 
 /// The display mode the dialog is initially displayed in.
@@ -22,11 +25,15 @@ enum DisplayMode { display, edit }
 final class CreateWorkoutSheet extends StatefulWidget {
   final Workout? workout;
   final DisplayMode initialDisplayMode;
+  final Function(BuildContext context, Workout workout)? onShare;
+  final Function(Workout workout)? onShowBeatdownBrowser;
 
   const CreateWorkoutSheet({
     super.key,
     this.workout,
     this.initialDisplayMode = DisplayMode.display,
+    this.onShare,
+    this.onShowBeatdownBrowser,
   });
 
   @override
@@ -42,6 +49,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
 
   final _sections = <String, List<String>>{};
 
+  Workout? _workout;
   var _displayMode = DisplayMode.display;
 
   // Track the group of the most recently added exercise for scrolling
@@ -55,11 +63,11 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     // have changed.
     AppLifecycleListener(onResume: () => setState(() {}));
 
-    final workout = widget.workout;
-    if (workout != null) {
-      _nameTextController.text = workout.name;
+    _workout = widget.workout;
+    if (_workout != null) {
+      _nameTextController.text = _workout!.name;
       final sectionMap = {
-        for (final s in workout.sections) s.name: List.of(s.exercises),
+        for (final s in _workout!.sections) s.name: List.of(s.exercises),
       };
       _sections.clear();
       _sections.addAll(sectionMap);
@@ -273,6 +281,23 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     }
   }
 
+  Future<void> showBeatdownBrowser(
+    BuildContext context,
+    Workout workout,
+  ) async {
+    // Stop the screen from sleeping while the beatdown browser is shown.
+    WakelockPlus.enable();
+
+    await Navigator.of(context, rootNavigator: true).push(
+      platformPageRoute(
+        context: context,
+        builder: (context) => BeatdownBrowser(workout: workout),
+      ),
+    );
+
+    WakelockPlus.disable();
+  }
+
   List<Widget> _content(BuildContext context) {
     final sectionOrder = _sections.keys.toList(growable: false);
     return [
@@ -328,6 +353,14 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                 ),
               ),
             ),
+            if (_displayMode == .display && widget.workout != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                child: Text(
+                  widget.workout!.date.formattedForDisplay(),
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
           ]),
         ),
       ),
@@ -435,19 +468,22 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                                           ),
                                     ),
                                   ),
-                                  ReorderableDelayedDragStartListener(
-                                    index: exerciseIndex,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                        right: 16.0,
-                                      ),
-                                      child: Icon(
-                                        Icons.drag_handle,
-                                        color: ThemeColors.dragHandle(context),
-                                        size: 24,
+                                  if (_displayMode == DisplayMode.edit)
+                                    ReorderableDelayedDragStartListener(
+                                      index: exerciseIndex,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                          right: 16.0,
+                                        ),
+                                        child: Icon(
+                                          Icons.drag_handle,
+                                          color: ThemeColors.dragHandle(
+                                            context,
+                                          ),
+                                          size: 24,
+                                        ),
                                       ),
                                     ),
-                                  ),
                                 ],
                               ),
                             ),
@@ -480,19 +516,26 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     ];
   }
 
-  Widget _rightAppBarButtonAction(BuildContext context) => ListenableBuilder(
-    listenable: Listenable.merge([_nameTextController]),
-    builder: (_, _) => PlatformIconButton(
-      padding: Theme.of(context).platform == TargetPlatform.iOS
-          ? EdgeInsets.only(right: 26)
-          : EdgeInsets.only(right: 16),
-      icon: Icon(
-        PlatformIcons(context).checkMark,
-        color: Theme.of(context).colorScheme.primary, // F3 Red
+  List<Widget> _rightAppBarButtonActions(BuildContext context) {
+    if (_displayMode == .display) return [];
+    return [
+      ListenableBuilder(
+        listenable: Listenable.merge([_nameTextController]),
+        builder: (_, _) => PlatformIconButton(
+          padding: Theme.of(context).platform == TargetPlatform.iOS
+              ? EdgeInsets.only(right: 26)
+              : EdgeInsets.only(right: 16),
+          icon: Icon(
+            PlatformIcons(context).checkMark,
+            color: Theme.of(context).colorScheme.primary, // F3 Red
+          ),
+          onPressed: _workoutCreationEnabled
+              ? () => _createWorkout(context)
+              : null,
+        ),
       ),
-      onPressed: _workoutCreationEnabled ? () => _createWorkout(context) : null,
-    ),
-  );
+    ];
+  }
 
   Widget _pasteExercisesButton(BuildContext context) => FutureBuilder(
     future: Clipboard.hasStrings(),
@@ -571,63 +614,70 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     required String sectionTitle,
     required List<String> exercises,
     required int sectionIndex,
-  }) => DismissibleRow(
-    key: ValueKey('dismissible_$sectionTitle'),
-    onDismissed: (_) {
-      setState(() {
-        _sections.remove(sectionTitle);
-      });
-    },
-    child: ReorderableDelayedDragStartListener(
-      index: sectionIndex,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
-        color: Theme.of(context).colorScheme.surface,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  sectionTitle.toUpperCase(),
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    color: Theme.of(context).colorScheme.primary,
-                    letterSpacing: .1,
+  }) {
+    final isEditingMode = _displayMode == DisplayMode.edit;
+    return DismissibleRow(
+      key: ValueKey('dismissible_$sectionTitle'),
+      onDismissed: (_) {
+        setState(() {
+          _sections.remove(sectionTitle);
+        });
+      },
+      child: ReorderableDelayedDragStartListener(
+        index: sectionIndex,
+        enabled: !isEditingMode,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
+          color: Theme.of(context).colorScheme.surface,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    sectionTitle.toUpperCase(),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      color: Theme.of(context).colorScheme.primary,
+                      letterSpacing: .1,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.left,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.left,
                 ),
               ),
-            ),
-            Row(
-              children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.edit,
-                    color: Theme.of(context).colorScheme.onSurface,
-                    size: 20,
-                  ),
-                  tooltip: 'Edit Section',
-                  onPressed: () =>
-                      _editSectionTitle(context, sectionTitle: sectionTitle),
+              if (isEditingMode)
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.edit,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        size: 20,
+                      ),
+                      tooltip: 'Edit Section',
+                      onPressed: () => _editSectionTitle(
+                        context,
+                        sectionTitle: sectionTitle,
+                      ),
+                    ),
+                    _addExerciseButton(
+                      context,
+                      exercises: exercises,
+                      sectionTitle: sectionTitle,
+                    ),
+                  ],
                 ),
-                _addExerciseButton(
-                  context,
-                  exercises: exercises,
-                  sectionTitle: sectionTitle,
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 
   Widget _addSectionFooter(BuildContext context) => SliverSafeArea(
     top: false,
@@ -675,7 +725,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                     icon: PlatformIcons(context).share,
                     outlined: true,
                     onPressed: () =>
-                        setState(() => _displayMode = DisplayMode.edit),
+                        widget.onShare?.call(context, widget.workout!),
                   ),
                 ),
               ],
@@ -685,8 +735,10 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
               child: ActionButton(
                 label: L10n.of(context)!.startBeatdownButtonText,
                 icon: PlatformIcons(context).playArrowSolid,
-                onPressed: () =>
-                    setState(() => _displayMode = DisplayMode.edit),
+                onPressed: () {
+                  //Navigator.of(context).pop(null);
+                  widget.onShowBeatdownBrowser?.call(_workout!);
+                },
               ),
             ),
           ],
@@ -723,7 +775,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
               context,
             ).clamp(maxScaleFactor: 1.5),
           ),
-          actions: [_rightAppBarButtonAction(context)],
+          actions: _rightAppBarButtonActions(context),
           pinned: true,
         ),
         ..._content(context),
