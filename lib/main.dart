@@ -108,6 +108,9 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
               BottomNavigationBarItem tabItem(IconData icon, String label) {
                 const double iconBoxHeight = 40;
                 const double iconSize = 24;
+                final theme = Theme.of(context);
+                final colorScheme = theme.colorScheme;
+                // Removed unused isDark variable
                 final indicator = Positioned(
                   top: 0,
                   left: 0,
@@ -117,7 +120,7 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
                       width: 28,
                       height: 2,
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
+                        color: colorScheme.primary,
                         borderRadius: const BorderRadius.vertical(
                           bottom: Radius.circular(2),
                         ),
@@ -137,7 +140,13 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
                         top: 4,
                         left: 0,
                         right: 0,
-                        child: Icon(icon, size: iconSize),
+                        child: Icon(
+                          icon,
+                          size: iconSize,
+                          color: active
+                              ? colorScheme.onSurface
+                              : colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
@@ -154,22 +163,19 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
                 bodyBuilder: (_, index) =>
                     _TabsContainer(selectedIndex: index, children: _tabPages),
                 material3Tabs: (tabBarContext, _) {
-                  final isDark =
-                      Theme.of(tabBarContext).brightness == Brightness.dark;
+                  // Removed unused isDark variable
+                  final theme = Theme.of(tabBarContext);
+                  final colorScheme = theme.colorScheme;
                   return MaterialNavigationBarData(
                     indicatorColor: Colors.transparent,
                     labelTextStyle: WidgetStateProperty.resolveWith((states) {
                       final isSelected = states.contains(WidgetState.selected);
                       final color = isSelected
-                          ? (isDark
-                                ? const Color(0xFFF0F0F0)
-                                : const Color(0xFF121212))
-                          : (isDark
-                                ? const Color(0xFF808080)
-                                : const Color(0xFF6F6F6F));
-                      return Theme.of(
-                        tabBarContext,
-                      ).textTheme.labelMedium?.copyWith(color: color);
+                          ? colorScheme.onSurface
+                          : colorScheme.onSurfaceVariant;
+                      return theme.textTheme.labelMedium?.copyWith(
+                        color: color,
+                      );
                     }),
                   );
                 },
@@ -181,15 +187,12 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
                           : Colors.transparent,
                     ),
                 cupertinoTabs: (tabBarContext, _) {
-                  final isDark =
-                      Theme.of(tabBarContext).brightness == Brightness.dark;
+                  // Removed unused isDark variable
+                  final theme = Theme.of(tabBarContext);
+                  final colorScheme = theme.colorScheme;
                   return CupertinoTabBarData(
-                    activeColor: isDark
-                        ? const Color(0xFFF0F0F0)
-                        : const Color(0xFF121212),
-                    inactiveColor: isDark
-                        ? const Color(0xFF808080)
-                        : const Color(0xFF6F6F6F),
+                    activeColor: colorScheme.onSurface,
+                    inactiveColor: colorScheme.onSurfaceVariant,
                   );
                 },
                 cupertinoBuilder: (tabBarContext, _, index) =>

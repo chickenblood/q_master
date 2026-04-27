@@ -432,7 +432,7 @@ class _DodecahedronShaderState extends State<DodecahedronShader>
     final c = Canvas(recorder);
 
     // clear
-    final bgPaint = Paint()..color = const Color(0x00000000);
+    final bgPaint = Paint()..color = Colors.transparent;
     c.drawRect(
       Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()),
       bgPaint,

@@ -10,6 +10,7 @@ import '../l10n/l10n.dart';
 import '../model/timer.dart';
 import '../settings/settings_sheet.dart';
 import '../theme/theme.dart';
+import '../ui/action_button.dart';
 import '../utils/datetime_utils.dart';
 import 'timer_tab.dart';
 
@@ -184,18 +185,11 @@ class TimerSetupTab extends ConsumerWidget {
                                         showSelectedIcon: false,
                                         style: SegmentedButton.styleFrom(
                                           backgroundColor: Colors.transparent,
-                                          foregroundColor:
-                                              TimerColors.controlFg(context),
+                                          foregroundColor: TimerColors.controlFg(context),
                                           selectedForegroundColor: Colors.white,
-                                          selectedBackgroundColor: Theme.of(
-                                            context,
-                                          ).colorScheme.primary,
+                                          selectedBackgroundColor: Theme.of(context).colorScheme.primary,
                                           side: BorderSide(
-                                            color:
-                                                Theme.of(context).brightness ==
-                                                    Brightness.dark
-                                                ? const Color(0xFF252525)
-                                                : const Color(0xFFDADADA),
+                                            color: Theme.of(context).colorScheme.outlineVariant,
                                             width: 1.5,
                                           ),
                                           padding: const EdgeInsets.symmetric(
@@ -208,8 +202,7 @@ class TimerSetupTab extends ConsumerWidget {
                                             letterSpacing: 0.1,
                                           ),
                                           visualDensity: VisualDensity.compact,
-                                          tapTargetSize:
-                                              MaterialTapTargetSize.shrinkWrap,
+                                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                         ),
                                       ),
                                     ),
@@ -338,27 +331,7 @@ class TimerSetupTab extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
               child: SizedBox(
                 height: 62,
-                child: PlatformElevatedButton(
-                  color: Theme.of(context).colorScheme.primary,
-                  material: (_, _) => MaterialElevatedButtonData(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Colors.white,
-                      textStyle: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -.2,
-                      ),
-                      minimumSize: const Size.fromHeight(62),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                  cupertino: (_, _) => CupertinoElevatedButtonData(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    borderRadius: const BorderRadius.all(Radius.circular(12)),
-                  ),
+                child: ActionButton(
                   onPressed: () {
                     Navigator.of(context).push(
                       platformPageRoute(
@@ -367,24 +340,8 @@ class TimerSetupTab extends ConsumerWidget {
                       ),
                     );
                   },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        context.platformIcons.playArrowSolid,
-                        size: 26,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        l10n.timerStartButtonLabel,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ],
-                  ),
+                  label: l10n.timerStartButtonLabel,
+                  icon: context.platformIcons.playArrowSolid,
                 ),
               ),
             ),
@@ -419,7 +376,7 @@ class _IntervalSetupRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           border: showDivider
-              ? const Border(bottom: BorderSide(color: Color(0xFF1a1a1a)))
+              ? Border(bottom: BorderSide(color: Theme.of(context).colorScheme.outlineVariant))
               : null,
         ),
         child: Row(

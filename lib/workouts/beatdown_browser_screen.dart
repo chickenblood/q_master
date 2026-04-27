@@ -9,7 +9,7 @@ import '../l10n/l10n.dart';
 import '../model/workout.dart';
 import '../utils/shared_app_prefs.dart';
 
-const _beatdownAccent = Color(0xFFE53935);
+// Use theme colorScheme.primary for accent color
 
 final class BeatdownBrowser extends StatefulWidget {
   final Workout workout;
@@ -133,7 +133,7 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                   // Red section identity bar
                   if (sectionName.isNotEmpty)
                     Container(
-                      color: _beatdownAccent,
+                      color: Theme.of(context).colorScheme.primary,
                       width: double.infinity,
                       height: 44,
                       child: Stack(
@@ -179,9 +179,11 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                               child: LinearProgressIndicator(
                                 value: (_pageIndex.value + 1) / pages.length,
                                 minHeight: 3,
-                                backgroundColor: const Color(0xFF1A1A1A),
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.surfaceContainerHighest,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  _beatdownAccent,
+                                  Theme.of(context).colorScheme.primary,
                                 ),
                               ),
                             ),
@@ -250,24 +252,10 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                                     horizontal: 1,
                                   ),
                                   child: PlatformElevatedButton(
-                                    color: _beatdownAccent,
-                                    material: (_, _) =>
-                                        MaterialElevatedButtonData(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: _beatdownAccent,
-                                            foregroundColor: Colors.white,
-                                            minimumSize: const Size.fromHeight(
-                                              58,
-                                            ),
-                                          ),
-                                        ),
-                                    cupertino: (_, _) =>
-                                        CupertinoElevatedButtonData(
-                                          color: _beatdownAccent,
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 18,
-                                          ),
-                                        ),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+
                                     onPressed: () => _onNextPage(
                                       context,
                                       pageIndex: index,
@@ -333,7 +321,7 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                         color: Theme.of(
                           context,
                         ).colorScheme.onSurface.withAlpha((0.24 * 255).round()),
-                        activeColor: _beatdownAccent,
+                        activeColor: Theme.of(context).colorScheme.primary,
                       ),
                       position: _pageIndex.value.toDouble(),
                     ),

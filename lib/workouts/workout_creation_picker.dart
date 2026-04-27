@@ -41,8 +41,8 @@ class WorkoutCreationPicker extends StatelessWidget {
             const SizedBox(height: 16),
             _PickerOptionButton(
               icon: AdaptiveIcons.create,
-              iconBg: const Color(0xFF1A0A0A),
-              iconColor: const Color(0xFFE53935),
+              iconBg: Theme.of(context).colorScheme.surfaceContainerHighest,
+              iconColor: Theme.of(context).colorScheme.primary,
               title: 'Build Manually',
               subtitle: 'Add sections & exercises',
               onTap: () =>
@@ -51,8 +51,8 @@ class WorkoutCreationPicker extends StatelessWidget {
             const SizedBox(height: 10),
             _PickerOptionButton(
               icon: AdaptiveIcons.sparkles,
-              iconBg: const Color(0xFF1A0A0A),
-              iconColor: const Color(0xFFE53935),
+              iconBg: Theme.of(context).colorScheme.surfaceContainerHighest,
+              iconColor: Theme.of(context).colorScheme.primary,
               title: 'Generate with AI',
               subtitle: 'Describe your beatdown',
               onTap: () =>
@@ -89,15 +89,9 @@ class _PickerOptionButton extends StatelessWidget {
     final buttonColor = isDark
         ? colorScheme.surfaceContainerHighest
         : colorScheme.surface;
-    final iconBgColor = isDark
-        ? const Color(0xFF1A0A0A)
-        : colorScheme.primary.withAlpha((0.08 * 255).round());
-    final subtitleColor = isDark
-        ? const Color(0xFF888888)
-        : colorScheme.onSurface.withAlpha((0.6 * 255).round());
-    final chevronColor = isDark
-        ? const Color(0xFF2A2A2A)
-        : colorScheme.outlineVariant;
+    final iconBgColor = colorScheme.surfaceContainerHighest;
+    final subtitleColor = colorScheme.onSurfaceVariant;
+    final chevronColor = colorScheme.outlineVariant;
     return Material(
       color: buttonColor,
       borderRadius: BorderRadius.circular(10),

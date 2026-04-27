@@ -60,16 +60,10 @@ class _SettingsSheet extends ConsumerWidget {
     final l10n = L10n.of(context)!;
     final timer = ref.read(timerProvider.notifier);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final labelColor = isDark
-        ? const Color(0xFFD0D0D0)
-        : const Color(0xFF333333);
+    final labelColor = Theme.of(context).colorScheme.onSurfaceVariant;
     final valueColor = Theme.of(context).colorScheme.onSurface;
-    final inactiveSegmentColor = isDark
-        ? const Color(0xFF7A7A7A)
-        : const Color(0xFF6F6F6F);
-    final segmentBorderColor = isDark
-        ? const Color(0xFF252525)
-        : const Color(0xFFDADADA);
+    final inactiveSegmentColor = Theme.of(context).colorScheme.outlineVariant;
+    final segmentBorderColor = Theme.of(context).colorScheme.outlineVariant;
     final rowValueStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
       fontSize: 22,
       fontWeight: FontWeight.w800,
@@ -297,11 +291,9 @@ final class _SettingsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? const Color(0xFF0D0D0D) : const Color(0xFFFFFFFF);
-    final cardBorder = isDark
-        ? const Color(0xFF1C1C1C)
-        : const Color(0xFFE8E8E8);
-    final headerBg = isDark ? const Color(0xFF0A0A0A) : const Color(0xFFF5F5F5);
+    final cardBg = Theme.of(context).colorScheme.surface;
+    final cardBorder = Theme.of(context).colorScheme.outlineVariant;
+    final headerBg = Theme.of(context).colorScheme.surfaceContainerHighest;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -358,8 +350,8 @@ final class _SettingsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final rowBorder = isDark
-        ? const Color(0xFF141414)
-        : const Color(0xFFF0F0F0);
+        ? Theme.of(context).colorScheme.outline
+        : Theme.of(context).colorScheme.outlineVariant;
 
     return InkWell(
       onTap: onTap,

@@ -344,12 +344,10 @@ final class _SectionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final chipBg = isDark ? const Color(0xFF111111) : const Color(0xFFF0F0F0);
-    final chipBorder = isDark
-        ? const Color(0xFF303030)
-        : const Color(0xFFE0E0E0);
-    final chipFg = isDark ? const Color(0xFF707070) : const Color(0xFF666666);
+    final theme = Theme.of(context);
+    final chipBg = theme.colorScheme.surfaceContainerHighest;
+    final chipBorder = theme.colorScheme.outlineVariant;
+    final chipFg = theme.colorScheme.onSurfaceVariant;
     return DecoratedBox(
       decoration: BoxDecoration(
         color: chipBg,
