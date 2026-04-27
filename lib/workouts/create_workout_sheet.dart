@@ -234,7 +234,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     required List<String> exercises,
     required String sectionTitle,
   }) => PlatformIconButton(
-    icon: Icon(PlatformIcons(context).add, color: Color(0xFFE53935)),
+    icon: Icon(PlatformIcons(context).add, color: Theme.of(context).colorScheme.primary),
     onPressed: () async {
       _focusNode.unfocus();
       final exercise = await showExercisePicker(context);
@@ -404,7 +404,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                                               .bodyLarge
                                               ?.copyWith(
                                                 fontWeight: FontWeight.w700,
-                                                color: const Color(0xFFD0D0D0),
+                                                color: Theme.of(context).textTheme.bodyLarge?.color,
                                                 fontSize: 16,
                                               ),
                                           maxLines: 2,
@@ -436,7 +436,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                                       ),
                                       child: Icon(
                                         Icons.drag_handle,
-                                        color: const Color(0xFF282828),
+                                        color: Theme.of(context).colorScheme.outlineVariant,
                                         size: 24,
                                       ),
                                     ),
@@ -481,7 +481,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
           : EdgeInsets.only(right: 16),
       icon: Icon(
         PlatformIcons(context).checkMark,
-        color: const Color(0xFFE53935), // F3 Red
+        color: Theme.of(context).colorScheme.primary, // F3 Red
       ),
       onPressed: _workoutCreationEnabled ? () => _createWorkout(context) : null,
     ),
@@ -493,23 +493,32 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     child: Padding(
       padding: const EdgeInsets.only(left: 16, right: 8),
       child: Container(
-        alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        alignment: Alignment.center,
         decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFF333333), width: 1),
-          borderRadius: BorderRadius.circular(12),
+          color: Theme.of(context).colorScheme.primary,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.35),
+              blurRadius: 20,
+              offset: Offset(0, 6),
+            ),
+          ],
         ),
+        constraints: const BoxConstraints(minHeight: 54),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.add, color: const Color(0xFFE53935), size: 20),
+            Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary, size: 20),
             const SizedBox(width: 8),
             Text(
               L10n.of(context)!.addSectionButtonText,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w800,
                 color: Theme.of(context).colorScheme.onPrimary,
-                fontSize: 15,
+                fontSize: 16,
+                letterSpacing: -0.1,
               ),
             ),
           ],
@@ -545,36 +554,32 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
           child: Padding(
             padding: const EdgeInsets.only(left: 16, right: 8),
             child: Container(
-              alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+              alignment: Alignment.center,
               decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface.withValues(alpha: 0),
                 border: Border.all(
-                  color: hasStrings
-                      ? const Color(0xFF333333)
-                      : const Color(0xFF444444),
-                  width: 1,
+                  color: hasStrings ? Theme.of(context).colorScheme.outline : Theme.of(context).colorScheme.surface,
+                  width: 1.5,
                 ),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(8),
               ),
+              constraints: const BoxConstraints(minHeight: 52),
+              padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 24),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     Icons.content_paste,
-                    color: hasStrings
-                        ? const Color(0xFFE53935)
-                        : Theme.of(context).iconTheme.color,
+                    color: hasStrings ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.onSurface,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     L10n.of(context)!.pasteSectionButtonText,
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                       fontSize: 15,
-                      color: hasStrings
-                          ? Theme.of(context).colorScheme.onPrimary
-                          : Theme.of(context).iconTheme.color,
+                      color: hasStrings ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ],
@@ -600,8 +605,9 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     },
     child: ReorderableDelayedDragStartListener(
       index: sectionIndex,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 16, right: 8, top: 10, bottom: 6),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
+        color: Theme.of(context).colorScheme.surface,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -611,10 +617,11 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   sectionTitle.toUpperCase(),
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: const Color(0xFFE53935), // F3 Red
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    fontSize: 10,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: 1.1,
+                    color: Theme.of(context).colorScheme.primary,
+                    letterSpacing: .1,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

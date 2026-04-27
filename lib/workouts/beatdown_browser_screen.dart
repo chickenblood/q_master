@@ -226,9 +226,12 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w900,
                                               fontSize: 60,
-                                              color: Theme.of(
-                                                context,
-                                              ).colorScheme.onSurface,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface
+                                                  .withAlpha(
+                                                    (0.24 * 255).round(),
+                                                  ),
                                               letterSpacing: -2,
                                               height: 1.05,
                                             ),
@@ -329,7 +332,7 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                       decorator: DotsDecorator(
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withOpacity(0.24),
+                        ).colorScheme.onSurface.withAlpha((0.24 * 255).round()),
                         activeColor: _beatdownAccent,
                       ),
                       position: _pageIndex.value.toDouble(),

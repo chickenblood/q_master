@@ -125,9 +125,10 @@ class _SettingsSheet extends ConsumerWidget {
                                     activeTrackColor: Theme.of(
                                       context,
                                     ).colorScheme.primary,
-                                    inactiveTrackColor: Theme.of(
-                                      context,
-                                    ).colorScheme.primary.withOpacity(0.24),
+                                    inactiveTrackColor: Theme.of(context)
+                                        .colorScheme
+                                        .primary
+                                        .withAlpha((0.24 * 255).round()),
                                     thumbColor: Theme.of(
                                       context,
                                     ).colorScheme.primary,
@@ -150,9 +151,10 @@ class _SettingsSheet extends ConsumerWidget {
                                   activeTrackColor: Theme.of(
                                     context,
                                   ).colorScheme.primary,
-                                  inactiveTrackColor: Theme.of(
-                                    context,
-                                  ).colorScheme.primary.withOpacity(0.24),
+                                  inactiveTrackColor: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withAlpha((0.24 * 255).round()),
                                   thumbColor: Theme.of(
                                     context,
                                   ).colorScheme.primary,

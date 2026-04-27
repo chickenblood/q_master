@@ -91,10 +91,10 @@ class _PickerOptionButton extends StatelessWidget {
         : colorScheme.surface;
     final iconBgColor = isDark
         ? const Color(0xFF1A0A0A)
-        : colorScheme.primary.withOpacity(0.08);
+        : colorScheme.primary.withAlpha((0.08 * 255).round());
     final subtitleColor = isDark
         ? const Color(0xFF888888)
-        : colorScheme.onSurface.withOpacity(0.6);
+        : colorScheme.onSurface.withAlpha((0.6 * 255).round());
     final chevronColor = isDark
         ? const Color(0xFF2A2A2A)
         : colorScheme.outlineVariant;

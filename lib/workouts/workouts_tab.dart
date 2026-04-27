@@ -47,9 +47,10 @@ class WorkoutsTab extends ConsumerWidget {
     if (!context.mounted) return;
 
     if (workout != null) {
-      Workout? updatedWorkout = await showAdaptiveModalSheet(
-        context: context,
-        child: CreateWorkoutSheet(workout: workout),
+      Workout? updatedWorkout = await _invokeWorkoutEditor(
+        context,
+        workout: workout,
+        displayMode: DisplayMode.edit,
       );
       if (updatedWorkout != null) {
         final listNotifier = ref.read(workoutListProvider.notifier);
@@ -69,21 +70,34 @@ class WorkoutsTab extends ConsumerWidget {
       showDragHandle: true,
       builder: (context) => const WorkoutCreationPicker(),
     );
+    if (!context.mounted) return;
+
     if (result == .manual) {
-      final workout = await showAdaptiveModalSheet(
-        // ignore: use_build_context_synchronously
-        context: navigator.context,
-        child: CreateWorkoutSheet(),
+      final workout = await _invokeWorkoutEditor(
+        context,
+        displayMode: DisplayMode.edit,
       );
       if (workout != null) {
         final listNotifier = ref.read(workoutListProvider.notifier);
         listNotifier.add(workout);
       }
     } else if (result == .generate) {
-      // ignore: use_build_context_synchronously
-      await _showGenerateWorkoutModal(navigator.context, ref);
+      await _showGenerateWorkoutModal(context, ref);
     }
   }
+
+  Future<Workout?> _invokeWorkoutEditor(
+    BuildContext context, {
+    Workout? workout,
+    required DisplayMode displayMode,
+  }) => Navigator.of(context, rootNavigator: true).push(
+    platformPageRoute(
+      fullscreenDialog: true,
+      context: context,
+      builder: (context) =>
+          CreateWorkoutSheet(workout: workout, initialDisplayMode: displayMode),
+    ),
+  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -123,6 +137,7 @@ class WorkoutsTab extends ConsumerWidget {
                   key: ValueKey(workouts[index]),
                   listNotifier: listNotifier,
                   workout: workouts[index],
+                  onInvokeWorkoutEditor: _invokeWorkoutEditor,
                 ),
                 onReorder: (oldIndex, newIndex) =>
                     listNotifier.move(oldIndex, newIndex),
@@ -149,11 +164,18 @@ class WorkoutsTab extends ConsumerWidget {
 final class _WorkoutTile extends StatelessWidget {
   final WorkoutList listNotifier;
   final Workout workout;
+  final Future<Workout?> Function(
+    BuildContext context, {
+    Workout? workout,
+    required DisplayMode displayMode,
+  })
+  onInvokeWorkoutEditor;
 
   const _WorkoutTile({
     required super.key,
     required this.listNotifier,
     required this.workout,
+    required this.onInvokeWorkoutEditor,
   });
 
   Future<void> _showBeatdownBrowser(
@@ -174,14 +196,12 @@ final class _WorkoutTile extends StatelessWidget {
   }
 
   Future<void> _editWorkout(BuildContext context, Workout workout) async {
-    Workout? updatedWorkout = await Navigator.of(context, rootNavigator: true)
-        .push<Workout?>(
-          platformPageRoute(
-            fullscreenDialog: true,
-            context: context,
-            builder: (context) => CreateWorkoutSheet(workout: workout),
-          ),
-        );
+    Workout? updatedWorkout = await onInvokeWorkoutEditor(
+      context,
+      workout: workout,
+      displayMode: .edit,
+    );
+
     if (updatedWorkout != null) {
       listNotifier.replace(workout, updatedWorkout);
     }
@@ -304,7 +324,11 @@ final class _WorkoutTile extends StatelessWidget {
                 ],
               ],
             ),
-            onTap: () => _editWorkout(context, workout),
+            onTap: () => onInvokeWorkoutEditor(
+              context,
+              workout: workout,
+              displayMode: .display,
+            ),
           ),
         ),
         const Divider(),
