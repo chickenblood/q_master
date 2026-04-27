@@ -16,7 +16,7 @@ import '../ui/adaptive_modal_sheet.dart';
 import '../ui/dismissible_row.dart';
 import '../ui/expandable_fab.dart';
 import '../utils/datetime_utils.dart';
-import 'beatdown_browser.dart';
+import 'beatdown_browser_screen.dart';
 import 'create_workout_sheet.dart';
 import 'generate_workout_sheet.dart';
 

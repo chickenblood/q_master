@@ -10,9 +10,9 @@ import '../ui/adaptive_icons.dart';
 import '../ui/media_query.dart';
 import '../utils/datetime_utils.dart';
 
-final class TimerTab extends ConsumerWidget {
+final class TimerScreen extends ConsumerWidget {
   static const fontFamily = 'RobotoCondensed-VariableFont_wght';
-  const TimerTab({super.key});
+  const TimerScreen({super.key});
 
   Future<void> _resetTimer(WidgetRef ref) async {
     final notifier = ref.read(timerProvider.notifier);
@@ -269,7 +269,7 @@ final class _PrimaryTile extends StatelessWidget {
             child: AutoSizeText(
               tileSpec.timeLabel,
               style: Theme.of(context).textTheme.displayLarge!.copyWith(
-                fontFamily: TimerTab.fontFamily,
+                fontFamily: TimerScreen.fontFamily,
                 fontVariations: [FontVariation.weight(700)],
                 fontFeatures: [FontFeature.tabularFigures()],
                 color: tileSpec.fgColor,
@@ -315,7 +315,7 @@ final class _SecondaryTile extends StatelessWidget {
               child: AutoSizeText(
                 tileSpec.timeLabel,
                 style: Theme.of(context).textTheme.displayLarge!.copyWith(
-                  fontFamily: TimerTab.fontFamily,
+                  fontFamily: TimerScreen.fontFamily,
                   fontVariations: [FontVariation.weight(500)],
                   fontFeatures: [FontFeature.tabularFigures()],
                   color: tileSpec.fgColor,

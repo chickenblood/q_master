@@ -349,7 +349,7 @@ class TimerSetupTab extends ConsumerWidget {
                     Navigator.of(context).push(
                       platformPageRoute(
                         context: context,
-                        builder: (_) => const TimerTab(),
+                        builder: (_) => const TimerScreen(),
                       ),
                     );
                   },

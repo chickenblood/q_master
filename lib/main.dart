@@ -106,26 +106,45 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
             builder: (context) {
               // Red 2px top-of-tab indicator for active tab — Option 3 identity.
               BottomNavigationBarItem tabItem(IconData icon, String label) {
-                final indicator = Container(
-                  width: 28,
-                  height: 2,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary,
-                    borderRadius: const BorderRadius.vertical(
-                      bottom: Radius.circular(2),
+                const double iconBoxHeight = 40;
+                const double iconSize = 24;
+                final indicator = Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      width: 28,
+                      height: 2,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        borderRadius: const BorderRadius.vertical(
+                          bottom: Radius.circular(2),
+                        ),
+                      ),
                     ),
                   ),
                 );
-                return BottomNavigationBarItem(
-                  icon: Icon(icon, size: 24),
-                  activeIcon: Column(
-                    mainAxisSize: MainAxisSize.min,
+                Widget iconWidget({bool active = false}) => SizedBox(
+                  height: iconBoxHeight,
+                  width: iconBoxHeight,
+                  child: Stack(
+                    alignment: Alignment.center,
                     children: [
-                      indicator,
-                      const SizedBox(height: 8),
-                      Icon(icon, size: 24),
+                      if (active) indicator,
+                      // Shift icon down by 4 pixels
+                      Positioned(
+                        top: 4,
+                        left: 0,
+                        right: 0,
+                        child: Icon(icon, size: iconSize),
+                      ),
                     ],
                   ),
+                );
+                return BottomNavigationBarItem(
+                  icon: iconWidget(active: false),
+                  activeIcon: iconWidget(active: true),
                   label: label,
                 );
               }

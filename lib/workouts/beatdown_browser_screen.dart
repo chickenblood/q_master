@@ -330,7 +330,7 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                         color: Theme.of(
                           context,
                         ).colorScheme.onSurface.withOpacity(0.24),
-                        activeDotColor: _beatdownAccent,
+                        activeColor: _beatdownAccent,
                       ),
                       position: _pageIndex.value.toDouble(),
                     ),
