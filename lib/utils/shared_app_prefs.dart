@@ -45,13 +45,15 @@ final class SharedAppPrefs extends ChangeNotifier {
     rounds = _valueSetup<int>('rounds', 8);
     cycles = _valueSetup<int>('cycles', 1);
 
-    theme = _valueSetup<int>('theme', ThemeMode.system.index);
+    // Default to Dark theme.
+    theme = _valueSetup<int>('theme', ThemeMode.dark.index);
     motorboatSoundEnabled = _valueSetup<bool>('motorboat_sound', true);
 
-    selectedCategoryFilters =
-        _valueSetup<List<String>>('selected_category_filters', const []);
-    exerciseVideoFilter =
-        _valueSetup<bool>('exercise_video_filter', false);
+    selectedCategoryFilters = _valueSetup<List<String>>(
+      'selected_category_filters',
+      const [],
+    );
+    exerciseVideoFilter = _valueSetup<bool>('exercise_video_filter', false);
   }
 
   ValueNotifier<T> _valueSetup<T>(String key, T defaultValue) {
