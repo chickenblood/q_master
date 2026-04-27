@@ -174,10 +174,14 @@ final class _WorkoutTile extends StatelessWidget {
   }
 
   Future<void> _editWorkout(BuildContext context, Workout workout) async {
-    Workout? updatedWorkout = await showAdaptiveModalSheet(
-      context: context,
-      child: CreateWorkoutSheet(workout: workout),
-    );
+    Workout? updatedWorkout = await Navigator.of(context, rootNavigator: true)
+        .push<Workout?>(
+          platformPageRoute(
+            fullscreenDialog: true,
+            context: context,
+            builder: (context) => CreateWorkoutSheet(workout: workout),
+          ),
+        );
     if (updatedWorkout != null) {
       listNotifier.replace(workout, updatedWorkout);
     }
@@ -281,33 +285,26 @@ final class _WorkoutTile extends StatelessWidget {
                 ),
               ],
             ),
-            trailing: isIOS
-                ? Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _OverflowMenu(
-                        onEdit: () => _editWorkout(context, workout),
-                        onDuplicate: () => _duplicateWorkout(workout),
-                        onShare: (buttonContext) =>
-                            _shareWorkout(buttonContext, workout),
-                        onDelete: () => _deleteWorkout(context, workout),
-                      ),
-                      const SizedBox(width: 6),
-                      Icon(
-                        CupertinoIcons.chevron_forward,
-                        size: 18,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ],
-                  )
-                : _OverflowMenu(
-                    onEdit: () => _editWorkout(context, workout),
-                    onDuplicate: () => _duplicateWorkout(workout),
-                    onShare: (buttonContext) =>
-                        _shareWorkout(buttonContext, workout),
-                    onDelete: () => _deleteWorkout(context, workout),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _OverflowMenu(
+                  onDuplicate: () => _duplicateWorkout(workout),
+                  onShare: (buttonContext) =>
+                      _shareWorkout(buttonContext, workout),
+                  onDelete: () => _deleteWorkout(context, workout),
+                ),
+                if (isIOS) ...[
+                  const SizedBox(width: 6),
+                  Icon(
+                    CupertinoIcons.chevron_forward,
+                    size: 18,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
-            onTap: () => _showBeatdownBrowser(context, workout),
+                ],
+              ],
+            ),
+            onTap: () => _editWorkout(context, workout),
           ),
         ),
         const Divider(),
@@ -353,13 +350,11 @@ final class _SectionChip extends StatelessWidget {
 }
 
 final class _OverflowMenu extends StatelessWidget {
-  final void Function() onEdit;
   final void Function() onDuplicate;
   final void Function(BuildContext) onShare;
   final void Function() onDelete;
 
   const _OverflowMenu({
-    required this.onEdit,
     required this.onDuplicate,
     required this.onShare,
     required this.onDelete,
@@ -374,11 +369,6 @@ final class _OverflowMenu extends StatelessWidget {
           color: Theme.of(context).colorScheme.onSurface,
         ),
         menuChildren: [
-          AdaptiveMenuItem(
-            onPressed: onEdit,
-            icon: context.platformIcons.edit,
-            text: L10n.of(context)!.editWorkoutText,
-          ),
           AdaptiveMenuItem(
             onPressed: () => onDuplicate(),
             icon: Icons.copy,

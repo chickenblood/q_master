@@ -153,18 +153,6 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
                 tabController: _tabController,
                 bodyBuilder: (_, index) =>
                     _TabsContainer(selectedIndex: index, children: _tabPages),
-                materialTabs: (tabBarContext, _) {
-                  final isDark =
-                      Theme.of(tabBarContext).brightness == Brightness.dark;
-                  return MaterialNavBarData(
-                    selectedItemColor: isDark
-                        ? const Color(0xFFF0F0F0)
-                        : const Color(0xFF121212),
-                    unselectedItemColor: isDark
-                        ? const Color(0xFF808080)
-                        : const Color(0xFF6F6F6F),
-                  );
-                },
                 material3Tabs: (tabBarContext, _) {
                   final isDark =
                       Theme.of(tabBarContext).brightness == Brightness.dark;

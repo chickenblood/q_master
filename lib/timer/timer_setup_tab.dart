@@ -134,7 +134,8 @@ class TimerSetupTab extends ConsumerWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      l10n.timerModeLabel, // Localized: "Mode"
+                                      l10n.timerModeLabel
+                                          .toUpperCase(), // Localized: "Mode"
                                       style: TextStyle(
                                         fontSize: 10,
                                         fontWeight: FontWeight.w800,
@@ -251,7 +252,8 @@ class TimerSetupTab extends ConsumerWidget {
                                       ),
                                     ),
                                     child: Text(
-                                      l10n.timerIntervalsLabel, // Localized: "Intervals — tap to change"
+                                      l10n.timerIntervalsLabel
+                                          .toUpperCase(), // Localized: "Intervals — tap to change"
                                       style: TextStyle(
                                         fontSize: 10,
                                         fontWeight: FontWeight.w800,

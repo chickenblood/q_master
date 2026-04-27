@@ -113,6 +113,10 @@
     "@addSectionDialogTitle": {
       "description": "Title of the add-section alert dialog, and label of its confirm action button."
     },
+    "addSectionForPasteDialogTitle": "Add section for paste",
+    "@addSectionForPasteDialogTitle": {
+      "description": "Title of the add-section alert dialog when pasting a section from the clipboard, and label of its confirm action button."
+    },
     "addSectionFieldHint": "e.g. “Thang”, “Repeat 5×”, etc.",
     "@addSectionFieldHint": {
       "description": "Placeholder hint text inside the section name text field in the add-section dialog."

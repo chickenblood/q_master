@@ -9,30 +9,38 @@ import '../ui/cupertino_sheet_fork.dart';
 import '../ui/dismissible_row.dart';
 import 'exercise_picker_sheet.dart';
 
+/// The display mode the dialog is initially displayed in.
+///
+/// In [display] mode, the workout details are shown read-only with options to
+/// 1) edit (which switches to [edit] mode),
+/// 2) share
+/// 3) Start the beatdown.
+enum DisplayMode { display, edit }
+
 final class CreateWorkoutSheet extends StatefulWidget {
   final Workout? workout;
+  final DisplayMode initialDisplayMode;
 
-  const CreateWorkoutSheet({super.key, this.workout});
+  const CreateWorkoutSheet({
+    super.key,
+    this.workout,
+    this.initialDisplayMode = DisplayMode.display,
+  });
 
   @override
   State<CreateWorkoutSheet> createState() => _CreateWorkoutSheetState();
 }
 
 final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
-  static final _footerButtonInsets = EdgeInsets.fromLTRB(
-    16.0,
-    16.0,
-    16.0,
-    16.0,
-  );
   static const _headerInsets = EdgeInsets.only(left: 16.0, right: 8.0);
-  static const _itemInsets = EdgeInsets.only(left: 32.0, right: 24.0);
 
   final _focusNode = FocusNode();
   final _nameTextController = TextEditingController();
   final _scrollController = ScrollController();
 
   final _sections = <String, List<String>>{};
+
+  var _displayMode = DisplayMode.display;
 
   // Track the group of the most recently added exercise for scrolling
   String? _lastAddedItemGroup;
@@ -55,6 +63,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
       _sections.addAll(sectionMap);
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _displayMode = widget.initialDisplayMode;
       if (widget.workout == null) {
         setState(() {
           _sections[L10n.of(context)!.warmupSectionTitle] = [];
@@ -150,7 +159,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
             cupertino: (_, _) =>
                 CupertinoDialogActionData(isDefaultAction: true),
             onPressed: () => Navigator.of(innerContext).pop(controller.text),
-            child: PlatformText(title),
+            child: PlatformText(L10n.of(innerContext)!.addSectionDialogTitle),
           ),
         ],
       ),
@@ -225,7 +234,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     required List<String> exercises,
     required String sectionTitle,
   }) => PlatformIconButton(
-    icon: Icon(PlatformIcons(context).add),
+    icon: Icon(PlatformIcons(context).add, color: Color(0xFFE53935)),
     onPressed: () async {
       _focusNode.unfocus();
       final exercise = await showExercisePicker(context);
@@ -263,6 +272,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     final sectionOrder = _sections.keys.toList(growable: false);
     return [
       SliverSafeArea(
+        top: false,
         bottom: false,
         sliver: SliverList(
           delegate: SliverChildListDelegate([
@@ -272,6 +282,45 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                 controller: _nameTextController,
                 textCapitalization: TextCapitalization.sentences,
                 focusNode: _focusNode,
+                material: (_, _) => MaterialTextFieldData(
+                  decoration: InputDecoration(
+                    border: const UnderlineInputBorder(),
+                    enabledBorder: const UnderlineInputBorder(),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 2,
+                      ),
+                    ),
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 18),
+                  ),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 22,
+                    letterSpacing: -0.3,
+                  ),
+                  cursorColor: Theme.of(context).colorScheme.primary,
+                  textAlign: TextAlign.left,
+                ),
+                cupertino: (_, _) => CupertinoTextFieldData(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Theme.of(context).colorScheme.outline,
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 22,
+                    letterSpacing: -0.3,
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  cursorColor: Theme.of(context).colorScheme.primary,
+                  textAlign: TextAlign.left,
+                ),
               ),
             ),
           ]),
@@ -331,27 +380,68 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                               index: exerciseIndex,
                               sectionGroup: sectionGroup,
                             ),
-                            child: ReorderableDelayedDragStartListener(
-                              index: exerciseIndex,
-                              child: PlatformListTile(
-                                key: ValueKey(
-                                  'exercise_$exercise$exerciseIndex',
-                                ),
-                                title: PlatformText(
-                                  exercise,
-                                  softWrap: true,
-                                  maxLines: 2,
-                                  overflow: .ellipsis,
-                                ),
-                                trailing: exercises.length > 1
-                                    ? Icon(Icons.drag_handle)
-                                    : null,
-                                material: (context, platform) =>
-                                    MaterialListTileData(
-                                      contentPadding: _itemInsets,
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                left: 16,
+                                right: 8,
+                                top: 5,
+                                bottom: 5,
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: PlatformListTile(
+                                      key: ValueKey(
+                                        'exercise_$exercise$exerciseIndex',
+                                      ),
+                                      title: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          exercise,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.w700,
+                                                color: const Color(0xFFD0D0D0),
+                                                fontSize: 16,
+                                              ),
+                                          maxLines: 2,
+                                          overflow: .ellipsis,
+                                          textAlign: .left,
+                                        ),
+                                      ),
+                                      material: (context, platform) =>
+                                          MaterialListTileData(
+                                            contentPadding: EdgeInsets.only(
+                                              left: 0,
+                                              right: 8,
+                                            ),
+                                          ),
+                                      cupertino: (context, platform) =>
+                                          CupertinoListTileData(
+                                            padding: EdgeInsets.only(
+                                              left: 0,
+                                              right: 8,
+                                            ),
+                                          ),
                                     ),
-                                cupertino: (context, platform) =>
-                                    CupertinoListTileData(padding: _itemInsets),
+                                  ),
+                                  ReorderableDelayedDragStartListener(
+                                    index: exerciseIndex,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        right: 16.0,
+                                      ),
+                                      child: Icon(
+                                        Icons.drag_handle,
+                                        color: const Color(0xFF282828),
+                                        size: 24,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           );
@@ -379,37 +469,48 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
           },
         ),
       ),
-      _addSectionFooter(context),
+      if (_displayMode == DisplayMode.edit) _addSectionFooter(context),
     ];
   }
 
   Widget _rightAppBarButtonAction(BuildContext context) => ListenableBuilder(
     listenable: Listenable.merge([_nameTextController]),
     builder: (_, _) => PlatformIconButton(
+      padding: Theme.of(context).platform == TargetPlatform.iOS
+          ? EdgeInsets.only(right: 26)
+          : EdgeInsets.only(right: 16),
+      icon: Icon(
+        PlatformIcons(context).checkMark,
+        color: const Color(0xFFE53935), // F3 Red
+      ),
       onPressed: _workoutCreationEnabled ? () => _createWorkout(context) : null,
-      icon: Icon(PlatformIcons(context).checkMark),
     ),
   );
 
   Widget _addSectionButton(BuildContext context) => PlatformTextButton(
     onPressed: () => _addSection(context),
-    child: DecoratedBox(
-      position: .foreground,
-      decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).colorScheme.outline),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: _footerButtonInsets,
+    padding: EdgeInsets.zero,
+    child: Padding(
+      padding: const EdgeInsets.only(left: 16, right: 8),
+      child: Container(
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xFF333333), width: 1),
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(PlatformIcons(context).add),
-            SizedBox(width: 8),
-            PlatformText(
+            Icon(Icons.add, color: const Color(0xFFE53935), size: 20),
+            const SizedBox(width: 8),
+            Text(
               L10n.of(context)!.addSectionButtonText,
-              style: Theme.of(
-                context,
-              ).textTheme.labelLarge!.copyWith(fontWeight: .w500),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontSize: 15,
+              ),
             ),
           ],
         ),
@@ -425,7 +526,9 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
         onPressed: hasStrings
             ? () async {
                 _focusNode.unfocus();
-                final sectionTitle = L10n.of(context)!.addSectionDialogTitle;
+                final sectionTitle = L10n.of(
+                  context,
+                )!.addSectionForPasteDialogTitle;
                 final newSectionName = await _showSectionTitleDialog(
                   context,
                   title: sectionTitle,
@@ -436,32 +539,46 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                 _pasteExercises(sectionGroup: newSectionName);
               }
             : null,
-        child: DecoratedBox(
-          position: .foreground,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(
-                context,
-              ).colorScheme.outline.withAlpha(hasStrings ? 255 : 135),
-            ),
-            borderRadius: BorderRadius.circular(12),
-          ),
+        padding: EdgeInsets.zero,
+        child: Opacity(
+          opacity: hasStrings ? 1.0 : 0.4,
           child: Padding(
-            padding: _footerButtonInsets,
-            child: Row(
-              children: [
-                Icon(AdaptiveIcons.paste),
-                SizedBox(width: 8),
-                PlatformText(
-                  L10n.of(context)!.pasteSectionButtonText,
-                  style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                    fontWeight: .w500,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withAlpha(hasStrings ? 255 : 135),
-                  ),
+            padding: const EdgeInsets.only(left: 16, right: 8),
+            child: Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: hasStrings
+                      ? const Color(0xFF333333)
+                      : const Color(0xFF444444),
+                  width: 1,
                 ),
-              ],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.content_paste,
+                    color: hasStrings
+                        ? const Color(0xFFE53935)
+                        : Theme.of(context).iconTheme.color,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    L10n.of(context)!.pasteSectionButtonText,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15,
+                      color: hasStrings
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context).iconTheme.color,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -481,28 +598,50 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
         _sections.remove(sectionTitle);
       });
     },
-    child: GestureDetector(
-      onDoubleTap: () => _editSectionTitle(context, sectionTitle: sectionTitle),
-      child: ReorderableDelayedDragStartListener(
-        index: sectionIndex,
-        child: PlatformListTile(
-          material: (context, platform) =>
-              MaterialListTileData(contentPadding: _headerInsets),
-          cupertino: (context, platform) =>
-              CupertinoListTileData(padding: _headerInsets),
-          title: PlatformText(
-            sectionTitle,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
+    child: ReorderableDelayedDragStartListener(
+      index: sectionIndex,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 16, right: 8, top: 10, bottom: 6),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  sectionTitle.toUpperCase(),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: const Color(0xFFE53935), // F3 Red
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.1,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.left,
+                ),
+              ),
             ),
-            maxLines: 2,
-            overflow: .ellipsis,
-          ),
-          trailing: _addExerciseButton(
-            context,
-            exercises: exercises,
-            sectionTitle: sectionTitle,
-          ),
+            Row(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.edit,
+                    color: Theme.of(context).colorScheme.onSurface,
+                    size: 20,
+                  ),
+                  tooltip: 'Edit Section',
+                  onPressed: () =>
+                      _editSectionTitle(context, sectionTitle: sectionTitle),
+                ),
+                _addExerciseButton(
+                  context,
+                  exercises: exercises,
+                  sectionTitle: sectionTitle,
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     ),
@@ -511,11 +650,13 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   Widget _addSectionFooter(BuildContext context) => SliverSafeArea(
     top: false,
     sliver: SliverToBoxAdapter(
-      child: Row(
-        mainAxisAlignment: .spaceEvenly,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(child: _addSectionButton(context)),
-          Expanded(child: _pasteExercisesButton(context)),
+          const SizedBox(height: 16),
+          _addSectionButton(context),
+          const SizedBox(height: 8),
+          _pasteExercisesButton(context),
         ],
       ),
     ),
@@ -527,7 +668,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
       controller: _scrollController,
       physics: BottomSheetScrollPhysics(),
       slivers: [
-        PlatformSliverAppBar(
+        SliverAppBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           leading: PlatformIconButton(
             padding: Theme.of(context).platform == TargetPlatform.iOS
@@ -540,17 +681,17 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
             widget.workout == null
                 ? L10n.of(context)!.createWorkoutDialogTitle
                 : L10n.of(context)!.editWorkoutDialogTitle,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w800,
+              fontSize: 22,
+              letterSpacing: -0.3,
+            ),
             textScaler: MediaQuery.textScalerOf(
               context,
             ).clamp(maxScaleFactor: 1.5),
           ),
-          cupertino: (_, _) => CupertinoSliverAppBarData(
-            trailing: _rightAppBarButtonAction(context),
-            padding: EdgeInsetsDirectional.only(end: 8),
-          ),
-          material: (_, _) => MaterialSliverAppBarData(
-            actions: [_rightAppBarButtonAction(context)],
-          ),
+          actions: [_rightAppBarButtonAction(context)],
+          pinned: true,
         ),
         ..._content(context),
       ],
