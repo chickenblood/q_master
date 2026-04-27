@@ -76,7 +76,3 @@ configure<ApplicationExtension> {
 flutter {
     source = "../.."
 }
-
-dependencies {
-    wearApp(project(":app:watchapp"))
-}
