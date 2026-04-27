@@ -91,6 +91,17 @@ abstract final class TimerColors {
       _isDark(context) ? const Color(0xFFE53935) : const Color(0xFFD32F2F);
 }
 
+/// App-wide color helpers for custom UI elements
+abstract final class ThemeColors {
+  /// Returns a color for drag handles that is visible in both light and dark modes.
+  static Color dragHandle(BuildContext context) {
+    final theme = Theme.of(context);
+    return theme.brightness == Brightness.dark
+        ? theme.colorScheme.onSurfaceVariant
+        : theme.colorScheme.outline;
+  }
+}
+
 // ─── Typography helpers ────────────────────────────────────────────────────
 // Option 3 uses a heavier, larger scale than stock Material for glanceability
 // at arm's length in pre-dawn conditions.

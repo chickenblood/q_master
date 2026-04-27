@@ -59,14 +59,16 @@ class _SettingsSheet extends ConsumerWidget {
   }) {
     final l10n = L10n.of(context)!;
     final timer = ref.read(timerProvider.notifier);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final labelColor = Theme.of(context).colorScheme.onSurfaceVariant;
     final valueColor = Theme.of(context).colorScheme.onSurface;
-    final inactiveSegmentColor = Theme.of(context).colorScheme.outlineVariant;
-    final segmentBorderColor = Theme.of(context).colorScheme.outlineVariant;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final inactiveSegmentColor = isDark
+        ? Theme.of(context).colorScheme.onSurfaceVariant
+        : Theme.of(context).colorScheme.onSurface;
+    final segmentBorderColor = Theme.of(context).colorScheme.outline;
     final rowValueStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
-      fontSize: 22,
-      fontWeight: FontWeight.w800,
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
       color: valueColor,
       fontFeatures: [FontFeature.tabularFigures()],
     );
@@ -290,7 +292,6 @@ final class _SettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = Theme.of(context).colorScheme.surface;
     final cardBorder = Theme.of(context).colorScheme.outlineVariant;
     final headerBg = Theme.of(context).colorScheme.surfaceContainerHighest;

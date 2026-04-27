@@ -4,6 +4,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
+import '../theme/theme.dart';
 import '../ui/action_button.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/cupertino_sheet_fork.dart';
@@ -442,9 +443,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                                       ),
                                       child: Icon(
                                         Icons.drag_handle,
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.outlineVariant,
+                                        color: ThemeColors.dragHandle(context),
                                         size: 24,
                                       ),
                                     ),
