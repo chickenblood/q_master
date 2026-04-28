@@ -7,6 +7,7 @@ import '../l10n/l10n.dart';
 import '../model/workout.dart';
 import '../theme/theme.dart';
 import '../ui/action_button.dart';
+import '../ui/adaptive_icons.dart';
 import '../ui/cupertino_sheet_fork.dart';
 import '../ui/dismissible_row.dart';
 import '../utils/datetime_utils.dart';
@@ -649,9 +650,11 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
           spacing: 8,
           children: [
             ActionButton(
-              onPressed: () => _addSection(context),
               label: L10n.of(context)!.addSectionButtonText,
               icon: PlatformIcons(context).add,
+              iconColor: Theme.of(context).colorScheme.primary,
+              outlined: true,
+              onPressed: () => _addSection(context),
             ),
             _pasteExercisesButton(context),
           ],
@@ -731,8 +734,16 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
             padding: Theme.of(context).platform == TargetPlatform.iOS
                 ? EdgeInsets.only(left: 8)
                 : EdgeInsets.zero,
-            icon: Icon(PlatformIcons(context).back),
-            onPressed: () => Navigator.pop(context),
+            icon: _displayMode == DisplayMode.display
+                ? Icon(PlatformIcons(context).back)
+                : Icon(AdaptiveIcons.close),
+            onPressed: () {
+              if (_displayMode == DisplayMode.display) {
+                Navigator.of(context).pop();
+                return;
+              }
+              setState(() => _displayMode = DisplayMode.display);
+            },
           ),
           title: PlatformText(
             _titleForAppBar(),

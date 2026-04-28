@@ -9,12 +9,14 @@ class ActionButton extends StatelessWidget {
   final Function()? onPressed;
   final String label;
   final IconData icon;
+  final Color? iconColor;
   final bool outlined;
   const ActionButton({
     super.key,
     required this.onPressed,
     required this.label,
     required this.icon,
+    this.iconColor,
     this.outlined = false,
   });
 
@@ -53,7 +55,7 @@ class ActionButton extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: Theme.of(context).colorScheme.onPrimary,
+              color: iconColor ?? Theme.of(context).colorScheme.onPrimary,
               size: 20,
             ),
             const SizedBox(width: 8),
