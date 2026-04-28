@@ -731,9 +731,6 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
         SliverAppBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           leading: PlatformIconButton(
-            padding: Theme.of(context).platform == TargetPlatform.iOS
-                ? EdgeInsets.only(left: 8)
-                : EdgeInsets.zero,
             icon: _displayMode == DisplayMode.display
                 ? Icon(PlatformIcons(context).back)
                 : Icon(AdaptiveIcons.close),
