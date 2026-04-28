@@ -86,16 +86,17 @@ class TimerSetupTab extends ConsumerWidget {
     final prefs = SharedAppPrefs.instance;
     return PlatformScaffold(
       appBar: PlatformAppBar(
-        title: Text(l10n.timerTabTitle),
+        title: Text(
+          l10n.timerTabTitle,
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+          textScaler: MediaQuery.textScalerOf(
+            context,
+          ).clamp(maxScaleFactor: 1.6),
+        ),
         backgroundColor: Theme.of(context).colorScheme.surface,
-        material: (_, _) => MaterialAppBarData(
-          elevation: 0,
-          leading: const SettingsActionButton(),
-        ),
-        cupertino: (_, _) => CupertinoNavigationBarData(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          leading: const SettingsActionButton(),
-        ),
+        leading: const SettingsActionButton(),
       ),
       body: SafeArea(
         bottom: true,
@@ -105,193 +106,172 @@ class TimerSetupTab extends ConsumerWidget {
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(12),
-                child: ValueListenableBuilder(
-                  valueListenable: prefs.prepareIntervalSeconds,
-                  builder: (context, _, _) => ValueListenableBuilder(
-                    valueListenable: prefs.workIntervalSeconds,
-                    builder: (context, _, _) => ValueListenableBuilder(
-                      valueListenable: prefs.restIntervalSeconds,
-                      builder: (context, _, _) => ValueListenableBuilder(
-                        valueListenable: prefs.rounds,
-                        builder: (context, _, _) => Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            // Mode selector
-                            Card(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.surfaceContainerHighest,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                side: BorderSide(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.outlineVariant,
+                child: ListenableBuilder(
+                  listenable: Listenable.merge([
+                    prefs.timerType,
+                    prefs.prepareIntervalSeconds,
+                    prefs.workIntervalSeconds,
+                    prefs.restIntervalSeconds,
+                    prefs.rounds,
+                  ]),
+                  builder: (context, _) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Mode selector
+                      Card(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.outlineVariant,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.timerModeLabel
+                                    .toUpperCase(), // Localized: "Mode"
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: .1,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  height: 1.2,
+                                  textBaseline: TextBaseline.alphabetic,
                                 ),
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(14),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      l10n.timerModeLabel
-                                          .toUpperCase(), // Localized: "Mode"
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w800,
-                                        letterSpacing: .1,
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.primary,
-                                        height: 1.2,
-                                        textBaseline: TextBaseline.alphabetic,
-                                      ),
+                              const SizedBox(height: 10),
+                              SizedBox(
+                                width: double.infinity,
+                                child: SegmentedButton<int>(
+                                  segments: [
+                                    ButtonSegment(
+                                      value: 0,
+                                      label: Text(l10n.timerTypeStopwatchLabel),
                                     ),
-                                    const SizedBox(height: 10),
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: SegmentedButton<int>(
-                                        segments: [
-                                          ButtonSegment(
-                                            value: 0,
-                                            label: Text(
-                                              l10n.timerTypeStopwatchLabel,
-                                            ),
-                                          ),
-                                          ButtonSegment(
-                                            value: 1,
-                                            label: Text(
-                                              l10n.timerTypeTabataLabel,
-                                            ),
-                                          ),
-                                        ],
-                                        selected: {prefs.timerType.value},
-                                        onSelectionChanged: (newSelection) {
-                                          prefs.timerType.value =
-                                              newSelection.single;
-                                          timer.reset();
-                                        },
-                                        showSelectedIcon: false,
-                                      ),
+                                    ButtonSegment(
+                                      value: 1,
+                                      label: Text(l10n.timerTypeTabataLabel),
                                     ),
                                   ],
+                                  selected: {prefs.timerType.value},
+                                  onSelectionChanged: (newSelection) {
+                                    prefs.timerType.value = newSelection.single;
+                                    timer.reset();
+                                  },
+                                  showSelectedIcon: false,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // Interval card
+                      Card(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.outlineVariant,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8,
+                                horizontal: 16,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.surface,
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.outlineVariant,
+                                  ),
+                                ),
+                              ),
+                              child: Text(
+                                l10n.timerIntervalsLabel
+                                    .toUpperCase(), // Localized: "Intervals — tap to change"
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: .1,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  height: 1.2,
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 10),
-                            // Interval card
-                            Card(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.surfaceContainerHighest,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                side: BorderSide(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.outlineVariant,
+                            _IntervalSetupRow(
+                              label: l10n.timerSettingsPrepareLabel,
+                              value: formatDuration(
+                                Duration(
+                                  seconds: prefs.prepareIntervalSeconds.value,
                                 ),
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 8,
-                                      horizontal: 16,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.surface,
-                                      border: Border(
-                                        bottom: BorderSide(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.outlineVariant,
-                                        ),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      l10n.timerIntervalsLabel
-                                          .toUpperCase(), // Localized: "Intervals — tap to change"
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w800,
-                                        letterSpacing: .1,
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.primary,
-                                        height: 1.2,
-                                      ),
-                                    ),
-                                  ),
-                                  _IntervalSetupRow(
-                                    label: l10n.timerSettingsPrepareLabel,
-                                    value: formatDuration(
-                                      Duration(
-                                        seconds:
-                                            prefs.prepareIntervalSeconds.value,
-                                      ),
-                                    ),
-                                    valueColor: TimerColors.prepareFg(context),
-                                    onTap: () => _showTimeIntervalPicker(
-                                      context,
-                                      prefs.prepareIntervalSeconds,
-                                      timer,
-                                    ),
-                                  ),
-                                  _IntervalSetupRow(
-                                    label: l10n.timerSettingsWorkLabel,
-                                    value: formatDuration(
-                                      Duration(
-                                        seconds:
-                                            prefs.workIntervalSeconds.value,
-                                      ),
-                                    ),
-                                    valueColor: TimerColors.workFg(context),
-                                    onTap: () => _showTimeIntervalPicker(
-                                      context,
-                                      prefs.workIntervalSeconds,
-                                      timer,
-                                    ),
-                                  ),
-                                  _IntervalSetupRow(
-                                    label: l10n.timerSettingsRestLabel,
-                                    value: formatDuration(
-                                      Duration(
-                                        seconds:
-                                            prefs.restIntervalSeconds.value,
-                                      ),
-                                    ),
-                                    valueColor: TimerColors.restFg(context),
-                                    onTap: () => _showTimeIntervalPicker(
-                                      context,
-                                      prefs.restIntervalSeconds,
-                                      timer,
-                                    ),
-                                  ),
-                                  _IntervalSetupRow(
-                                    label: l10n.timerSettingsRoundsLabel,
-                                    value: prefs.rounds.value.toString(),
-                                    valueColor: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                    onTap: () => _showRoundsPicker(
-                                      context,
-                                      prefs.rounds,
-                                      timer,
-                                    ),
-                                    showDivider: false,
-                                  ),
-                                ],
+                              valueColor: TimerColors.prepareFg(context),
+                              onTap: () => _showTimeIntervalPicker(
+                                context,
+                                prefs.prepareIntervalSeconds,
+                                timer,
                               ),
+                            ),
+                            _IntervalSetupRow(
+                              label: l10n.timerSettingsWorkLabel,
+                              value: formatDuration(
+                                Duration(
+                                  seconds: prefs.workIntervalSeconds.value,
+                                ),
+                              ),
+                              valueColor: TimerColors.workFg(context),
+                              onTap: () => _showTimeIntervalPicker(
+                                context,
+                                prefs.workIntervalSeconds,
+                                timer,
+                              ),
+                            ),
+                            _IntervalSetupRow(
+                              label: l10n.timerSettingsRestLabel,
+                              value: formatDuration(
+                                Duration(
+                                  seconds: prefs.restIntervalSeconds.value,
+                                ),
+                              ),
+                              valueColor: TimerColors.restFg(context),
+                              onTap: () => _showTimeIntervalPicker(
+                                context,
+                                prefs.restIntervalSeconds,
+                                timer,
+                              ),
+                            ),
+                            _IntervalSetupRow(
+                              label: l10n.timerSettingsRoundsLabel,
+                              value: prefs.rounds.value.toString(),
+                              valueColor: Theme.of(
+                                context,
+                              ).colorScheme.onSurface,
+                              onTap: () => _showRoundsPicker(
+                                context,
+                                prefs.rounds,
+                                timer,
+                              ),
+                              showDivider: false,
                             ),
                           ],
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),

@@ -50,7 +50,9 @@ class NearMeTab extends StatelessWidget {
       leading: SettingsActionButton(),
       title: Text(
         L10n.of(context)!.nearMeTabTitle,
-        style: Theme.of(context).textTheme.titleLarge,
+        style: Theme.of(
+          context,
+        ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
         textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.6),
       ),
       trailingActions: [

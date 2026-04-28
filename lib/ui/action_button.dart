@@ -6,7 +6,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 ///
 /// Supports outlined and filled styles, with an icon and label.
 class ActionButton extends StatelessWidget {
-  final VoidCallback onPressed;
+  final Function()? onPressed;
   final String label;
   final IconData icon;
   final bool outlined;

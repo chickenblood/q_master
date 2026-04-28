@@ -42,7 +42,9 @@ class GamesTab extends StatelessWidget {
         leading: const SettingsActionButton(),
         title: Text(
           L10n.of(context)!.gamesTabTitle,
-          style: Theme.of(context).textTheme.titleLarge,
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
           textScaler: MediaQuery.textScalerOf(
             context,
           ).clamp(maxScaleFactor: 1.6),

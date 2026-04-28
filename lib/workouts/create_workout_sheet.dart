@@ -7,7 +7,6 @@ import '../l10n/l10n.dart';
 import '../model/workout.dart';
 import '../theme/theme.dart';
 import '../ui/action_button.dart';
-import '../ui/adaptive_icons.dart';
 import '../ui/cupertino_sheet_fork.dart';
 import '../ui/dismissible_row.dart';
 import '../utils/datetime_utils.dart';
@@ -134,7 +133,8 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
           WorkoutSection(name: entry.key, exercises: List.of(entry.value)),
       ],
     );
-    Navigator.pop(context, workout);
+    //Navigator.pop(context, workout);
+    setState(() => _displayMode = .display);
   }
 
   /// Shows a dialog for editing the title of a section.
@@ -310,6 +310,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
               padding: _headerInsets,
               child: PlatformTextField(
                 controller: _nameTextController,
+                enabled: _displayMode == DisplayMode.edit,
                 textCapitalization: TextCapitalization.sentences,
                 focusNode: _focusNode,
                 material: (_, _) => MaterialTextFieldData(
@@ -541,69 +542,28 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     future: Clipboard.hasStrings(),
     builder: (context, snapshot) {
       final hasStrings = snapshot.data ?? false;
-      return PlatformTextButton(
-        onPressed: hasStrings
-            ? () async {
-                _focusNode.unfocus();
-                final sectionTitle = L10n.of(
-                  context,
-                )!.addSectionForPasteDialogTitle;
-                final newSectionName = await _showSectionTitleDialog(
-                  context,
-                  title: sectionTitle,
-                  initialText: L10n.of(context)!.pasteSectionInitialText,
-                );
-                if (newSectionName == null) return;
-                setState(() => _sections[newSectionName] = []);
-                _pasteExercises(sectionGroup: newSectionName);
-              }
-            : null,
-        padding: EdgeInsets.zero,
-        child: Opacity(
-          opacity: hasStrings ? 1.0 : 0.4,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 16, right: 8),
-            child: Container(
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.surface.withValues(alpha: 0),
-                border: Border.all(
-                  color: hasStrings
-                      ? Theme.of(context).colorScheme.outline
-                      : Theme.of(context).colorScheme.surface,
-                  width: 1.5,
-                ),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              constraints: const BoxConstraints(minHeight: 52),
-              padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 24),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.content_paste,
-                    color: hasStrings
-                        ? Theme.of(context).colorScheme.onSurfaceVariant
-                        : Theme.of(context).colorScheme.onSurface,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    L10n.of(context)!.pasteSectionButtonText,
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                      color: hasStrings
-                          ? Theme.of(context).colorScheme.onSurfaceVariant
-                          : Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+      return Opacity(
+        opacity: hasStrings ? 1.0 : 0.4,
+        child: ActionButton(
+          outlined: true,
+          icon: Icons.content_paste,
+          label: L10n.of(context)!.pasteSectionButtonText,
+          onPressed: hasStrings
+              ? () async {
+                  _focusNode.unfocus();
+                  final sectionTitle = L10n.of(
+                    context,
+                  )!.addSectionForPasteDialogTitle;
+                  final newSectionName = await _showSectionTitleDialog(
+                    context,
+                    title: sectionTitle,
+                    initialText: L10n.of(context)!.pasteSectionInitialText,
+                  );
+                  if (newSectionName == null) return;
+                  setState(() => _sections[newSectionName] = []);
+                  _pasteExercises(sectionGroup: newSectionName);
+                }
+              : null,
         ),
       );
     },
@@ -682,18 +642,20 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
   Widget _addSectionFooter(BuildContext context) => SliverSafeArea(
     top: false,
     sliver: SliverToBoxAdapter(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: 16),
-          ActionButton(
-            onPressed: () => _addSection(context),
-            label: L10n.of(context)!.addSectionButtonText,
-            icon: PlatformIcons(context).add,
-          ),
-          const SizedBox(height: 8),
-          _pasteExercisesButton(context),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: 8,
+          children: [
+            ActionButton(
+              onPressed: () => _addSection(context),
+              label: L10n.of(context)!.addSectionButtonText,
+              icon: PlatformIcons(context).add,
+            ),
+            _pasteExercisesButton(context),
+          ],
+        ),
       ),
     ),
   );
@@ -747,6 +709,16 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     ),
   );
 
+  String _titleForAppBar() {
+    if (_displayMode == DisplayMode.edit) {
+      return widget.workout == null
+          ? L10n.of(context)!.createWorkoutDialogTitle
+          : L10n.of(context)!.editWorkoutDialogTitle;
+    } else {
+      return widget.workout?.name ?? '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) => PlatformScaffold(
     body: CustomScrollView(
@@ -759,16 +731,13 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
             padding: Theme.of(context).platform == TargetPlatform.iOS
                 ? EdgeInsets.only(left: 8)
                 : EdgeInsets.zero,
-            icon: Icon(AdaptiveIcons.close),
+            icon: Icon(PlatformIcons(context).back),
             onPressed: () => Navigator.pop(context),
           ),
           title: PlatformText(
-            widget.workout == null
-                ? L10n.of(context)!.createWorkoutDialogTitle
-                : L10n.of(context)!.editWorkoutDialogTitle,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            _titleForAppBar(),
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w800,
-              fontSize: 22,
               letterSpacing: -0.3,
             ),
             textScaler: MediaQuery.textScalerOf(

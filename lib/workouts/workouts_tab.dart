@@ -144,7 +144,9 @@ class WorkoutsTab extends ConsumerWidget {
           leading: SettingsActionButton(),
           title: Text(
             L10n.of(context)!.workoutsTabTitle,
-            style: Theme.of(context).textTheme.titleLarge,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
             textScaler: MediaQuery.textScalerOf(
               context,
             ).clamp(maxScaleFactor: 1.6),

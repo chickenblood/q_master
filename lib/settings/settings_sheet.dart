@@ -59,9 +59,13 @@ class _SettingsSheet extends ConsumerWidget {
   }) {
     final l10n = L10n.of(context)!;
     final timer = ref.read(timerProvider.notifier);
-    final labelColor = Theme.of(context).colorScheme.onSurfaceVariant;
-    final valueColor = Theme.of(context).colorScheme.onSurface;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final labelColor = isDark
+        ? Theme.of(context)
+              .colorScheme
+              .onSurface // white-like in dark mode
+        : Theme.of(context).colorScheme.onSurfaceVariant;
+    final valueColor = Theme.of(context).colorScheme.onSurface;
     final inactiveSegmentColor = isDark
         ? Theme.of(context).colorScheme.onSurfaceVariant
         : Theme.of(context).colorScheme.onSurface;
@@ -268,7 +272,7 @@ class _SettingsSheet extends ConsumerWidget {
         child: CustomScrollView(
           physics: BottomSheetScrollPhysics(),
           slivers: [
-            PlatformSliverAppBar(
+            SliverAppBar(
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               leading: PlatformIconButton(
                 padding: Theme.of(context).platform == TargetPlatform.iOS
