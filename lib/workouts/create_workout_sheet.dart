@@ -107,7 +107,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           ? L10n.of(context)!.createWorkoutDialogTitle
           : L10n.of(context)!.editWorkoutDialogTitle;
     } else {
-      return widget.originalWorkout?.name ?? '';
+      return _buildWorkout().name;
     }
   }
 

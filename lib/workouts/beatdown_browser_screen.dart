@@ -208,44 +208,38 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                                 child: Center(
                                   child: Column(
                                     mainAxisSize: .max,
-                                    mainAxisAlignment: .spaceBetween,
+                                    mainAxisAlignment: .spaceAround,
                                     crossAxisAlignment: exercisesPerPage == 1
                                         ? .center
                                         : .start,
                                     children: [
-                                      Spacer(),
                                       ...pageLines.map(
-                                        (line) => Expanded(
-                                          child: AutoSizeText(
-                                            group: autoSizeGroup,
-                                            line,
-                                            textAlign: exercisesPerPage == 1
-                                                ? TextAlign.center
-                                                : TextAlign.left,
-                                            overflow: .fade,
-                                            maxLines: 2,
-                                            minFontSize: 12,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w900,
-                                              fontSize: 60,
-                                              color:
-                                                  Theme.of(
-                                                        context,
-                                                      ).brightness ==
-                                                      Brightness.dark
-                                                  ? Theme.of(
-                                                      context,
-                                                    ).colorScheme.onPrimary
-                                                  : Theme.of(
-                                                      context,
-                                                    ).colorScheme.onSurface,
-                                              letterSpacing: -2,
-                                              height: 1.05,
-                                            ),
+                                        (line) => AutoSizeText(
+                                          group: autoSizeGroup,
+                                          line,
+                                          textAlign: exercisesPerPage == 1
+                                              ? TextAlign.center
+                                              : TextAlign.left,
+                                          overflow: .fade,
+                                          maxLines: 2,
+                                          minFontSize: 12,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 60,
+                                            color:
+                                                Theme.of(context).brightness ==
+                                                    Brightness.dark
+                                                ? Theme.of(
+                                                    context,
+                                                  ).colorScheme.onPrimary
+                                                : Theme.of(
+                                                    context,
+                                                  ).colorScheme.onSurface,
+                                            letterSpacing: -2,
+                                            height: 1.05,
                                           ),
                                         ),
                                       ),
-                                      Spacer(),
                                     ],
                                   ),
                                 ),
