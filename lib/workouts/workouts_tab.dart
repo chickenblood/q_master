@@ -108,11 +108,10 @@ class WorkoutsTab extends ConsumerWidget {
       //fullscreenDialog: true,
       context: context,
       builder: (_) => CreateWorkoutSheet(
-        workout: workout,
+        originalWorkout: workout,
         initialDisplayMode: displayMode,
         onShare: shareWorkout,
-        onShowBeatdownBrowser: (workout) =>
-            _showBeatdownBrowser(context, workout),
+        onShowBeatdownBrowser: _showBeatdownBrowser,
       ),
     ),
   );
@@ -217,18 +216,6 @@ final class _WorkoutTile extends StatelessWidget {
     required this.onInvokeWorkoutEditor,
     required this.onShareWorkout,
   });
-
-  Future<void> _editWorkout(BuildContext context, Workout workout) async {
-    Workout? updatedWorkout = await onInvokeWorkoutEditor(
-      context,
-      workout: workout,
-      displayMode: .edit,
-    );
-
-    if (updatedWorkout != null) {
-      listNotifier.replace(workout, updatedWorkout);
-    }
-  }
 
   Future<bool?> _confirmDelete(BuildContext context) => showAdaptiveDialog(
     context: context,

@@ -42,7 +42,9 @@ class ActionButton extends StatelessWidget {
             BoxShadow(
               color: outlined
                   ? Colors.transparent
-                  : Theme.of(context).colorScheme.primary.withOpacity(0.35),
+                  : Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.35),
               blurRadius: 20,
               offset: Offset(0, 6),
             ),

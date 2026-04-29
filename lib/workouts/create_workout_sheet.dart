@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
+import '../model/workout_list.dart';
 import '../theme/theme.dart';
 import '../ui/action_button.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/cupertino_sheet_fork.dart';
 import '../ui/dismissible_row.dart';
 import '../utils/datetime_utils.dart';
-import 'beatdown_browser_screen.dart';
 import 'exercise_picker_sheet.dart';
 
 /// The display mode the dialog is initially displayed in.
@@ -22,25 +22,25 @@ import 'exercise_picker_sheet.dart';
 /// 3) Start the beatdown.
 enum DisplayMode { display, edit }
 
-final class CreateWorkoutSheet extends StatefulWidget {
-  final Workout? workout;
+final class CreateWorkoutSheet extends ConsumerStatefulWidget {
+  final Workout? originalWorkout;
   final DisplayMode initialDisplayMode;
   final Function(BuildContext context, Workout workout)? onShare;
-  final Function(Workout workout)? onShowBeatdownBrowser;
+  final Function(BuildContext context, Workout workout)? onShowBeatdownBrowser;
 
   const CreateWorkoutSheet({
     super.key,
-    this.workout,
+    this.originalWorkout,
     this.initialDisplayMode = DisplayMode.display,
     this.onShare,
     this.onShowBeatdownBrowser,
   });
 
   @override
-  State<CreateWorkoutSheet> createState() => _CreateWorkoutSheetState();
+  ConsumerState<CreateWorkoutSheet> createState() => _CreateWorkoutSheetState();
 }
 
-final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
+final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   static const _headerInsets = EdgeInsets.only(left: 16.0, right: 8.0);
 
   final _focusNode = FocusNode();
@@ -49,38 +49,33 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
 
   final _sections = <String, List<String>>{};
 
-  Workout? _workout;
   var _displayMode = DisplayMode.display;
 
   // Track the group of the most recently added exercise for scrolling
   String? _lastAddedItemGroup;
 
+  // --- Lifecycle & State ---
   @override
   void initState() {
     super.initState();
-
-    // Rebuild when app is resumed to update the UI if the pasteboard contents
-    // have changed.
+    _displayMode = widget.initialDisplayMode;
     AppLifecycleListener(onResume: () => setState(() {}));
-
-    _workout = widget.workout;
-    if (_workout != null) {
-      _nameTextController.text = _workout!.name;
+    final workout = widget.originalWorkout;
+    if (workout != null) {
+      _nameTextController.text = workout.name;
       final sectionMap = {
-        for (final s in _workout!.sections) s.name: List.of(s.exercises),
+        for (final s in workout.sections) s.name: List.of(s.exercises),
       };
-      _sections.clear();
       _sections.addAll(sectionMap);
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _displayMode = widget.initialDisplayMode;
-      if (widget.workout == null) {
+      if (widget.originalWorkout == null) {
         setState(() {
           _sections[L10n.of(context)!.warmupSectionTitle] = [];
         });
         _nameTextController.text = L10n.of(context)!.defaultWorkoutName;
-        _focusNode.requestFocus();
         _selectNameText();
+        _focusNode.requestFocus();
       }
     });
   }
@@ -93,14 +88,30 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     super.dispose();
   }
 
+  // --- UI State Helpers ---
   void _selectNameText() {
-    // Select all text on focus
     _nameTextController.selection = TextSelection(
       baseOffset: 0,
       extentOffset: _nameTextController.value.text.length,
     );
   }
 
+  bool get _workoutCreationEnabled {
+    return _nameTextController.text.trim().isNotEmpty &&
+        _sections.values.any((exercises) => exercises.isNotEmpty);
+  }
+
+  String _titleForAppBar() {
+    if (_displayMode == DisplayMode.edit) {
+      return widget.originalWorkout == null
+          ? L10n.of(context)!.createWorkoutDialogTitle
+          : L10n.of(context)!.editWorkoutDialogTitle;
+    } else {
+      return widget.originalWorkout?.name ?? '';
+    }
+  }
+
+  // --- Section & Exercise Manipulation ---
   void _moveExercise(
     List<String> exercises, {
     required int fromIndex,
@@ -114,31 +125,11 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     final sectionEntries = _sections.entries.toList(growable: true);
     final section = sectionEntries.removeAt(fromIndex);
     sectionEntries.insert(toIndex > fromIndex ? toIndex - 1 : toIndex, section);
-
     _sections
       ..clear()
       ..addEntries(sectionEntries);
   }
 
-  bool get _workoutCreationEnabled {
-    return _nameTextController.text.trim().isNotEmpty &&
-        _sections.values.any((exercises) => exercises.isNotEmpty);
-  }
-
-  void _createWorkout(BuildContext context) {
-    final workout = Workout(
-      name: _nameTextController.text.trim(),
-      date: DateTime.now(),
-      sections: [
-        for (final entry in _sections.entries)
-          WorkoutSection(name: entry.key, exercises: List.of(entry.value)),
-      ],
-    );
-    //Navigator.pop(context, workout);
-    setState(() => _displayMode = .display);
-  }
-
-  /// Shows a dialog for editing the title of a section.
   Future<String?> _showSectionTitleDialog(
     BuildContext context, {
     required String title,
@@ -189,7 +180,6 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
       (name) => name.toLowerCase() == trimmedName.toLowerCase(),
     );
     if (alreadyExists) return;
-
     setState(() {
       _sections[trimmedName] = [];
     });
@@ -223,9 +213,6 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     );
     final trimmedName = updatedTitle?.trim();
     if (trimmedName == null || trimmedName.isEmpty) return;
-
-    // Copy sections in the order they were created, but with the updated title
-    // for the edited section.
     final updatedSections = <String, List<String>>{};
     for (final name in _sections.keys) {
       if (name == sectionTitle) {
@@ -252,7 +239,6 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     onPressed: () async {
       _focusNode.unfocus();
       final exercise = await showExercisePicker(context);
-      // Maybe add new empty exercise
       if (exercise?.trim().isNotEmpty ?? false) {
         setState(() {
           exercises.add(exercise!);
@@ -262,7 +248,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     },
   );
 
-  void _editExercise(
+  void editExercise(
     BuildContext context, {
     required List<String> exercises,
     required int index,
@@ -273,7 +259,6 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
       context,
       text: existingExercise,
     );
-    // Maybe update exercise
     if (updatedExercise?.trim().isNotEmpty ?? false) {
       setState(() {
         exercises[index] = updatedExercise!;
@@ -282,24 +267,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
     }
   }
 
-  Future<void> showBeatdownBrowser(
-    BuildContext context,
-    Workout workout,
-  ) async {
-    // Stop the screen from sleeping while the beatdown browser is shown.
-    WakelockPlus.enable();
-
-    await Navigator.of(context, rootNavigator: true).push(
-      platformPageRoute(
-        context: context,
-        builder: (context) => BeatdownBrowser(workout: workout),
-      ),
-    );
-
-    WakelockPlus.disable();
-  }
-
-  List<Widget> _content(BuildContext context) {
+  List<Widget> content(BuildContext context) {
     final sectionOrder = _sections.keys.toList(growable: false);
     return [
       SliverSafeArea(
@@ -355,11 +323,11 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                 ),
               ),
             ),
-            if (_displayMode == .display && widget.workout != null)
+            if (_displayMode == .display && widget.originalWorkout != null)
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                 child: Text(
-                  widget.workout!.date.formattedForDisplay(),
+                  widget.originalWorkout!.date.formattedForDisplay(),
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),
@@ -414,7 +382,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                             }
                           });
                           return GestureDetector(
-                            onDoubleTap: () => _editExercise(
+                            onDoubleTap: () => editExercise(
                               context,
                               exercises: exercises,
                               index: exerciseIndex,
@@ -532,7 +500,14 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
             color: Theme.of(context).colorScheme.primary, // F3 Red
           ),
           onPressed: _workoutCreationEnabled
-              ? () => _createWorkout(context)
+              ? () {
+                  if (widget.originalWorkout == null) {
+                    _createWorkout();
+                  } else {
+                    _updateExistingWorkout();
+                  }
+                  setState(() => _displayMode = .display);
+                }
               : null,
         ),
       ),
@@ -690,7 +665,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                     icon: PlatformIcons(context).share,
                     outlined: true,
                     onPressed: () =>
-                        widget.onShare?.call(context, widget.workout!),
+                        widget.onShare?.call(context, _buildWorkout()),
                   ),
                 ),
               ],
@@ -701,8 +676,7 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
                 label: L10n.of(context)!.startBeatdownButtonText,
                 icon: PlatformIcons(context).playArrowSolid,
                 onPressed: () {
-                  //Navigator.of(context).pop(null);
-                  widget.onShowBeatdownBrowser?.call(_workout!);
+                  widget.onShowBeatdownBrowser?.call(context, _buildWorkout());
                 },
               ),
             ),
@@ -711,16 +685,6 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
       ),
     ),
   );
-
-  String _titleForAppBar() {
-    if (_displayMode == DisplayMode.edit) {
-      return widget.workout == null
-          ? L10n.of(context)!.createWorkoutDialogTitle
-          : L10n.of(context)!.editWorkoutDialogTitle;
-    } else {
-      return widget.workout?.name ?? '';
-    }
-  }
 
   @override
   Widget build(BuildContext context) => PlatformScaffold(
@@ -755,9 +719,34 @@ final class _CreateWorkoutSheetState extends State<CreateWorkoutSheet> {
           actions: _rightAppBarButtonActions(context),
           pinned: true,
         ),
-        ..._content(context),
-        if (_displayMode == DisplayMode.display) _displayFooter(context),
+        ...content(context),
+        if (_displayMode == .display) _displayFooter(context),
       ],
     ),
   );
+
+  void _createWorkout() {
+    final listNotifier = ref.read(workoutListProvider.notifier);
+    listNotifier.add(_buildWorkout());
+  }
+
+  /// Updates an existing workout in the list with the current state.
+  void _updateExistingWorkout() {
+    assert(widget.originalWorkout != null);
+    final listNotifier = ref.read(workoutListProvider.notifier);
+    listNotifier.replace(widget.originalWorkout!, _buildWorkout());
+  }
+
+  /// Builds a [Workout] object from the current state of the UI fields and
+  /// sections.
+  Workout _buildWorkout() {
+    return Workout(
+      name: _nameTextController.text.trim(),
+      date: widget.originalWorkout?.date ?? DateTime.now(),
+      sections: [
+        for (final entry in _sections.entries)
+          WorkoutSection(name: entry.key, exercises: List.of(entry.value)),
+      ],
+    );
+  }
 }
