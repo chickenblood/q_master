@@ -47,15 +47,15 @@ class WorkoutsTab extends ConsumerWidget {
     if (!context.mounted) return;
 
     if (workout != null) {
-      Workout? updatedWorkout = await _invokeWorkoutEditor(
+      // Add the workout to the store before invoking the editor.
+      final listNotifier = ref.read(workoutListProvider.notifier);
+      listNotifier.add(workout);
+
+      await _invokeWorkoutEditor(
         context,
         workout: workout,
         displayMode: DisplayMode.edit,
       );
-      if (updatedWorkout != null) {
-        final listNotifier = ref.read(workoutListProvider.notifier);
-        listNotifier.add(updatedWorkout);
-      }
     }
   }
 
@@ -73,20 +73,13 @@ class WorkoutsTab extends ConsumerWidget {
     if (!context.mounted) return;
 
     if (result == .manual) {
-      final workout = await _invokeWorkoutEditor(
-        context,
-        displayMode: DisplayMode.edit,
-      );
-      if (workout != null) {
-        final listNotifier = ref.read(workoutListProvider.notifier);
-        listNotifier.add(workout);
-      }
+      await _invokeWorkoutEditor(context, displayMode: DisplayMode.edit);
     } else if (result == .generate) {
       await _showGenerateWorkoutModal(context, ref);
     }
   }
 
-  void shareWorkout(BuildContext context, Workout workout) {
+  void _shareWorkout(BuildContext context, Workout workout) {
     // Get rect of button to present popovers from on iPad.
     final box = context.findRenderObject() as RenderBox;
     final sharePositionRect = box.localToGlobal(Offset.zero) & box.size;
@@ -110,7 +103,7 @@ class WorkoutsTab extends ConsumerWidget {
       builder: (_) => CreateWorkoutSheet(
         originalWorkout: workout,
         initialDisplayMode: displayMode,
-        onShare: shareWorkout,
+        onShare: _shareWorkout,
         onShowBeatdownBrowser: _showBeatdownBrowser,
       ),
     ),
@@ -174,7 +167,7 @@ class WorkoutsTab extends ConsumerWidget {
                   listNotifier: listNotifier,
                   workout: workouts[index],
                   onInvokeWorkoutEditor: _invokeWorkoutEditor,
-                  onShareWorkout: shareWorkout,
+                  onShareWorkout: _shareWorkout,
                 ),
                 onReorder: (oldIndex, newIndex) =>
                     listNotifier.move(oldIndex, newIndex),
