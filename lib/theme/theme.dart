@@ -220,7 +220,7 @@ ThemeData darkTheme() {
       onSurface: textPrimary,
       onSurfaceVariant: textSecondary,
       outline: border, // Now lighter for pill outlines
-      outlineVariant: bgRaised,
+      outlineVariant: Color(0xFF252525),
       error: _errorRed,
       onError: Colors.white,
     ),
@@ -390,7 +390,7 @@ ThemeData lightTheme() {
       onSurface: textPrimary,
       onSurfaceVariant: textSecondary,
       outline: border,
-      outlineVariant: Color(0xFFF0F0F0),
+      outlineVariant: Color(0xFFDDDDDD),
       error: Color(0xFFB00020),
       onError: Colors.white,
     ),

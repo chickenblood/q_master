@@ -130,6 +130,14 @@
     "@updateSectionDialogTitle": {
       "description": "Title of the edit section title alert dialog, and label of its confirm action button."
     },
+    "updateExerciseDialogTitle": "Update exercise",
+    "@updateExerciseDialogTitle": {
+      "description": "Title of the edit exercise alert dialog, and label of its confirm action button."
+    },
+    "updateExerciseButtonTitle": "Update",
+    "@updateExerciseButtonTitle": {
+      "description": "Label of the confirm action button in the edit exercise alert dialog."
+    },
     "defaultWorkoutName": "New workout",
     "@defaultWorkoutName": {
       "description": "Default name pre-filled in the workout name field when creating a new workout."
@@ -141,6 +149,10 @@
     "workoutCompleteText": "All done!",
     "@workoutCompleteText": {
       "description": "Message shown on the final page of the beatdown browser when all exercises are complete."
+    },
+    "exercisePickerAddButtonLabel": "Add",
+    "@exercisePickerAddButtonLabel": {
+      "description": "Red button to the right of the exercise text field in the exercise picker sheet. Submits the entered exercise name."
     },
     "workoutNextUpText": "Next up: {name} ➜",
     "@workoutNextUpText": {

@@ -9,7 +9,6 @@ import '../model/workout_list.dart';
 import '../theme/theme.dart';
 import '../ui/action_button.dart';
 import '../ui/adaptive_icons.dart';
-import '../ui/cupertino_sheet_fork.dart';
 import '../ui/dismissible_row.dart';
 import '../utils/datetime_utils.dart';
 import 'exercise_picker_sheet.dart';
@@ -45,7 +44,6 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
 
   final _focusNode = FocusNode();
   final _nameTextController = TextEditingController();
-  final _scrollController = ScrollController();
 
   final _sections = <String, List<String>>{};
 
@@ -84,7 +82,6 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   void dispose() {
     _nameTextController.dispose();
     _focusNode.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -130,9 +127,10 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       ..addEntries(sectionEntries);
   }
 
-  Future<String?> _showSectionTitleDialog(
+  Future<String?> _showNameChangeDialog(
     BuildContext context, {
     required String title,
+    required String buttonTitle,
     String? initialText,
   }) async {
     final controller = TextEditingController(text: initialText);
@@ -161,7 +159,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
             cupertino: (_, _) =>
                 CupertinoDialogActionData(isDefaultAction: true),
             onPressed: () => Navigator.of(innerContext).pop(controller.text),
-            child: PlatformText(L10n.of(innerContext)!.addSectionDialogTitle),
+            child: PlatformText(buttonTitle),
           ),
         ],
       ),
@@ -170,9 +168,10 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
 
   Future<void> _addSection(BuildContext context) async {
     _focusNode.unfocus();
-    final sectionName = await _showSectionTitleDialog(
+    final sectionName = await _showNameChangeDialog(
       context,
       title: L10n.of(context)!.addSectionDialogTitle,
+      buttonTitle: L10n.of(context)!.addSectionDialogTitle,
     );
     final trimmedName = sectionName?.trim();
     if (trimmedName == null || trimmedName.isEmpty) return;
@@ -206,9 +205,10 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     BuildContext context, {
     required String sectionTitle,
   }) async {
-    final updatedTitle = await _showSectionTitleDialog(
+    final updatedTitle = await _showNameChangeDialog(
       context,
       title: L10n.of(context)!.updateSectionDialogTitle,
+      buttonTitle: L10n.of(context)!.updateSectionDialogTitle,
       initialText: sectionTitle,
     );
     final trimmedName = updatedTitle?.trim();
@@ -240,26 +240,30 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
         CupertinoIconButtonData(padding: EdgeInsets.only(right: 8)),
     onPressed: () async {
       _focusNode.unfocus();
-      final exercise = await showExercisePicker(context);
-      if (exercise?.trim().isNotEmpty ?? false) {
-        setState(() {
-          exercises.add(exercise!);
-          _lastAddedItemGroup = sectionTitle;
-        });
-      }
+      showExercisePicker(
+        context,
+        onExerciseAdded: (exercise) {
+          setState(() {
+            exercises.add(exercise);
+            _lastAddedItemGroup = sectionTitle;
+          });
+        },
+      );
     },
   );
 
-  void editExercise(
+  void _editExercise(
     BuildContext context, {
     required List<String> exercises,
     required int index,
     required String sectionGroup,
   }) async {
     final existingExercise = exercises[index];
-    final updatedExercise = await showExercisePicker(
+    final updatedExercise = await _showNameChangeDialog(
       context,
-      text: existingExercise,
+      title: L10n.of(context)!.updateExerciseDialogTitle,
+      buttonTitle: L10n.of(context)!.updateExerciseButtonTitle,
+      initialText: existingExercise,
     );
     if (updatedExercise?.trim().isNotEmpty ?? false) {
       setState(() {
@@ -384,7 +388,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                             }
                           });
                           return GestureDetector(
-                            onDoubleTap: () => editExercise(
+                            onDoubleTap: () => _editExercise(
                               context,
                               exercises: exercises,
                               index: exerciseIndex,
@@ -479,7 +483,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           },
         ),
       ),
-      if (_displayMode == DisplayMode.edit) _addSectionFooter(context),
+      if (_displayMode == DisplayMode.edit) addSectionFooter(context),
     ];
   }
 
@@ -512,7 +516,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     ];
   }
 
-  Widget _pasteExercisesButton(BuildContext context) => FutureBuilder(
+  Widget pasteExercisesButton(BuildContext context) => FutureBuilder(
     future: Clipboard.hasStrings(),
     builder: (context, snapshot) {
       final hasStrings = snapshot.data ?? false;
@@ -528,9 +532,10 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                   final sectionTitle = L10n.of(
                     context,
                   )!.addSectionForPasteDialogTitle;
-                  final newSectionName = await _showSectionTitleDialog(
+                  final newSectionName = await _showNameChangeDialog(
                     context,
                     title: sectionTitle,
+                    buttonTitle: L10n.of(context)!.pasteExercisesButtonLabel,
                     initialText: L10n.of(context)!.pasteSectionInitialText,
                   );
                   if (newSectionName == null) return;
@@ -613,7 +618,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     );
   }
 
-  Widget _addSectionFooter(BuildContext context) => SliverSafeArea(
+  Widget addSectionFooter(BuildContext context) => SliverSafeArea(
     top: false,
     sliver: SliverToBoxAdapter(
       child: Padding(
@@ -629,7 +634,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
               outlined: true,
               onPressed: () => _addSection(context),
             ),
-            _pasteExercisesButton(context),
+            pasteExercisesButton(context),
           ],
         ),
       ),
@@ -689,8 +694,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   @override
   Widget build(BuildContext context) => PlatformScaffold(
     body: CustomScrollView(
-      controller: _scrollController,
-      physics: BottomSheetScrollPhysics(),
+      primary: true,
       slivers: [
         SliverAppBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,

@@ -10,37 +10,56 @@ import 'workout_auto_completions.dart';
 import 'workout_constants.dart';
 import 'youtube_video_screen.dart';
 
-Future<String?> showExercisePicker(BuildContext context, {String? text}) async {
-  final controller = TextEditingController(text: text);
-  controller.selection = TextSelection(
-    baseOffset: 0,
-    extentOffset: text?.length ?? 0,
-  );
+Future<String?> showExercisePicker(
+  BuildContext context, {
+  String? text,
+  required void Function(String) onExerciseAdded,
+}) async {
+  final controller = TextEditingController(text: text)
+    ..selection = TextSelection(baseOffset: 0, extentOffset: text?.length ?? 0);
 
   return showModalBottomSheet<String>(
     context: context,
-    showDragHandle: true,
+    //showDragHandle: true,
     isScrollControlled: true,
     useSafeArea: true,
-    builder: (context) => _ExercisePickerSheet(controller: controller),
+    elevation: 4,
+    builder: (context) => _ExercisePickerSheet(
+      controller: controller,
+      onExerciseAdded: onExerciseAdded,
+    ),
   );
 }
 
 class _ExercisePickerSheet extends StatefulWidget {
   final TextEditingController controller;
+  final void Function(String) onExerciseAdded;
 
-  const _ExercisePickerSheet({required this.controller});
+  const _ExercisePickerSheet({
+    required this.controller,
+    required this.onExerciseAdded,
+  });
 
   @override
   State<_ExercisePickerSheet> createState() => _ExercisePickerSheetState();
 }
 
 class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
-  late final Set<ExerciseCategory> selectedCategories;
-  late bool videoFilter;
-  String? pressedExerciseName;
+  bool _canAdd = false;
 
-  static const orderedCategories = <ExerciseCategory>[
+  void _addExercise() {
+    final selection = widget.controller.text.trim();
+    if (selection.isEmpty) return;
+    widget.onExerciseAdded(selection);
+    // Clear text so that the user can easily add another exercise.
+    widget.controller.clear();
+  }
+
+  late final Set<ExerciseCategory> _selectedCategories;
+  late bool _videoFilter;
+  String? _pressedExerciseName;
+
+  static const _orderedCategories = <ExerciseCategory>[
     .core,
     .cardio,
     .strength,
@@ -57,7 +76,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     super.initState();
     final prefs = SharedAppPrefs.instance;
     final savedNames = prefs.selectedCategoryFilters.value;
-    selectedCategories = savedNames
+    _selectedCategories = savedNames
         .map((name) {
           try {
             return ExerciseCategory.values.byName(name);
@@ -67,16 +86,33 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
         })
         .whereType<ExerciseCategory>()
         .toSet();
-    videoFilter = prefs.exerciseVideoFilter.value;
+    _videoFilter = prefs.exerciseVideoFilter.value;
+
+    widget.controller.addListener(_updateCanAdd);
+  }
+
+  void _updateCanAdd() {
+    final canAdd = widget.controller.text.trim().isNotEmpty;
+    if (canAdd != _canAdd) {
+      setState(() {
+        _canAdd = canAdd;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_updateCanAdd);
+    super.dispose();
   }
 
   void _toggleCategory(ExerciseCategory category) {
     setState(() {
-      if (!selectedCategories.add(category)) {
-        selectedCategories.remove(category);
+      if (!_selectedCategories.add(category)) {
+        _selectedCategories.remove(category);
       }
     });
-    SharedAppPrefs.instance.selectedCategoryFilters.value = selectedCategories
+    SharedAppPrefs.instance.selectedCategoryFilters.value = _selectedCategories
         .map((e) => e.name)
         .toList();
   }
@@ -90,22 +126,12 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   }
 
   void _setPressedExercise(String? exerciseName) {
-    if (pressedExerciseName == exerciseName) {
+    if (_pressedExerciseName == exerciseName) {
       return;
     }
     setState(() {
-      pressedExerciseName = exerciseName;
+      _pressedExerciseName = exerciseName;
     });
-  }
-
-  bool get _canSubmitSelection => widget.controller.text.trim().isNotEmpty;
-
-  void _submitSelection(BuildContext context) {
-    final selection = widget.controller.text.trim();
-    if (selection.isEmpty) {
-      return;
-    }
-    Navigator.of(context).pop(selection);
   }
 
   Future<void> _openExerciseVideo(BuildContext context, Uri videoUrl) async {
@@ -129,22 +155,122 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   List<String> get _filteredExercises {
     return workoutCompletions.entries
         .where((entry) {
-          if (videoFilter && entry.value.videoUrl == null) {
+          if (_videoFilter && entry.value.videoUrl == null) {
             return false;
           }
-          if (selectedCategories.isEmpty) {
+          if (_selectedCategories.isEmpty) {
             return true;
           }
-          return selectedCategories.every(entry.value.categories.contains);
+          return _selectedCategories.every(entry.value.categories.contains);
         })
         .map((entry) => entry.key)
         .toList(growable: false);
   }
 
+  Widget _dragHandle() {
+    return Container(
+      width: 60,
+      height: 4,
+      margin: const EdgeInsets.only(top: 12, bottom: 12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.outline,
+        borderRadius: BorderRadius.circular(2),
+      ),
+    );
+  }
+
+  Widget _exerciseGrid(BuildContext context, {required int gridColumnCount}) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return SliverGrid(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: gridColumnCount,
+        crossAxisSpacing: 0,
+        mainAxisSpacing: 0,
+        mainAxisExtent: 72,
+      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        if (index >= _filteredExercises.length) {
+          return null;
+        }
+        final exerciseName = _filteredExercises[index];
+        final exerciseEntry = workoutCompletions[exerciseName]!;
+        final videoUrl = exerciseEntry.videoUrl;
+        final isSelected = widget.controller.text == exerciseName;
+        final isPressed = _pressedExerciseName == exerciseName;
+
+        return GestureDetector(
+          onTapDown: (_) => _setPressedExercise(exerciseName),
+          onTapCancel: () => _setPressedExercise(null),
+          onTapUp: (_) => _setPressedExercise(null),
+          onTap: () => _selectExercise(context, exerciseName),
+          child: AnimatedScale(
+            duration: const Duration(milliseconds: 100),
+            scale: isPressed ? 0.97 : 1,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 100),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? colorScheme.primary.withOpacity(0.12)
+                    : colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.zero,
+                border: Border.all(
+                  width: 0.5,
+                  color: isSelected ? colorScheme.primary : colorScheme.outline,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: AutoSizeText(
+                          exerciseName,
+                          maxLines: 2,
+                          minFontSize: 11,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: isSelected
+                                    ? colorScheme.primary
+                                    : colorScheme.onSurface,
+                              ),
+                        ),
+                      ),
+                    ),
+                    if (videoUrl != null)
+                      IconButton(
+                        onPressed: () => _openExerciseVideo(context, videoUrl),
+                        constraints: const BoxConstraints(
+                          minWidth: 52,
+                          minHeight: 52,
+                        ),
+                        padding: EdgeInsets.zero,
+                        visualDensity: VisualDensity.compact,
+                        style: IconButton.styleFrom(
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          foregroundColor: isSelected
+                              ? colorScheme.primary
+                              : colorScheme.onSurface,
+                        ),
+                        icon: const Icon(Icons.ondemand_video, size: 29),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final filteredExercises = _filteredExercises;
     final isLandscape = MediaQuery.orientationOf(context) == .landscape;
     final gridColumnCount = isLandscape ? 4 : 2;
 
@@ -152,270 +278,184 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
       expand: false,
       snap: true,
       snapSizes: [0.75, 1.0],
-      builder: (_, scrollController) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            WorkoutAutocompleteTextField(
-              textEditingController: widget.controller,
-              autofocus: true,
-              minLines: 1,
-              maxLines: 1,
-            ),
-            ValueListenableBuilder<TextEditingValue>(
-              valueListenable: widget.controller,
-              builder: (context, value, child) {
-                final showPickerContent = value.text.isEmpty;
-
-                return Flexible(
-                  fit: .loose,
-                  child: AnimatedSwitcher(
+      builder: (_, scrollController) => CustomScrollView(
+        controller: scrollController,
+        slivers: [
+          PinnedHeaderSliver(
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              padding: const EdgeInsets.all(4),
+              child: Column(
+                children: [
+                  _dragHandle(),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: WorkoutAutocompleteTextField(
+                          textEditingController: widget.controller,
+                          autofocus: true,
+                          minLines: 1,
+                          maxLines: 1,
+                          onSubmitted: _addExercise,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        height: 40,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            foregroundColor: Theme.of(
+                              context,
+                            ).colorScheme.onPrimary,
+                            textStyle: Theme.of(context).textTheme.labelLarge,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                          ),
+                          onPressed: _canAdd ? _addExercise : null,
+                          child: Text(
+                            L10n.of(context)!.exercisePickerAddButtonLabel,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  AnimatedSwitcher(
                     duration: const Duration(milliseconds: 200),
                     switchInCurve: Curves.easeOut,
                     switchOutCurve: Curves.easeOut,
                     transitionBuilder: (child, animation) {
                       return FadeTransition(opacity: animation, child: child);
                     },
-                    child: showPickerContent
-                        ? Column(
-                            key: const ValueKey('picker-content'),
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              const SizedBox(height: 12),
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: [
-                                  for (final category in orderedCategories)
-                                    FilterChip(
-                                      label: Text(
-                                        category.displayLabel(context),
-                                      ),
-                                      selected: selectedCategories.contains(
-                                        category,
-                                      ),
-                                      onSelected: (_) =>
-                                          _toggleCategory(category),
-                                      showCheckmark: false,
-                                      labelStyle: Theme.of(context)
-                                          .textTheme
-                                          .labelLarge
-                                          ?.copyWith(
-                                            color:
-                                                selectedCategories.contains(
-                                                  category,
-                                                )
-                                                ? colorScheme.onPrimary
-                                                : colorScheme.onSurface,
-                                          ),
-                                      backgroundColor:
-                                          colorScheme.surfaceContainerHighest,
-                                      selectedColor: colorScheme.primary,
-                                      side: BorderSide(
-                                        color:
-                                            selectedCategories.contains(
-                                              category,
-                                            )
-                                            ? colorScheme.primary
-                                            : colorScheme.outlineVariant,
-                                      ),
-                                      shape: const StadiumBorder(),
-                                      materialTapTargetSize: .shrinkWrap,
-                                    ),
-                                  FilterChip(
-                                    label: Text(
-                                      L10n.of(
-                                        context,
-                                      )!.exerciseFilterVideoLabel,
-                                    ),
-                                    selected: videoFilter,
-                                    onSelected: (_) => setState(() {
-                                      videoFilter = !videoFilter;
-                                      SharedAppPrefs
-                                              .instance
-                                              .exerciseVideoFilter
-                                              .value =
-                                          videoFilter;
-                                    }),
-                                    showCheckmark: false,
-                                    avatar: Icon(
-                                      Icons.ondemand_video,
-                                      size: 18,
-                                      color: videoFilter
-                                          ? colorScheme.onPrimary
-                                          : colorScheme.onSurface,
-                                    ),
-                                    labelStyle: Theme.of(context)
-                                        .textTheme
-                                        .labelLarge
-                                        ?.copyWith(
-                                          color: videoFilter
-                                              ? colorScheme.onPrimary
-                                              : colorScheme.onSurface,
-                                        ),
-                                    backgroundColor:
-                                        colorScheme.surfaceContainerHighest,
-                                    selectedColor: colorScheme.primary,
-                                    side: BorderSide(
-                                      color: videoFilter
-                                          ? colorScheme.primary
-                                          : colorScheme.outlineVariant,
-                                    ),
-                                    shape: const StadiumBorder(),
-                                    materialTapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                  ),
-                                ],
-                              ),
-                              const Divider(),
-                              Expanded(
-                                child: GridView.builder(
-                                  itemCount: filteredExercises.length,
-                                  controller: scrollController,
-                                  gridDelegate:
-                                      SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: gridColumnCount,
-                                        crossAxisSpacing: 8,
-                                        mainAxisSpacing: 8,
-                                        mainAxisExtent: 72,
-                                      ),
-                                  itemBuilder: (context, index) {
-                                    final exerciseName =
-                                        filteredExercises[index];
-                                    final exerciseEntry =
-                                        workoutCompletions[exerciseName]!;
-                                    final videoUrl = exerciseEntry.videoUrl;
-                                    final isSelected =
-                                        widget.controller.text == exerciseName;
-                                    final isPressed =
-                                        pressedExerciseName == exerciseName;
-
-                                    return GestureDetector(
-                                      onTapDown: (_) =>
-                                          _setPressedExercise(exerciseName),
-                                      onTapCancel: () =>
-                                          _setPressedExercise(null),
-                                      onTapUp: (_) => _setPressedExercise(null),
-                                      onTap: () => _selectExercise(
-                                        context,
-                                        exerciseName,
-                                      ),
-                                      child: AnimatedScale(
-                                        duration: const Duration(
-                                          milliseconds: 100,
-                                        ),
-                                        scale: isPressed ? 0.97 : 1,
-                                        child: AnimatedContainer(
-                                          duration: const Duration(
-                                            milliseconds: 100,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: isPressed
-                                                ? (isSelected
-                                                      ? colorScheme.primary
-                                                            .withValues(
-                                                              alpha: 0.22,
-                                                            )
-                                                      : colorScheme.primary
-                                                            .withValues(
-                                                              alpha: 0.08,
-                                                            ))
-                                                : (isSelected
-                                                      ? colorScheme
-                                                            .primaryContainer
-                                                      : colorScheme
-                                                            .surfaceContainerHighest),
-                                            borderRadius: BorderRadius.circular(
-                                              16,
-                                            ),
-                                            border: Border.all(
-                                              color: isSelected
-                                                  ? colorScheme.primary
-                                                  : colorScheme.outlineVariant,
-                                            ),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 10,
-                                            ),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Expanded(
-                                                  child: Align(
-                                                    alignment:
-                                                        Alignment.centerLeft,
-                                                    child: AutoSizeText(
-                                                      exerciseName,
-                                                      maxLines: 2,
-                                                      minFontSize: 10,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .bodyLarge
-                                                          ?.copyWith(
-                                                            color: isSelected
-                                                                ? colorScheme
-                                                                      .onPrimaryContainer
-                                                                : colorScheme
-                                                                      .onSurface,
-                                                          ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                if (videoUrl != null)
-                                                  IconButton(
-                                                    onPressed: () =>
-                                                        _openExerciseVideo(
-                                                          context,
-                                                          videoUrl,
-                                                        ),
-                                                    constraints:
-                                                        const BoxConstraints(
-                                                          minWidth: 52,
-                                                          minHeight: 52,
-                                                        ),
-                                                    padding: EdgeInsets.zero,
-                                                    visualDensity:
-                                                        VisualDensity.compact,
-                                                    style: IconButton.styleFrom(
-                                                      tapTargetSize:
-                                                          MaterialTapTargetSize
-                                                              .shrinkWrap,
-                                                      foregroundColor:
-                                                          isSelected
-                                                          ? colorScheme
-                                                                .onPrimaryContainer
-                                                          : colorScheme.primary,
-                                                    ),
-                                                    icon: const Icon(
-                                                      Icons.ondemand_video,
-                                                      size: 29,
-                                                    ),
-                                                  ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
+                    child: Column(
+                      key: const ValueKey('picker-content'),
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            for (final category in _orderedCategories)
+                              FilterChip(
+                                label: Text(category.displayLabel(context)),
+                                selected: _selectedCategories.contains(
+                                  category,
                                 ),
+                                onSelected: (_) => _toggleCategory(category),
+                                showCheckmark: false,
+                                labelStyle: Theme.of(context)
+                                    .textTheme
+                                    .labelMedium
+                                    ?.copyWith(
+                                      fontSize:
+                                          Theme.of(context)
+                                                  .textTheme
+                                                  .labelMedium
+                                                  ?.fontSize !=
+                                              null
+                                          ? Theme.of(context)
+                                                    .textTheme
+                                                    .labelMedium!
+                                                    .fontSize! +
+                                                2
+                                          : 12,
+                                      fontWeight: FontWeight.w700,
+                                      color:
+                                          _selectedCategories.contains(category)
+                                          ? colorScheme.onPrimary
+                                          : colorScheme.onSurfaceVariant,
+                                    ),
+                                backgroundColor:
+                                    colorScheme.surfaceContainerHighest,
+                                selectedColor: colorScheme.primary,
+                                side: BorderSide(
+                                  width: 1.5,
+                                  color: _selectedCategories.contains(category)
+                                      ? colorScheme.primary
+                                      : colorScheme.outlineVariant,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
                               ),
-                            ],
-                          )
-                        : const SizedBox.shrink(
-                            key: ValueKey('hidden-picker-content'),
-                          ),
+                            FilterChip(
+                              label: Text(
+                                L10n.of(context)!.exerciseFilterVideoLabel,
+                              ),
+                              selected: _videoFilter,
+                              onSelected: (_) => setState(() {
+                                _videoFilter = !_videoFilter;
+                                SharedAppPrefs
+                                        .instance
+                                        .exerciseVideoFilter
+                                        .value =
+                                    _videoFilter;
+                              }),
+                              showCheckmark: false,
+                              avatar: Icon(
+                                Icons.ondemand_video,
+                                size: 18,
+                                color: _videoFilter
+                                    ? colorScheme.onPrimary
+                                    : colorScheme.onSurfaceVariant,
+                              ),
+                              labelStyle: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium
+                                  ?.copyWith(
+                                    fontSize:
+                                        Theme.of(
+                                              context,
+                                            ).textTheme.labelMedium?.fontSize !=
+                                            null
+                                        ? Theme.of(context)
+                                                  .textTheme
+                                                  .labelMedium!
+                                                  .fontSize! +
+                                              2
+                                        : 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: _videoFilter
+                                        ? colorScheme.onPrimary
+                                        : colorScheme.onSurfaceVariant,
+                                  ),
+                              backgroundColor:
+                                  colorScheme.surfaceContainerHighest,
+                              selectedColor: colorScheme.primary,
+                              side: BorderSide(
+                                width: 1.5,
+                                color: _videoFilter
+                                    ? colorScheme.primary
+                                    : colorScheme.outlineVariant,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 4),
+                      ],
+                    ),
                   ),
-                );
-              },
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+          SliverSafeArea(
+            sliver: _exerciseGrid(context, gridColumnCount: gridColumnCount),
+          ),
+        ],
       ),
     );
   }
