@@ -1,13 +1,10 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../l10n/l10n.dart';
-import '../ui/adaptive_icons.dart';
-import '../ui/adaptive_modal_sheet.dart';
 import '../utils/shared_app_prefs.dart';
 import 'workout_auto_completions.dart';
 import 'workout_constants.dart';
@@ -20,9 +17,12 @@ Future<String?> showExercisePicker(BuildContext context, {String? text}) async {
     extentOffset: text?.length ?? 0,
   );
 
-  return showAdaptiveModalSheet<String>(
+  return showModalBottomSheet<String>(
     context: context,
-    child: _ExercisePickerSheet(controller: controller),
+    showDragHandle: true,
+    isScrollControlled: true,
+    useSafeArea: true,
+    builder: (context) => _ExercisePickerSheet(controller: controller),
   );
 }
 
@@ -57,13 +57,16 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     super.initState();
     final prefs = SharedAppPrefs.instance;
     final savedNames = prefs.selectedCategoryFilters.value;
-    selectedCategories = savedNames.map((name) {
-      try {
-        return ExerciseCategory.values.byName(name);
-      } on ArgumentError {
-        return null;
-      }
-    }).whereType<ExerciseCategory>().toSet();
+    selectedCategories = savedNames
+        .map((name) {
+          try {
+            return ExerciseCategory.values.byName(name);
+          } on ArgumentError {
+            return null;
+          }
+        })
+        .whereType<ExerciseCategory>()
+        .toSet();
     videoFilter = prefs.exerciseVideoFilter.value;
   }
 
@@ -73,8 +76,9 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
         selectedCategories.remove(category);
       }
     });
-    SharedAppPrefs.instance.selectedCategoryFilters.value =
-        selectedCategories.map((e) => e.name).toList();
+    SharedAppPrefs.instance.selectedCategoryFilters.value = selectedCategories
+        .map((e) => e.name)
+        .toList();
   }
 
   void _selectExercise(BuildContext context, String exerciseName) {
@@ -144,142 +148,64 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     final isLandscape = MediaQuery.orientationOf(context) == .landscape;
     final gridColumnCount = isLandscape ? 4 : 2;
 
-    return PlatformScaffold(
-      appBar: PlatformAppBar(
-        trailingActions: [
-          ValueListenableBuilder<TextEditingValue>(
-            valueListenable: widget.controller,
-            builder: (context, value, child) => PlatformIconButton(
-              icon: Icon(PlatformIcons(context).checkMark),
-              onPressed: _canSubmitSelection
-                  ? () => _submitSelection(context)
-                  : null,
+    return DraggableScrollableSheet(
+      expand: false,
+      snap: true,
+      snapSizes: [0.75, 1.0],
+      builder: (_, scrollController) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            WorkoutAutocompleteTextField(
+              textEditingController: widget.controller,
+              autofocus: true,
+              minLines: 1,
+              maxLines: 1,
             ),
-          ),
-        ],
-        cupertino: (appBarContext, _) => CupertinoNavigationBarData(
-          backgroundColor: Colors.transparent,
-          leading: PlatformIconButton(
-            padding: const EdgeInsets.only(right: 22),
-            icon: Icon(AdaptiveIcons.close),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          trailing: ValueListenableBuilder<TextEditingValue>(
-            valueListenable: widget.controller,
-            builder: (context, value, child) => PlatformIconButton(
-              icon: Icon(PlatformIcons(context).checkMark),
-              onPressed: _canSubmitSelection
-                  ? () => _submitSelection(context)
-                  : null,
-            ),
-          ),
-          title: PlatformText(
-            L10n.of(context)!.exerciseEntryPromptText,
-            textScaler: MediaQuery.textScalerOf(
-              context,
-            ).clamp(maxScaleFactor: 1.6),
-          ),
-        ),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              WorkoutAutocompleteTextField(
-                textEditingController: widget.controller,
-                autofocus: true,
-                minLines: 1,
-                maxLines: 1,
-              ),
-              ValueListenableBuilder<TextEditingValue>(
-                valueListenable: widget.controller,
-                builder: (context, value, child) {
-                  final showPickerContent = value.text.isEmpty;
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: widget.controller,
+              builder: (context, value, child) {
+                final showPickerContent = value.text.isEmpty;
 
-                  return Flexible(
-                    fit: .loose,
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 200),
-                      switchInCurve: Curves.easeOut,
-                      switchOutCurve: Curves.easeOut,
-                      transitionBuilder: (child, animation) {
-                        return FadeTransition(opacity: animation, child: child);
-                      },
-                      child: showPickerContent
-                          ? Column(
-                              key: const ValueKey('picker-content'),
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                const SizedBox(height: 12),
-                                Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
-                                  children: [
-                                    for (final category in orderedCategories)
-                                      FilterChip(
-                                        label: Text(
-                                          category.displayLabel(context),
-                                        ),
-                                        selected: selectedCategories.contains(
-                                          category,
-                                        ),
-                                        onSelected: (_) =>
-                                            _toggleCategory(category),
-                                        showCheckmark: false,
-                                        labelStyle: Theme.of(context)
-                                            .textTheme
-                                            .labelLarge
-                                            ?.copyWith(
-                                              color:
-                                                  selectedCategories.contains(
-                                                    category,
-                                                  )
-                                                  ? colorScheme.onPrimary
-                                                  : colorScheme.onSurface,
-                                            ),
-                                        backgroundColor:
-                                            colorScheme.surfaceContainerHighest,
-                                        selectedColor: colorScheme.primary,
-                                        side: BorderSide(
-                                          color:
-                                              selectedCategories.contains(
-                                                category,
-                                              )
-                                              ? colorScheme.primary
-                                              : colorScheme.outlineVariant,
-                                        ),
-                                        shape: const StadiumBorder(),
-                                        materialTapTargetSize: .shrinkWrap,
-                                      ),
+                return Flexible(
+                  fit: .loose,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    switchInCurve: Curves.easeOut,
+                    switchOutCurve: Curves.easeOut,
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+                    child: showPickerContent
+                        ? Column(
+                            key: const ValueKey('picker-content'),
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              const SizedBox(height: 12),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: [
+                                  for (final category in orderedCategories)
                                     FilterChip(
                                       label: Text(
-                                        L10n.of(
-                                          context,
-                                        )!.exerciseFilterVideoLabel,
+                                        category.displayLabel(context),
                                       ),
-                                      selected: videoFilter,
-                                      onSelected: (_) => setState(() {
-                                        videoFilter = !videoFilter;
-                                        SharedAppPrefs
-                                            .instance
-                                            .exerciseVideoFilter
-                                            .value = videoFilter;
-                                      }),
+                                      selected: selectedCategories.contains(
+                                        category,
+                                      ),
+                                      onSelected: (_) =>
+                                          _toggleCategory(category),
                                       showCheckmark: false,
-                                      avatar: Icon(
-                                        Icons.ondemand_video,
-                                        size: 18,
-                                        color: videoFilter
-                                            ? colorScheme.onPrimary
-                                            : colorScheme.onSurface,
-                                      ),
                                       labelStyle: Theme.of(context)
                                           .textTheme
                                           .labelLarge
                                           ?.copyWith(
-                                            color: videoFilter
+                                            color:
+                                                selectedCategories.contains(
+                                                  category,
+                                                )
                                                 ? colorScheme.onPrimary
                                                 : colorScheme.onSurface,
                                           ),
@@ -287,167 +213,208 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                           colorScheme.surfaceContainerHighest,
                                       selectedColor: colorScheme.primary,
                                       side: BorderSide(
-                                        color: videoFilter
+                                        color:
+                                            selectedCategories.contains(
+                                              category,
+                                            )
                                             ? colorScheme.primary
                                             : colorScheme.outlineVariant,
                                       ),
                                       shape: const StadiumBorder(),
-                                      materialTapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
+                                      materialTapTargetSize: .shrinkWrap,
                                     ),
-                                  ],
-                                ),
-                                const Divider(),
-                                Expanded(
-                                  child: GridView.builder(
-                                    itemCount: filteredExercises.length,
-                                    gridDelegate:
-                                        SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: gridColumnCount,
-                                          crossAxisSpacing: 8,
-                                          mainAxisSpacing: 8,
-                                          mainAxisExtent: 72,
+                                  FilterChip(
+                                    label: Text(
+                                      L10n.of(
+                                        context,
+                                      )!.exerciseFilterVideoLabel,
+                                    ),
+                                    selected: videoFilter,
+                                    onSelected: (_) => setState(() {
+                                      videoFilter = !videoFilter;
+                                      SharedAppPrefs
+                                              .instance
+                                              .exerciseVideoFilter
+                                              .value =
+                                          videoFilter;
+                                    }),
+                                    showCheckmark: false,
+                                    avatar: Icon(
+                                      Icons.ondemand_video,
+                                      size: 18,
+                                      color: videoFilter
+                                          ? colorScheme.onPrimary
+                                          : colorScheme.onSurface,
+                                    ),
+                                    labelStyle: Theme.of(context)
+                                        .textTheme
+                                        .labelLarge
+                                        ?.copyWith(
+                                          color: videoFilter
+                                              ? colorScheme.onPrimary
+                                              : colorScheme.onSurface,
                                         ),
-                                    itemBuilder: (context, index) {
-                                      final exerciseName =
-                                          filteredExercises[index];
-                                      final exerciseEntry =
-                                          workoutCompletions[exerciseName]!;
-                                      final videoUrl = exerciseEntry.videoUrl;
-                                      final isSelected =
-                                          widget.controller.text ==
-                                          exerciseName;
-                                      final isPressed =
-                                          pressedExerciseName == exerciseName;
+                                    backgroundColor:
+                                        colorScheme.surfaceContainerHighest,
+                                    selectedColor: colorScheme.primary,
+                                    side: BorderSide(
+                                      color: videoFilter
+                                          ? colorScheme.primary
+                                          : colorScheme.outlineVariant,
+                                    ),
+                                    shape: const StadiumBorder(),
+                                    materialTapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                ],
+                              ),
+                              const Divider(),
+                              Expanded(
+                                child: GridView.builder(
+                                  itemCount: filteredExercises.length,
+                                  controller: scrollController,
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: gridColumnCount,
+                                        crossAxisSpacing: 8,
+                                        mainAxisSpacing: 8,
+                                        mainAxisExtent: 72,
+                                      ),
+                                  itemBuilder: (context, index) {
+                                    final exerciseName =
+                                        filteredExercises[index];
+                                    final exerciseEntry =
+                                        workoutCompletions[exerciseName]!;
+                                    final videoUrl = exerciseEntry.videoUrl;
+                                    final isSelected =
+                                        widget.controller.text == exerciseName;
+                                    final isPressed =
+                                        pressedExerciseName == exerciseName;
 
-                                      return GestureDetector(
-                                        onTapDown: (_) =>
-                                            _setPressedExercise(exerciseName),
-                                        onTapCancel: () =>
-                                            _setPressedExercise(null),
-                                        onTapUp: (_) =>
-                                            _setPressedExercise(null),
-                                        onTap: () => _selectExercise(
-                                          context,
-                                          exerciseName,
+                                    return GestureDetector(
+                                      onTapDown: (_) =>
+                                          _setPressedExercise(exerciseName),
+                                      onTapCancel: () =>
+                                          _setPressedExercise(null),
+                                      onTapUp: (_) => _setPressedExercise(null),
+                                      onTap: () => _selectExercise(
+                                        context,
+                                        exerciseName,
+                                      ),
+                                      child: AnimatedScale(
+                                        duration: const Duration(
+                                          milliseconds: 100,
                                         ),
-                                        child: AnimatedScale(
+                                        scale: isPressed ? 0.97 : 1,
+                                        child: AnimatedContainer(
                                           duration: const Duration(
                                             milliseconds: 100,
                                           ),
-                                          scale: isPressed ? 0.97 : 1,
-                                          child: AnimatedContainer(
-                                            duration: const Duration(
-                                              milliseconds: 100,
+                                          decoration: BoxDecoration(
+                                            color: isPressed
+                                                ? (isSelected
+                                                      ? colorScheme.primary
+                                                            .withValues(
+                                                              alpha: 0.22,
+                                                            )
+                                                      : colorScheme.primary
+                                                            .withValues(
+                                                              alpha: 0.08,
+                                                            ))
+                                                : (isSelected
+                                                      ? colorScheme
+                                                            .primaryContainer
+                                                      : colorScheme
+                                                            .surfaceContainerHighest),
+                                            borderRadius: BorderRadius.circular(
+                                              16,
                                             ),
-                                            decoration: BoxDecoration(
-                                              color: isPressed
-                                                  ? (isSelected
-                                                        ? colorScheme.primary
-                                                              .withValues(
-                                                                alpha: 0.22,
-                                                              )
-                                                        : colorScheme.primary
-                                                              .withValues(
-                                                                alpha: 0.08,
-                                                              ))
-                                                  : (isSelected
-                                                        ? colorScheme
-                                                              .primaryContainer
-                                                        : colorScheme
-                                                              .surfaceContainerHighest),
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              border: Border.all(
-                                                color: isSelected
-                                                    ? colorScheme.primary
-                                                    : colorScheme
-                                                          .outlineVariant,
-                                              ),
+                                            border: Border.all(
+                                              color: isSelected
+                                                  ? colorScheme.primary
+                                                  : colorScheme.outlineVariant,
                                             ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 10,
-                                                  ),
-                                              child: Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  Expanded(
-                                                    child: Align(
-                                                      alignment:
-                                                          Alignment.centerLeft,
-                                                      child: AutoSizeText(
-                                                        exerciseName,
-                                                        maxLines: 2,
-                                                        minFontSize: 10,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .bodyLarge
-                                                            ?.copyWith(
-                                                              color: isSelected
-                                                                  ? colorScheme
-                                                                        .onPrimaryContainer
-                                                                  : colorScheme
-                                                                        .onSurface,
-                                                            ),
-                                                      ),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                            ),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Expanded(
+                                                  child: Align(
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: AutoSizeText(
+                                                      exerciseName,
+                                                      maxLines: 2,
+                                                      minFontSize: 10,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyLarge
+                                                          ?.copyWith(
+                                                            color: isSelected
+                                                                ? colorScheme
+                                                                      .onPrimaryContainer
+                                                                : colorScheme
+                                                                      .onSurface,
+                                                          ),
                                                     ),
                                                   ),
-                                                  if (videoUrl != null)
-                                                    IconButton(
-                                                      onPressed: () =>
-                                                          _openExerciseVideo(
-                                                            context,
-                                                            videoUrl,
-                                                          ),
-                                                      constraints:
-                                                          const BoxConstraints(
-                                                            minWidth: 52,
-                                                            minHeight: 52,
-                                                          ),
-                                                      padding: EdgeInsets.zero,
-                                                      visualDensity:
-                                                          VisualDensity.compact,
-                                                      style: IconButton.styleFrom(
-                                                        tapTargetSize:
-                                                            MaterialTapTargetSize
-                                                                .shrinkWrap,
-                                                        foregroundColor:
-                                                            isSelected
-                                                            ? colorScheme
-                                                                  .onPrimaryContainer
-                                                            : colorScheme
-                                                                  .primary,
-                                                      ),
-                                                      icon: const Icon(
-                                                        Icons.ondemand_video,
-                                                        size: 29,
-                                                      ),
+                                                ),
+                                                if (videoUrl != null)
+                                                  IconButton(
+                                                    onPressed: () =>
+                                                        _openExerciseVideo(
+                                                          context,
+                                                          videoUrl,
+                                                        ),
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                          minWidth: 52,
+                                                          minHeight: 52,
+                                                        ),
+                                                    padding: EdgeInsets.zero,
+                                                    visualDensity:
+                                                        VisualDensity.compact,
+                                                    style: IconButton.styleFrom(
+                                                      tapTargetSize:
+                                                          MaterialTapTargetSize
+                                                              .shrinkWrap,
+                                                      foregroundColor:
+                                                          isSelected
+                                                          ? colorScheme
+                                                                .onPrimaryContainer
+                                                          : colorScheme.primary,
                                                     ),
-                                                ],
-                                              ),
+                                                    icon: const Icon(
+                                                      Icons.ondemand_video,
+                                                      size: 29,
+                                                    ),
+                                                  ),
+                                              ],
                                             ),
                                           ),
                                         ),
-                                      );
-                                    },
-                                  ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              ],
-                            )
-                          : const SizedBox.shrink(
-                              key: ValueKey('hidden-picker-content'),
-                            ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
+                              ),
+                            ],
+                          )
+                        : const SizedBox.shrink(
+                            key: ValueKey('hidden-picker-content'),
+                          ),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );

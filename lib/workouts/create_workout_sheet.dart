@@ -49,6 +49,9 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
 
   final _sections = <String, List<String>>{};
 
+  // For storing the original workout when in edit mode, so we can revert to it
+  // if the user cancels out of editing.
+  Workout? _storedWorkout;
   var _displayMode = DisplayMode.display;
 
   // Track the group of the most recently added exercise for scrolling
@@ -62,11 +65,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     AppLifecycleListener(onResume: () => setState(() {}));
     final workout = widget.originalWorkout;
     if (workout != null) {
-      _nameTextController.text = workout.name;
-      final sectionMap = {
-        for (final s in workout.sections) s.name: List.of(s.exercises),
-      };
-      _sections.addAll(sectionMap);
+      _updateUiFromWorkout(workout);
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.originalWorkout == null) {
@@ -77,6 +76,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
         _selectNameText();
         _focusNode.requestFocus();
       }
+      _storedWorkout = _buildWorkoutFromUi();
     });
   }
 
@@ -107,7 +107,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           ? L10n.of(context)!.createWorkoutDialogTitle
           : L10n.of(context)!.editWorkoutDialogTitle;
     } else {
-      return _buildWorkout().name;
+      return _buildWorkoutFromUi().name;
     }
   }
 
@@ -506,7 +506,10 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                   } else {
                     _updateExistingWorkout();
                   }
-                  setState(() => _displayMode = .display);
+                  setState(() {
+                    _storedWorkout = _buildWorkoutFromUi();
+                    _displayMode = .display;
+                  });
                 }
               : null,
         ),
@@ -655,8 +658,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                     label: L10n.of(context)!.editWorkoutButtonText,
                     icon: PlatformIcons(context).edit,
                     outlined: true,
-                    onPressed: () =>
-                        setState(() => _displayMode = DisplayMode.edit),
+                    onPressed: () => setState(() => _displayMode = .edit),
                   ),
                 ),
                 Expanded(
@@ -665,7 +667,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                     icon: PlatformIcons(context).share,
                     outlined: true,
                     onPressed: () =>
-                        widget.onShare?.call(context, _buildWorkout()),
+                        widget.onShare?.call(context, _buildWorkoutFromUi()),
                   ),
                 ),
               ],
@@ -676,7 +678,10 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                 label: L10n.of(context)!.startBeatdownButtonText,
                 icon: PlatformIcons(context).playArrowSolid,
                 onPressed: () {
-                  widget.onShowBeatdownBrowser?.call(context, _buildWorkout());
+                  widget.onShowBeatdownBrowser?.call(
+                    context,
+                    _buildWorkoutFromUi(),
+                  );
                 },
               ),
             ),
@@ -703,7 +708,10 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                 Navigator.of(context).pop();
                 return;
               }
-              setState(() => _displayMode = DisplayMode.display);
+              setState(() {
+                _displayMode = DisplayMode.display;
+                _updateUiFromWorkout(_storedWorkout!);
+              });
             },
           ),
           title: PlatformText(
@@ -727,19 +735,19 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
 
   void _createWorkout() {
     final listNotifier = ref.read(workoutListProvider.notifier);
-    listNotifier.add(_buildWorkout());
+    listNotifier.add(_buildWorkoutFromUi());
   }
 
   /// Updates an existing workout in the list with the current state.
   void _updateExistingWorkout() {
     assert(widget.originalWorkout != null);
     final listNotifier = ref.read(workoutListProvider.notifier);
-    listNotifier.replace(widget.originalWorkout!, _buildWorkout());
+    listNotifier.replace(widget.originalWorkout!, _buildWorkoutFromUi());
   }
 
   /// Builds a [Workout] object from the current state of the UI fields and
   /// sections.
-  Workout _buildWorkout() {
+  Workout _buildWorkoutFromUi() {
     return Workout(
       name: _nameTextController.text.trim(),
       date: widget.originalWorkout?.date ?? DateTime.now(),
@@ -748,5 +756,14 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           WorkoutSection(name: entry.key, exercises: List.of(entry.value)),
       ],
     );
+  }
+
+  void _updateUiFromWorkout(Workout workout) {
+    _nameTextController.text = workout.name;
+    _sections
+      ..clear()
+      ..addEntries(
+        workout.sections.map((s) => MapEntry(s.name, List.of(s.exercises))),
+      );
   }
 }
