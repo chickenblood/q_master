@@ -1,3 +1,4 @@
+
 {
     "@@locale": "en",
     "appBarTitle": "Q Master",
@@ -100,6 +101,10 @@
     "addSectionButtonText": "Add section",
     "@addSectionButtonText": {
       "description": "Outlined button at the bottom of the workout editor that opens the add-section picker."
+    },
+    "editSectionTooltip": "Edit section",
+    "@editSectionTooltip": {
+      "description": "Tooltip for the edit section button in the workout editor."
     },
     "pasteSectionButtonText": "Paste section",
     "@pasteSectionButtonText": {

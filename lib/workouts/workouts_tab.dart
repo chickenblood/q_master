@@ -47,7 +47,7 @@ class WorkoutsTab extends ConsumerWidget {
     if (!context.mounted) return;
 
     if (workout != null) {
-      // Add the workout to the store before invoking the editor.
+      // Add the workout to the store before invoking the editor
       final listNotifier = ref.read(workoutListProvider.notifier);
       listNotifier.add(workout);
 
@@ -150,6 +150,8 @@ class WorkoutsTab extends ConsumerWidget {
                 PlatformIcons(context).add,
                 color: Theme.of(appBarContext).colorScheme.onSurface,
               ),
+              cupertino: (context, platform) =>
+                  CupertinoIconButtonData(padding: EdgeInsets.only(left: 16)),
               onPressed: () => _showWorkoutCreationPicker(context, ref),
             ),
           ),

@@ -41,7 +41,7 @@ final class CreateWorkoutSheet extends ConsumerStatefulWidget {
 }
 
 final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
-  static const _headerInsets = EdgeInsets.only(left: 16.0, right: 8.0);
+  static const _headerInsets = EdgeInsets.only(left: 16.0, right: 16.0);
 
   final _focusNode = FocusNode();
   final _nameTextController = TextEditingController();
@@ -236,6 +236,8 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       PlatformIcons(context).add,
       color: Theme.of(context).colorScheme.primary,
     ),
+    cupertino: (context, platform) =>
+        CupertinoIconButtonData(padding: EdgeInsets.only(right: 8)),
     onPressed: () async {
       _focusNode.unfocus();
       final exercise = await showExercisePicker(context);
@@ -388,13 +390,8 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                               index: exerciseIndex,
                               sectionGroup: sectionGroup,
                             ),
-                            child: Container(
-                              padding: const EdgeInsets.only(
-                                left: 16,
-                                right: 8,
-                                top: 5,
-                                bottom: 5,
-                              ),
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 5, 8, 5),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
@@ -443,7 +440,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                                       index: exerciseIndex,
                                       child: Padding(
                                         padding: const EdgeInsets.only(
-                                          right: 16.0,
+                                          right: 6.0,
                                         ),
                                         child: Icon(
                                           Icons.drag_handle,
@@ -492,9 +489,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       ListenableBuilder(
         listenable: Listenable.merge([_nameTextController]),
         builder: (_, _) => PlatformIconButton(
-          padding: Theme.of(context).platform == TargetPlatform.iOS
-              ? EdgeInsets.only(right: 26)
-              : EdgeInsets.only(right: 16),
+          padding: EdgeInsets.only(right: 4),
           icon: Icon(
             PlatformIcons(context).checkMark,
             color: Theme.of(context).colorScheme.primary, // F3 Red
@@ -566,11 +561,11 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
         index: sectionIndex,
         enabled: !isEditingMode,
         child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
+          padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
           color: Theme.of(context).colorScheme.surface,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: .spaceBetween,
+            crossAxisAlignment: .center,
             children: [
               Expanded(
                 child: Align(
@@ -598,7 +593,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                         color: Theme.of(context).colorScheme.onSurface,
                         size: 20,
                       ),
-                      tooltip: 'Edit Section',
+                      tooltip: L10n.of(context)!.editSectionTooltip,
                       onPressed: () => _editSectionTitle(
                         context,
                         sectionTitle: sectionTitle,
@@ -703,6 +698,8 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
             icon: _displayMode == DisplayMode.display
                 ? Icon(PlatformIcons(context).back)
                 : Icon(AdaptiveIcons.close),
+            cupertino: (context, platform) =>
+                CupertinoIconButtonData(padding: EdgeInsets.only(right: 8)),
             onPressed: () {
               if (_displayMode == DisplayMode.display) {
                 Navigator.of(context).pop();
