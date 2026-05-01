@@ -20,7 +20,6 @@ Future<String?> showExercisePicker(
 
   return showModalBottomSheet<String>(
     context: context,
-    //showDragHandle: true,
     isScrollControlled: true,
     useSafeArea: true,
     elevation: 4,
@@ -57,7 +56,6 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
 
   late final Set<ExerciseCategory> _selectedCategories;
   late bool _videoFilter;
-  String? _pressedExerciseName;
 
   static const _orderedCategories = <ExerciseCategory>[
     .core,
@@ -125,15 +123,6 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     FocusScope.of(context).unfocus();
   }
 
-  void _setPressedExercise(String? exerciseName) {
-    if (_pressedExerciseName == exerciseName) {
-      return;
-    }
-    setState(() {
-      _pressedExerciseName = exerciseName;
-    });
-  }
-
   Future<void> _openExerciseVideo(BuildContext context, Uri videoUrl) async {
     if (defaultTargetPlatform == .iOS || defaultTargetPlatform == .android) {
       final videoId = YoutubePlayer.convertUrlToId(videoUrl.toString());
@@ -196,70 +185,59 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
         final exerciseEntry = workoutCompletions[exerciseName]!;
         final videoUrl = exerciseEntry.videoUrl;
         final isSelected = widget.controller.text == exerciseName;
-        final isPressed = _pressedExerciseName == exerciseName;
 
         return GestureDetector(
-          onTapDown: (_) => _setPressedExercise(exerciseName),
-          onTapCancel: () => _setPressedExercise(null),
-          onTapUp: (_) => _setPressedExercise(null),
           onTap: () => _selectExercise(context, exerciseName),
-          child: AnimatedScale(
-            duration: const Duration(milliseconds: 100),
-            scale: isPressed ? 0.97 : 1,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 100),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? colorScheme.primary.withOpacity(0.12)
-                    : colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.zero,
-                border: Border.all(
-                  width: 0.5,
-                  color: isSelected ? colorScheme.primary : colorScheme.outline,
-                ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? colorScheme.primary.withValues(alpha: 0.12)
+                  : colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.zero,
+              border: Border.all(
+                width: 1.5,
+                color: isSelected ? colorScheme.primary : colorScheme.outline,
               ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: AutoSizeText(
-                          exerciseName,
-                          maxLines: 2,
-                          minFontSize: 11,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.titleSmall
-                              ?.copyWith(
-                                fontWeight: FontWeight.w800,
-                                color: isSelected
-                                    ? colorScheme.primary
-                                    : colorScheme.onSurface,
-                              ),
-                        ),
-                      ),
-                    ),
-                    if (videoUrl != null)
-                      IconButton(
-                        onPressed: () => _openExerciseVideo(context, videoUrl),
-                        constraints: const BoxConstraints(
-                          minWidth: 52,
-                          minHeight: 52,
-                        ),
-                        padding: EdgeInsets.zero,
-                        visualDensity: VisualDensity.compact,
-                        style: IconButton.styleFrom(
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          foregroundColor: isSelected
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: AutoSizeText(
+                        exerciseName,
+                        maxLines: 2,
+                        minFontSize: 11,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: isSelected
                               ? colorScheme.primary
                               : colorScheme.onSurface,
                         ),
-                        icon: const Icon(Icons.ondemand_video, size: 29),
                       ),
-                  ],
-                ),
+                    ),
+                  ),
+                  if (videoUrl != null)
+                    IconButton(
+                      onPressed: () => _openExerciseVideo(context, videoUrl),
+                      constraints: const BoxConstraints(
+                        minWidth: 52,
+                        minHeight: 52,
+                      ),
+                      visualDensity: VisualDensity.compact,
+                      style: IconButton.styleFrom(
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        foregroundColor: isSelected
+                            ? colorScheme.primary
+                            : colorScheme.onSurface,
+                      ),
+                      icon: const Icon(Icons.ondemand_video, size: 29),
+                    ),
+                ],
               ),
             ),
           ),
@@ -283,8 +261,8 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
         slivers: [
           PinnedHeaderSliver(
             child: Container(
+              padding: EdgeInsets.fromLTRB(8, 0, 8, 8),
               color: Theme.of(context).scaffoldBackgroundColor,
-              padding: const EdgeInsets.all(4),
               child: Column(
                 children: [
                   _dragHandle(),

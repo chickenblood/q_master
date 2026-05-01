@@ -163,6 +163,18 @@ class _WorkoutAutocompleteTextFieldState
             ),
             material: (_, _) => MaterialTextFieldData(
               decoration: InputDecoration(
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.outline,
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 2.0,
+                  ),
+                ),
                 suffixIcon: _showClearButton
                     ? IconButton(
                         onPressed: _clearText,

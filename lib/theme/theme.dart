@@ -203,7 +203,7 @@ ThemeData darkTheme() {
   const bgPage = Color(0xFF080808);
   const bgSurface = Color(0xFF0D0D0D);
   const bgRaised = Color(0xFF141414);
-  const border = Color(0xFF353535); // Slightly darker for better balance
+  const border = Color(0xFF252525);
   const textPrimary = Color(0xFFF0F0F0);
   const textSecondary = Color(0xFF808080);
   const iconColor = textPrimary;
@@ -219,8 +219,8 @@ ThemeData darkTheme() {
       surface: bgSurface,
       onSurface: textPrimary,
       onSurfaceVariant: textSecondary,
-      outline: border, // Now lighter for pill outlines
-      outlineVariant: Color(0xFF252525),
+      outline: border,
+      outlineVariant: Color(0xFF373737),
       error: _errorRed,
       onError: Colors.white,
     ),
@@ -373,7 +373,7 @@ ThemeData darkTheme() {
 ThemeData lightTheme() {
   const bgPage = Color(0xFFF5F5F5);
   const bgSurface = Color(0xFFFFFFFF);
-  const border = Color(0xFFE8E8E8);
+  const border = Color(0xFFDDDDDD); // Match outlineVariant for consistency
   const textPrimary = Color(0xFF121212);
   const textSecondary = Color(0xFF6F6F6F); // 5.02:1 on #FFFFFF
   const iconColor = textPrimary;

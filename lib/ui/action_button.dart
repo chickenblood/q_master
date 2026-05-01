@@ -22,29 +22,27 @@ class ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final textColor = outlined && isLight
+        ? colorScheme.onSurface
+        : colorScheme.onPrimary;
     return PlatformTextButton(
       onPressed: onPressed,
       padding: EdgeInsets.zero,
       child: Container(
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: outlined
-              ? Colors.transparent
-              : Theme.of(context).colorScheme.primary,
+          color: outlined ? Colors.transparent : colorScheme.primary,
           border: outlined
-              ? Border.all(
-                  color: Theme.of(context).colorScheme.outline,
-                  width: 2,
-                )
+              ? Border.all(color: colorScheme.outline, width: 2)
               : null,
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
               color: outlined
                   ? Colors.transparent
-                  : Theme.of(
-                      context,
-                    ).colorScheme.primary.withValues(alpha: 0.35),
+                  : colorScheme.primary.withOpacity(0.35),
               blurRadius: 20,
               offset: Offset(0, 6),
             ),
@@ -55,17 +53,13 @@ class ActionButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              color: iconColor ?? Theme.of(context).colorScheme.onPrimary,
-              size: 20,
-            ),
+            Icon(icon, color: iconColor ?? textColor, size: 20),
             const SizedBox(width: 8),
             Text(
               label,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                 fontWeight: FontWeight.w800,
-                color: Theme.of(context).colorScheme.onPrimary,
+                color: textColor,
                 fontSize: 16,
                 letterSpacing: -0.1,
               ),
