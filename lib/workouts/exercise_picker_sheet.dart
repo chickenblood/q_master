@@ -45,6 +45,7 @@ class _ExercisePickerSheet extends StatefulWidget {
 
 class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   bool _canAdd = false;
+  String? _selectedExercise;
 
   void _addExercise() {
     final selection = widget.controller.text.trim();
@@ -116,6 +117,8 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   }
 
   void _selectExercise(BuildContext context, String exerciseName) {
+    setState(() => _selectedExercise = exerciseName);
+
     widget.controller.value = TextEditingValue(
       text: exerciseName,
       selection: TextSelection.collapsed(offset: exerciseName.length),
