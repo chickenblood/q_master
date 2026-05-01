@@ -164,9 +164,13 @@
         }
       }
     },
-    "noWorkoutsPlaceholderText": "No workouts yet.\n Tap the + button to create one",
+    "noWorkoutsPlaceholderText": "No workouts yet",
     "@noWorkoutsPlaceholderText": {
       "description": "Placeholder text on the Workouts tab when no workouts have been created yet."
+    },
+    "noWorkoutsPlaceholderDetailText": "Tap + to build a beatdown or generate one with AI.",
+    "@noWorkoutsPlaceholderDetailText": {
+      "description": "Placeholder detail text on the Workouts tab telling user how to create or generate a workout."
     },
     "exerciseEntryPromptText": "Describe your exercise",
     "@exerciseEntryPromptText": {

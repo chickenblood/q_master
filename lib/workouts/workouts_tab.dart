@@ -23,13 +23,43 @@ import 'workout_creation_picker.dart';
 class WorkoutsTab extends ConsumerWidget {
   const WorkoutsTab({super.key});
 
-  Widget _emptyContentPlaceholder(BuildContext context) => Padding(
-    padding: const EdgeInsets.all(16.0),
+  Widget _emptyContentPlaceholder(BuildContext context) => SafeArea(
     child: Center(
-      child: Text(
-        L10n.of(context)!.noWorkoutsPlaceholderText,
-        style: Theme.of(context).textTheme.headlineLarge,
-        textAlign: TextAlign.center,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          children: [
+            Spacer(),
+            Icon(
+              AdaptiveIcons.history,
+              size: 64,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              L10n.of(context)!.noWorkoutsPlaceholderText,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+                color: Theme.of(context).colorScheme.onSurface,
+                letterSpacing: -0.2,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              L10n.of(context)!.noWorkoutsPlaceholderDetailText,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                height: 1.6,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            Spacer(),
+          ],
+        ),
       ),
     ),
   );
