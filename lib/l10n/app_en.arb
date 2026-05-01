@@ -5,9 +5,9 @@
     "@appBarTitle": {
       "description": "Main app name shown in the navigation bar."
     },
-    "workoutsTabTitle": "Workouts",
+    "workoutsTabTitle": "Beatdowns",
     "@workoutsTabTitle": {
-      "description": "Label for the Workouts tab in bottom navigation."
+      "description": "Label for the Beatdowns tab in bottom navigation."
     },
     "gamesTabTitle": "Games",
     "@gamesTabTitle": {
@@ -50,27 +50,27 @@
     "@settingsAboutDialogDescription": {
       "description": "Credits text shown in the About section of the Settings sheet."
     },
-    "workoutCreationPickerTitle": "How would you like to create a workout?",
+    "workoutCreationPickerTitle": "How would you like to create a beatdown?",
     "@workoutCreationPickerTitle": {
-      "description": "Title for the unified workout creation picker modal sheet."
+      "description": "Title for the unified beatdown creation picker modal sheet."
     },
     "workoutCreationPickerManual": "Create manually",
     "@workoutCreationPickerManual": {
-      "description": "Button label for manual workout creation in the picker."
+      "description": "Button label for manual beatdown creation in the picker."
     },
     "workoutCreationPickerGenerate": "Generate with AI",
     "@workoutCreationPickerGenerate": {
-      "description": "Button label for AI-generated workout creation in the picker."
+      "description": "Button label for AI-generated beatdown creation in the picker."
     },
     "workoutCreationPickerFromTemplate": "From template",
     "@workoutCreationPickerFromTemplate": {
-      "description": "Button label for creating a workout from a template in the picker."
+      "description": "Button label for creating a beatdown from a template in the picker."
     },
-    "createWorkoutDialogTitle": "Create Workout",
+    "createWorkoutDialogTitle": "Create beatdown",
     "@createWorkoutDialogTitle": {
-      "description": "Title of the bottom sheet for creating a new workout."
+      "description": "Title of the bottom sheet for creating a new beatdown."
     },
-    "generateWorkoutDialogTitle": "Generate Workout",
+    "generateWorkoutDialogTitle": "Generate Beatdown",
     "@generateWorkoutDialogTitle": {
       "description": "Title of the bottom sheet for creating a new workout using AI."
     },
@@ -78,7 +78,7 @@
     "@generateWorkoutPromptHint": {
       "description": "Placeholder hint text inside the AI prompt text field on the Generate Workout sheet."
     },
-    "generateWorkoutButtonLabel": "Generate Workout",
+    "generateWorkoutButtonLabel": "Generate Beatdown",
     "@generateWorkoutButtonLabel": {
       "description": "Label for the button that submits the prompt and generates a workout via AI."
     },
@@ -94,11 +94,11 @@
     "@captureVoiceInputStopButton": {
       "description": "Label for the stop button in the voice capture dialog."
     },
-    "editWorkoutDialogTitle": "Edit Workout",
+    "editWorkoutDialogTitle": "Edit Beatdown",
     "@editWorkoutDialogTitle": {
-      "description": "Title of the bottom sheet for editing an existing workout."
+      "description": "Title of the bottom sheet for editing an existing beatdown."
     },
-    "addSectionButtonText": "Add section",
+    "addSectionButtonText": "Add Section",
     "@addSectionButtonText": {
       "description": "Outlined button at the bottom of the workout editor that opens the add-section picker."
     },
@@ -138,7 +138,7 @@
     "@updateExerciseButtonTitle": {
       "description": "Label of the confirm action button in the edit exercise alert dialog."
     },
-    "defaultWorkoutName": "New workout",
+    "defaultWorkoutName": "New Beatdown",
     "@defaultWorkoutName": {
       "description": "Default name pre-filled in the workout name field when creating a new workout."
     },
@@ -146,7 +146,7 @@
     "@warmupSectionTitle": {
       "description": "Section header for the warm-up exercises in the workout editor and beatdown browser."
     },
-    "workoutCompleteText": "All done!",
+    "workoutCompleteText": "All Done!",
     "@workoutCompleteText": {
       "description": "Message shown on the final page of the beatdown browser when all exercises are complete."
     },
@@ -164,7 +164,7 @@
         }
       }
     },
-    "noWorkoutsPlaceholderText": "No workouts yet",
+    "noWorkoutsPlaceholderText": "No beatdowns yet",
     "@noWorkoutsPlaceholderText": {
       "description": "Placeholder text on the Workouts tab when no workouts have been created yet."
     },
