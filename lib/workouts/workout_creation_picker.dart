@@ -29,7 +29,7 @@ class WorkoutCreationPicker extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'New Workout',
+              L10n.of(context)!.createWorkoutPickerTitle,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w900,
                 fontSize: 22,

@@ -132,6 +132,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     required String title,
     required String buttonTitle,
     String? initialText,
+    String? hintText,
   }) async {
     final controller = TextEditingController(text: initialText);
     controller.selection = TextSelection(
@@ -146,7 +147,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           controller: controller,
           autofocus: true,
           textCapitalization: TextCapitalization.words,
-          hintText: L10n.of(innerContext)!.addSectionFieldHint,
+          hintText: hintText,
           onSubmitted: (_) =>
               Navigator.of(innerContext).pop(controller.text.trim()),
         ),
@@ -171,7 +172,8 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     final sectionName = await _showNameChangeDialog(
       context,
       title: L10n.of(context)!.addSectionDialogTitle,
-      buttonTitle: L10n.of(context)!.addSectionDialogTitle,
+      buttonTitle: L10n.of(context)!.addSectionDialogButtonText,
+      hintText: L10n.of(context)!.addSectionFieldHint,
     );
     final trimmedName = sectionName?.trim();
     if (trimmedName == null || trimmedName.isEmpty) return;
@@ -208,7 +210,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     final updatedTitle = await _showNameChangeDialog(
       context,
       title: L10n.of(context)!.updateSectionDialogTitle,
-      buttonTitle: L10n.of(context)!.updateSectionDialogTitle,
+      buttonTitle: L10n.of(context)!.updateSectionDialogButtonText,
       initialText: sectionTitle,
     );
     final trimmedName = updatedTitle?.trim();

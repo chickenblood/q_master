@@ -66,7 +66,11 @@
     "@workoutCreationPickerFromTemplate": {
       "description": "Button label for creating a beatdown from a template in the picker."
     },
-    "createWorkoutDialogTitle": "Create beatdown",
+    "createWorkoutPickerTitle": "New Beatdown",
+    "@createWorkoutPickerTitle": {
+      "description": "Title of the bottom sheet for deciding how to create a new beatdown."
+    },
+    "createWorkoutDialogTitle": "Create Beatdown",
     "@createWorkoutDialogTitle": {
       "description": "Title of the bottom sheet for creating a new beatdown."
     },
@@ -106,7 +110,7 @@
     "@editSectionTooltip": {
       "description": "Tooltip for the edit section button in the workout editor."
     },
-    "pasteSectionButtonText": "Paste section",
+    "pasteSectionButtonText": "Paste Section",
     "@pasteSectionButtonText": {
       "description": "Outlined button at the bottom of the workout editor that pastes a section from the clipboard."
     },
@@ -114,11 +118,15 @@
     "@pasteSectionInitialText": {
       "description": "Initial text shown in the section name field when pasting a section from the clipboard."
     },
-    "addSectionDialogTitle": "Add section",
+    "addSectionDialogTitle": "Add new section",
     "@addSectionDialogTitle": {
       "description": "Title of the add-section alert dialog, and label of its confirm action button."
     },
-    "addSectionForPasteDialogTitle": "Add section for paste",
+    "addSectionDialogButtonText": "Add Section",
+    "@addSectionDialogButtonText": {
+      "description": "Label of the confirm action button in the add-section alert dialog."
+    },
+    "addSectionForPasteDialogTitle": "Add section for pasted content",
     "@addSectionForPasteDialogTitle": {
       "description": "Title of the add-section alert dialog when pasting a section from the clipboard, and label of its confirm action button."
     },
@@ -126,15 +134,19 @@
     "@addSectionFieldHint": {
       "description": "Placeholder hint text inside the section name text field in the add-section dialog."
     },
-    "updateSectionDialogTitle": "Update section",
+    "updateSectionDialogTitle": "Edit section name",
     "@updateSectionDialogTitle": {
       "description": "Title of the edit section title alert dialog, and label of its confirm action button."
     },
-    "updateExerciseDialogTitle": "Update exercise",
+    "updateSectionDialogButtonText": "Rename",
+    "@updateSectionDialogButtonText": {
+      "description": "Label of the confirm action button in the edit section title alert dialog."
+    },
+    "updateExerciseDialogTitle": "Edit exercise name",
     "@updateExerciseDialogTitle": {
       "description": "Title of the edit exercise alert dialog, and label of its confirm action button."
     },
-    "updateExerciseButtonTitle": "Update",
+    "updateExerciseButtonTitle": "Rename",
     "@updateExerciseButtonTitle": {
       "description": "Label of the confirm action button in the edit exercise alert dialog."
     },
@@ -216,7 +228,7 @@
     "@exerciseFilterVideoLabel": {
       "description": "Filter pill label that filters exercises to only those with an associated video in the exercise picker."
     },
-    "pasteExercisesButtonLabel": "Paste exercises",
+    "pasteExercisesButtonLabel": "Paste Exercises",
     "@pasteExercisesButtonLabel": {
       "description": "Accessibility label for the paste button in a section header, which pastes clipboard lines as individual exercises."
     },
