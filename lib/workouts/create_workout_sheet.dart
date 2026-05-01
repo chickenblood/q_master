@@ -579,8 +579,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     sectionTitle.toUpperCase(),
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      fontSize: 10,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.w800,
                       color: Theme.of(context).colorScheme.primary,
                       letterSpacing: .1,
