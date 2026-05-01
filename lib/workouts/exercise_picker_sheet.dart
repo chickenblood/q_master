@@ -15,6 +15,7 @@ Future<String?> showExercisePicker(
   String? text,
   required void Function(String) onExerciseAdded,
 }) async {
+  final colorScheme = Theme.of(context).colorScheme;
   final controller = TextEditingController(text: text)
     ..selection = TextSelection(baseOffset: 0, extentOffset: text?.length ?? 0);
 
@@ -23,6 +24,12 @@ Future<String?> showExercisePicker(
     isScrollControlled: true,
     useSafeArea: true,
     elevation: 4,
+    backgroundColor: colorScheme.surface,
+    clipBehavior: Clip.antiAlias,
+    shape: RoundedRectangleBorder(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      side: BorderSide(color: colorScheme.outlineVariant),
+    ),
     builder: (context) => _ExercisePickerSheet(
       controller: controller,
       onExerciseAdded: onExerciseAdded,
@@ -45,7 +52,6 @@ class _ExercisePickerSheet extends StatefulWidget {
 
 class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   bool _canAdd = false;
-  String? _selectedExercise;
 
   void _addExercise() {
     final selection = widget.controller.text.trim();
@@ -91,12 +97,9 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   }
 
   void _updateCanAdd() {
-    final canAdd = widget.controller.text.trim().isNotEmpty;
-    if (canAdd != _canAdd) {
-      setState(() {
-        _canAdd = canAdd;
-      });
-    }
+    setState(() {
+      _canAdd = widget.controller.text.trim().isNotEmpty;
+    });
   }
 
   @override
@@ -117,8 +120,6 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   }
 
   void _selectExercise(BuildContext context, String exerciseName) {
-    setState(() => _selectedExercise = exerciseName);
-
     widget.controller.value = TextEditingValue(
       text: exerciseName,
       selection: TextSelection.collapsed(offset: exerciseName.length),
