@@ -7,6 +7,7 @@ import 'package:q_master/ui/simple_alert.dart';
 
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
+import '../ui/action_button.dart';
 import '../ui/adaptive_icons.dart';
 import 'capture_voice_input_dialog.dart';
 
@@ -114,11 +115,11 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
         ),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: PlatformTextField(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+          child: Column(
+            children: [
+              PlatformTextField(
                 controller: _promptTextController,
                 focusNode: _promptFocusNode,
                 autofocus: true,
@@ -128,58 +129,87 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
                 keyboardType: .multiline,
                 onSubmitted: (_) => _handleGenerateWorkout(),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: Center(
-                child: Hero(
-                  tag: 'voiceInputButton',
-                  child: SizedBox(
-                    width: 64,
-                    height: 64,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        onPressed: _handleCaptureVoiceInput,
-                        icon: Icon(
-                          AdaptiveIcons.microphone,
-                          color: Theme.of(context).colorScheme.onPrimary,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 32.0),
+                child: Center(
+                  child: Hero(
+                    tag: 'voiceInputButton',
+                    child: SizedBox(
+                      width: 84,
+                      height: 84,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.15),
+                              blurRadius: 0,
+                              spreadRadius: 14,
+                            ),
+                          ],
+                        ),
+                        child: IconButton(
+                          onPressed: _handleCaptureVoiceInput,
+                          icon: Icon(
+                            AdaptiveIcons.microphone,
+                            size: 36,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-            Stack(
-              children: [
-                ValueListenableBuilder<TextEditingValue>(
-                  valueListenable: _promptTextController,
-                  builder: (context, value, child) {
-                    final hasPrompt = value.text.trim().isNotEmpty;
-                    if (!hasPrompt && !_isGenerating) {
-                      return Container();
-                    }
+              Stack(
+                children: [
+                  ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _promptTextController,
+                    builder: (context, value, child) {
+                      final hasPrompt = value.text.trim().isNotEmpty;
 
-                    return _isGenerating
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16.0),
-                            child: PlatformCircularProgressIndicator(),
-                          )
-                        : PlatformElevatedButton(
-                            onPressed: _handleGenerateWorkout,
-                            child: PlatformText(
-                              L10n.of(context)!.generateWorkoutButtonLabel,
-                            ),
-                          );
-                  },
+                      return _isGenerating
+                          ? Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 16.0,
+                              ),
+                              child: PlatformCircularProgressIndicator(),
+                            )
+                          : Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 16.0,
+                              ),
+                              child: SizedBox(
+                                height: 62,
+                                child: ActionButton(
+                                  label: L10n.of(
+                                    context,
+                                  )!.generateWorkoutButtonLabel,
+                                  onPressed: hasPrompt
+                                      ? _handleGenerateWorkout
+                                      : null,
+                                  icon: AdaptiveIcons.sparkles,
+                                ),
+                              ),
+                            );
+                    },
+                  ),
+                ],
+              ),
+              PlatformText(
+                L10n.of(context)!.voiceGenerationInstructions,
+                textAlign: .center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontSize: 15,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

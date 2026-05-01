@@ -8,14 +8,14 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 class ActionButton extends StatelessWidget {
   final Function()? onPressed;
   final String label;
-  final IconData icon;
+  final IconData? icon;
   final Color? iconColor;
   final bool outlined;
   const ActionButton({
     super.key,
     required this.onPressed,
     required this.label,
-    required this.icon,
+    this.icon,
     this.iconColor,
     this.outlined = false,
   });
@@ -24,23 +24,29 @@ class ActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isLight = Theme.of(context).brightness == Brightness.light;
-    final textColor = outlined && isLight
-        ? colorScheme.onSurface
-        : colorScheme.onPrimary;
+    final isDisabled = onPressed == null;
+    final disabledBg = colorScheme.onSurface.withOpacity(0.12);
+    final disabledFg = colorScheme.onSurface.withOpacity(0.38);
+    final textColor = isDisabled
+        ? disabledFg
+        : (outlined && isLight ? colorScheme.onSurface : colorScheme.onPrimary);
+    final borderColor = isDisabled
+        ? colorScheme.outline.withOpacity(0.38)
+        : colorScheme.outline;
     return PlatformTextButton(
       onPressed: onPressed,
       padding: EdgeInsets.zero,
       child: Container(
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: outlined ? Colors.transparent : colorScheme.primary,
-          border: outlined
-              ? Border.all(color: colorScheme.outline, width: 2)
-              : null,
+          color: outlined
+              ? Colors.transparent
+              : (isDisabled ? disabledBg : colorScheme.primary),
+          border: outlined ? Border.all(color: borderColor, width: 2) : null,
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: outlined
+              color: outlined || isDisabled
                   ? Colors.transparent
                   : colorScheme.primary.withOpacity(0.35),
               blurRadius: 20,
@@ -53,8 +59,10 @@ class ActionButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: iconColor ?? textColor, size: 20),
-            const SizedBox(width: 8),
+            if (icon != null) ...[
+              Icon(icon, color: iconColor ?? textColor, size: 20),
+              const SizedBox(width: 8),
+            ],
             Text(
               label,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(

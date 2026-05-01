@@ -11,6 +11,7 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 import '../l10n/l10n.dart';
+import '../ui/action_button.dart';
 import '../ui/adaptive_icons.dart';
 
 const _waveformBarCount = 14;
@@ -366,35 +367,31 @@ final class _CaptureVoiceInputDialogState
       ),
       body: SafeArea(
         child: Stack(
-          fit: StackFit.expand,
+          //fit: StackFit.expand,
           children: [
             Hero(
               tag: 'voiceInputButton',
               child: _SpeechWaveform(levels: _soundLevels),
             ),
-            Align(
-              alignment: .topCenter,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                child: PlatformText(
-                  _recognizedText,
-                  textAlign: .center,
-                  style: Theme.of(context).textTheme.displaySmall,
-                ),
+            Positioned(
+              top: 16,
+              left: 16,
+              right: 16,
+              child: PlatformText(
+                _recognizedText,
+                textAlign: .center,
+                style: Theme.of(context).textTheme.displaySmall,
               ),
             ),
             if (_isListening)
-              Align(
-                alignment: .bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: PlatformElevatedButton(
-                      onPressed: _isFinishing ? null : _finishAndClose,
-                      child: PlatformText(l10n.captureVoiceInputStopButton),
-                    ),
-                  ),
+              Positioned(
+                bottom: 16,
+                left: 16,
+                right: 16,
+                child: ActionButton(
+                  outlined: true,
+                  label: l10n.captureVoiceInputStopButton,
+                  onPressed: _isFinishing ? null : _finishAndClose,
                 ),
               ),
           ],

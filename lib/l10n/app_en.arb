@@ -383,5 +383,9 @@
     "startBeatdownButtonText": "Start Beatdown",
     "@startBeatdownButtonText": {
       "description": "Button label for starting the beatdown in the workout detail footer."
+    },
+    "voiceGenerationInstructions": "Describe your beatdown. Tap the mic to speak it.",
+    "@voiceGenerationInstructions": {
+      "description": "Instructional text shown on the Generate Workout sheet above the voice input option."
     }
   }
