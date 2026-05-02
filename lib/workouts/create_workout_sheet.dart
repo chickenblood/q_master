@@ -493,10 +493,12 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     if (_displayMode == .display) {
       return [
         PlatformIconButton(
+          padding: EdgeInsets.only(right: 0),
           icon: Icon(PlatformIcons(context).edit),
           onPressed: () => setState(() => _displayMode = .edit),
         ),
         PlatformIconButton(
+          padding: EdgeInsets.only(right: 2),
           icon: Icon(PlatformIcons(context).playArrowSolid),
           onPressed: () => widget.onShowBeatdownBrowser?.call(
             context,
@@ -609,7 +611,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                   children: [
                     IconButton(
                       icon: Icon(
-                        Icons.edit,
+                        PlatformIcons(context).edit,
                         color: Theme.of(context).colorScheme.onSurface,
                         size: 20,
                       ),

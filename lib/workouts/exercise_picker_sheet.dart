@@ -347,9 +347,10 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
       expand: false,
       snap: true,
       shouldCloseOnMinExtent: false,
-      minChildSize: 0.5,
+      initialChildSize: 0.7,
+      minChildSize: 0.7,
       maxChildSize: 0.9,
-      snapSizes: [0.5, 0.75, 0.9],
+      snapSizes: [0.7, 0.9],
       builder: (_, scrollController) => Column(
         children: [
           Container(
@@ -364,7 +365,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                     Expanded(
                       child: WorkoutAutocompleteTextField(
                         textEditingController: widget.controller,
-                        autofocus: true,
+                        //autofocus: true,
                         minLines: 1,
                         maxLines: 1,
                         onSubmitted: _addExercise,
