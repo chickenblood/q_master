@@ -95,89 +95,43 @@ class _SettingsSheet extends ConsumerWidget {
           delegate: SliverChildListDelegate([
             _SettingsCard(
               header: l10n.workoutsSettingsTitle,
-              child: _SettingsRow(
-                label: l10n.exercisesPerPageSettingsLabel,
-                labelStyle: rowLabelStyle,
-                trailing: SizedBox(
-                  width: 164,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child:
-                            Theme.of(context).platform ==
-                                    TargetPlatform.android ||
-                                Theme.of(context).platform ==
-                                    TargetPlatform.fuchsia
-                            ? SliderTheme(
-                                data: SliderTheme.of(
-                                  context,
-                                ).copyWith(trackHeight: 7),
-                                child: SliderTheme(
-                                  data: SliderTheme.of(context).copyWith(
-                                    activeTrackColor: Theme.of(
-                                      context,
-                                    ).colorScheme.primary,
-                                    inactiveTrackColor: Theme.of(context)
-                                        .colorScheme
-                                        .primary
-                                        .withAlpha((0.24 * 255).round()),
-                                    thumbColor: Theme.of(
-                                      context,
-                                    ).colorScheme.primary,
-                                  ),
-                                  child: Slider(
-                                    value: prefs.exercisesPerPage.value
-                                        .toDouble(),
-                                    min: 1,
-                                    max: SharedAppPrefs.maxExercisesPerPage
-                                        .toDouble(),
-                                    divisions: 30,
-                                    onChanged: (value) =>
-                                        prefs.exercisesPerPage.value = value
-                                            .round(),
-                                  ),
-                                ),
-                              )
-                            : SliderTheme(
-                                data: SliderTheme.of(context).copyWith(
-                                  activeTrackColor: Theme.of(
-                                    context,
-                                  ).colorScheme.primary,
-                                  inactiveTrackColor: Theme.of(context)
-                                      .colorScheme
-                                      .primary
-                                      .withAlpha((0.24 * 255).round()),
-                                  thumbColor: Theme.of(
-                                    context,
-                                  ).colorScheme.primary,
-                                ),
-                                child: Slider.adaptive(
-                                  value: prefs.exercisesPerPage.value
-                                      .toDouble(),
-                                  min: 1,
-                                  max: SharedAppPrefs.maxExercisesPerPage
-                                      .toDouble(),
-                                  divisions: 30,
-                                  onChanged: (value) =>
-                                      prefs.exercisesPerPage.value = value
-                                          .round(),
-                                ),
-                              ),
-                      ),
-                      const SizedBox(width: 8),
-                      SizedBox(
-                        width: 30,
-                        child: Text(
-                          prefs.exercisesPerPage.value.toString(),
-                          maxLines: 1,
-                          softWrap: false,
-                          textAlign: TextAlign.right,
-                          style: rowValueStyle,
-                        ),
-                      ),
-                    ],
+              child: Column(
+                children: [
+                  _SettingsRow(
+                    label: l10n.exercisesPerPageSettingsLabel,
+                    labelStyle: rowLabelStyle,
+                    showDivider: false,
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Expanded(
+                          child: Slider.adaptive(
+                            value: prefs.exercisesPerPage.value.toDouble(),
+                            min: 1,
+                            max: SharedAppPrefs.maxExercisesPerPage.toDouble(),
+                            divisions: 30,
+                            onChanged: (value) =>
+                                prefs.exercisesPerPage.value = value.round(),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        SizedBox(
+                          width: 30,
+                          child: Text(
+                            prefs.exercisesPerPage.value.toString(),
+                            maxLines: 1,
+                            softWrap: false,
+                            textAlign: TextAlign.right,
+                            style: rowValueStyle,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
             // Timer settings card removed
@@ -362,7 +316,6 @@ final class _SettingsRow extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        constraints: const BoxConstraints(minHeight: 60),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           border: showDivider
@@ -372,11 +325,7 @@ final class _SettingsRow extends StatelessWidget {
         child: Row(
           children: [
             Expanded(
-              child: Text(
-                label,
-                style: labelStyle,
-                overflow: TextOverflow.ellipsis,
-              ),
+              child: Text(label, style: labelStyle, overflow: .ellipsis),
             ),
             ?trailing,
           ],

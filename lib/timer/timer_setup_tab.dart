@@ -183,11 +183,11 @@ class TimerSetupTab extends ConsumerWidget {
                           ),
                         ),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          crossAxisAlignment: .stretch,
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                vertical: 8,
+                                vertical: 12,
                                 horizontal: 16,
                               ),
                               decoration: BoxDecoration(
