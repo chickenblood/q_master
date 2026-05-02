@@ -348,6 +348,12 @@ final class _CaptureVoiceInputDialogState
 
     return PlatformScaffold(
       appBar: PlatformAppBar(
+        title: PlatformText(
+          l10n.captureVoiceInputPrompt,
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+        ),
         cupertino: (appBarContext, _) => CupertinoNavigationBarData(
           backgroundColor: Colors.transparent,
           leading: PlatformIconButton(
@@ -355,14 +361,12 @@ final class _CaptureVoiceInputDialogState
             icon: Icon(AdaptiveIcons.close),
             onPressed: _cancelAndClose,
           ),
-          title: PlatformText(l10n.captureVoiceInputPrompt),
         ),
         material: (appBarContext, _) => MaterialAppBarData(
           leading: PlatformIconButton(
             icon: Icon(AdaptiveIcons.close),
             onPressed: _cancelAndClose,
           ),
-          title: PlatformText(l10n.captureVoiceInputPrompt),
         ),
       ),
       body: SafeArea(

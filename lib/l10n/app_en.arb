@@ -13,9 +13,13 @@
     "@gamesTabTitle": {
       "description": "Label for the Games tab in bottom navigation."
     },
-    "timerTabTitle": "Timer",
-    "@timerTabTitle": {
+    "timerSetupTabTitle": "Setup Timer",
+    "@timerSetupTabTitle": {
       "description": "Label for the Timer tab in bottom navigation."
+    },
+    "timerPageTitle": "Timer",
+    "@timerPageTitle": {
+      "description": "Title of the Timer page."
     },
     "nearMeTabTitle": "Near me",
     "@nearMeTabTitle": {

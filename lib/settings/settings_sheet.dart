@@ -59,24 +59,14 @@ class _SettingsSheet extends ConsumerWidget {
   }) {
     final l10n = L10n.of(context)!;
     final timer = ref.read(timerProvider.notifier);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final labelColor = isDark
-        ? Theme.of(context)
-              .colorScheme
-              .onSurface // white-like in dark mode
-        : Theme.of(context).colorScheme.onSurfaceVariant;
-    final valueColor = Theme.of(context).colorScheme.onSurface;
-    final inactiveSegmentColor = isDark
-        ? Theme.of(context).colorScheme.onSurfaceVariant
-        : Theme.of(context).colorScheme.onSurface;
-    // Use a much lighter border in dark mode for segmented control
-    final segmentBorderColor = isDark
-        ? const Color(0xFF484848) // Slightly darker for better balance
-        : Theme.of(context).colorScheme.outline;
+    final colorScheme = Theme.of(context).colorScheme;
+    final labelColor = colorScheme.onSurface;
+    final inactiveSegmentColor = colorScheme.onSurfaceVariant;
+    final segmentBorderColor = colorScheme.outline;
     final rowValueStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
       fontSize: 16,
       fontWeight: FontWeight.w700,
-      color: valueColor,
+      color: labelColor,
       fontFeatures: [FontFeature.tabularFigures()],
     );
     final rowLabelStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -88,10 +78,9 @@ class _SettingsSheet extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       foregroundColor: inactiveSegmentColor,
       selectedForegroundColor: Colors.white,
-      selectedBackgroundColor: Theme.of(context).colorScheme.primary,
+      selectedBackgroundColor: colorScheme.primary,
       side: BorderSide(color: segmentBorderColor, width: 1.5),
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
-      textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
       visualDensity: VisualDensity.compact,
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
@@ -275,13 +264,21 @@ class _SettingsSheet extends ConsumerWidget {
             SliverAppBar(
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               leading: PlatformIconButton(
-                padding: Theme.of(context).platform == TargetPlatform.iOS
+                padding: Theme.of(context).platform == .iOS
                     ? EdgeInsets.only(right: 24)
                     : EdgeInsets.zero,
                 icon: Icon(AdaptiveIcons.close),
                 onPressed: () => Navigator.pop(context),
               ),
-              title: Text(L10n.of(context)!.settingsDialogTitle),
+              title: Text(
+                L10n.of(context)!.settingsDialogTitle,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+                textScaler: MediaQuery.textScalerOf(
+                  context,
+                ).clamp(maxScaleFactor: 1.6),
+              ),
             ),
             _content(context, prefs: prefs, ref: ref),
           ],
@@ -305,6 +302,7 @@ final class _SettingsCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: BorderRadius.circular(8),

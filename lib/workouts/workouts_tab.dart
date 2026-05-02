@@ -174,7 +174,7 @@ class WorkoutsTab extends ConsumerWidget {
             L10n.of(context)!.workoutsTabTitle,
             style: Theme.of(
               context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
             textScaler: MediaQuery.textScalerOf(
               context,
             ).clamp(maxScaleFactor: 1.6),

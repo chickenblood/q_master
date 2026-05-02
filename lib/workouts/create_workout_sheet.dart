@@ -391,12 +391,14 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                             }
                           });
                           return GestureDetector(
-                            onDoubleTap: () => _editExercise(
-                              context,
-                              exercises: exercises,
-                              index: exerciseIndex,
-                              sectionGroup: sectionGroup,
-                            ),
+                            onDoubleTap: () => _displayMode == .edit
+                                ? _editExercise(
+                                    context,
+                                    exercises: exercises,
+                                    index: exerciseIndex,
+                                    sectionGroup: sectionGroup,
+                                  )
+                                : null,
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(16, 5, 8, 5),
                               child: Row(
@@ -493,7 +495,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     if (_displayMode == .display) {
       return [
         PlatformIconButton(
-          padding: EdgeInsets.only(right: 0),
+          padding: EdgeInsets.only(left: 0, right: 0),
           icon: Icon(PlatformIcons(context).edit),
           onPressed: () => setState(() => _displayMode = .edit),
         ),
@@ -715,6 +717,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       primary: true,
       slivers: [
         SliverAppBar(
+          centerTitle: Theme.of(context).platform == .iOS,
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           leading: PlatformIconButton(
             icon: _displayMode == .display

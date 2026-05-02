@@ -87,10 +87,10 @@ class TimerSetupTab extends ConsumerWidget {
     return PlatformScaffold(
       appBar: PlatformAppBar(
         title: Text(
-          l10n.timerTabTitle,
+          l10n.timerSetupTabTitle,
           style: Theme.of(
             context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
           textScaler: MediaQuery.textScalerOf(
             context,
           ).clamp(maxScaleFactor: 1.6),
@@ -141,7 +141,6 @@ class TimerSetupTab extends ConsumerWidget {
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: .1,
                                   color: Theme.of(context).colorScheme.primary,
-                                  height: 1.2,
                                   textBaseline: TextBaseline.alphabetic,
                                 ),
                               ),
@@ -209,7 +208,6 @@ class TimerSetupTab extends ConsumerWidget {
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: .1,
                                   color: Theme.of(context).colorScheme.primary,
-                                  height: 1.2,
                                 ),
                               ),
                             ),

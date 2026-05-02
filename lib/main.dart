@@ -211,7 +211,10 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
                     AdaptiveIcons.sports,
                     L10n.of(context)!.gamesTabTitle,
                   ),
-                  tabItem(AdaptiveIcons.timer, L10n.of(context)!.timerTabTitle),
+                  tabItem(
+                    AdaptiveIcons.timer,
+                    L10n.of(context)!.timerPageTitle,
+                  ),
                   tabItem(
                     AdaptiveIcons.location,
                     L10n.of(context)!.nearMeTabTitle,
