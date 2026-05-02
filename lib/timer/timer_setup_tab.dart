@@ -241,33 +241,38 @@ class TimerSetupTab extends ConsumerWidget {
                                 timer,
                               ),
                             ),
-                            _IntervalSetupRow(
-                              label: l10n.timerSettingsRestLabel,
-                              value: formatDuration(
-                                Duration(
-                                  seconds: prefs.restIntervalSeconds.value,
+                            if (prefs.timerType.value ==
+                                TimerType
+                                    .tabata
+                                    .index) // Only show rest interval for Tabata
+                              _IntervalSetupRow(
+                                label: l10n.timerSettingsRestLabel,
+                                value: formatDuration(
+                                  Duration(
+                                    seconds: prefs.restIntervalSeconds.value,
+                                  ),
+                                ),
+                                valueColor: TimerColors.restFg(context),
+                                onTap: () => _showTimeIntervalPicker(
+                                  context,
+                                  prefs.restIntervalSeconds,
+                                  timer,
                                 ),
                               ),
-                              valueColor: TimerColors.restFg(context),
-                              onTap: () => _showTimeIntervalPicker(
-                                context,
-                                prefs.restIntervalSeconds,
-                                timer,
+                            if (prefs.timerType.value == TimerType.tabata.index)
+                              _IntervalSetupRow(
+                                label: l10n.timerSettingsRoundsLabel,
+                                value: prefs.rounds.value.toString(),
+                                valueColor: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface,
+                                onTap: () => _showRoundsPicker(
+                                  context,
+                                  prefs.rounds,
+                                  timer,
+                                ),
+                                showDivider: false,
                               ),
-                            ),
-                            _IntervalSetupRow(
-                              label: l10n.timerSettingsRoundsLabel,
-                              value: prefs.rounds.value.toString(),
-                              valueColor: Theme.of(
-                                context,
-                              ).colorScheme.onSurface,
-                              onTap: () => _showRoundsPicker(
-                                context,
-                                prefs.rounds,
-                                timer,
-                              ),
-                              showDivider: false,
-                            ),
                           ],
                         ),
                       ),
@@ -338,17 +343,17 @@ class _IntervalSetupRow extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
             Text(
               value,
               style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
+                fontSize: 28,
+                fontWeight: FontWeight.w900,
                 color: valueColor,
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
