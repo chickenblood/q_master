@@ -27,7 +27,10 @@ final class DodGameView extends StatelessWidget {
             textScaler: MediaQuery.textScalerOf(
               context,
             ).clamp(maxScaleFactor: 1.6),
-            style: TextStyle(color: Colors.white),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+            ),
           ),
         ),
         body: const Center(child: DodecahedronShader()),

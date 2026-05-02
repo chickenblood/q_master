@@ -29,7 +29,12 @@ final class DeckOfPainGameView extends StatelessWidget {
           ),
           title: PlatformText(
             L10n.of(context)!.dopGameScreenTitle,
-            style: TextStyle(color: Colors.white),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+            ),
             textScaler: MediaQuery.textScalerOf(
               context,
             ).clamp(maxScaleFactor: 1.6),
