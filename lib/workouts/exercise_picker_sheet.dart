@@ -172,6 +172,94 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     );
   }
 
+  Widget _filterChips(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      switchInCurve: Curves.easeOut,
+      switchOutCurve: Curves.easeOut,
+      transitionBuilder: (child, animation) {
+        return FadeTransition(opacity: animation, child: child);
+      },
+      child: Column(
+        key: const ValueKey('picker-content'),
+        crossAxisAlignment: .stretch,
+        children: [
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final category in _orderedCategories)
+                FilterChip(
+                  label: Text(category.displayLabel(context)),
+                  selected: _selectedCategories.contains(category),
+                  onSelected: (_) => _toggleCategory(category),
+                  showCheckmark: false,
+                  labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    fontSize: 12,
+                    fontWeight: .w700,
+                    color: _selectedCategories.contains(category)
+                        ? colorScheme.onPrimary
+                        : colorScheme.onSurfaceVariant,
+                  ),
+                  backgroundColor: colorScheme.surfaceContainerHighest,
+                  selectedColor: colorScheme.primary,
+                  side: BorderSide(
+                    width: 1.5,
+                    color: _selectedCategories.contains(category)
+                        ? colorScheme.primary
+                        : colorScheme.outlineVariant,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  materialTapTargetSize: .shrinkWrap,
+                ),
+              FilterChip(
+                label: Text(L10n.of(context)!.exerciseFilterVideoLabel),
+                selected: _videoFilter,
+                onSelected: (_) => setState(() {
+                  _videoFilter = !_videoFilter;
+                  SharedAppPrefs.instance.exerciseVideoFilter.value =
+                      _videoFilter;
+                }),
+                showCheckmark: false,
+                avatar: Icon(
+                  Icons.ondemand_video,
+                  size: 18,
+                  color: _videoFilter
+                      ? colorScheme.onPrimary
+                      : colorScheme.onSurfaceVariant,
+                ),
+                labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  fontSize: 12,
+                  fontWeight: .w700,
+                  color: _videoFilter
+                      ? colorScheme.onPrimary
+                      : colorScheme.onSurfaceVariant,
+                ),
+                backgroundColor: colorScheme.surfaceContainerHighest,
+                selectedColor: colorScheme.primary,
+                side: BorderSide(
+                  width: 1.5,
+                  color: _videoFilter
+                      ? colorScheme.primary
+                      : colorScheme.outlineVariant,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                materialTapTargetSize: .shrinkWrap,
+              ),
+            ],
+          ),
+          SizedBox(height: 4),
+        ],
+      ),
+    );
+  }
+
   Widget _exerciseGrid(BuildContext context, {required int gridColumnCount}) {
     final colorScheme = Theme.of(context).colorScheme;
     return SliverGrid(
@@ -252,7 +340,6 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final isLandscape = MediaQuery.orientationOf(context) == .landscape;
     final gridColumnCount = isLandscape ? 4 : 2;
 
@@ -266,7 +353,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
       builder: (_, scrollController) => Column(
         children: [
           Container(
-            padding: EdgeInsets.fromLTRB(8, 0, 8, 8),
+            padding: EdgeInsets.symmetric(horizontal: 8),
             color: Theme.of(context).scaffoldBackgroundColor,
             child: Column(
               mainAxisSize: .min,
@@ -309,102 +396,6 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                     ),
                   ],
                 ),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  switchInCurve: Curves.easeOut,
-                  switchOutCurve: Curves.easeOut,
-                  transitionBuilder: (child, animation) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
-                  child: Column(
-                    key: const ValueKey('picker-content'),
-                    crossAxisAlignment: .stretch,
-                    children: [
-                      const SizedBox(height: 12),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: [
-                          for (final category in _orderedCategories)
-                            FilterChip(
-                              label: Text(category.displayLabel(context)),
-                              selected: _selectedCategories.contains(category),
-                              onSelected: (_) => _toggleCategory(category),
-                              showCheckmark: false,
-                              labelStyle: Theme.of(context)
-                                  .textTheme
-                                  .labelMedium
-                                  ?.copyWith(
-                                    fontSize: 12,
-                                    fontWeight: .w700,
-                                    color:
-                                        _selectedCategories.contains(category)
-                                        ? colorScheme.onPrimary
-                                        : colorScheme.onSurfaceVariant,
-                                  ),
-                              backgroundColor:
-                                  colorScheme.surfaceContainerHighest,
-                              selectedColor: colorScheme.primary,
-                              side: BorderSide(
-                                width: 1.5,
-                                color: _selectedCategories.contains(category)
-                                    ? colorScheme.primary
-                                    : colorScheme.outlineVariant,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              materialTapTargetSize: .shrinkWrap,
-                            ),
-                          FilterChip(
-                            label: Text(
-                              L10n.of(context)!.exerciseFilterVideoLabel,
-                            ),
-                            selected: _videoFilter,
-                            onSelected: (_) => setState(() {
-                              _videoFilter = !_videoFilter;
-                              SharedAppPrefs
-                                      .instance
-                                      .exerciseVideoFilter
-                                      .value =
-                                  _videoFilter;
-                            }),
-                            showCheckmark: false,
-                            avatar: Icon(
-                              Icons.ondemand_video,
-                              size: 18,
-                              color: _videoFilter
-                                  ? colorScheme.onPrimary
-                                  : colorScheme.onSurfaceVariant,
-                            ),
-                            labelStyle: Theme.of(context).textTheme.labelMedium
-                                ?.copyWith(
-                                  fontSize: 12,
-                                  fontWeight: .w700,
-                                  color: _videoFilter
-                                      ? colorScheme.onPrimary
-                                      : colorScheme.onSurfaceVariant,
-                                ),
-                            backgroundColor:
-                                colorScheme.surfaceContainerHighest,
-                            selectedColor: colorScheme.primary,
-                            side: BorderSide(
-                              width: 1.5,
-                              color: _videoFilter
-                                  ? colorScheme.primary
-                                  : colorScheme.outlineVariant,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            materialTapTargetSize: .shrinkWrap,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 4),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),
@@ -412,6 +403,13 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
             child: CustomScrollView(
               controller: scrollController,
               slivers: [
+                PinnedHeaderSliver(
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    child: _filterChips(context),
+                  ),
+                ),
                 SliverSafeArea(
                   sliver: _exerciseGrid(
                     context,
