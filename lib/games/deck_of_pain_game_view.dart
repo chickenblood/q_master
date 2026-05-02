@@ -29,9 +29,7 @@ final class DeckOfPainGameView extends StatelessWidget {
           ),
           title: PlatformText(
             L10n.of(context)!.dopGameScreenTitle,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w800,
               color: Colors.white,
             ),

@@ -6,11 +6,13 @@ final class DismissibleRow extends StatelessWidget {
   const DismissibleRow({
     required super.key,
     required this.onDismissed,
+    this.enabled = true,
     this.backgroundPadding = const EdgeInsets.fromLTRB(24, 0, 24, 0),
     this.confirmDismiss,
     required this.child,
   });
 
+  final bool enabled;
   final EdgeInsets backgroundPadding;
   final ConfirmDismissCallback? confirmDismiss;
   final void Function(DismissDirection) onDismissed;
@@ -30,7 +32,7 @@ final class DismissibleRow extends StatelessWidget {
           children: [const Icon(Icons.delete, color: Colors.white)],
         ),
       ),
-      direction: DismissDirection.endToStart,
+      direction: enabled ? .endToStart : .none,
       child: child,
     );
   }

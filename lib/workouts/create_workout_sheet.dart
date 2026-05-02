@@ -370,6 +370,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                     final isLastItem = exerciseIndex == (exercises.length - 1);
                     return DismissibleRow(
                       key: ValueKey('dismissible_$exercise$exerciseIndex'),
+                      enabled: _displayMode == DisplayMode.edit,
                       onDismissed: (direction) {
                         setState(() {
                           exercises.removeAt(exerciseIndex);
@@ -571,9 +572,10 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     required List<String> exercises,
     required int sectionIndex,
   }) {
-    final isEditingMode = _displayMode == DisplayMode.edit;
+    final isEditingMode = _displayMode == .edit;
     return DismissibleRow(
       key: ValueKey('dismissible_$sectionTitle'),
+      enabled: isEditingMode,
       onDismissed: (_) {
         setState(() {
           _sections.remove(sectionTitle);
@@ -715,18 +717,18 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
         SliverAppBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           leading: PlatformIconButton(
-            icon: _displayMode == DisplayMode.display
+            icon: _displayMode == .display
                 ? Icon(PlatformIcons(context).back)
                 : Icon(AdaptiveIcons.close),
             cupertino: (context, platform) =>
                 CupertinoIconButtonData(padding: EdgeInsets.only(right: 8)),
             onPressed: () {
-              if (_displayMode == DisplayMode.display) {
+              if (_displayMode == .display) {
                 Navigator.of(context).pop();
                 return;
               }
               setState(() {
-                _displayMode = DisplayMode.display;
+                _displayMode = .display;
                 _updateUiFromWorkout(_storedWorkout!);
               });
             },
