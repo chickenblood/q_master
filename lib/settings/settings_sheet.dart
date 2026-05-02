@@ -219,8 +219,8 @@ class _SettingsSheet extends ConsumerWidget {
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               leading: PlatformIconButton(
                 padding: Theme.of(context).platform == .iOS
-                    ? EdgeInsets.only(right: 24)
-                    : EdgeInsets.zero,
+                    ? EdgeInsets.only(right: 22)
+                    : EdgeInsets.only(right: 14),
                 icon: Icon(AdaptiveIcons.close),
                 onPressed: () => Navigator.pop(context),
               ),
