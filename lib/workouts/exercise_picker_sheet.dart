@@ -318,7 +318,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                   },
                   child: Column(
                     key: const ValueKey('picker-content'),
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    crossAxisAlignment: .stretch,
                     children: [
                       const SizedBox(height: 12),
                       Wrap(
@@ -335,18 +335,8 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                   .textTheme
                                   .labelMedium
                                   ?.copyWith(
-                                    fontSize:
-                                        Theme.of(
-                                              context,
-                                            ).textTheme.labelMedium?.fontSize !=
-                                            null
-                                        ? Theme.of(context)
-                                                  .textTheme
-                                                  .labelMedium!
-                                                  .fontSize! +
-                                              2
-                                        : 12,
-                                    fontWeight: FontWeight.w700,
+                                    fontSize: 12,
+                                    fontWeight: .w700,
                                     color:
                                         _selectedCategories.contains(category)
                                         ? colorScheme.onPrimary
@@ -364,8 +354,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
+                              materialTapTargetSize: .shrinkWrap,
                             ),
                           FilterChip(
                             label: Text(
@@ -390,17 +379,8 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                             ),
                             labelStyle: Theme.of(context).textTheme.labelMedium
                                 ?.copyWith(
-                                  fontSize:
-                                      Theme.of(
-                                            context,
-                                          ).textTheme.labelMedium?.fontSize !=
-                                          null
-                                      ? Theme.of(
-                                              context,
-                                            ).textTheme.labelMedium!.fontSize! +
-                                            2
-                                      : 12,
-                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12,
+                                  fontWeight: .w700,
                                   color: _videoFilter
                                       ? colorScheme.onPrimary
                                       : colorScheme.onSurfaceVariant,
@@ -417,8 +397,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
+                            materialTapTargetSize: .shrinkWrap,
                           ),
                         ],
                       ),
