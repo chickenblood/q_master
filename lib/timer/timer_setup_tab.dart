@@ -277,7 +277,7 @@ class TimerSetupTab extends ConsumerWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 24),
               child: SizedBox(
                 height: 62,
                 child: ActionButton(

@@ -490,7 +490,21 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   }
 
   List<Widget> _rightAppBarButtonActions(BuildContext context) {
-    if (_displayMode == .display) return [];
+    if (_displayMode == .display) {
+      return [
+        PlatformIconButton(
+          icon: Icon(PlatformIcons(context).edit),
+          onPressed: () => setState(() => _displayMode = .edit),
+        ),
+        PlatformIconButton(
+          icon: Icon(PlatformIcons(context).playArrowSolid),
+          onPressed: () => widget.onShowBeatdownBrowser?.call(
+            context,
+            _buildWorkoutFromUi(),
+          ),
+        ),
+      ];
+    }
     return [
       ListenableBuilder(
         listenable: Listenable.merge([_nameTextController]),
