@@ -276,6 +276,13 @@ ThemeData darkTheme() {
       type: BottomNavigationBarType.fixed,
       elevation: 0,
     ),
+    bottomSheetTheme: const BottomSheetThemeData(
+      dragHandleSize: Size(60, 4),
+      dragHandleColor: textSecondary,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+    ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
         backgroundColor: _f3Red,
@@ -445,6 +452,13 @@ ThemeData lightTheme() {
       unselectedItemColor: textSecondary,
       type: BottomNavigationBarType.fixed,
       elevation: 0,
+    ),
+    bottomSheetTheme: const BottomSheetThemeData(
+      dragHandleSize: Size(60, 4),
+      dragHandleColor: textSecondary,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(

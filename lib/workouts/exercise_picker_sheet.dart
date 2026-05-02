@@ -23,9 +23,7 @@ Future<String?> showExercisePicker(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
-    elevation: 4,
-    backgroundColor: colorScheme.surface,
-    clipBehavior: Clip.antiAlias,
+    clipBehavior: .antiAlias,
     shape: RoundedRectangleBorder(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       side: BorderSide(color: colorScheme.outlineVariant),
@@ -161,12 +159,14 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   }
 
   Widget _dragHandle() {
+    final bottomSheetTheme = Theme.of(context).bottomSheetTheme;
+    final dragHandleSize = bottomSheetTheme.dragHandleSize ?? const Size(60, 4);
     return Container(
-      width: 60,
-      height: 4,
+      width: dragHandleSize.width,
+      height: dragHandleSize.height,
       margin: const EdgeInsets.only(top: 12, bottom: 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.outline,
+        color: bottomSheetTheme.dragHandleColor!,
         borderRadius: BorderRadius.circular(2),
       ),
     );
@@ -259,136 +259,78 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     return DraggableScrollableSheet(
       expand: false,
       snap: true,
-      snapSizes: [0.75, 1.0],
-      builder: (_, scrollController) => CustomScrollView(
-        controller: scrollController,
-        slivers: [
-          PinnedHeaderSliver(
-            child: Container(
-              padding: EdgeInsets.fromLTRB(8, 0, 8, 8),
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: Column(
-                children: [
-                  _dragHandle(),
-                  Row(
+      shouldCloseOnMinExtent: false,
+      minChildSize: 0.5,
+      maxChildSize: 0.9,
+      snapSizes: [0.5, 0.75, 0.9],
+      builder: (_, scrollController) => Column(
+        children: [
+          Container(
+            padding: EdgeInsets.fromLTRB(8, 0, 8, 8),
+            color: Theme.of(context).scaffoldBackgroundColor,
+            child: Column(
+              mainAxisSize: .min,
+              children: [
+                _dragHandle(),
+                Row(
+                  children: [
+                    Expanded(
+                      child: WorkoutAutocompleteTextField(
+                        textEditingController: widget.controller,
+                        autofocus: true,
+                        minLines: 1,
+                        maxLines: 1,
+                        onSubmitted: _addExercise,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      height: 40,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
+                          foregroundColor: Theme.of(
+                            context,
+                          ).colorScheme.onPrimary,
+                          textStyle: Theme.of(context).textTheme.labelLarge,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                        ),
+                        onPressed: _canAdd ? _addExercise : null,
+                        child: Text(
+                          L10n.of(context)!.exercisePickerAddButtonLabel,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  switchInCurve: Curves.easeOut,
+                  switchOutCurve: Curves.easeOut,
+                  transitionBuilder: (child, animation) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                  child: Column(
+                    key: const ValueKey('picker-content'),
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Expanded(
-                        child: WorkoutAutocompleteTextField(
-                          textEditingController: widget.controller,
-                          autofocus: true,
-                          minLines: 1,
-                          maxLines: 1,
-                          onSubmitted: _addExercise,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      SizedBox(
-                        height: 40,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.primary,
-                            foregroundColor: Theme.of(
-                              context,
-                            ).colorScheme.onPrimary,
-                            textStyle: Theme.of(context).textTheme.labelLarge,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            elevation: 0,
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                          ),
-                          onPressed: _canAdd ? _addExercise : null,
-                          child: Text(
-                            L10n.of(context)!.exercisePickerAddButtonLabel,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 200),
-                    switchInCurve: Curves.easeOut,
-                    switchOutCurve: Curves.easeOut,
-                    transitionBuilder: (child, animation) {
-                      return FadeTransition(opacity: animation, child: child);
-                    },
-                    child: Column(
-                      key: const ValueKey('picker-content'),
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            for (final category in _orderedCategories)
-                              FilterChip(
-                                label: Text(category.displayLabel(context)),
-                                selected: _selectedCategories.contains(
-                                  category,
-                                ),
-                                onSelected: (_) => _toggleCategory(category),
-                                showCheckmark: false,
-                                labelStyle: Theme.of(context)
-                                    .textTheme
-                                    .labelMedium
-                                    ?.copyWith(
-                                      fontSize:
-                                          Theme.of(context)
-                                                  .textTheme
-                                                  .labelMedium
-                                                  ?.fontSize !=
-                                              null
-                                          ? Theme.of(context)
-                                                    .textTheme
-                                                    .labelMedium!
-                                                    .fontSize! +
-                                                2
-                                          : 12,
-                                      fontWeight: FontWeight.w700,
-                                      color:
-                                          _selectedCategories.contains(category)
-                                          ? colorScheme.onPrimary
-                                          : colorScheme.onSurfaceVariant,
-                                    ),
-                                backgroundColor:
-                                    colorScheme.surfaceContainerHighest,
-                                selectedColor: colorScheme.primary,
-                                side: BorderSide(
-                                  width: 1.5,
-                                  color: _selectedCategories.contains(category)
-                                      ? colorScheme.primary
-                                      : colorScheme.outlineVariant,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                              ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          for (final category in _orderedCategories)
                             FilterChip(
-                              label: Text(
-                                L10n.of(context)!.exerciseFilterVideoLabel,
-                              ),
-                              selected: _videoFilter,
-                              onSelected: (_) => setState(() {
-                                _videoFilter = !_videoFilter;
-                                SharedAppPrefs
-                                        .instance
-                                        .exerciseVideoFilter
-                                        .value =
-                                    _videoFilter;
-                              }),
+                              label: Text(category.displayLabel(context)),
+                              selected: _selectedCategories.contains(category),
+                              onSelected: (_) => _toggleCategory(category),
                               showCheckmark: false,
-                              avatar: Icon(
-                                Icons.ondemand_video,
-                                size: 18,
-                                color: _videoFilter
-                                    ? colorScheme.onPrimary
-                                    : colorScheme.onSurfaceVariant,
-                              ),
                               labelStyle: Theme.of(context)
                                   .textTheme
                                   .labelMedium
@@ -405,7 +347,8 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                                               2
                                         : 12,
                                     fontWeight: FontWeight.w700,
-                                    color: _videoFilter
+                                    color:
+                                        _selectedCategories.contains(category)
                                         ? colorScheme.onPrimary
                                         : colorScheme.onSurfaceVariant,
                                   ),
@@ -414,7 +357,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                               selectedColor: colorScheme.primary,
                               side: BorderSide(
                                 width: 1.5,
-                                color: _videoFilter
+                                color: _selectedCategories.contains(category)
                                     ? colorScheme.primary
                                     : colorScheme.outlineVariant,
                               ),
@@ -424,18 +367,80 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                               materialTapTargetSize:
                                   MaterialTapTargetSize.shrinkWrap,
                             ),
-                          ],
-                        ),
-                        SizedBox(height: 4),
-                      ],
-                    ),
+                          FilterChip(
+                            label: Text(
+                              L10n.of(context)!.exerciseFilterVideoLabel,
+                            ),
+                            selected: _videoFilter,
+                            onSelected: (_) => setState(() {
+                              _videoFilter = !_videoFilter;
+                              SharedAppPrefs
+                                      .instance
+                                      .exerciseVideoFilter
+                                      .value =
+                                  _videoFilter;
+                            }),
+                            showCheckmark: false,
+                            avatar: Icon(
+                              Icons.ondemand_video,
+                              size: 18,
+                              color: _videoFilter
+                                  ? colorScheme.onPrimary
+                                  : colorScheme.onSurfaceVariant,
+                            ),
+                            labelStyle: Theme.of(context).textTheme.labelMedium
+                                ?.copyWith(
+                                  fontSize:
+                                      Theme.of(
+                                            context,
+                                          ).textTheme.labelMedium?.fontSize !=
+                                          null
+                                      ? Theme.of(
+                                              context,
+                                            ).textTheme.labelMedium!.fontSize! +
+                                            2
+                                      : 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: _videoFilter
+                                      ? colorScheme.onPrimary
+                                      : colorScheme.onSurfaceVariant,
+                                ),
+                            backgroundColor:
+                                colorScheme.surfaceContainerHighest,
+                            selectedColor: colorScheme.primary,
+                            side: BorderSide(
+                              width: 1.5,
+                              color: _videoFilter
+                                  ? colorScheme.primary
+                                  : colorScheme.outlineVariant,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          SliverSafeArea(
-            sliver: _exerciseGrid(context, gridColumnCount: gridColumnCount),
+          Expanded(
+            child: CustomScrollView(
+              controller: scrollController,
+              slivers: [
+                SliverSafeArea(
+                  sliver: _exerciseGrid(
+                    context,
+                    gridColumnCount: gridColumnCount,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
