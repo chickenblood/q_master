@@ -162,13 +162,13 @@ TextTheme _textTheme(Color primary, Color secondary) => TextTheme(
   ),
   titleLarge: TextStyle(
     color: primary,
-    fontSize: 19,
+    fontSize: 24,
     fontWeight: FontWeight.w900,
     letterSpacing: -0.4,
   ),
   titleMedium: TextStyle(
     color: primary,
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: FontWeight.w800,
     letterSpacing: -0.2,
   ),
@@ -177,8 +177,8 @@ TextTheme _textTheme(Color primary, Color secondary) => TextTheme(
     fontSize: 16,
     fontWeight: FontWeight.w400,
   ),
-  bodyLarge: TextStyle(color: primary, fontSize: 16),
-  bodyMedium: TextStyle(color: secondary, fontSize: 13),
+  bodyLarge: TextStyle(color: primary, fontSize: 18),
+  bodyMedium: TextStyle(color: secondary, fontSize: 16),
   bodySmall: TextStyle(color: secondary, fontSize: 12),
   labelLarge: TextStyle(
     color: primary,
@@ -187,7 +187,7 @@ TextTheme _textTheme(Color primary, Color secondary) => TextTheme(
   ),
   labelMedium: TextStyle(
     color: secondary,
-    fontSize: 10,
+    fontSize: 14,
     fontWeight: FontWeight.w600,
   ),
   labelSmall: TextStyle(

@@ -418,7 +418,6 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                                                 color: Theme.of(
                                                   context,
                                                 ).textTheme.bodyLarge?.color,
-                                                fontSize: 16,
                                               ),
                                           maxLines: 2,
                                           overflow: .ellipsis,
