@@ -642,7 +642,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     top: false,
     sliver: SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+        padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           spacing: 8,
