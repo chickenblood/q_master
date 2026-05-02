@@ -345,7 +345,7 @@ class _IntervalSetupRow extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w500,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
