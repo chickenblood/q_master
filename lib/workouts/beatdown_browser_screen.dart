@@ -156,11 +156,14 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                           Text(
                             textAlign: .center,
                             sectionName.toUpperCase(),
+                            maxLines: 1,
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 1.2,
                               color: Theme.of(context).colorScheme.onPrimary,
+
+                              overflow: .ellipsis,
                             ),
                           ),
                         ],
