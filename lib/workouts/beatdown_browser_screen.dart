@@ -136,36 +136,35 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                       color: Theme.of(context).colorScheme.primary,
                       width: double.infinity,
                       height: 44,
-                      child: Stack(
-                        alignment: .center,
+                      child: Row(
                         children: [
-                          Positioned(
-                            left: 0,
-                            child: PlatformIconButton(
-                              icon: Icon(
-                                PlatformIcons(context).back,
-                                color: Theme.of(context).colorScheme.onPrimary,
-                                size: 24,
-                              ),
-                              onPressed: () => Navigator.of(context).pop(),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            textAlign: .center,
-                            sectionName.toUpperCase(),
-                            maxLines: 1,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.2,
+                          PlatformIconButton(
+                            icon: Icon(
+                              PlatformIcons(context).back,
                               color: Theme.of(context).colorScheme.onPrimary,
+                              size: 24,
+                            ),
+                            onPressed: () => Navigator.of(context).pop(),
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                          ),
+                          Expanded(
+                            child: Text(
+                              textAlign: .center,
+                              sectionName.toUpperCase(),
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.2,
+                                color: Theme.of(context).colorScheme.onPrimary,
 
-                              overflow: .ellipsis,
+                                overflow: .ellipsis,
+                              ),
                             ),
                           ),
+                          const SizedBox(
+                            width: 32,
+                          ), // To balance the back button
                         ],
                       ),
                     ),
