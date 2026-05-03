@@ -136,13 +136,14 @@ class TimerSetupTab extends ConsumerWidget {
                               Text(
                                 l10n.timerModeLabel
                                     .toUpperCase(), // Localized: "Mode"
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: .1,
-                                  color: Theme.of(context).colorScheme.primary,
-                                  textBaseline: TextBaseline.alphabetic,
-                                ),
+                                style: Theme.of(context).textTheme.labelLarge
+                                    ?.copyWith(
+                                      letterSpacing: .1,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                      textBaseline: TextBaseline.alphabetic,
+                                    ),
                               ),
                               const SizedBox(height: 10),
                               SizedBox(
@@ -203,12 +204,13 @@ class TimerSetupTab extends ConsumerWidget {
                               child: Text(
                                 l10n.timerIntervalsLabel
                                     .toUpperCase(), // Localized: "Intervals — tap to change"
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: .1,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
+                                style: Theme.of(context).textTheme.labelLarge
+                                    ?.copyWith(
+                                      letterSpacing: 1.0,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                    ),
                               ),
                             ),
                             _IntervalSetupRow(

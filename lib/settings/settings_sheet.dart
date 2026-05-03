@@ -276,9 +276,7 @@ final class _SettingsCard extends StatelessWidget {
             ),
             child: Text(
               header.toUpperCase(),
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
                 letterSpacing: 1.0,
                 color: Theme.of(context).colorScheme.primary,
               ),
