@@ -192,7 +192,7 @@ TextTheme _textTheme(Color primary, Color secondary) => TextTheme(
   ),
   labelSmall: TextStyle(
     color: primary,
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: FontWeight.w800,
     letterSpacing: 1.0,
   ),

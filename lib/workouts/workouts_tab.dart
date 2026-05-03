@@ -285,6 +285,7 @@ final class _WorkoutTile extends StatelessWidget {
   Widget build(BuildContext context) {
     const padding = EdgeInsets.symmetric(horizontal: 16, vertical: 14);
     final isIOS = Theme.of(context).platform == TargetPlatform.iOS;
+    const maxSectionsToDisplayInTile = 3;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -322,7 +323,9 @@ final class _WorkoutTile extends StatelessWidget {
                       spacing: 5,
                       runSpacing: 4,
                       children: [
-                        for (final section in workout.sections)
+                        for (final section in workout.sections.take(
+                          maxSectionsToDisplayInTile,
+                        ))
                           _SectionChip(name: section.name),
                       ],
                     ),
