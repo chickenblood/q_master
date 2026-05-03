@@ -57,13 +57,6 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     widget.onExerciseAdded(selection);
     // Clear text so that the user can easily add another exercise.
     widget.controller.clear();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(L10n.of(context)!.exerciseAddedSnackbarMessage),
-        duration: const Duration(milliseconds: 500),
-      ),
-    );
   }
 
   late final Set<ExerciseCategory> _selectedCategories;
@@ -404,6 +397,11 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                     ),
                   ],
                 ),
+                Container(
+                  padding: EdgeInsets.all(8),
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  child: _filterChips(context),
+                ),
               ],
             ),
           ),
@@ -411,13 +409,17 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
             child: CustomScrollView(
               controller: scrollController,
               slivers: [
-                PinnedHeaderSliver(
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    child: _filterChips(context),
-                  ),
-                ),
+                // Disabled, since not happy with behavior when trying to
+                // drag down from the header. It requires grid content to
+                // be scrolled all the waytto the top first. Dragging up is
+                // okay.
+                // PinnedHeaderSliver(
+                //   child: Container(
+                //     padding: EdgeInsets.all(8),
+                //     color: Theme.of(context).scaffoldBackgroundColor,
+                //     child: _filterChips(context),
+                //   ),
+                // ),
                 SliverSafeArea(
                   sliver: _exerciseGrid(
                     context,
