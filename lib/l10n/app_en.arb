@@ -276,6 +276,10 @@
     "@dodShakeToRollDiceMessage": {
       "description": "Instruction shown on the Dodecahedron of Doom screen before rolling."
     },
+    "exerciseAddedSnackbarMessage": "Added exercise",
+    "@exerciseAddedSnackbarMessage": {
+      "description": "Snackbar message shown when an exercise is added to a workout, confirming the action to the user."
+    },
     "themeSettingsTitle": "Theme",
     "@themeSettingsTitle": {
       "description": "Section header for theme options in Settings."

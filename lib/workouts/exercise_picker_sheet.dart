@@ -57,6 +57,13 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     widget.onExerciseAdded(selection);
     // Clear text so that the user can easily add another exercise.
     widget.controller.clear();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(L10n.of(context)!.exerciseAddedSnackbarMessage),
+        duration: const Duration(milliseconds: 500),
+      ),
+    );
   }
 
   late final Set<ExerciseCategory> _selectedCategories;
