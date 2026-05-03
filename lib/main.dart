@@ -96,132 +96,138 @@ class MainApp extends ConsumerWidget with WidgetsBindingObserver {
           materialTheme: darkTheme(),
         ),
         themeMode: ThemeMode.values[SharedAppPrefs.instance.theme.value],
-        builder: (context) => PlatformApp(
-          title: 'Q Master',
-          localizationsDelegates: L10n.localizationsDelegates,
-          supportedLocales: L10n.supportedLocales,
-          navigatorKey: _navigatorKey,
-          debugShowCheckedModeBanner: false,
-          home: Builder(
-            builder: (context) {
-              // Red 2px top-of-tab indicator for active tab — Option 3 identity.
-              BottomNavigationBarItem tabItem(IconData icon, String label) {
-                const double iconBoxHeight = 40;
-                const double iconSize = 24;
-                final theme = Theme.of(context);
-                final colorScheme = theme.colorScheme;
-                // Removed unused isDark variable
-                final indicator = Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Container(
-                      width: 28,
-                      height: 2,
-                      decoration: BoxDecoration(
-                        color: colorScheme.primary,
-                        borderRadius: const BorderRadius.vertical(
-                          bottom: Radius.circular(2),
+        builder: (context) => ScaffoldMessenger(
+          child: PlatformApp(
+            title: 'Q Master',
+            localizationsDelegates: L10n.localizationsDelegates,
+            supportedLocales: L10n.supportedLocales,
+            navigatorKey: _navigatorKey,
+            debugShowCheckedModeBanner: false,
+            home: Builder(
+              builder: (context) {
+                // Red 2px top-of-tab indicator for active tab — Option 3 identity.
+                BottomNavigationBarItem tabItem(IconData icon, String label) {
+                  const double iconBoxHeight = 40;
+                  const double iconSize = 24;
+                  final theme = Theme.of(context);
+                  final colorScheme = theme.colorScheme;
+                  // Removed unused isDark variable
+                  final indicator = Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: Container(
+                        width: 28,
+                        height: 2,
+                        decoration: BoxDecoration(
+                          color: colorScheme.primary,
+                          borderRadius: const BorderRadius.vertical(
+                            bottom: Radius.circular(2),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                );
-                Widget iconWidget({bool active = false}) => SizedBox(
-                  height: iconBoxHeight,
-                  width: iconBoxHeight,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      if (active) indicator,
-                      // Shift icon down by 4 pixels
-                      Positioned(
-                        top: 4,
-                        left: 0,
-                        right: 0,
-                        child: Icon(
-                          icon,
-                          size: iconSize,
-                          color: active
-                              ? colorScheme.onSurface
-                              : colorScheme.onSurfaceVariant,
+                  );
+                  Widget iconWidget({bool active = false}) => SizedBox(
+                    height: iconBoxHeight,
+                    width: iconBoxHeight,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        if (active) indicator,
+                        // Shift icon down by 4 pixels
+                        Positioned(
+                          top: 4,
+                          left: 0,
+                          right: 0,
+                          child: Icon(
+                            icon,
+                            size: iconSize,
+                            color: active
+                                ? colorScheme.onSurface
+                                : colorScheme.onSurfaceVariant,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-                return BottomNavigationBarItem(
-                  icon: iconWidget(active: false),
-                  activeIcon: iconWidget(active: true),
-                  label: label,
-                );
-              }
+                      ],
+                    ),
+                  );
+                  return BottomNavigationBarItem(
+                    icon: iconWidget(active: false),
+                    activeIcon: iconWidget(active: true),
+                    label: label,
+                  );
+                }
 
-              return PlatformTabScaffold(
-                tabController: _tabController,
-                bodyBuilder: (_, index) =>
-                    _TabsContainer(selectedIndex: index, children: _tabPages),
-                material3Tabs: (tabBarContext, _) {
-                  // Removed unused isDark variable
-                  final theme = Theme.of(tabBarContext);
-                  final colorScheme = theme.colorScheme;
-                  return MaterialNavigationBarData(
-                    indicatorColor: Colors.transparent,
-                    labelTextStyle: WidgetStateProperty.resolveWith((states) {
-                      final isSelected = states.contains(WidgetState.selected);
-                      final color = isSelected
-                          ? colorScheme.onSurface
-                          : colorScheme.onSurfaceVariant;
-                      return theme.textTheme.labelMedium?.copyWith(
-                        color: color,
-                      );
-                    }),
-                  );
-                },
-                materialBuilder: (tabBarContext, _, index) =>
-                    MaterialTabScaffoldData(
-                      height: _shouldShowTabBar(tabBarContext) ? null : 0,
-                      tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
-                          ? null
-                          : Colors.transparent,
+                return PlatformTabScaffold(
+                  tabController: _tabController,
+                  bodyBuilder: (_, index) =>
+                      _TabsContainer(selectedIndex: index, children: _tabPages),
+                  material3Tabs: (tabBarContext, _) {
+                    // Removed unused isDark variable
+                    final theme = Theme.of(tabBarContext);
+                    final colorScheme = theme.colorScheme;
+                    return MaterialNavigationBarData(
+                      indicatorColor: Colors.transparent,
+                      labelTextStyle: WidgetStateProperty.resolveWith((states) {
+                        final isSelected = states.contains(
+                          WidgetState.selected,
+                        );
+                        final color = isSelected
+                            ? colorScheme.onSurface
+                            : colorScheme.onSurfaceVariant;
+                        return theme.textTheme.labelMedium?.copyWith(
+                          color: color,
+                        );
+                      }),
+                    );
+                  },
+                  materialBuilder: (tabBarContext, _, index) =>
+                      MaterialTabScaffoldData(
+                        height: _shouldShowTabBar(tabBarContext) ? null : 0,
+                        tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
+                            ? null
+                            : Colors.transparent,
+                      ),
+                  cupertinoTabs: (tabBarContext, _) {
+                    // Removed unused isDark variable
+                    final theme = Theme.of(tabBarContext);
+                    final colorScheme = theme.colorScheme;
+                    return CupertinoTabBarData(
+                      activeColor: colorScheme.onSurface,
+                      inactiveColor: colorScheme.onSurfaceVariant,
+                    );
+                  },
+                  cupertinoBuilder: (tabBarContext, _, index) =>
+                      CupertinoTabScaffoldData(
+                        navBarHeight: _shouldShowTabBar(tabBarContext)
+                            ? null
+                            : 0,
+                        tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
+                            ? null
+                            : Colors.transparent,
+                      ),
+                  items: [
+                    tabItem(
+                      AdaptiveIcons.history,
+                      L10n.of(context)!.workoutsTabTitle,
                     ),
-                cupertinoTabs: (tabBarContext, _) {
-                  // Removed unused isDark variable
-                  final theme = Theme.of(tabBarContext);
-                  final colorScheme = theme.colorScheme;
-                  return CupertinoTabBarData(
-                    activeColor: colorScheme.onSurface,
-                    inactiveColor: colorScheme.onSurfaceVariant,
-                  );
-                },
-                cupertinoBuilder: (tabBarContext, _, index) =>
-                    CupertinoTabScaffoldData(
-                      navBarHeight: _shouldShowTabBar(tabBarContext) ? null : 0,
-                      tabsBackgroundColor: _shouldShowTabBar(tabBarContext)
-                          ? null
-                          : Colors.transparent,
+                    tabItem(
+                      AdaptiveIcons.sports,
+                      L10n.of(context)!.gamesTabTitle,
                     ),
-                items: [
-                  tabItem(
-                    AdaptiveIcons.history,
-                    L10n.of(context)!.workoutsTabTitle,
-                  ),
-                  tabItem(
-                    AdaptiveIcons.sports,
-                    L10n.of(context)!.gamesTabTitle,
-                  ),
-                  tabItem(
-                    AdaptiveIcons.timer,
-                    L10n.of(context)!.timerPageTitle,
-                  ),
-                  tabItem(
-                    AdaptiveIcons.location,
-                    L10n.of(context)!.nearMeTabTitle,
-                  ),
-                ],
-              );
-            },
+                    tabItem(
+                      AdaptiveIcons.timer,
+                      L10n.of(context)!.timerPageTitle,
+                    ),
+                    tabItem(
+                      AdaptiveIcons.location,
+                      L10n.of(context)!.nearMeTabTitle,
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),

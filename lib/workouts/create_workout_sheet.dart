@@ -248,12 +248,6 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           setState(() {
             exercises.add(exercise);
             _lastAddedItemGroup = sectionTitle;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(L10n.of(context)!.exerciseAddedSnackbarMessage),
-                duration: const Duration(milliseconds: 500),
-              ),
-            );
           });
         },
       );

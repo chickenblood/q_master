@@ -57,6 +57,13 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     widget.onExerciseAdded(selection);
     // Clear text so that the user can easily add another exercise.
     widget.controller.clear();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(L10n.of(context)!.exerciseAddedSnackbarMessage),
+        duration: const Duration(milliseconds: 500),
+      ),
+    );
   }
 
   late final Set<ExerciseCategory> _selectedCategories;
@@ -351,85 +358,86 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
       minChildSize: 0.7,
       maxChildSize: 0.9,
       snapSizes: [0.7, 0.9],
-      builder: (_, scrollController) => Column(
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            color: Theme.of(context).scaffoldBackgroundColor,
-            child: Column(
-              mainAxisSize: .min,
-              children: [
-                _dragHandle(),
-                Row(
-                  children: [
-                    Expanded(
-                      child: WorkoutAutocompleteTextField(
-                        textEditingController: widget.controller,
-                        //autofocus: true,
-                        minLines: 1,
-                        maxLines: 1,
-                        onSubmitted: _addExercise,
+      builder: (_, scrollController) => Scaffold(
+        body: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: Column(
+                mainAxisSize: .min,
+                children: [
+                  _dragHandle(),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: WorkoutAutocompleteTextField(
+                          textEditingController: widget.controller,
+                          minLines: 1,
+                          maxLines: 1,
+                          onSubmitted: _addExercise,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    SizedBox(
-                      height: 40,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primary,
-                          foregroundColor: Theme.of(
-                            context,
-                          ).colorScheme.onPrimary,
-                          textStyle: Theme.of(context).textTheme.labelLarge,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        height: 40,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            foregroundColor: Theme.of(
+                              context,
+                            ).colorScheme.onPrimary,
+                            textStyle: Theme.of(context).textTheme.labelLarge,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
                           ),
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                        ),
-                        onPressed: _canAdd ? _addExercise : null,
-                        child: Text(
-                          L10n.of(context)!.exercisePickerAddButtonLabel,
+                          onPressed: _canAdd ? _addExercise : null,
+                          child: Text(
+                            L10n.of(context)!.exercisePickerAddButtonLabel,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                Container(
-                  padding: EdgeInsets.all(8),
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  child: _filterChips(context),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: CustomScrollView(
-              controller: scrollController,
-              slivers: [
-                // Disabled, since not happy with behavior when trying to
-                // drag down from the header. It requires grid content to
-                // be scrolled all the waytto the top first. Dragging up is
-                // okay.
-                // PinnedHeaderSliver(
-                //   child: Container(
-                //     padding: EdgeInsets.all(8),
-                //     color: Theme.of(context).scaffoldBackgroundColor,
-                //     child: _filterChips(context),
-                //   ),
-                // ),
-                SliverSafeArea(
-                  sliver: _exerciseGrid(
-                    context,
-                    gridColumnCount: gridColumnCount,
+                    ],
                   ),
-                ),
-              ],
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    child: _filterChips(context),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            Expanded(
+              child: CustomScrollView(
+                controller: scrollController,
+                slivers: [
+                  // Disabled, since not happy with behavior when trying to
+                  // drag down from the header. It requires grid content to
+                  // be scrolled all the waytto the top first. Dragging up is
+                  // okay.
+                  // PinnedHeaderSliver(
+                  //   child: Container(
+                  //     padding: EdgeInsets.all(8),
+                  //     color: Theme.of(context).scaffoldBackgroundColor,
+                  //     child: _filterChips(context),
+                  //   ),
+                  // ),
+                  SliverSafeArea(
+                    sliver: _exerciseGrid(
+                      context,
+                      gridColumnCount: gridColumnCount,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
