@@ -99,21 +99,22 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
   Widget build(BuildContext context) {
     return PlatformScaffold(
       appBar: PlatformAppBar(
-        cupertino: (appBarContext, _) => CupertinoNavigationBarData(
-          backgroundColor: Colors.transparent,
-          leading: PlatformIconButton(
-            padding: EdgeInsets.only(right: 22),
-            icon: Icon(AdaptiveIcons.close),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          title: PlatformText(
-            L10n.of(context)!.generateWorkoutDialogTitle,
-            style: Theme.of(context).textTheme.titleMedium,
-            textScaler: MediaQuery.textScalerOf(
-              context,
-            ).clamp(maxScaleFactor: 1.6),
-          ),
+        leading: PlatformIconButton(
+          padding: EdgeInsets.only(right: 22),
+          icon: Icon(AdaptiveIcons.close),
+          onPressed: () => Navigator.of(context).pop(),
         ),
+        title: Text(
+          L10n.of(context)!.generateWorkoutDialogTitle,
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+          textScaler: MediaQuery.textScalerOf(
+            context,
+          ).clamp(maxScaleFactor: 1.6),
+        ),
+        cupertino: (appBarContext, _) =>
+            CupertinoNavigationBarData(backgroundColor: Colors.transparent),
       ),
       body: SafeArea(
         child: Padding(

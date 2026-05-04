@@ -16,8 +16,8 @@ final class SettingsActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) => PlatformIconButton(
     padding: Theme.of(context).platform == TargetPlatform.iOS
-        ? EdgeInsets.only(right: 22)
-        : EdgeInsets.zero,
+        ? EdgeInsets.only(right: 24)
+        : EdgeInsets.only(right: 10),
     icon: Icon(context.platformIcons.gearSolid),
     onPressed: () async {
       final navigator = Navigator.of(context, rootNavigator: true);
@@ -215,9 +215,7 @@ class _SettingsSheet extends ConsumerWidget {
             SliverAppBar(
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               leading: PlatformIconButton(
-                padding: Theme.of(context).platform == .iOS
-                    ? EdgeInsets.only(right: 22)
-                    : EdgeInsets.only(right: 14),
+                padding: EdgeInsets.only(right: 14),
                 icon: Icon(AdaptiveIcons.close),
                 onPressed: () => Navigator.pop(context),
               ),

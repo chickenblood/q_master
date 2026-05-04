@@ -95,7 +95,6 @@ class TimerSetupTab extends ConsumerWidget {
             context,
           ).clamp(maxScaleFactor: 1.6),
         ),
-        backgroundColor: Theme.of(context).colorScheme.surface,
         leading: const SettingsActionButton(),
       ),
       body: SafeArea(
