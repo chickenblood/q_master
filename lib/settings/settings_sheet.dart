@@ -60,18 +60,15 @@ class _SettingsSheet extends ConsumerWidget {
     final l10n = L10n.of(context)!;
     final timer = ref.read(timerProvider.notifier);
     final colorScheme = Theme.of(context).colorScheme;
-    final labelColor = colorScheme.onSurface;
     final inactiveSegmentColor = colorScheme.onSurfaceVariant;
     final segmentBorderColor = colorScheme.outline;
     final rowValueStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
       fontSize: 16,
       fontWeight: FontWeight.w700,
-      color: labelColor,
       fontFeatures: [FontFeature.tabularFigures()],
     );
     final rowLabelStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
       fontSize: 16,
-      color: labelColor,
       fontWeight: FontWeight.w500,
     );
     final segmentedStyle = SegmentedButton.styleFrom(

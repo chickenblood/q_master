@@ -66,9 +66,7 @@ class ActionButton extends StatelessWidget {
             Text(
               label,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.w800,
                 color: textColor,
-                fontSize: 16,
                 letterSpacing: -0.1,
               ),
             ),

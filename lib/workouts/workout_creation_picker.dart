@@ -20,7 +20,6 @@ class WorkoutCreationPicker extends StatelessWidget {
   }
 
   Widget _buildContent(BuildContext context, L10n l10n) {
-    final colorScheme = Theme.of(context).colorScheme;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
@@ -31,9 +30,7 @@ class WorkoutCreationPicker extends StatelessWidget {
             Text(
               L10n.of(context)!.createWorkoutPickerTitle,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w900,
                 fontSize: 22,
-                color: colorScheme.onSurface,
                 letterSpacing: -0.3,
               ),
               textAlign: TextAlign.left,

@@ -418,9 +418,6 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                                               .bodyLarge
                                               ?.copyWith(
                                                 fontWeight: FontWeight.w700,
-                                                color: Theme.of(
-                                                  context,
-                                                ).textTheme.bodyLarge?.color,
                                               ),
                                           maxLines: 2,
                                           overflow: .ellipsis,
@@ -599,7 +596,6 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                   child: Text(
                     sectionTitle.toUpperCase(),
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
                       color: Theme.of(context).colorScheme.primary,
                       letterSpacing: .1,
                     ),

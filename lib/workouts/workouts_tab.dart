@@ -40,8 +40,6 @@ class WorkoutsTab extends ConsumerWidget {
               L10n.of(context)!.noWorkoutsPlaceholderText,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontSize: 20,
-                fontWeight: FontWeight.w900,
-                color: Theme.of(context).colorScheme.onSurface,
                 letterSpacing: -0.2,
               ),
               textAlign: TextAlign.center,
@@ -49,12 +47,9 @@ class WorkoutsTab extends ConsumerWidget {
             const SizedBox(height: 16),
             Text(
               L10n.of(context)!.noWorkoutsPlaceholderDetailText,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                height: 1.6,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontSize: 14, height: 1.6),
               textAlign: TextAlign.center,
             ),
             Spacer(),

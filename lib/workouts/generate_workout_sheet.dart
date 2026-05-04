@@ -108,9 +108,7 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
           ),
           title: PlatformText(
             L10n.of(context)!.generateWorkoutDialogTitle,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+            style: Theme.of(context).textTheme.titleMedium,
             textScaler: MediaQuery.textScalerOf(
               context,
             ).clamp(maxScaleFactor: 1.6),
@@ -207,7 +205,6 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
                 textAlign: .center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontSize: 15,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w500,
                 ),
               ),
