@@ -41,7 +41,7 @@ struct RectangularView: View {
         .resizable()
         .scaledToFit()
         .frame(width: 26, height: 26)
-      Text("Q Master")
+      Text(.complicationDescription)
         .font(.headline)
         .minimumScaleFactor(0.7)
     }
@@ -53,7 +53,7 @@ struct CornerView: View {
     Image("ComplicationIcon")
       .resizable()
       .scaledToFit()
-      .widgetLabel(String(localized: "Q Master", bundle: .main))
+      .widgetLabel(.qMaster)
   }
 }
 
@@ -84,8 +84,8 @@ struct QMasterComplication: Widget {
     StaticConfiguration(kind: kind, provider: QMasterProvider()) { entry in
       QMasterComplicationView(entry: entry)
     }
-    .configurationDisplayName("Q Master")
-    .description(String(localized: "complication.description", bundle: .main))
+    .configurationDisplayName(.qMaster)
+    .description(.complicationDescription)
     .supportedFamilies([
       .accessoryCircular,
       .accessoryRectangular,
