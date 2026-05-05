@@ -53,7 +53,7 @@ struct CornerView: View {
     Image("ComplicationIcon")
       .resizable()
       .scaledToFit()
-      .widgetLabel("Q Master")
+      .widgetLabel(String(localized: "Q Master", bundle: .main))
   }
 }
 
@@ -77,7 +77,6 @@ struct QMasterComplicationView: View {
 
 // MARK: - Widget
 
-@main
 struct QMasterComplication: Widget {
   let kind = "QMasterComplication"
 
@@ -86,7 +85,7 @@ struct QMasterComplication: Widget {
       QMasterComplicationView(entry: entry)
     }
     .configurationDisplayName("Q Master")
-    .description("Launch Q Master from your watch face.")
+    .description(String(localized: "complication.description", bundle: .main))
     .supportedFamilies([
       .accessoryCircular,
       .accessoryRectangular,

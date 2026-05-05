@@ -1,0 +1,30 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Q Master" : {
+      "comment" : "App name used as complication display name and label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Q Master"
+          }
+        }
+      }
+    },
+    "complication.description" : {
+      "comment" : "Short description of the Q Master complication shown in the watch face picker",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launch Q Master from your watch face."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}
