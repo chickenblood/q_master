@@ -48,7 +48,7 @@ struct RectangularView: View {
   }
 }
 
-struct InlineView: View {
+struct CornerView: View {
   var body: some View {
     Image(.complicationIcon)
       .resizable()
@@ -67,8 +67,8 @@ struct QMasterComplicationView: View {
       CircularView()
     case .accessoryRectangular:
       RectangularView()
-    case .accessoryInline:
-      InlineView()
+    case .accessoryCorner:
+      CornerView()
     default:
       CircularView()
     }
@@ -90,7 +90,7 @@ struct QMasterComplication: Widget {
     .supportedFamilies([
       .accessoryCircular,
       .accessoryRectangular,
-      .accessoryInline,
+      .accessoryCorner,
     ])
   }
 }

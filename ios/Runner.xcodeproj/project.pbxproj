@@ -15,7 +15,7 @@
 		3C1F25DE2F34457900D29563 /* Q Master Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 3C1F25D42F34457900D29563 /* Q Master Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3C3867472FA943AC001B1A6A /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C3867462FA943AC001B1A6A /* WidgetKit.framework */; };
 		3C3867492FA943AC001B1A6A /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C3867482FA943AC001B1A6A /* SwiftUI.framework */; };
-		3C3867542FA943AD001B1A6A /* QMasterComplicationExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3C3867452FA943AC001B1A6A /* QMasterComplicationExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3C3867542FA943AD001B1A6A /* QMasterComplicationExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3C3867452FA943AC001B1A6A /* QMasterComplicationExtension.appex */; platformFilter = watchos; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		81B7F8966E50C266D27506A4 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E4F7A059DBC90589E2EDACF /* Pods_Runner.framework */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
@@ -908,6 +908,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.f3nation.qmaster.watchkitapp.QMasterComplication;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
+				SUPPORTED_PLATFORMS = "watchsimulator watchos";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
@@ -953,6 +954,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.f3nation.qmaster.watchkitapp.QMasterComplication;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
+				SUPPORTED_PLATFORMS = "watchsimulator watchos";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -996,6 +998,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.f3nation.qmaster.watchkitapp.QMasterComplication;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
+				SUPPORTED_PLATFORMS = "watchsimulator watchos";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
