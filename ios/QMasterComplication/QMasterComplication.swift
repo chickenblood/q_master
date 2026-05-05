@@ -26,7 +26,7 @@ struct CircularView: View {
   var body: some View {
     ZStack {
       AccessoryWidgetBackground()
-      Image("ComplicationIcon")
+      Image(.complicationIcon)
         .resizable()
         .scaledToFit()
         .padding(4)
@@ -37,7 +37,7 @@ struct CircularView: View {
 struct RectangularView: View {
   var body: some View {
     HStack(spacing: 6) {
-      Image("ComplicationIcon")
+      Image(.complicationIcon)
         .resizable()
         .scaledToFit()
         .frame(width: 26, height: 26)
@@ -50,7 +50,7 @@ struct RectangularView: View {
 
 struct CornerView: View {
   var body: some View {
-    Image("ComplicationIcon")
+    Image(.complicationIcon)
       .resizable()
       .scaledToFit()
       .widgetLabel(.qMaster)
@@ -83,6 +83,7 @@ struct QMasterComplication: Widget {
   var body: some WidgetConfiguration {
     StaticConfiguration(kind: kind, provider: QMasterProvider()) { entry in
       QMasterComplicationView(entry: entry)
+        .containerBackground(.clear, for: .widget)
     }
     .configurationDisplayName(.qMaster)
     .description(.complicationDescription)
