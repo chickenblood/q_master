@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import '../l10n/l10n.dart';
 import '../ui/adaptive_icons.dart';
@@ -12,17 +11,9 @@ class WorkoutCreationPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = L10n.of(context)!;
-    return PlatformWidget(
-      material: (_, _) => _buildContent(context, l10n),
-      cupertino: (_, _) => _buildContent(context, l10n),
-    );
-  }
-
-  Widget _buildContent(BuildContext context, L10n l10n) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
