@@ -25,7 +25,7 @@ configure<ApplicationExtension> {
         applicationId = "com.f3nation.q_master"
         minSdk = 31
         targetSdk = 36
-        versionCode = 1461
+        versionCode = 1462
         versionName = "3.1.0"
 
     }
