@@ -298,7 +298,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                   : colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.zero,
               border: Border.all(
-                width: 1.5,
+                width: isSelected ? 2 : 1,
                 color: isSelected ? colorScheme.primary : colorScheme.outline,
               ),
             ),
