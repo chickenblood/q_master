@@ -19,7 +19,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 configure<ApplicationExtension> {
-    namespace = "com.example.q_master"
+    namespace = "com.f3nation.q_master"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
