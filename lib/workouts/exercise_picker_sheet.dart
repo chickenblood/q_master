@@ -366,7 +366,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
         body: Column(
           children: [
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 8),
+              padding: EdgeInsets.symmetric(horizontal: 16),
               color: Theme.of(context).scaffoldBackgroundColor,
               child: Column(
                 mainAxisSize: .min,
@@ -397,7 +397,6 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            elevation: 0,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                           ),
                           onPressed: _canAdd ? _addExercise : null,
@@ -408,11 +407,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                       ),
                     ],
                   ),
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    child: _filterChips(context),
-                  ),
+                  _filterChips(context),
                 ],
               ),
             ),

@@ -82,11 +82,8 @@ class _PickerOptionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final buttonColor = isDark
-        ? colorScheme.surfaceContainerHighest
-        : colorScheme.surface;
-    final iconBgColor = colorScheme.surfaceContainerHighest;
+    final buttonColor = colorScheme.surface;
+    final iconBgColor = iconColor.withValues(alpha: 0.1);
     final subtitleColor = colorScheme.onSurfaceVariant;
     final chevronColor = colorScheme.outlineVariant;
     return Material(
@@ -95,8 +92,12 @@ class _PickerOptionButton extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
         onTap: onTap,
-        child: Padding(
+        child: Container(
           padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: colorScheme.outline, width: 1),
+          ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
