@@ -1,0 +1,6 @@
+<resources>
+    <string-array name="android_wear_capabilities">
+        <!-- This string must be IDENTICAL in both apps -->
+        <item>q_master_sync</item>
+    </string-array>
+</resources>
