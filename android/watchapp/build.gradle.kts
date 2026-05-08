@@ -3,6 +3,7 @@ import java.io.FileInputStream
 import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import com.android.build.api.dsl.ApplicationExtension
+import org.gradle.api.GradleException
 
 plugins {
     id("com.android.application")
@@ -17,6 +18,22 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+val localProperties = Properties()
+val localPropertiesFile: File = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
+}
+
+val flutterVersionCode = localProperties.getProperty("flutter.versionCode").toIntOrNull()
+    ?: throw GradleException("Missing flutter.versionCode in local.properties")
+// Add 1 in front of the version code to ensure the watch version code is always higher than the phone version code.
+val watchVersionCode = "1$flutterVersionCode".toIntOrNull()
+    ?: throw GradleException(
+        "Invalid flutter versionCode '$flutterVersionCode' in local.properties, cannot derive watch versionCode"
+    )
+val flutterVersionName = localProperties.getProperty("flutter.versionName")
+    ?: throw GradleException("Missing flutter.versionName in local.properties")
+
 configure<ApplicationExtension> {
     namespace = "com.f3nation.q_master"
     compileSdk = 36
@@ -25,8 +42,8 @@ configure<ApplicationExtension> {
         applicationId = "com.f3nation.q_master"
         minSdk = 31
         targetSdk = 36
-        versionCode = 1463
-        versionName = "3.1.1"
+        versionCode = watchVersionCode
+        versionName = flutterVersionName
 
     }
     signingConfigs {
