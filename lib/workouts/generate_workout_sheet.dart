@@ -117,99 +117,102 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
             CupertinoNavigationBarData(backgroundColor: Colors.transparent),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-          child: Column(
-            children: [
-              PlatformTextField(
-                controller: _promptTextController,
-                focusNode: _promptFocusNode,
-                autofocus: true,
-                textInputAction: .done,
-                maxLines: 5,
-                hintText: L10n.of(context)!.generateWorkoutPromptHint,
-                keyboardType: .multiline,
-                onSubmitted: (_) => _handleGenerateWorkout(),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 32.0),
-                child: Center(
-                  child: Hero(
-                    tag: 'voiceInputButton',
-                    child: SizedBox(
-                      width: 84,
-                      height: 84,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.primary.withValues(alpha: 0.15),
-                              blurRadius: 0,
-                              spreadRadius: 14,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            child: Column(
+              children: [
+                PlatformTextField(
+                  controller: _promptTextController,
+                  focusNode: _promptFocusNode,
+                  autofocus: true,
+                  textInputAction: .done,
+                  maxLines: 5,
+                  hintText: L10n.of(context)!.generateWorkoutPromptHint,
+                  keyboardType: .multiline,
+                  onTapOutside: (event) => _promptFocusNode.unfocus(),
+                  onSubmitted: (_) => _handleGenerateWorkout(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 32.0),
+                  child: Center(
+                    child: Hero(
+                      tag: 'voiceInputButton',
+                      child: SizedBox(
+                        width: 84,
+                        height: 84,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.15),
+                                blurRadius: 0,
+                                spreadRadius: 14,
+                              ),
+                            ],
+                          ),
+                          child: IconButton(
+                            onPressed: _handleCaptureVoiceInput,
+                            icon: Icon(
+                              AdaptiveIcons.microphone,
+                              size: 36,
+                              color: Theme.of(context).colorScheme.onPrimary,
                             ),
-                          ],
-                        ),
-                        child: IconButton(
-                          onPressed: _handleCaptureVoiceInput,
-                          icon: Icon(
-                            AdaptiveIcons.microphone,
-                            size: 36,
-                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              Stack(
-                children: [
-                  ValueListenableBuilder<TextEditingValue>(
-                    valueListenable: _promptTextController,
-                    builder: (context, value, child) {
-                      final hasPrompt = value.text.trim().isNotEmpty;
+                Stack(
+                  children: [
+                    ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _promptTextController,
+                      builder: (context, value, child) {
+                        final hasPrompt = value.text.trim().isNotEmpty;
 
-                      return _isGenerating
-                          ? Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 16.0,
-                              ),
-                              child: PlatformCircularProgressIndicator(),
-                            )
-                          : Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 16.0,
-                              ),
-                              child: SizedBox(
-                                height: 62,
-                                child: ActionButton(
-                                  label: L10n.of(
-                                    context,
-                                  )!.generateWorkoutButtonLabel,
-                                  onPressed: hasPrompt
-                                      ? _handleGenerateWorkout
-                                      : null,
-                                  icon: AdaptiveIcons.sparkles,
+                        return _isGenerating
+                            ? Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16.0,
                                 ),
-                              ),
-                            );
-                    },
-                  ),
-                ],
-              ),
-              PlatformText(
-                L10n.of(context)!.voiceGenerationInstructions,
-                textAlign: .center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
+                                child: PlatformCircularProgressIndicator(),
+                              )
+                            : Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16.0,
+                                ),
+                                child: SizedBox(
+                                  height: 62,
+                                  child: ActionButton(
+                                    label: L10n.of(
+                                      context,
+                                    )!.generateWorkoutButtonLabel,
+                                    onPressed: hasPrompt
+                                        ? _handleGenerateWorkout
+                                        : null,
+                                    icon: AdaptiveIcons.sparkles,
+                                  ),
+                                ),
+                              );
+                      },
+                    ),
+                  ],
                 ),
-              ),
-            ],
+                PlatformText(
+                  L10n.of(context)!.voiceGenerationInstructions,
+                  textAlign: .center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
