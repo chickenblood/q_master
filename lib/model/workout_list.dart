@@ -35,12 +35,12 @@ final class WorkoutList extends _$WorkoutList {
           .map((e) => Workout.fromJson(_migrateJson(e as Map<String, Object?>)))
           .toList();
       state = newWorkouts;
-      _syncToWatch();
+      await _syncToWatch();
     }();
     return [];
   }
 
-  void _syncToWatch() async {
+  Future<void> _syncToWatch() async {
     final workoutsArray = state.map((e) => e.toJson()).toList();
     final isPaired = await _watch.isPaired;
     final isReachable = await _watch.isReachable;
@@ -59,7 +59,7 @@ final class WorkoutList extends _$WorkoutList {
     file.writeAsStringSync(json);
     state = updatedWorkouts;
 
-    _syncToWatch();
+    await _syncToWatch();
   }
 
   void add(Workout workout) {
