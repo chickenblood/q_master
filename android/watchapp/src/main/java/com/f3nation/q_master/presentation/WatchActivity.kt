@@ -59,6 +59,7 @@ class WatchActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WorkoutRepository.init(this)
         setContent {
             WearApp(viewModel)
         }
@@ -66,6 +67,9 @@ class WatchActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        // Ensure Repository is initialized (in case service started it first)
+        WorkoutRepository.init(this)
+
         // Get previously-synced data for initial load
         val dataClient = Wearable.getDataClient(this)
         dataClient.dataItems.addOnSuccessListener { dataItemBuffer ->

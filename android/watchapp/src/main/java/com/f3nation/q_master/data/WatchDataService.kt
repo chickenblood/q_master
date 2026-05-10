@@ -1,5 +1,6 @@
 package com.f3nation.q_master.data
 
+import android.util.Log
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataItem
@@ -7,40 +8,41 @@ import com.google.android.gms.wearable.WearableListenerService
 import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 
+private const val TAG = "WatchDataService"
+
 /**
  * A background service that listens for data changes from the handheld (phone) app.
- * This service is managed by the Wearable system and will be instantiated even if the
- * main UI activity is not running.
- *
- * It filters for the `/watch_connectivity` path and updates the [WorkoutRepository]
- * when new data is received.
  */
 class WatchDataService : WearableListenerService() {
 
-    /**
-     * Triggered when the Wearable Data Layer detects a change in the data items
-     * associated with this app's package.
-     */
+    override fun onCreate() {
+        super.onCreate()
+        // Ensure repository is initialized with context for persistence
+        WorkoutRepository.init(this)
+        Log.d(TAG, "WatchDataService created")
+    }
+
     override fun onDataChanged(dataEvents: DataEventBuffer) {
+        Log.d(TAG, "onDataChanged: ${dataEvents.count} events received")
         try {
             dataEvents.forEach { event ->
                 if (event.type == DataEvent.TYPE_CHANGED) {
                     val path = event.dataItem.uri.path
+                    Log.d(TAG, "Processing data item with path: $path")
                     if (path == "/watch_connectivity") {
                         parseAndSaveData(event.dataItem)
                     }
                 }
             }
         } catch (e: Exception) {
-            WorkoutRepository.updateError("Error in onDataChanged", e.stackTraceToString())
+            Log.e(TAG, "Error processing data events", e)
+            WorkoutRepository.updateError("Sync processing failed", e.stackTraceToString())
+        } finally {
+            // Releasing the buffer is essential to prevent memory leaks and sync stalls
+            dataEvents.release()
         }
     }
 
-    /**
-     * Decodes the binary payload from a [DataItem] into a list of [Workout] objects.
-     * The payload is expected to be a serialized Java Map (matching the format sent
-     * by the Flutter 'watch_connectivity' plugin).
-     */
     private fun parseAndSaveData(dataItem: DataItem) {
         val data = dataItem.data ?: return
         try {
@@ -54,15 +56,19 @@ class WatchDataService : WearableListenerService() {
                     val workouts = workoutsMap
                         .filterIsInstance<Map<*, *>>()
                         .map { it.toWorkout() }
+                    Log.d(TAG, "Parsed ${workouts.size} workouts successfully")
                     WorkoutRepository.updateWorkouts(workouts)
                 } else {
-                    WorkoutRepository.updateError("Missing 'workouts' key", "Received: $receivedObject")
+                    Log.w(TAG, "Received map missing 'workouts' key")
+                    WorkoutRepository.updateError("Data missing workouts list")
                 }
             } else {
-                WorkoutRepository.updateError("Invalid data format", "Expected Map, got: ${receivedObject?.javaClass?.name}")
+                Log.w(TAG, "Unexpected data format: ${receivedObject?.javaClass?.name}")
+                WorkoutRepository.updateError("Invalid sync format")
             }
         } catch (e: Exception) {
-            WorkoutRepository.updateError(e.message ?: "Unknown parsing error", e.stackTraceToString())
+            Log.e(TAG, "Parsing error", e)
+            WorkoutRepository.updateError("Data parsing failed", e.stackTraceToString())
         }
     }
 }
