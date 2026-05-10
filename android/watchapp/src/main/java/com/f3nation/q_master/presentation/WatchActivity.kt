@@ -9,13 +9,19 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
@@ -76,39 +82,39 @@ fun Map<*, *>.toWorkout(): Workout {
 }
 
 class WorkoutsViewModel : ViewModel() {
-    private val _workouts = mutableStateOf(emptyList<Workout>())
-    private val _errorMessage = mutableStateOf<String?>(null)
+    var workouts by mutableStateOf(emptyList<Workout>())
+        private set
 
-    fun setWorkouts(workouts: List<Workout>) {
-        _workouts.value = workouts
+    var errorMessage by mutableStateOf<String?>(null)
+        private set
+
+    var debugInfo by mutableStateOf<String?>(null)
+        private set
+
+    fun setWorkoutsData(newWorkouts: List<Workout>) {
+        workouts = newWorkouts
     }
 
-    val workouts: List<Workout>
-        get() = _workouts.value
-
-    fun setErrorMessage(message: String?) {
-        _errorMessage.value = message
+    fun updateError(message: String?, debug: String? = null) {
+        errorMessage = message
+        debugInfo = debug
     }
-
-    val errorMessage: String?
-        get() = _errorMessage.value
 }
 
 class WatchActivity : ComponentActivity(), DataClient.OnDataChangedListener {
-    val workoutKey = "workouts"
     val viewModel = WorkoutsViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            WearApp("Q Master", viewModel)
+            WearApp(viewModel)
         }
     }
 
     override fun onResume() {
         super.onResume()
         // Register the listener to start receiving data updates
-        val dataClient = Wearable.getDataClient(this);
+        val dataClient = Wearable.getDataClient(this)
         dataClient.addListener(this)
 
         // Get previously-synced data
@@ -123,7 +129,7 @@ class WatchActivity : ComponentActivity(), DataClient.OnDataChangedListener {
                     }
                 }
             } catch (e: Exception) {
-                viewModel.setErrorMessage(e.message)
+                viewModel.updateError("Error loading buffered data", e.stackTraceToString())
             } finally {
                 // Important: Release the buffer to prevent memory leaks
                 dataItemBuffer.release()
@@ -150,7 +156,7 @@ class WatchActivity : ComponentActivity(), DataClient.OnDataChangedListener {
                 }
             }
         } catch (e: Exception) {
-            viewModel.setErrorMessage(e.message)
+            viewModel.updateError("Error in onDataChanged", e.stackTraceToString())
         } finally {
             // Important: Release the buffer to prevent memory leaks
             dataEvents.release()
@@ -158,26 +164,37 @@ class WatchActivity : ComponentActivity(), DataClient.OnDataChangedListener {
     }
 
     private fun parseData(dataItem: DataItem) {
-        if (dataItem.data == null) return;
+        val data = dataItem.data ?: return
         try {
-            val bytes = dataItem.data!!
+            val bytes = data
             val byteArrayInputStream = ByteArrayInputStream(bytes)
             val objectInputStream = ObjectInputStream(byteArrayInputStream)
-            val map = objectInputStream.readObject() as Map<*, *>
-            val workouts =
-                (map["workouts"] as List<*>).map { it as Map<*, *> }.map { it.toWorkout() }
-            viewModel.setWorkouts(workouts)
-            viewModel.setErrorMessage(null)
+            val receivedObject = objectInputStream.readObject()
+            
+            if (receivedObject is Map<*, *>) {
+                val workoutsMap = receivedObject["workouts"] as? List<*>
+                if (workoutsMap != null) {
+                    val workouts = workoutsMap
+                        .filterIsInstance<Map<*, *>>()
+                        .map { it.toWorkout() }
+                    viewModel.setWorkoutsData(workouts)
+                    viewModel.updateError(null)
+                } else {
+                    viewModel.updateError("Missing 'workouts' key", "Received: $receivedObject")
+                }
+            } else {
+                viewModel.updateError("Invalid data format", "Expected Map, got: ${receivedObject?.javaClass?.name}")
+            }
         } catch (e: Exception) {
             println("Error parsing data: $e")
-            viewModel.setErrorMessage(e.message)
-            viewModel.setWorkouts(emptyList())
+            viewModel.updateError(e.message ?: "Unknown parsing error", e.stackTraceToString())
+            viewModel.setWorkoutsData(emptyList())
         }
     }
 }
 
 @Composable
-fun WearApp(greetingName: String, viewModel: WorkoutsViewModel = WorkoutsViewModel()) {
+fun WearApp(viewModel: WorkoutsViewModel) {
     val navController = rememberSwipeDismissableNavController()
 
     AndroidTheme {
@@ -190,6 +207,8 @@ fun WearApp(greetingName: String, viewModel: WorkoutsViewModel = WorkoutsViewMod
                 composable("main_list") {
                     MainListScreen(viewModel, onItemSelected = { index ->
                         navController.navigate("workout_list/$index")
+                    }, onShowDebug = {
+                        navController.navigate("debug_info")
                     })
                 }
 
@@ -212,9 +231,14 @@ fun WearApp(greetingName: String, viewModel: WorkoutsViewModel = WorkoutsViewMod
 
                     val sectionIndex = backStackEntry.arguments?.getString("section")?.toInt()
                     if (sectionIndex == null || sectionIndex >= workout.sections.size) return@composable
-                    val section = workout.sections[sectionIndex];
+                    val section = workout.sections[sectionIndex]
 
                     SectionListScreen(section)
+                }
+
+                // Debug Screen
+                composable("debug_info") {
+                    DebugInfoScreen(viewModel)
                 }
             }
         }
@@ -222,7 +246,11 @@ fun WearApp(greetingName: String, viewModel: WorkoutsViewModel = WorkoutsViewMod
 }
 
 @Composable
-fun MainListScreen(viewModel: WorkoutsViewModel, onItemSelected: (Int) -> Unit) {
+fun MainListScreen(
+    viewModel: WorkoutsViewModel, 
+    onItemSelected: (Int) -> Unit,
+    onShowDebug: () -> Unit
+) {
     val listState = rememberTransformingLazyColumnState()
     val transformationSpec = rememberTransformationSpec()
     ScreenScaffold(
@@ -265,16 +293,60 @@ fun MainListScreen(viewModel: WorkoutsViewModel, onItemSelected: (Int) -> Unit) 
                         }
                     }
                 }
-            } else if (viewModel.errorMessage != null) {
-                item {
-                    Text(text = viewModel.errorMessage!!)
-                }
             } else {
                 item {
-                    Text(text = stringResource(R.string.syncInstructionsText),
+                    Text(
+                        text = if (viewModel.errorMessage != null) 
+                            "Sync Error: ${viewModel.errorMessage}" 
+                        else 
+                            stringResource(R.string.syncInstructionsText),
                         fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center)
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
                 }
+                item {
+                    Button(
+                        onClick = onShowDebug,
+                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
+                    ) {
+                        Text("Show Debug Info")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DebugInfoScreen(viewModel: WorkoutsViewModel) {
+    val listState = rememberTransformingLazyColumnState()
+    ScreenScaffold(scrollState = listState) { contentPadding ->
+        TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
+            item {
+                Text(
+                    text = "Debug Info",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
+            item {
+                Text(
+                    text = "Error: ${viewModel.errorMessage ?: "None"}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+            item {
+                Text(
+                    text = "Details: ${viewModel.debugInfo ?: "No additional info"}",
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
             }
         }
     }
@@ -374,14 +446,13 @@ fun SectionListScreen(section: WorkoutSection) {
     }
 }
 
-@SuppressLint("ViewModelConstructorInComposable")
 @WearPreviewDevices
 @WearPreviewFontScales
 @Composable
 fun DefaultPreview() {
     val viewModel = WorkoutsViewModel()
-    viewModel.setWorkouts(stockContent)
-    WearApp("Preview Android", viewModel)
+    viewModel.setWorkoutsData(stockContent)
+    WearApp(viewModel)
 }
 
 val sampleExercises = listOf("30 high knees", "10 Bonnie Blairs", "20 side-shuttle hops")
