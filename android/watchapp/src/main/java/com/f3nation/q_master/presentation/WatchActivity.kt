@@ -8,6 +8,7 @@ package com.f3nation.q_master.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -59,6 +60,8 @@ class WatchActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Enable edge-to-edge support for Android 15+
+        enableEdgeToEdge()
         WorkoutRepository.init(this)
         setContent {
             WearApp(viewModel)

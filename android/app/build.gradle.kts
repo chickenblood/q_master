@@ -73,6 +73,10 @@ configure<ApplicationExtension> {
     }
 }
 
+dependencies {
+    implementation("androidx.activity:activity:1.10.0")
+}
+
 flutter {
     source = "../.."
 }
