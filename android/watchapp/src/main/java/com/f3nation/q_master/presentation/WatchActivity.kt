@@ -5,26 +5,19 @@
 
 package com.f3nation.q_master.presentation
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.google.android.gms.wearable.DataClient
-import com.google.android.gms.wearable.DataEvent
-import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataItem
 import com.google.android.gms.wearable.Wearable
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
@@ -48,61 +41,21 @@ import androidx.lifecycle.ViewModel
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
+import com.f3nation.q_master.data.Workout
+import com.f3nation.q_master.data.WorkoutRepository
+import com.f3nation.q_master.data.WorkoutSection
+import com.f3nation.q_master.data.toWorkout
 import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 
-/// A workout to mirror the definition  in workout.dart
-/// An ordered section of a workout with its exercises.
-data class WorkoutSection(val name: String, val exercises: List<String>)
-
-/// A workout to mirror the definition  in workout.dart
-data class Workout(
-    val name: String,
-    val date: String,
-    val sections: List<WorkoutSection>
-)
-
-/// Converts a map to a workout.
-fun Map<*, *>.toWorkout(): Workout {
-    val badData = "Bad data"
-    val sections = ((this["sections"] as? List<*>) ?: emptyList<Any>())
-        .filterIsInstance<Map<*, *>>()
-        .map { sectionMap ->
-            WorkoutSection(
-                name = sectionMap["name"] as? String ?: "",
-                exercises = (sectionMap["exercises"] as? List<*> ?: emptyList<String>())
-                    .filterIsInstance<String>(),
-            )
-        }
-    return Workout(
-        name = this["name"] as? String ?: badData,
-        date = this["date"] as? String ?: badData,
-        sections = sections,
-    )
-}
-
 class WorkoutsViewModel : ViewModel() {
-    var workouts by mutableStateOf(emptyList<Workout>())
-        private set
-
-    var errorMessage by mutableStateOf<String?>(null)
-        private set
-
-    var debugInfo by mutableStateOf<String?>(null)
-        private set
-
-    fun setWorkoutsData(newWorkouts: List<Workout>) {
-        workouts = newWorkouts
-    }
-
-    fun updateError(message: String?, debug: String? = null) {
-        errorMessage = message
-        debugInfo = debug
-    }
+    val workouts = WorkoutRepository.workouts
+    val errorMessage = WorkoutRepository.errorMessage
+    val debugInfo = WorkoutRepository.debugInfo
 }
 
-class WatchActivity : ComponentActivity(), DataClient.OnDataChangedListener {
-    val viewModel = WorkoutsViewModel()
+class WatchActivity : ComponentActivity() {
+    private val viewModel = WorkoutsViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -113,61 +66,28 @@ class WatchActivity : ComponentActivity(), DataClient.OnDataChangedListener {
 
     override fun onResume() {
         super.onResume()
-        // Register the listener to start receiving data updates
+        // Get previously-synced data for initial load
         val dataClient = Wearable.getDataClient(this)
-        dataClient.addListener(this)
-
-        // Get previously-synced data
         dataClient.dataItems.addOnSuccessListener { dataItemBuffer ->
             try {
                 for (i in 0 until dataItemBuffer.count) {
                     val item = dataItemBuffer.get(i)
-
-                    // Check for your specific path
                     if (item.uri.path == "/watch_connectivity") {
                         parseData(item)
                     }
                 }
             } catch (e: Exception) {
-                viewModel.updateError("Error loading buffered data", e.stackTraceToString())
+                WorkoutRepository.updateError("Error loading buffered data", e.stackTraceToString())
             } finally {
-                // Important: Release the buffer to prevent memory leaks
                 dataItemBuffer.release()
             }
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        // Unregister the listener to save resources
-        Wearable.getDataClient(this).removeListener(this)
-    }
-
-    override fun onDataChanged(dataEvents: DataEventBuffer) {
-        println("DATA CHANGED")
-        try {
-            dataEvents.forEach { event ->
-                // Check if data was changed (rather than deleted)
-                if (event.type == DataEvent.TYPE_CHANGED) {
-                    val path = event.dataItem.uri.path
-                    if (path == "/watch_connectivity") {
-                        parseData(event.dataItem)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            viewModel.updateError("Error in onDataChanged", e.stackTraceToString())
-        } finally {
-            // Important: Release the buffer to prevent memory leaks
-            dataEvents.release()
         }
     }
 
     private fun parseData(dataItem: DataItem) {
         val data = dataItem.data ?: return
         try {
-            val bytes = data
-            val byteArrayInputStream = ByteArrayInputStream(bytes)
+            val byteArrayInputStream = ByteArrayInputStream(data)
             val objectInputStream = ObjectInputStream(byteArrayInputStream)
             val receivedObject = objectInputStream.readObject()
             
@@ -177,18 +97,11 @@ class WatchActivity : ComponentActivity(), DataClient.OnDataChangedListener {
                     val workouts = workoutsMap
                         .filterIsInstance<Map<*, *>>()
                         .map { it.toWorkout() }
-                    viewModel.setWorkoutsData(workouts)
-                    viewModel.updateError(null)
-                } else {
-                    viewModel.updateError("Missing 'workouts' key", "Received: $receivedObject")
+                    WorkoutRepository.updateWorkouts(workouts)
                 }
-            } else {
-                viewModel.updateError("Invalid data format", "Expected Map, got: ${receivedObject?.javaClass?.name}")
             }
         } catch (e: Exception) {
-            println("Error parsing data: $e")
-            viewModel.updateError(e.message ?: "Unknown parsing error", e.stackTraceToString())
-            viewModel.setWorkoutsData(emptyList())
+            WorkoutRepository.updateError(e.message ?: "Unknown parsing error", e.stackTraceToString())
         }
     }
 }
@@ -196,6 +109,7 @@ class WatchActivity : ComponentActivity(), DataClient.OnDataChangedListener {
 @Composable
 fun WearApp(viewModel: WorkoutsViewModel) {
     val navController = rememberSwipeDismissableNavController()
+    val workouts by viewModel.workouts.collectAsState()
 
     AndroidTheme {
         AppScaffold {
@@ -215,8 +129,8 @@ fun WearApp(viewModel: WorkoutsViewModel) {
                 // Screen 2: The Section List
                 composable("workout_list/{index}") { backStackEntry ->
                     val index = backStackEntry.arguments?.getString("index")?.toInt()
-                    if (index == null || index >= viewModel.workouts.size) return@composable
-                    val workout = viewModel.workouts[index]
+                    if (index == null || index >= workouts.size) return@composable
+                    val workout = workouts[index]
 
                     WorkoutListScreen(workout, onItemSelected = { section ->
                         navController.navigate("$index/section_list/$section")
@@ -226,8 +140,8 @@ fun WearApp(viewModel: WorkoutsViewModel) {
                 // Screen 3: The Exercises List
                 composable("{index}/section_list/{section}") { backStackEntry ->
                     val index = backStackEntry.arguments?.getString("index")?.toInt()
-                    if (index == null || index >= viewModel.workouts.size) return@composable
-                    val workout = viewModel.workouts[index]
+                    if (index == null || index >= workouts.size) return@composable
+                    val workout = workouts[index]
 
                     val sectionIndex = backStackEntry.arguments?.getString("section")?.toInt()
                     if (sectionIndex == null || sectionIndex >= workout.sections.size) return@composable
@@ -253,6 +167,9 @@ fun MainListScreen(
 ) {
     val listState = rememberTransformingLazyColumnState()
     val transformationSpec = rememberTransformationSpec()
+    val workouts by viewModel.workouts.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+
     ScreenScaffold(
         scrollState = listState,
         edgeButton = {
@@ -282,8 +199,8 @@ fun MainListScreen(
                     Text(text = stringResource(R.string.workoutsTitle))
                 }
             }
-            if (viewModel.workouts.isNotEmpty()) {
-                viewModel.workouts.forEachIndexed { index, workout ->
+            if (workouts.isNotEmpty()) {
+                workouts.forEachIndexed { index, workout ->
                     item {
                         Button(
                             onClick = { onItemSelected(index) },
@@ -296,8 +213,8 @@ fun MainListScreen(
             } else {
                 item {
                     Text(
-                        text = if (viewModel.errorMessage != null) 
-                            "Sync Error: ${viewModel.errorMessage}" 
+                        text = if (errorMessage != null) 
+                            "Sync Error: $errorMessage" 
                         else 
                             stringResource(R.string.syncInstructionsText),
                         fontWeight = FontWeight.Bold,
@@ -324,6 +241,9 @@ fun MainListScreen(
 @Composable
 fun DebugInfoScreen(viewModel: WorkoutsViewModel) {
     val listState = rememberTransformingLazyColumnState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+    val debugInfo by viewModel.debugInfo.collectAsState()
+
     ScreenScaffold(scrollState = listState) { contentPadding ->
         TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
             item {
@@ -336,14 +256,14 @@ fun DebugInfoScreen(viewModel: WorkoutsViewModel) {
             }
             item {
                 Text(
-                    text = "Error: ${viewModel.errorMessage ?: "None"}",
+                    text = "Error: ${errorMessage ?: "None"}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error
                 )
             }
             item {
                 Text(
-                    text = "Details: ${viewModel.debugInfo ?: "No additional info"}",
+                    text = "Details: ${debugInfo ?: "No additional info"}",
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.padding(top = 4.dp)
                 )
@@ -450,8 +370,8 @@ fun SectionListScreen(section: WorkoutSection) {
 @WearPreviewFontScales
 @Composable
 fun DefaultPreview() {
+    WorkoutRepository.updateWorkouts(stockContent)
     val viewModel = WorkoutsViewModel()
-    viewModel.setWorkoutsData(stockContent)
     WearApp(viewModel)
 }
 
