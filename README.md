@@ -101,3 +101,9 @@ Build Android app:
 Build Wear app:
   `./android/gradlew -p android :watchapp:bundleRelease`
   The output AAB will be under build/watchapp/outputs/bundle/release/watchapp-release.aab
+
+### Marketing URL
+https://q-master-7346a.web.app/download.html
+
+Deploy website:
+  `firebase deploy --only hosting --project q-master-7346a`
