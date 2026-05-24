@@ -12,8 +12,15 @@ SOURCE_VIDEO_URLS = Path('.tmp/exicon_video_urls.json')
 TARGET_DART = Path('lib/workouts/workout_constants.dart')
 
 BAD_NAMES = {
-    '6\\ In the Air Tonight"',
     'Lochness \\Latte\\" Merkins"',
+}
+
+DESCRIPTION_NAME_ALIASES = {
+    'Butt kickers': 'Alabama Ass-Kickers',
+    'Push-ups': 'Merkin',
+    'Superman holds': 'Superman',
+    'Tricep dips': 'Dips',
+    'Wall sit': "People's Chair",
 }
 
 FILE_HEADER = '''import 'package:flutter/widgets.dart';
@@ -50,9 +57,14 @@ enum ExerciseCategory {
 
 final class ExerciseEntry {
     final Set<ExerciseCategory> categories;
+    final String? description;
     final Uri? videoUrl;
 
-    const ExerciseEntry({required this.categories, this.videoUrl});
+    const ExerciseEntry({
+        required this.categories,
+        this.description,
+        this.videoUrl,
+    });
 }
 
 '''
@@ -72,13 +84,13 @@ def read_current_names() -> list[str]:
     return ast.literal_eval(text[start : end + 1])
 
 
-def read_existing_entries() -> dict[str, tuple[set[str], str | None]]:
+def read_existing_entries() -> dict[str, tuple[set[str], str | None, str | None]]:
     text = TARGET_DART.read_text()
     pattern = re.compile(
         r"^  '((?:\\'|[^'])*)': ExerciseEntry\((.*?)\),(?=\n  '(?:\\'|[^'])*': ExerciseEntry|\n};)",
         flags=re.MULTILINE | re.DOTALL,
     )
-    entry_map: dict[str, tuple[set[str], str | None]] = {}
+    entry_map: dict[str, tuple[set[str], str | None, str | None]] = {}
 
     for escaped_name, entry_body in pattern.findall(text):
         name = ast.literal_eval(f"'{escaped_name}'")
@@ -97,7 +109,14 @@ def read_existing_entries() -> dict[str, tuple[set[str], str | None]]:
         if video_match:
             video_url = ast.literal_eval(f"'{video_match.group(1)}'")
 
-        entry_map[name] = (categories, video_url)
+        description_match = re.search(r"description:\s*'((?:\\'|[^'])*)'", entry_body)
+        description = None
+        if description_match:
+            description = ast.literal_eval(f"'{description_match.group(1)}'")
+        elif re.search(r'description:\s*null\b', entry_body):
+            description = None
+
+        entry_map[name] = (categories, video_url, description)
 
     return entry_map
 
@@ -112,6 +131,197 @@ def clean_text(value: str) -> str:
 
 def normalize_name(value: str) -> str:
     return re.sub(r'\s+', ' ', value).strip().casefold()
+
+
+def normalize_loose_name(value: str) -> str:
+    # Remove parenthetical qualifiers like "(aka, Foo)" before loose matching.
+    value = re.sub(r'\([^)]*\)', ' ', value)
+    value = normalize_name(value)
+    # Remove explicit "aka" tails that are often alias notes, not canonical names.
+    value = re.sub(r'\baka\b.*$', ' ', value).strip()
+    value = re.sub(r'[^a-z0-9]+', ' ', value)
+    return re.sub(r'\s+', ' ', value).strip()
+
+
+def singularize_tokens(tokens: list[str]) -> list[str]:
+    singularized: list[str] = []
+    for token in tokens:
+        if len(token) > 4 and token.endswith('ies'):
+            token = f'{token[:-3]}y'
+        elif token == 'ups':
+            token = 'up'
+        elif len(token) > 3 and token.endswith('ups'):
+            token = f'{token[:-1]}'
+        elif len(token) > 3 and token.endswith('s') and not token.endswith('ss'):
+            token = token[:-1]
+        singularized.append(token)
+    return singularized
+
+
+def dedupe_adjacent_tokens(tokens: list[str]) -> list[str]:
+    deduped: list[str] = []
+    for token in tokens:
+        if not deduped or deduped[-1] != token:
+            deduped.append(token)
+    return deduped
+
+
+def singularize_last_token(value: str) -> str:
+    tokens = value.split()
+    if not tokens:
+        return value
+
+    tokens[-1:] = singularize_tokens(tokens[-1:])
+    return ' '.join(tokens)
+
+
+def canonical_loose_name(value: str) -> str:
+    tokens = normalize_loose_name(value).split()
+    tokens = singularize_tokens(tokens)
+    tokens = dedupe_adjacent_tokens(tokens)
+    return ' '.join(tokens)
+
+    tokens[-1] = token
+    return ' '.join(tokens)
+
+
+def build_loose_name_candidates(value: str) -> set[str]:
+    loose = normalize_loose_name(value)
+    canonical = canonical_loose_name(value)
+    candidates = {
+        loose,
+        singularize_last_token(loose),
+        canonical,
+        loose.replace(' ', ''),
+        canonical.replace(' ', ''),
+    }
+    return {candidate for candidate in candidates if candidate}
+
+
+def tokenize_canonical_name(value: str) -> set[str]:
+    canonical = canonical_loose_name(value)
+    if not canonical:
+        return set()
+    tokens = set(canonical.split())
+    compact = canonical.replace(' ', '')
+    if compact:
+        tokens.add(compact)
+    return tokens
+
+
+def tokenize_canonical_words(value: str) -> set[str]:
+    canonical = canonical_loose_name(value)
+    if not canonical:
+        return set()
+    return set(canonical.split())
+
+
+def read_csv_descriptions() -> tuple[dict[str, str], dict[str, str]]:
+    exact_descriptions: dict[str, str] = {}
+    loose_descriptions: dict[str, str] = {}
+    if not SOURCE_CSV.exists():
+        return exact_descriptions, loose_descriptions
+
+    with SOURCE_CSV.open(newline='') as f:
+        for row in csv.DictReader(f):
+            name = row['Name'].strip()
+            if not name or name in BAD_NAMES:
+                continue
+            cleaned = clean_text(row['Description'])
+            if not cleaned:
+                continue
+            normalized_name = normalize_name(name)
+            exact_descriptions[normalized_name] = cleaned
+            for loose_name in build_loose_name_candidates(name):
+                loose_descriptions.setdefault(loose_name, cleaned)
+
+    return exact_descriptions, loose_descriptions
+
+
+def read_csv_entries() -> list[tuple[str, set[str], str]]:
+    entries: list[tuple[str, set[str], str]] = []
+    if not SOURCE_CSV.exists():
+        return entries
+
+    with SOURCE_CSV.open(newline='') as f:
+        for row in csv.DictReader(f):
+            name = row['Name'].strip()
+            if not name or name in BAD_NAMES:
+                continue
+            description = clean_text(row['Description'])
+            if not description:
+                continue
+            entries.append((name, tokenize_canonical_name(name), description))
+
+    return entries
+
+
+def resolve_csv_description(
+    name: str,
+    exact_descriptions: dict[str, str],
+    loose_descriptions: dict[str, str],
+    csv_entries: list[tuple[str, set[str], str]],
+) -> str | None:
+    alias_name = DESCRIPTION_NAME_ALIASES.get(name)
+    if alias_name:
+        alias_match = exact_descriptions.get(normalize_name(alias_name))
+        if alias_match:
+            return alias_match
+        for loose_name in build_loose_name_candidates(alias_name):
+            match = loose_descriptions.get(loose_name)
+            if match:
+                return match
+
+    direct_match = exact_descriptions.get(normalize_name(name))
+    if direct_match:
+        return direct_match
+
+    for loose_name in build_loose_name_candidates(name):
+        match = loose_descriptions.get(loose_name)
+        if match:
+            return match
+
+    # Conservative fallback: only attempt fuzzy subset matching for multi-token names.
+    query_word_tokens = tokenize_canonical_words(name)
+    query_token_count = len(query_word_tokens)
+    if query_token_count < 2:
+        return None
+
+    query_token_variants: list[set[str]] = [query_word_tokens]
+    if query_word_tokens & {'hold', 'holds'}:
+        query_token_variants.append({
+            token
+            for token in query_word_tokens
+            if token not in {'hold', 'holds'}
+        })
+    if query_word_tokens & {'tricep', 'triceps'}:
+        query_token_variants.append({
+            token
+            for token in query_word_tokens
+            if token not in {'tricep', 'triceps'}
+        })
+
+    best_match: tuple[int, int, str] | None = None
+    for csv_name, csv_tokens, csv_description in csv_entries:
+        csv_word_tokens = {token for token in csv_tokens if ' ' not in token}
+        for query_tokens in query_token_variants:
+            if len(query_tokens) < 2:
+                continue
+            if not query_tokens.issubset(csv_word_tokens):
+                continue
+            extra_tokens = len(csv_word_tokens) - len(query_tokens)
+            # Keep this strict so generic names like "Squats" do not get arbitrary matches.
+            if extra_tokens > 2:
+                continue
+
+            candidate_score = (extra_tokens, len(csv_name), csv_description)
+            if best_match is None or candidate_score < best_match:
+                best_match = candidate_score
+
+    if best_match is not None:
+        return best_match[2]
+
+    return None
 
 
 def infer_categories(name: str, description: str) -> set[str]:
@@ -219,24 +429,53 @@ def infer_categories(name: str, description: str) -> set[str]:
 def build_category_map() -> dict[str, set[str]]:
     names = read_current_names()
     existing_entries = read_existing_entries()
-    descriptions: dict[str, str] = {}
-
-    if SOURCE_CSV.exists():
-        with SOURCE_CSV.open(newline='') as f:
-            for row in csv.DictReader(f):
-                name = row['Name'].strip()
-                if not name or name in BAD_NAMES:
-                    continue
-                descriptions[name.casefold()] = clean_text(row['Description'])
+    exact_descriptions, loose_descriptions = read_csv_descriptions()
+    csv_entries = read_csv_entries()
 
     result: dict[str, set[str]] = {}
     for name in names:
-        description = descriptions.get(name.casefold())
+        description = resolve_csv_description(
+            name,
+            exact_descriptions,
+            loose_descriptions,
+            csv_entries,
+        )
         if description is None:
-            result[name] = existing_entries.get(name, ({'fullBody'}, None))[0]
+            result[name] = existing_entries.get(name, ({'fullBody'}, None, None))[0]
             continue
         result[name] = infer_categories(name, description)
     return result
+
+
+def build_description_map() -> tuple[dict[str, str | None], list[str]]:
+    names = read_current_names()
+    existing_entries = read_existing_entries()
+    exact_descriptions, loose_descriptions = read_csv_descriptions()
+    csv_entries = read_csv_entries()
+
+    descriptions: dict[str, str | None] = {}
+    missing: list[str] = []
+
+    for name in names:
+        csv_description = resolve_csv_description(
+            name,
+            exact_descriptions,
+            loose_descriptions,
+            csv_entries,
+        )
+        if csv_description:
+            descriptions[name] = csv_description
+            continue
+
+        existing_description = existing_entries.get(name, (set(), None, None))[2]
+        if existing_description:
+            descriptions[name] = existing_description
+            continue
+
+        descriptions[name] = None
+        missing.append(name)
+
+    return descriptions, missing
 
 
 def read_video_urls() -> dict[str, str]:
@@ -247,7 +486,7 @@ def read_video_urls() -> dict[str, str]:
     existing_entries = read_existing_entries()
     video_urls = {
         current_name_lookup.get(normalize_name(name), name): video_url
-        for name, (_, video_url) in existing_entries.items()
+        for name, (_, video_url, _) in existing_entries.items()
         if video_url is not None
     }
 
@@ -265,7 +504,11 @@ def read_video_urls() -> dict[str, str]:
     return video_urls
 
 
-def write_dart(category_map: dict[str, set[str]], video_urls: dict[str, str]) -> None:
+def write_dart(
+    category_map: dict[str, set[str]],
+    descriptions: dict[str, str | None],
+    video_urls: dict[str, str],
+) -> None:
     lines = [
         FILE_HEADER,
         '/// A map of workout token completion strings to exercise metadata.\n',
@@ -274,6 +517,11 @@ def write_dart(category_map: dict[str, set[str]], video_urls: dict[str, str]) ->
 
     for name in sorted(category_map, key=lambda value: (value.casefold(), value)):
         escaped_name = name.replace('\\', '\\\\').replace("'", "\\'")
+        description = descriptions.get(name)
+        description_literal = 'null'
+        if description is not None:
+            escaped_description = description.replace('\\', '\\\\').replace("'", "\\'")
+            description_literal = f"'{escaped_description}'"
         categories = ', '.join(
             f'.{category}'
             for category in sorted(category_map[name], key=lambda value: value)
@@ -281,13 +529,13 @@ def write_dart(category_map: dict[str, set[str]], video_urls: dict[str, str]) ->
         video_url = video_urls.get(name)
         if video_url is None:
             lines.append(
-                f"  '{escaped_name}': ExerciseEntry(categories: {{{categories}}}),\n"
+                f"  '{escaped_name}': ExerciseEntry(categories: {{{categories}}}, description: {description_literal}),\n"
             )
             continue
 
         escaped_video_url = video_url.replace('\\', '\\\\').replace("'", "\\'")
         lines.append(
-            f"  '{escaped_name}': ExerciseEntry(categories: {{{categories}}}, videoUrl: Uri.parse('{escaped_video_url}')),\n"
+            f"  '{escaped_name}': ExerciseEntry(categories: {{{categories}}}, description: {description_literal}, videoUrl: Uri.parse('{escaped_video_url}')),\n"
         )
 
     lines.append('};\n')
@@ -295,4 +543,14 @@ def write_dart(category_map: dict[str, set[str]], video_urls: dict[str, str]) ->
 
 
 if __name__ == '__main__':
-    write_dart(build_category_map(), read_video_urls())
+    category_map = build_category_map()
+    description_map, missing_descriptions = build_description_map()
+    video_url_map = read_video_urls()
+    write_dart(category_map, description_map, video_url_map)
+    print('Workout constants regenerated.')
+    if missing_descriptions:
+        print(
+            f'WARNING: Missing descriptions for {len(missing_descriptions)} exercises:'
+        )
+        for exercise_name in missing_descriptions:
+            print(f' - {exercise_name}')

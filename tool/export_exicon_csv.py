@@ -3,11 +3,17 @@ from __future__ import annotations
 import argparse
 import asyncio
 from pathlib import Path
+from typing import Protocol
 
-from playwright.async_api import Download, Frame, Page, TimeoutError, async_playwright
+from playwright.async_api import Download, Locator, Page, TimeoutError, async_playwright
 
 
-EXICON_URL = 'https://f3nation.com/exicon/'
+EXICON_URL = 'https://codex.f3nation.com/exicon'
+
+
+class _SearchSurface(Protocol):
+    def get_by_role(self, role: str, name: str | None = None) -> Locator: ...
+    def get_by_text(self, text: str, exact: bool | None = None) -> Locator: ...
 
 
 async def _dismiss_cookie_banner(page: Page) -> None:
@@ -28,28 +34,18 @@ async def _dismiss_cookie_banner(page: Page) -> None:
             continue
 
 
-async def _get_codex_frame(page: Page) -> Frame:
-    for _ in range(30):
-        for frame in page.frames:
-            if 'codex.f3nation.com/exicon' in frame.url:
-                return frame
-        await page.wait_for_timeout(1_000)
-
-    raise RuntimeError('Unable to locate embedded Codex Exicon frame')
-
-
-async def _wait_for_export_control(frame: Frame) -> None:
-    await frame.get_by_text('Export CSV', exact=False).first.wait_for(
+async def _wait_for_export_control(surface: _SearchSurface) -> None:
+    await surface.get_by_text('Export CSV', exact=False).first.wait_for(
         state='visible',
         timeout=30_000,
     )
 
 
-async def _trigger_download(frame: Frame, page: Page) -> Download:
+async def _trigger_download(surface: _SearchSurface, page: Page) -> Download:
     export_candidates = [
-        frame.get_by_role('button', name='Export CSV'),
-        frame.get_by_role('link', name='Export CSV'),
-        frame.get_by_text('Export CSV', exact=False),
+        surface.get_by_role('button', name='Export CSV'),
+        surface.get_by_role('link', name='Export CSV'),
+        surface.get_by_text('Export CSV', exact=False),
     ]
 
     last_error: Exception | None = None
@@ -73,9 +69,8 @@ async def export_csv(output_path: Path, *, headed: bool) -> Path:
         try:
             await page.goto(EXICON_URL, wait_until='domcontentloaded', timeout=60_000)
             await _dismiss_cookie_banner(page)
-            frame = await _get_codex_frame(page)
-            await _wait_for_export_control(frame)
-            download = await _trigger_download(frame, page)
+            await _wait_for_export_control(page)
+            download = await _trigger_download(page, page)
             await download.save_as(str(output_path))
             return output_path
         finally:
