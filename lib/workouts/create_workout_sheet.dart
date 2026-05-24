@@ -70,7 +70,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     );
     final workout = widget.originalWorkout;
     if (workout != null) {
-      _storedWorkout = workout;
+      _storedWorkout = workout.copyWith();
       _updateUiFromWorkout(workout);
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -779,19 +779,15 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
 
   /// Builds a [Workout] object from the current state of the UI fields and
   /// sections.
-  Workout _buildWorkoutFromUi() {
-    return Workout(
-      name: _nameTextController.text.trim(),
-      date:
-          _storedWorkout?.date ??
-          widget.originalWorkout?.date ??
-          DateTime.now(),
-      sections: [
-        for (final entry in _sections.entries)
-          WorkoutSection(name: entry.key, exercises: List.of(entry.value)),
-      ],
-    );
-  }
+  Workout _buildWorkoutFromUi() => Workout(
+    name: _nameTextController.text.trim(),
+    date:
+        _storedWorkout?.date ?? widget.originalWorkout?.date ?? DateTime.now(),
+    sections: [
+      for (final entry in _sections.entries)
+        WorkoutSection(name: entry.key, exercises: List.of(entry.value)),
+    ],
+  );
 
   void _updateUiFromWorkout(Workout workout) {
     _nameTextController.text = workout.name;
