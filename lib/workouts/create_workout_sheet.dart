@@ -63,10 +63,11 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     AppLifecycleListener(onResume: () => setState(() {}));
     final workout = widget.originalWorkout;
     if (workout != null) {
+      _storedWorkout = workout;
       _updateUiFromWorkout(workout);
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.originalWorkout == null) {
+      if (workout == null) {
         setState(() {
           _sections[L10n.of(context)!.warmupSectionTitle] = [];
         });
@@ -283,60 +284,53 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
         bottom: false,
         sliver: SliverList(
           delegate: SliverChildListDelegate([
-            Padding(
-              padding: _headerInsets,
-              child: PlatformTextField(
-                controller: _nameTextController,
-                enabled: _displayMode == DisplayMode.edit,
-                textCapitalization: TextCapitalization.sentences,
-                focusNode: _focusNode,
-                material: (_, _) => MaterialTextFieldData(
-                  decoration: InputDecoration(
-                    border: const UnderlineInputBorder(),
-                    enabledBorder: const UnderlineInputBorder(),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 2,
-                      ),
-                    ),
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 18),
-                  ),
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 22,
-                    letterSpacing: -0.3,
-                  ),
-                  cursorColor: Theme.of(context).colorScheme.primary,
-                  textAlign: TextAlign.left,
-                ),
-                cupertino: (_, _) => CupertinoTextFieldData(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Theme.of(context).colorScheme.outline,
-                        width: 1.5,
-                      ),
-                    ),
-                  ),
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 22,
-                    letterSpacing: -0.3,
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  cursorColor: Theme.of(context).colorScheme.primary,
-                  textAlign: TextAlign.left,
-                ),
-              ),
-            ),
-            if (_displayMode == .display && widget.originalWorkout != null)
+            if (_displayMode == DisplayMode.edit)
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                child: Text(
-                  widget.originalWorkout!.date.formattedForDisplay(),
-                  style: Theme.of(context).textTheme.bodyMedium,
+                padding: _headerInsets,
+                child: PlatformTextField(
+                  controller: _nameTextController,
+                  enabled: _displayMode == DisplayMode.edit,
+                  textCapitalization: TextCapitalization.sentences,
+                  focusNode: _focusNode,
+                  material: (_, _) => MaterialTextFieldData(
+                    decoration: InputDecoration(
+                      border: const UnderlineInputBorder(),
+                      enabledBorder: const UnderlineInputBorder(),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 2,
+                        ),
+                      ),
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 18),
+                    ),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 22,
+                      letterSpacing: -0.3,
+                    ),
+                    cursorColor: Theme.of(context).colorScheme.primary,
+                    textAlign: TextAlign.left,
+                  ),
+                  cupertino: (_, _) => CupertinoTextFieldData(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Theme.of(context).colorScheme.outline,
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 22,
+                      letterSpacing: -0.3,
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    cursorColor: Theme.of(context).colorScheme.primary,
+                    textAlign: TextAlign.left,
+                  ),
                 ),
               ),
           ]),
@@ -523,7 +517,9 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                     _updateExistingWorkout();
                   }
                   setState(() {
-                    _storedWorkout = _buildWorkoutFromUi();
+                    _storedWorkout = _buildWorkoutFromUi().copyWith(
+                      date: DateTime.now(),
+                    );
                     _displayMode = .display;
                   });
                 }
@@ -732,15 +728,24 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
               });
             },
           ),
-          title: PlatformText(
-            _titleForAppBar(),
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.3,
-            ),
-            textScaler: MediaQuery.textScalerOf(
-              context,
-            ).clamp(maxScaleFactor: 1.5),
+          title: Column(
+            children: [
+              PlatformText(
+                _titleForAppBar(),
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.3,
+                ),
+                textScaler: MediaQuery.textScalerOf(
+                  context,
+                ).clamp(maxScaleFactor: 1.5),
+              ),
+              if (_displayMode == .display && _storedWorkout != null)
+                Text(
+                  _storedWorkout!.date.formattedForDisplay(),
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+            ],
           ),
           actions: _rightAppBarButtonActions(context),
           pinned: true,
