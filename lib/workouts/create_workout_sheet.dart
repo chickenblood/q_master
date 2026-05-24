@@ -514,22 +514,28 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     return [
       ListenableBuilder(
         listenable: Listenable.merge([_nameTextController]),
-        builder: (_, _) => PlatformIconButton(
-          padding: EdgeInsets.only(right: 4),
-          icon: Icon(
-            PlatformIcons(context).checkMark,
-            color: Theme.of(context).colorScheme.primary, // F3 Red
-          ),
-          onPressed: _workoutCreationEnabled
-              ? () {
-                  final savedWorkout = _saveWorkout();
-                  setState(() {
-                    _storedWorkout = savedWorkout;
-                    _displayMode = .display;
-                  });
-                }
-              : null,
-        ),
+        builder: (_, _) {
+          final theme = Theme.of(context);
+          final isEnabled = _workoutCreationEnabled;
+          final enabledColor = theme.colorScheme.primary;
+          final disabledColor = theme.colorScheme.onSurfaceVariant;
+          return PlatformIconButton(
+            padding: EdgeInsets.only(right: 4),
+            icon: Icon(
+              PlatformIcons(context).checkMark,
+              color: isEnabled ? enabledColor : disabledColor,
+            ),
+            onPressed: isEnabled
+                ? () {
+                    final savedWorkout = _saveWorkout();
+                    setState(() {
+                      _storedWorkout = savedWorkout;
+                      _displayMode = .display;
+                    });
+                  }
+                : null,
+          );
+        },
       ),
     ];
   }
