@@ -35,7 +35,6 @@ class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: PlatformScaffold(
-        backgroundColor: Colors.transparent,
         material: (_, _) => MaterialScaffoldData(extendBodyBehindAppBar: true),
         appBar: PlatformAppBar(
           backgroundColor: Colors.transparent,

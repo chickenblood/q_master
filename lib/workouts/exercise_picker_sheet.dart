@@ -5,6 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../l10n/l10n.dart';
+import '../ui/adaptive_icons.dart';
+import '../ui/simple_alert.dart';
 import '../utils/shared_app_prefs.dart';
 import 'workout_auto_completions.dart';
 import 'workout_constants.dart';
@@ -154,6 +156,12 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     }
   }
 
+  Future<void> _showExerciseDescription(
+    BuildContext context,
+    String exerciseName,
+    String description,
+  ) => showSimpleAlert(context, title: exerciseName, message: description);
+
   List<String> get _filteredExercises {
     return workoutCompletions.entries
         .where((entry) {
@@ -287,6 +295,10 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
         final exerciseName = _filteredExercises[index];
         final exerciseEntry = workoutCompletions[exerciseName]!;
         final videoUrl = exerciseEntry.videoUrl;
+        final hasVideo = videoUrl != null;
+        final description = exerciseEntry.description;
+        final hasDescription =
+            description != null && description.trim().isNotEmpty;
         final isSelected = widget.controller.text == exerciseName;
 
         return GestureDetector(
@@ -324,9 +336,15 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                       ),
                     ),
                   ),
-                  if (videoUrl != null)
+                  if (hasVideo || hasDescription)
                     IconButton(
-                      onPressed: () => _openExerciseVideo(context, videoUrl),
+                      onPressed: () => hasVideo
+                          ? _openExerciseVideo(context, videoUrl)
+                          : _showExerciseDescription(
+                              context,
+                              exerciseName,
+                              description!,
+                            ),
                       constraints: const BoxConstraints(
                         minWidth: 52,
                         minHeight: 52,
@@ -338,7 +356,10 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                             ? colorScheme.primary
                             : colorScheme.onSurface,
                       ),
-                      icon: const Icon(Icons.ondemand_video, size: 29),
+                      icon: Icon(
+                        hasVideo ? Icons.ondemand_video : AdaptiveIcons.notes,
+                        size: 26,
+                      ),
                     ),
                 ],
               ),

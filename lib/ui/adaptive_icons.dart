@@ -36,4 +36,7 @@ final class AdaptiveIcons {
 
   static IconData get sparkles =>
       Platform.isIOS ? CupertinoIcons.sparkles : Icons.auto_awesome;
+
+  static IconData get notes =>
+      Platform.isIOS ? CupertinoIcons.doc_text : Icons.description_outlined;
 }
