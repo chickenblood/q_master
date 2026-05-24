@@ -54,13 +54,20 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
 
   // Track the group of the most recently added exercise for scrolling
   String? _lastAddedItemGroup;
+  AppLifecycleListener? _appLifecycleListener;
 
   // --- Lifecycle & State ---
   @override
   void initState() {
     super.initState();
     _displayMode = widget.initialDisplayMode;
-    AppLifecycleListener(onResume: () => setState(() {}));
+    _appLifecycleListener = AppLifecycleListener(
+      onResume: () {
+        if (mounted) {
+          setState(() {});
+        }
+      },
+    );
     final workout = widget.originalWorkout;
     if (workout != null) {
       _storedWorkout = workout;
@@ -81,6 +88,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
 
   @override
   void dispose() {
+    _appLifecycleListener?.dispose();
     _nameTextController.dispose();
     _focusNode.dispose();
     super.dispose();
@@ -105,7 +113,10 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           ? L10n.of(context)!.createWorkoutDialogTitle
           : L10n.of(context)!.editWorkoutDialogTitle;
     } else {
-      return _buildWorkoutFromUi().name;
+      final currentName = _nameTextController.text.trim();
+      return currentName.isEmpty
+          ? L10n.of(context)!.defaultWorkoutName
+          : currentName;
     }
   }
 
@@ -511,15 +522,9 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           ),
           onPressed: _workoutCreationEnabled
               ? () {
-                  if (widget.originalWorkout == null) {
-                    _createWorkout();
-                  } else {
-                    _updateExistingWorkout();
-                  }
+                  final savedWorkout = _saveWorkout();
                   setState(() {
-                    _storedWorkout = _buildWorkoutFromUi().copyWith(
-                      date: DateTime.now(),
-                    );
+                    _storedWorkout = savedWorkout;
                     _displayMode = .display;
                   });
                 }
@@ -578,7 +583,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       },
       child: ReorderableDelayedDragStartListener(
         index: sectionIndex,
-        enabled: !isEditingMode,
+        enabled: isEditingMode,
         child: Container(
           padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
           color: Theme.of(context).colorScheme.surface,
@@ -722,13 +727,17 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                 Navigator.of(context).pop();
                 return;
               }
+              final storedWorkout = _storedWorkout;
               setState(() {
                 _displayMode = .display;
-                _updateUiFromWorkout(_storedWorkout!);
+                if (storedWorkout != null) {
+                  _updateUiFromWorkout(storedWorkout);
+                }
               });
             },
           ),
           title: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               PlatformText(
                 _titleForAppBar(),
@@ -741,7 +750,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                 ).clamp(maxScaleFactor: 1.5),
               ),
               if (_displayMode == .display && _storedWorkout != null)
-                Text(
+                PlatformText(
                   _storedWorkout!.date.formattedForDisplay(),
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
@@ -756,16 +765,16 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     ),
   );
 
-  void _createWorkout() {
+  Workout _saveWorkout() {
+    final workoutToSave = _buildWorkoutFromUi().copyWith(date: DateTime.now());
     final listNotifier = ref.read(workoutListProvider.notifier);
-    listNotifier.add(_buildWorkoutFromUi());
-  }
-
-  /// Updates an existing workout in the list with the current state.
-  void _updateExistingWorkout() {
-    assert(widget.originalWorkout != null);
-    final listNotifier = ref.read(workoutListProvider.notifier);
-    listNotifier.replace(widget.originalWorkout!, _buildWorkoutFromUi());
+    final originalWorkout = widget.originalWorkout;
+    if (originalWorkout == null) {
+      listNotifier.add(workoutToSave);
+    } else {
+      listNotifier.replace(originalWorkout, workoutToSave);
+    }
+    return workoutToSave;
   }
 
   /// Builds a [Workout] object from the current state of the UI fields and
@@ -773,7 +782,10 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   Workout _buildWorkoutFromUi() {
     return Workout(
       name: _nameTextController.text.trim(),
-      date: widget.originalWorkout?.date ?? DateTime.now(),
+      date:
+          _storedWorkout?.date ??
+          widget.originalWorkout?.date ??
+          DateTime.now(),
       sections: [
         for (final entry in _sections.entries)
           WorkoutSection(name: entry.key, exercises: List.of(entry.value)),
