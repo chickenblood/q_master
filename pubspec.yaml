@@ -76,6 +76,8 @@ flutter_launcher_icons:
   min_sdk_android: 21
 
 flutter:
+  config:
+    enable-swift-package-manager: false
   generate: true
   uses-material-design: true
   assets:
