@@ -46,7 +46,19 @@ final class WorkoutList extends _$WorkoutList {
     final isReachable = await _watch.isReachable;
     if (isPaired) {
       try {
-        await _watch.updateApplicationContext({'workouts': workoutsArray});
+        final payload = {
+          'workouts': workoutsArray,
+          'date': DateTime.now().toIso8601String(),
+        };
+
+        if (Platform.isAndroid) {
+          // Use custom urgent sync on Android to bypass battery-saving batching
+          const channel = MethodChannel('com.f3nation.q_master/sync');
+          await channel.invokeMethod('urgent_sync', payload);
+        } else {
+          // Standard sync for iOS/watchOS
+          await _watch.updateApplicationContext(payload);
+        }
       } on PlatformException catch (e) {
         _logger.e('Sync failure. Reachable: $isReachable', error: e);
       }

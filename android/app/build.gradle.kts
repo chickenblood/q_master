@@ -75,6 +75,7 @@ configure<ApplicationExtension> {
 
 dependencies {
     implementation("androidx.activity:activity:1.10.0")
+    implementation("com.google.android.gms:play-services-wearable:19.0.0")
 }
 
 flutter {
