@@ -774,11 +774,12 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   Workout _saveWorkout() {
     final workoutToSave = _buildWorkoutFromUi().copyWith(date: DateTime.now());
     final listNotifier = ref.read(workoutListProvider.notifier);
-    final originalWorkout = widget.originalWorkout;
-    if (originalWorkout == null) {
+    if (widget.originalWorkout == null) {
       listNotifier.add(workoutToSave);
+    } else if (_storedWorkout != null) {
+      listNotifier.replace(_storedWorkout!, workoutToSave);
     } else {
-      listNotifier.replace(originalWorkout, workoutToSave);
+      assert(false, 'Unable to save workout: _storedWorkout is null');
     }
     return workoutToSave;
   }
