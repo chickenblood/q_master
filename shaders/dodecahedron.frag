@@ -177,16 +177,18 @@ void main() {
     faces[10]= vec3( PHI, 0.0, -1.0);
     faces[11]= vec3(-PHI, 0.0, -1.0);
 
+    vec3 faceNormal = normalize(faces[0]);
     for (int i = 0; i < 12; i++) {
-      float dplane = dot(normalize(faces[i]), pRot);
+      vec3 faceCandidate = normalize(faces[i]);
+      float dplane = dot(faceCandidate, pRot);
       if (dplane > bestDot) {
         bestDot = dplane;
         faceIdx = i;
+        faceNormal = faceCandidate;
       }
     }
 
     // compute a tangent frame for the selected face (use the face's canonical normal for stability)
-    vec3 faceNormal = normalize(faces[faceIdx]);
     vec3 tangent = normalize(cross(faceNormal, vec3(0.0, 1.0, 0.0)));
     if (length(tangent) < 0.1) tangent = normalize(cross(faceNormal, vec3(1.0, 0.0, 0.0)));
     vec3 bitangent = cross(faceNormal, tangent);
@@ -219,8 +221,9 @@ void main() {
     vec2 local = vec2(localX / scaleX, localY / scaleY);
 
     // map local (-0.5..0.5) to atlas cell
-    float colIdx = float(faceIdx % LABEL_COLS);
-    float rowIdx = float(faceIdx / LABEL_COLS);
+    float faceIdxF = float(faceIdx);
+    float rowIdx = floor(faceIdxF / float(LABEL_COLS));
+    float colIdx = faceIdxF - rowIdx * float(LABEL_COLS);
     vec2 atlasUV = vec2((colIdx + (local.x * 0.5 + 0.5)) / float(LABEL_COLS), (rowIdx + (local.y * 0.5 + 0.5)) / float(LABEL_ROWS));
 
     // sample atlas and blend on surface when within label bounds

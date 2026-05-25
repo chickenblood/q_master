@@ -16,6 +16,7 @@ final class DodGameView extends StatelessWidget {
       tag: Object() /* ignore heroTag for now */,
       child: PlatformScaffold(
         backgroundColor: Colors.black,
+        material: (_, _) => MaterialScaffoldData(extendBodyBehindAppBar: true),
         appBar: PlatformAppBar(
           backgroundColor: Colors.transparent,
           leading: PlatformIconButton(
