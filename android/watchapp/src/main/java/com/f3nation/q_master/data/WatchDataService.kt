@@ -4,14 +4,20 @@ import android.util.Log
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataItem
+import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
 import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 
 private const val TAG = "WatchDataService"
+private const val CHANNEL_PATH = "watch_connectivity"
 
 /**
- * A background service that listens for data changes from the handheld (phone) app.
+ * A background service that listens for sync payloads from the handheld app.
+ *
+ * Supports both:
+ * - Data layer context updates (`updateApplicationContext` / PutDataItem)
+ * - Realtime message updates (`sendMessage`)
  */
 class WatchDataService : WearableListenerService() {
 
@@ -29,8 +35,8 @@ class WatchDataService : WearableListenerService() {
                 if (event.type == DataEvent.TYPE_CHANGED) {
                     val path = event.dataItem.uri.path
                     Log.d(TAG, "Processing data item with path: $path")
-                    if (path == "/watch_connectivity") {
-                        parseAndSaveData(event.dataItem)
+                    if (path?.endsWith(CHANNEL_PATH) == true) {
+                        parseAndSaveData(event.dataItem.data, source = "data")
                     }
                 }
             }
@@ -43,8 +49,20 @@ class WatchDataService : WearableListenerService() {
         }
     }
 
-    private fun parseAndSaveData(dataItem: DataItem) {
-        val data = dataItem.data ?: return
+    override fun onMessageReceived(messageEvent: MessageEvent) {
+        val path = messageEvent.path
+        Log.d(TAG, "onMessageReceived: path=$path")
+
+        // Be more lenient with paths for messages
+        if (path.endsWith(CHANNEL_PATH)) {
+            parseAndSaveData(messageEvent.data, source = "message")
+        } else {
+            Log.w(TAG, "Received message with unexpected path: $path")
+        }
+    }
+
+    private fun parseAndSaveData(data: ByteArray?, source: String) {
+        if (data == null) return
         try {
             val byteArrayInputStream = ByteArrayInputStream(data)
             val objectInputStream = ObjectInputStream(byteArrayInputStream)
@@ -56,7 +74,7 @@ class WatchDataService : WearableListenerService() {
                     val workouts = workoutsMap
                         .filterIsInstance<Map<*, *>>()
                         .map { it.toWorkout() }
-                    Log.d(TAG, "Parsed ${workouts.size} workouts successfully")
+                    Log.d(TAG, "Parsed ${workouts.size} workouts successfully from $source")
                     WorkoutRepository.updateWorkouts(workouts)
                 } else {
                     Log.w(TAG, "Received map missing 'workouts' key")

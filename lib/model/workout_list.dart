@@ -52,9 +52,13 @@ final class WorkoutList extends _$WorkoutList {
         };
 
         if (Platform.isAndroid) {
-          // Use custom urgent sync on Android to bypass battery-saving batching
-          const channel = MethodChannel('com.f3nation.q_master/sync');
-          await channel.invokeMethod('urgent_sync', payload);
+          // Realtime push when connected; fall back to context sync when not
+          // reachable.
+          if (isReachable) {
+            await _watch.sendMessage(payload);
+          } else {
+            await _watch.updateApplicationContext(payload);
+          }
         } else {
           // Standard sync for iOS/watchOS
           await _watch.updateApplicationContext(payload);

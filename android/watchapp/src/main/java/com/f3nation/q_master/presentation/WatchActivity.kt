@@ -72,44 +72,6 @@ class WatchActivity : ComponentActivity() {
         super.onResume()
         // Ensure Repository is initialized (in case service started it first)
         WorkoutRepository.init(this)
-
-        // Get previously-synced data for initial load
-        val dataClient = Wearable.getDataClient(this)
-        dataClient.dataItems.addOnSuccessListener { dataItemBuffer ->
-            try {
-                for (i in 0 until dataItemBuffer.count) {
-                    val item = dataItemBuffer.get(i)
-                    if (item.uri.path == "/watch_connectivity") {
-                        parseData(item)
-                    }
-                }
-            } catch (e: Exception) {
-                WorkoutRepository.updateError("Error loading buffered data", e.stackTraceToString())
-            } finally {
-                dataItemBuffer.release()
-            }
-        }
-    }
-
-    private fun parseData(dataItem: DataItem) {
-        val data = dataItem.data ?: return
-        try {
-            val byteArrayInputStream = ByteArrayInputStream(data)
-            val objectInputStream = ObjectInputStream(byteArrayInputStream)
-            val receivedObject = objectInputStream.readObject()
-            
-            if (receivedObject is Map<*, *>) {
-                val workoutsMap = receivedObject["workouts"] as? List<*>
-                if (workoutsMap != null) {
-                    val workouts = workoutsMap
-                        .filterIsInstance<Map<*, *>>()
-                        .map { it.toWorkout() }
-                    WorkoutRepository.updateWorkouts(workouts)
-                }
-            }
-        } catch (e: Exception) {
-            WorkoutRepository.updateError(e.message ?: "Unknown parsing error", e.stackTraceToString())
-        }
     }
 }
 
