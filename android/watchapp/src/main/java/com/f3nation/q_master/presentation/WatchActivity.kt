@@ -67,12 +67,6 @@ class WatchActivity : ComponentActivity() {
             WearApp(viewModel)
         }
     }
-
-    override fun onResume() {
-        super.onResume()
-        // Ensure Repository is initialized (in case service started it first)
-        WorkoutRepository.init(this)
-    }
 }
 
 @Composable
