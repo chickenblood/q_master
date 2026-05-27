@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q Master - F3 Hangar 1</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #d1d1d1;
+            background-color: #0b0c10;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        .container {
+            display: flex; /* Side-by-side layout */
+            max-width: 1000px;
+            background: #1f2833;
+            border-radius: 80px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+            border: 1px solid #45a29e;
+            overflow: hidden;
+            align-items: stretch;
+        }
+
+        /* Left Side: Image Section */
+        .hero-wrapper {
+            position: relative;
+            flex: 1; /* Takes up 50% */
+            min-width: 400px;
+            border-right: 3px solid #66fcf1;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures image fills the height */
+            display: block;
+        }
+
+        .corner-logo-link {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            height: 12%;
+            display: flex;
+            align-items: flex-end;
+            transition: transform 0.2s ease;
+        }
+
+        .corner-logo-link:hover {
+            transform: scale(1.1);
+        }
+
+        .corner-logo {
+            max-height: 100%;
+            width: auto;
+            filter: drop-shadow(0 2px 10px rgba(0,0,0,0.8));
+        }
+
+        /* Right Side: Content Section */
+        .content-padding {
+            flex: 1;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: left; /* Aligned left for the horizontal look */
+        }
+
+        .story-text {
+            color: #ffffff;
+            margin-bottom: clamp(16px, 3vh, 30px);
+            border-left: 5px solid #66fcf1;
+            padding: 10px 0 10px 25px;
+            font-size: 1.15rem;
+            line-height: 1.7;
+            background: rgba(102, 252, 241, 0.05);
+            border-radius: 0 10px 10px 0;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 2.35rem;
+            margin: 0;
+            letter-spacing: -1px;
+        }
+
+        .tagline {
+            font-weight: 600;
+            color: #66fcf1;
+            margin-top: 5px;
+            margin-bottom: 40px;
+            font-size: 1.3rem;
+        }
+
+        .badge-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-end;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .badge-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .badge-label {
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .label-active { color: #66fcf1; }
+        .label-soon { color: #45a29e; }
+
+        .app-store-badge img {
+            height: 44px;
+            width: auto;
+            transition: transform 0.2s ease;
+        }
+
+        .app-store-badge:hover img {
+            transform: scale(1.05);
+        }
+
+        .badge-disabled {
+            cursor: not-allowed;
+            filter: grayscale(1) opacity(0.2);
+            pointer-events: none;
+        }
+
+        .badge-disabled img {
+            height: 44px;
+        }
+
+        .footer {
+            margin-top: auto; /* Pushes footer to bottom of right side */
+            padding-top: 40px;
+            font-size: 0.85rem;
+            color: #8892b0;
+        }
+
+        .promo-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 1s ease;
+            cursor: pointer;
+        }
+
+        .main-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .main-content.is-visible {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Responsive: Stack vertically on small screens */
+        @media (max-width: 850px) {
+            body {
+                padding: 6px;
+                align-items: flex-start;
+                min-height: 100dvh;
+            }
+
+            .container {
+                flex-direction: column;
+                max-width: 520px;
+                height: calc(100dvh - 12px);
+                overflow: hidden;
+            }
+
+            .hero-wrapper {
+                flex: 1 1 auto;
+                min-width: unset;
+                border-right: none;
+                border-bottom: 3px solid #66fcf1;
+                min-height: 34dvh;
+                max-height: 48dvh;
+            }
+
+            .hero-image {
+                height: 100%;
+            }
+
+            .content-padding {
+                flex: 0 0 auto;
+                justify-content: flex-start;
+                text-align: center;
+                padding: 12px 14px;
+            }
+
+            .story-text {
+                flex: 1 1 auto;
+                text-align: left;
+                font-size: 0.84rem;
+                line-height: 1.32;
+                margin-bottom: auto;
+                padding: 5px 0 5px 10px;
+                overflow: visible;
+            }
+
+            h1 {
+                margin-top: 8px;
+                font-size: clamp(1.45rem, 5.5vw, 1.75rem);
+            }
+
+            .tagline {
+                font-size: clamp(0.9rem, 3.8vw, 1.05rem);
+                margin-bottom: 10px;
+            }
+
+            .badge-label {
+                font-size: 0.72rem;
+                margin-bottom: 6px;
+            }
+
+            .badge-container {
+                justify-content: center;
+            }
+
+            .badge-item {
+                align-items: center;
+            }
+
+            .app-store-badge img,
+            .badge-disabled img {
+                height: 34px;
+            }
+
+            .footer {
+                margin-top: 6px;
+                padding-top: 8px;
+                font-size: 0.68rem;
+            }
+        }
+
+        /* Keep classic side-by-side layout for short, wide phone screens */
+        @media (max-width: 850px) and (orientation: landscape) {
+            body {
+                padding: 8px;
+                align-items: center;
+            }
+
+            .container {
+                flex-direction: row;
+                direction: ltr;
+                max-width: 1000px;
+                width: 100%;
+                height: calc(100dvh - 16px);
+            }
+
+            .hero-wrapper {
+                order: 0;
+                flex: 1 1 50%;
+                min-height: 0;
+                max-height: none;
+                border-bottom: none;
+                border-right: 3px solid #66fcf1;
+            }
+
+            .content-padding {
+                order: 1;
+                flex: 1 1 50%;
+                justify-content: flex-start;
+                text-align: left;
+                padding: 18px;
+            }
+
+            .story-text {
+                flex: 0 0 auto;
+                font-size: 0.86rem;
+                line-height: 1.35;
+                margin-bottom: auto;
+                padding: 6px 0 6px 12px;
+            }
+
+            h1 {
+                margin-top: 8px;
+                font-size: clamp(1.7rem, 3.2vw, 2.05rem);
+            }
+
+            .tagline {
+                font-size: 0.95rem;
+                margin-bottom: 10px;
+            }
+
+            .badge-container {
+                justify-content: flex-start;
+            }
+
+            .badge-item {
+                align-items: flex-start;
+            }
+
+            .app-store-badge img,
+            .badge-disabled img {
+                height: 32px;
+            }
+
+            .watch-info {
+                margin-top: 12px;
+                font-size: 0.75rem;
+                color: #45a29e;
+            }
+
+            .footer {
+                margin-top: auto;
+                padding-top: 10px;
+                font-size: 0.66rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<video
+    id="promoVideo"
+    class="promo-video"
+  autoplay
+  muted
+  playsinline
+  preload="auto">
+    <source src="apple_promo_video.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+
+<div id="mainContent" class="main-content">
+  <div class="container">
+    <div class="hero-wrapper">
+        <img src="gloom.png" alt="The November Gloom" class="hero-image">
+
+        <a href="https://apps.apple.com/app/id6756852098" target="_blank" class="corner-logo-link">
+            <img src="logo.png" alt="F3 Hangar 1 Logo" class="corner-logo">
+        </a>
+    </div>
+
+    <div class="content-padding">
+        <div class="story-text">
+            “There I was, preparing to Q in the November gloom, with a blinking headlamp in my left hand and a soggy weinke in my right. The wind was blowing as I squinted, trying to read my merkin count off the wet page. I thought, <i>There has to be a better way.</i>”
+        </div>
+
+        <h1>Q Master</h1>
+        <p class="tagline">…and the Q Master app was born.</p>
+
+        <div class="badge-container">
+            <div class="badge-item">
+                <span class="badge-label label-active">iOS</span>
+                <a href="https://apps.apple.com/app/id6756852098" target="_blank" class="app-store-badge">
+                    <img src="Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg" alt="Download on the App Store">
+                </a>
+            </div>
+
+            <div class="badge-item">
+                <span class="badge-label label-active">Android</span>
+                <a href="https://play.google.com/store/apps/details?id=com.f3nation.q_master" target="_blank" class="app-store-badge">
+                    <img src="GetItOnGooglePlay_Badge_Web_color_English.svg" alt="Get it on Google Play">
+                </a>
+            </div>
+        </div>
+        <p class="watch-info">Now available on Apple Watch and Android Wear.</p>
+
+        <div class="footer">
+            Brought to you by Vevo and the Pax of F3 Hangar 1.
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    // when the promo video finishes, cross-fade to the main content
+    const video = document.getElementById('promoVideo');
+    const main = document.getElementById('mainContent');
+    let hasTransitioned = false;
+
+    // Never block content if playback hangs on load.
+    const fallbackTimer = window.setTimeout(transitionToMain, 5000);
+
+    // Try to play on page load; if blocked, show main content immediately
+    video.play().catch(() => {
+        // Autoplay blocked or failed - show main content
+        transitionToMain();
+    });
+
+    // If video finishes normally, transition
+    video.addEventListener('ended', transitionToMain);
+    video.addEventListener('error', transitionToMain);
+    video.addEventListener('click', transitionToMain);
+
+    function transitionToMain() {
+        if (hasTransitioned) {
+            return;
+        }
+        hasTransitioned = true;
+        window.clearTimeout(fallbackTimer);
+
+        video.style.opacity = '0';
+        main.classList.add('is-visible');
+        requestAnimationFrame(() => {
+            main.classList.add('is-visible');
+        });
+        setTimeout(() => {
+            video.remove();
+        }, 1000);
+    }
+</script>
+
+</body>
+</html>
