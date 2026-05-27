@@ -38,6 +38,7 @@ dependencies: # keep sorted alphabetically
   watch_connectivity: ^0.2.8
   webview_flutter: ^4.13.0
   webview_flutter_android: ^4.10.11
+  stupid_simple_sheet: ^0.9.1+1
 
 
 # flutter_inappwebview_android 1.1.3 uses proguard-android.txt which AGP 9 no longer supports.
