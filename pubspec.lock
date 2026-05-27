@@ -957,14 +957,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.10.2"
-  rename:
-    dependency: "direct main"
-    description:
-      name: rename
-      sha256: da5f4d67f8c68f066ad04edfd6585495dbe595f2baf3b1999eb6af1805d79539
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.0"
   riverpod:
     dependency: transitive
     description:
@@ -1371,7 +1363,7 @@ packages:
     source: hosted
     version: "4.5.3"
   vector_math:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: vector_math
       sha256: d530bd74fea330e6e364cda7a85019c434070188383e1cd8d9777ee586914c5b
