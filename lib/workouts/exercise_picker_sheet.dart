@@ -369,13 +369,19 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
   Widget build(BuildContext context) {
     final isLandscape = MediaQuery.orientationOf(context) == .landscape;
     final gridColumnCount = isLandscape ? 4 : 2;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return SafeArea(
       bottom: false,
-      child: SheetBackground(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        child: Scaffold(
-          body: Column(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SheetBackground(
+          shape: RoundedRectangleBorder(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            side: BorderSide(color: colorScheme.outlineVariant),
+          ),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          child: Column(
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),

@@ -93,7 +93,6 @@ class WorkoutsTab extends ConsumerWidget {
 
     final result = await showModalBottomSheet<WorkoutCreationType>(
       context: navigator.context,
-      clipBehavior: .antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         side: BorderSide(color: colorScheme.outlineVariant),
