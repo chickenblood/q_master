@@ -434,17 +434,6 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
               Expanded(
                 child: CustomScrollView(
                   slivers: [
-                    // Disabled, since not happy with behavior when trying to
-                    // drag down from the header. It requires grid content to
-                    // be scrolled all the waytto the top first. Dragging up is
-                    // okay.
-                    // PinnedHeaderSliver(
-                    //   child: Container(
-                    //     padding: EdgeInsets.all(8),
-                    //     color: Theme.of(context).scaffoldBackgroundColor,
-                    //     child: _filterChips(context),
-                    //   ),
-                    // ),
                     SliverSafeArea(
                       bottom: true,
                       sliver: _exerciseGrid(

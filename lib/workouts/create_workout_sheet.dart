@@ -51,10 +51,11 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   // if the user cancels out of editing.
   Workout? _storedWorkout;
   var _displayMode = DisplayMode.display;
+  var _pickerIsShown = false;
 
   // Track the group of the most recently added exercise for scrolling
   String? _lastAddedItemGroup;
-  AppLifecycleListener? _appLifecycleListener;
+  late final AppLifecycleListener _appLifecycleListener;
 
   // --- Lifecycle & State ---
   @override
@@ -88,7 +89,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
 
   @override
   void dispose() {
-    _appLifecycleListener?.dispose();
+    _appLifecycleListener.dispose();
     _nameTextController.dispose();
     _focusNode.dispose();
     super.dispose();
@@ -254,6 +255,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
         CupertinoIconButtonData(padding: EdgeInsets.only(right: 8)),
     onPressed: () async {
       _focusNode.unfocus();
+      setState(() => _pickerIsShown = true);
       showExercisePicker(
         context,
         onExerciseAdded: (exercise) {
@@ -262,7 +264,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
             _lastAddedItemGroup = sectionTitle;
           });
         },
-      );
+      ).then((_) => setState(() => _pickerIsShown = false));
     },
   );
 
@@ -389,7 +391,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                               Scrollable.ensureVisible(
                                 itemContext,
                                 duration: const Duration(milliseconds: 300),
-                                alignment: 0.5,
+                                alignment: 0.0,
                                 alignmentPolicy: .explicit,
                               );
                               _lastAddedItemGroup = null;
@@ -469,7 +471,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                       ),
                     );
                   },
-                  onReorder: (startIndex, endIndex) {
+                  onReorderItem: (startIndex, endIndex) {
                     setState(() {
                       _moveExercise(
                         exercises,
@@ -482,7 +484,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
               ],
             );
           },
-          onReorder: (startIndex, endIndex) {
+          onReorderItem: (startIndex, endIndex) {
             setState(() {
               _moveSection(fromIndex: startIndex, toIndex: endIndex);
             });
@@ -593,48 +595,53 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
         child: Container(
           padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
           color: Theme.of(context).colorScheme.surface,
-          child: Row(
-            mainAxisAlignment: .spaceBetween,
-            crossAxisAlignment: .center,
-            children: [
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    sectionTitle.toUpperCase(),
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      letterSpacing: .1,
+          child: GestureDetector(
+            onDoubleTap: () => isEditingMode
+                ? _editSectionTitle(context, sectionTitle: sectionTitle)
+                : null,
+            child: Row(
+              mainAxisAlignment: .spaceBetween,
+              crossAxisAlignment: .center,
+              children: [
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      sectionTitle.toUpperCase(),
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        letterSpacing: .1,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.left,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.left,
                   ),
                 ),
-              ),
-              if (isEditingMode)
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        PlatformIcons(context).edit,
-                        color: Theme.of(context).colorScheme.onSurface,
-                        size: 20,
+                if (isEditingMode)
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          PlatformIcons(context).edit,
+                          color: Theme.of(context).colorScheme.onSurface,
+                          size: 20,
+                        ),
+                        tooltip: L10n.of(context)!.editSectionTooltip,
+                        onPressed: () => _editSectionTitle(
+                          context,
+                          sectionTitle: sectionTitle,
+                        ),
                       ),
-                      tooltip: L10n.of(context)!.editSectionTooltip,
-                      onPressed: () => _editSectionTitle(
+                      _addExerciseButton(
                         context,
+                        exercises: exercises,
                         sectionTitle: sectionTitle,
                       ),
-                    ),
-                    _addExerciseButton(
-                      context,
-                      exercises: exercises,
-                      sectionTitle: sectionTitle,
-                    ),
-                  ],
-                ),
-            ],
+                    ],
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -767,6 +774,9 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
         ),
         ...content(context),
         if (_displayMode == .display) _displayFooter(context),
+        // Add padding when the picker is up, so we can scroll the content
+        // above the keyboard and picker without it being obscured
+        if (_pickerIsShown) SliverFillRemaining(child: SizedBox(height: 800)),
       ],
     ),
   );
