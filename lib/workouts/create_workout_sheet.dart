@@ -128,13 +128,13 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     required int toIndex,
   }) {
     final exercise = exercises.removeAt(fromIndex);
-    exercises.insert(toIndex > fromIndex ? toIndex - 1 : toIndex, exercise);
+    exercises.insert(toIndex, exercise);
   }
 
   void _moveSection({required int fromIndex, required int toIndex}) {
     final sectionEntries = _sections.entries.toList(growable: true);
     final section = sectionEntries.removeAt(fromIndex);
-    sectionEntries.insert(toIndex > fromIndex ? toIndex - 1 : toIndex, section);
+    sectionEntries.insert(toIndex, section);
     _sections
       ..clear()
       ..addEntries(sectionEntries);

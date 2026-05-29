@@ -200,8 +200,7 @@ class WorkoutsTab extends ConsumerWidget {
                   onInvokeWorkoutEditor: _invokeWorkoutEditor,
                   onShareWorkout: _shareWorkout,
                 ),
-                onReorder: (oldIndex, newIndex) =>
-                    listNotifier.move(oldIndex, newIndex),
+                onReorderItem: listNotifier.move,
               )
             : _emptyContentPlaceholder(context),
         material: (innerContext, _) => MaterialScaffoldData(

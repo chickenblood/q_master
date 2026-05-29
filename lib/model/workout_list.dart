@@ -110,10 +110,7 @@ final class WorkoutList extends _$WorkoutList {
   void move(int fromIndex, int toIndex) {
     final updatedWorkouts = List.of(state);
     final workout = updatedWorkouts.removeAt(fromIndex);
-    updatedWorkouts.insert(
-      toIndex > fromIndex ? toIndex - 1 : toIndex,
-      workout,
-    );
+    updatedWorkouts.insert(toIndex, workout);
     _save(updatedWorkouts: updatedWorkouts);
   }
 
