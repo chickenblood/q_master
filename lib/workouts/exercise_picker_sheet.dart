@@ -372,6 +372,9 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return SafeArea(
+      // Add additional top padding to allow the content behind to be visible
+      // when adding a new exercise to the list.
+      minimum: const EdgeInsets.only(top: 180),
       bottom: false,
       child: Scaffold(
         backgroundColor: Colors.transparent,
