@@ -15,6 +15,7 @@ class ExiconEntry with _$ExiconEntry {
   const factory ExiconEntry({
     required String name,
     String? description,
+    Uri? videoUrl,
     @Default(<String, Object?>{}) Map<String, Object?> data,
   }) = _ExiconEntry;
 
@@ -28,6 +29,19 @@ class ExiconEntry with _$ExiconEntry {
     description: _readString(
       json,
       const ['description', 'details', 'explanation'],
+    ),
+    videoUrl: _readUri(
+      json,
+      const [
+        'videoUrl',
+        'video_url',
+        'video',
+        'videoLink',
+        'video_link',
+        'youtube',
+        'youtubeUrl',
+        'youtube_url',
+      ],
     ),
     data: Map<String, Object?>.of(json),
   );
@@ -73,6 +87,28 @@ String? _readString(Map<String, Object?> json, List<String> keys) {
     final value = json[key];
     if (value is String && value.trim().isNotEmpty) {
       return value;
+    }
+  }
+  return null;
+}
+
+Uri? _readUri(Map<String, Object?> json, List<String> keys) {
+  for (final key in keys) {
+    final value = json[key];
+    if (value is String) {
+      final parsed = Uri.tryParse(value.trim());
+      if (parsed != null && parsed.hasScheme) {
+        return parsed;
+      }
+    }
+    if (value is Map) {
+      final urlCandidate = value['url'];
+      if (urlCandidate is String) {
+        final parsed = Uri.tryParse(urlCandidate.trim());
+        if (parsed != null && parsed.hasScheme) {
+          return parsed;
+        }
+      }
     }
   }
   return null;
