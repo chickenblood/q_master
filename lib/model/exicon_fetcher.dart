@@ -10,8 +10,7 @@ part 'exicon_fetcher.g.dart';
 const _exiconEndpoint = 'https://codex.f3nation.com/submit?type=exicon';
 
 @freezed
-abstract class ExiconEntry with _$ExiconEntry {
-  @JsonSerializable(explicitToJson: true)
+class ExiconEntry with _$ExiconEntry {
   const factory ExiconEntry({
     required String name,
     String? description,
@@ -33,19 +32,28 @@ abstract class ExiconEntry with _$ExiconEntry {
 
 @riverpod
 final class ExiconFetcher extends _$ExiconFetcher {
-  static final _httpClient = HttpClient();
-
   @override
-  Future<List<ExiconEntry>> build() => _fetchEntries();
+  Future<List<ExiconEntry>> build() {
+    final httpClient = HttpClient();
+    ref.onDispose(httpClient.close);
+    return _fetchEntries(httpClient);
+  }
 
   Future<void> refresh() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(_fetchEntries);
+    state = await AsyncValue.guard(() async {
+      final httpClient = HttpClient();
+      try {
+        return await _fetchEntries(httpClient);
+      } finally {
+        httpClient.close();
+      }
+    });
   }
 
-  Future<List<ExiconEntry>> _fetchEntries() async {
+  Future<List<ExiconEntry>> _fetchEntries(HttpClient httpClient) async {
     final uri = Uri.parse(_exiconEndpoint);
-    final request = await _httpClient.getUrl(uri);
+    final request = await httpClient.getUrl(uri);
     final response = await request.close();
     if (response.statusCode != HttpStatus.ok) {
       throw HttpException(
@@ -89,7 +97,13 @@ List<Map<String, Object?>> _extractRows(Object? decoded) {
   throw const FormatException('Unexpected exicon response format.');
 }
 
-List<Map<String, Object?>> _rowsFromList(List<dynamic> rows) => [
-  for (final row in rows)
-    if (row is Map) Map<String, Object?>.from(row),
-];
+List<Map<String, Object?>> _rowsFromList(List<dynamic> rows) {
+  final mappedRows = <Map<String, Object?>>[];
+  for (final row in rows) {
+    if (row is! Map) {
+      throw const FormatException('Exicon row must be a JSON object.');
+    }
+    mappedRows.add(Map<String, Object?>.from(row));
+  }
+  return mappedRows;
+}
