@@ -11,8 +11,6 @@ part 'exicon_fetcher.freezed.dart';
 part 'exicon_fetcher.g.dart';
 
 const _exiconEndpoint = 'https://codex.f3nation.com/api/exicon';
-const _unknownExerciseName = 'unknown';
-const _unknownTagName = 'unknown-tag';
 const _exiconCacheFilename = 'exicon_latest_fetch.json';
 
 @freezed
@@ -26,11 +24,20 @@ class ExiconTag with _$ExiconTag {
   factory ExiconTag.fromJson(Map<String, Object?> json) =>
       _$ExiconTagFromJson(json);
 
-  factory ExiconTag.fromApiJson(Map<String, Object?> json) => ExiconTag(
-    id: _readString(json, const ['id']),
-    name: _readString(json, const ['name', 'label', 'title']) ?? _unknownTagName,
-    data: Map<String, Object?>.of(json),
-  );
+  factory ExiconTag.fromApiJson(Map<String, Object?> json) {
+    final name = _readString(json, 'name');
+    if (name == null) {
+      throw FormatException(
+        'Exicon tag must include a non-empty name. Received keys: ${json.keys.join(', ')}',
+      );
+    }
+
+    return ExiconTag(
+      id: _readString(json, 'id'),
+      name: name,
+      data: Map<String, Object?>.of(json),
+    );
+  }
 }
 
 @freezed
@@ -51,38 +58,30 @@ class ExiconEntry with _$ExiconEntry {
   factory ExiconEntry.fromJson(Map<String, Object?> json) =>
       _$ExiconEntryFromJson(json);
 
-  factory ExiconEntry.fromApiJson(Map<String, Object?> json) => ExiconEntry(
-    id: _readString(json, const ['id']),
-    name:
-        _readString(json, const ['name', 'exercise', 'title']) ??
-        _unknownExerciseName,
-    description: _readString(
-      json,
-      const ['description', 'details', 'explanation'],
-    ),
-    type: _readString(json, const ['type']),
-    aliases: _readStringList(json, const ['aliases', 'alias']),
-    tags: _readTags(json, const ['tags']),
-    videoUrl: _readUri(
-      json,
-      const [
-        'videoUrl',
-        'video_url',
-        'video',
-        'videoLink',
-        'video_link',
-        'youtube',
-        'youtubeUrl',
-        'youtube_url',
-      ],
-    ),
-    mentionedEntries: _readStringList(
-      json,
-      const ['mentionedEntries', 'mentioned_entries'],
-    ),
-    referencedBy: _readStringList(json, const ['referencedBy', 'referenced_by']),
-    data: Map<String, Object?>.of(json),
-  );
+  factory ExiconEntry.fromApiJson(Map<String, Object?> json) {
+    final name = _readString(json, 'name');
+    if (name == null) {
+      throw FormatException(
+        'Exicon entry must include a non-empty name. Received keys: ${json.keys.join(', ')}',
+      );
+    }
+
+    final id = _readString(json, 'id');
+    final entryIdentifier = id ?? name;
+
+    return ExiconEntry(
+      id: id,
+      name: name,
+      description: _readString(json, 'description'),
+      type: _readString(json, 'type'),
+      aliases: _readStringList(json, 'aliases'),
+      tags: _readTags(json, entryIdentifier),
+      videoUrl: _readUri(json, 'videoLink'),
+      mentionedEntries: _readStringList(json, 'mentionedEntries'),
+      referencedBy: _readStringList(json, 'referencedBy'),
+      data: Map<String, Object?>.of(json),
+    );
+  }
 }
 
 @riverpod
@@ -134,115 +133,75 @@ Future<void> _persistLatestFetch(String responseBody) async {
   }
 }
 
-String? _readString(Map<String, Object?> json, List<String> keys) {
-  for (final key in keys) {
-    final value = json[key];
-    if (value is String && value.trim().isNotEmpty) {
-      return value;
-    }
-  }
-  return null;
-}
-
-Uri? _readUri(Map<String, Object?> json, List<String> keys) {
-  for (final key in keys) {
-    final value = json[key];
-    if (value is String) {
-      final parsed = Uri.tryParse(value.trim());
-      if (parsed != null && parsed.hasScheme) {
-        return parsed;
-      }
-    }
-    if (value is Map) {
-      final urlCandidate = value['url'];
-      if (urlCandidate is String) {
-        final parsed = Uri.tryParse(urlCandidate.trim());
-        if (parsed != null && parsed.hasScheme) {
-          return parsed;
-        }
-      }
-    }
-  }
-  return null;
-}
-
-List<String> _readStringList(Map<String, Object?> json, List<String> keys) {
-  for (final key in keys) {
-    final value = json[key];
-    final parsed = _stringListFromValue(value);
-    if (parsed.isNotEmpty) {
-      return parsed;
-    }
-  }
-  return const [];
-}
-
-List<String> _stringListFromValue(Object? value) {
+/// Reads a non-empty string from a single schema-defined field.
+String? _readString(Map<String, Object?> json, String key) {
+  final value = json[key];
   if (value is String) {
     final trimmed = value.trim();
     if (trimmed.isNotEmpty) {
-      return [trimmed];
-    }
-    return const [];
-  }
-
-  if (value is List) {
-    final parsed = <String>[];
-    for (final item in value) {
-      final asString = _stringValue(item);
-      if (asString != null) {
-        parsed.add(asString);
-      }
-    }
-    return parsed;
-  }
-
-  final asString = _stringValue(value);
-  return asString == null ? const [] : [asString];
-}
-
-String? _stringValue(Object? value) {
-  if (value is String && value.trim().isNotEmpty) {
-    return value.trim();
-  }
-  if (value is Map) {
-    final id = value['id'];
-    if (id is String && id.trim().isNotEmpty) {
-      return id.trim();
-    }
-    final name = value['name'];
-    if (name is String && name.trim().isNotEmpty) {
-      return name.trim();
+      return trimmed;
     }
   }
   return null;
 }
 
-List<ExiconTag> _readTags(Map<String, Object?> json, List<String> keys) {
-  for (final key in keys) {
-    final value = json[key];
-    if (value is! List) {
+/// Reads a URI from a single schema-defined key.
+Uri? _readUri(Map<String, Object?> json, String key) {
+  final value = json[key];
+  if (value is String) {
+    final parsed = Uri.tryParse(value.trim());
+    if (parsed != null && parsed.hasScheme) {
+      return parsed;
+    }
+  }
+  return null;
+}
+
+/// Reads a list of strings from one schema-defined field (e.g. `aliases`).
+List<String> _readStringList(Map<String, Object?> json, String key) {
+  final value = json[key];
+  if (value is! List) {
+    return const [];
+  }
+
+  final parsed = <String>[];
+  for (final item in value) {
+    if (item is String) {
+      final trimmed = item.trim();
+      if (trimmed.isNotEmpty) {
+        parsed.add(trimmed);
+      }
+    }
+  }
+  return parsed;
+}
+
+/// Reads schema-defined `tags` and extracts nested `id` and `name` values.
+List<ExiconTag> _readTags(Map<String, Object?> json, String entryIdentifier) {
+  final value = json['tags'];
+  if (value is! List) {
+    return const [];
+  }
+
+  final tags = <ExiconTag>[];
+  for (final item in value) {
+    if (item is! Map) {
       continue;
     }
 
-    final tags = <ExiconTag>[];
-    for (final item in value) {
-      if (item is Map) {
-        tags.add(ExiconTag.fromApiJson(Map<String, Object?>.from(item)));
-        continue;
-      }
-      final name = _stringValue(item);
-      if (name != null) {
-        tags.add(ExiconTag(name: name));
-      }
-    }
-
-    if (tags.isNotEmpty) {
-      return tags;
+    final tag = Map<String, Object?>.from(item);
+    try {
+      tags.add(ExiconTag.fromApiJson(tag));
+    } on FormatException catch (error) {
+      developer.log(
+        'Skipping malformed Exicon tag for entry: $entryIdentifier.',
+        name: 'ExiconFetcher',
+        error: error,
+      );
+      continue;
     }
   }
-
-  return const [];
+  return tags;
 }
 
 List<Map<String, Object?>> _extractRows(Object? decoded) {
