@@ -54,7 +54,13 @@ void main() {
           'mentioned_entries': ['Squat'],
           'referenced_by': ['Beatdown-2'],
         }),
-        throwsFormatException,
+        throwsA(
+          isA<FormatException>().having(
+            (error) => error.message,
+            'message',
+            contains('name'),
+          ),
+        ),
       );
     });
 
@@ -78,6 +84,12 @@ void main() {
           ),
         ],
       );
+    });
+
+    test('id remains optional', () {
+      final entry = ExiconEntry.fromApiJson({'name': 'No ID'});
+      expect(entry.id, isNull);
+      expect(entry.name, 'No ID');
     });
   });
 }

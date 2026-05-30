@@ -27,7 +27,9 @@ class ExiconTag with _$ExiconTag {
   factory ExiconTag.fromApiJson(Map<String, Object?> json) {
     final name = _readString(json, 'name');
     if (name == null) {
-      throw const FormatException('Exicon tag must include a non-empty name.');
+      throw FormatException(
+        'Exicon tag must include a non-empty name. Received keys: ${json.keys.join(', ')}',
+      );
     }
 
     return ExiconTag(
@@ -59,16 +61,21 @@ class ExiconEntry with _$ExiconEntry {
   factory ExiconEntry.fromApiJson(Map<String, Object?> json) {
     final name = _readString(json, 'name');
     if (name == null) {
-      throw const FormatException('Exicon entry must include a non-empty name.');
+      throw FormatException(
+        'Exicon entry must include a non-empty name. Received keys: ${json.keys.join(', ')}',
+      );
     }
 
+    final id = _readString(json, 'id');
+    final entryIdentifier = id ?? name;
+
     return ExiconEntry(
-      id: _readString(json, 'id'),
+      id: id,
       name: name,
       description: _readString(json, 'description'),
       type: _readString(json, 'type'),
       aliases: _readStringList(json, 'aliases'),
-      tags: _readTags(json),
+      tags: _readTags(json, entryIdentifier),
       videoUrl: _readUri(json, 'videoLink'),
       mentionedEntries: _readStringList(json, 'mentionedEntries'),
       referencedBy: _readStringList(json, 'referencedBy'),
@@ -129,13 +136,16 @@ Future<void> _persistLatestFetch(String responseBody) async {
 /// Reads a non-empty string from a single schema-defined field.
 String? _readString(Map<String, Object?> json, String key) {
   final value = json[key];
-  if (value is String && value.trim().isNotEmpty) {
-    return value.trim();
+  if (value is String) {
+    final trimmed = value.trim();
+    if (trimmed.isNotEmpty) {
+      return trimmed;
+    }
   }
   return null;
 }
 
-/// Reads a URI from one schema-defined field (for example, `videoLink`).
+/// Reads a URI from a single schema-defined key.
 Uri? _readUri(Map<String, Object?> json, String key) {
   final value = json[key];
   if (value is String) {
@@ -156,15 +166,18 @@ List<String> _readStringList(Map<String, Object?> json, String key) {
 
   final parsed = <String>[];
   for (final item in value) {
-    if (item is String && item.trim().isNotEmpty) {
-      parsed.add(item.trim());
+    if (item is String) {
+      final trimmed = item.trim();
+      if (trimmed.isNotEmpty) {
+        parsed.add(trimmed);
+      }
     }
   }
   return parsed;
 }
 
 /// Reads schema-defined `tags` and extracts nested `id` and `name` values.
-List<ExiconTag> _readTags(Map<String, Object?> json) {
+List<ExiconTag> _readTags(Map<String, Object?> json, String entryIdentifier) {
   final value = json['tags'];
   if (value is! List) {
     return const [];
@@ -177,18 +190,16 @@ List<ExiconTag> _readTags(Map<String, Object?> json) {
     }
 
     final tag = Map<String, Object?>.from(item);
-    final name = _readString(tag, 'name');
-    if (name == null) {
+    try {
+      tags.add(ExiconTag.fromApiJson(tag));
+    } on FormatException catch (error) {
+      developer.log(
+        'Skipping malformed Exicon tag for entry: $entryIdentifier.',
+        name: 'ExiconFetcher',
+        error: error,
+      );
       continue;
     }
-
-    tags.add(
-      ExiconTag(
-        id: _readString(tag, 'id'),
-        name: name,
-        data: tag,
-      ),
-    );
   }
   return tags;
 }
