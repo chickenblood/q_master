@@ -56,8 +56,10 @@ final class ExiconFetcher extends _$ExiconFetcher {
         );
       }
 
-      final payload = await response.transform(utf8.decoder).join();
-      final decoded = jsonDecode(payload);
+      final decoded = await response
+          .transform(utf8.decoder)
+          .transform(json.decoder)
+          .first;
       final rows = _extractRows(decoded);
       return rows.map(ExiconEntry.fromApiJson).toList(growable: false);
     } finally {
@@ -96,9 +98,12 @@ List<Map<String, Object?>> _extractRows(Object? decoded) {
 
 List<Map<String, Object?>> _rowsFromList(List<dynamic> rows) {
   final mappedRows = <Map<String, Object?>>[];
-  for (final row in rows) {
+  for (var index = 0; index < rows.length; index++) {
+    final row = rows[index];
     if (row is! Map) {
-      throw const FormatException('Exicon row must be a JSON object.');
+      throw FormatException(
+        'Exicon row at index $index must be a JSON object (found ${row.runtimeType}).',
+      );
     }
     mappedRows.add(Map<String, Object?>.from(row));
   }
