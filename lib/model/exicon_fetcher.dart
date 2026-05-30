@@ -10,7 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'exicon_fetcher.freezed.dart';
 part 'exicon_fetcher.g.dart';
 
-const _exiconEndpoint = 'https://codex.f3nation.com/submit?type=exicon';
+const _exiconEndpoint = 'https://codex.f3nation.com/api/exicon';
 const _unknownExerciseName = 'unknown';
 const _exiconCacheFilename = 'exicon_latest_fetch.json';
 
