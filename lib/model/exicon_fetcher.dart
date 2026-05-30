@@ -36,39 +36,33 @@ class ExiconEntry with _$ExiconEntry {
 @riverpod
 final class ExiconFetcher extends _$ExiconFetcher {
   @override
-  Future<List<ExiconEntry>> build() {
-    final httpClient = HttpClient();
-    ref.onDispose(httpClient.close);
-    return _fetchEntries(httpClient);
-  }
+  Future<List<ExiconEntry>> build() => _fetchEntries();
 
   Future<void> refresh() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      final httpClient = HttpClient();
-      try {
-        return await _fetchEntries(httpClient);
-      } finally {
-        httpClient.close();
-      }
-    });
+    state = await AsyncValue.guard(_fetchEntries);
   }
 
-  Future<List<ExiconEntry>> _fetchEntries(HttpClient httpClient) async {
+  Future<List<ExiconEntry>> _fetchEntries() async {
+    final httpClient = HttpClient();
     final uri = Uri.parse(_exiconEndpoint);
-    final request = await httpClient.getUrl(uri);
-    final response = await request.close();
-    if (response.statusCode != HttpStatus.ok) {
-      throw HttpException(
-        'Failed to fetch exicon data: ${response.statusCode}',
-        uri: uri,
-      );
-    }
+    try {
+      final request = await httpClient.getUrl(uri);
+      final response = await request.close();
+      if (response.statusCode != HttpStatus.ok) {
+        throw HttpException(
+          'Failed to fetch exicon data: ${response.statusCode}',
+          uri: uri,
+        );
+      }
 
-    final payload = await response.transform(utf8.decoder).join();
-    final decoded = jsonDecode(payload);
-    final rows = _extractRows(decoded);
-    return rows.map(ExiconEntry.fromApiJson).toList(growable: false);
+      final payload = await response.transform(utf8.decoder).join();
+      final decoded = jsonDecode(payload);
+      final rows = _extractRows(decoded);
+      return rows.map(ExiconEntry.fromApiJson).toList(growable: false);
+    } finally {
+      httpClient.close();
+    }
   }
 }
 
