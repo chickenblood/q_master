@@ -8,6 +8,7 @@ part 'exicon_fetcher.freezed.dart';
 part 'exicon_fetcher.g.dart';
 
 const _exiconEndpoint = 'https://codex.f3nation.com/submit?type=exicon';
+const _unknownExerciseName = 'unknown';
 
 @freezed
 class ExiconEntry with _$ExiconEntry {
@@ -21,7 +22,9 @@ class ExiconEntry with _$ExiconEntry {
       _$ExiconEntryFromJson(json);
 
   factory ExiconEntry.fromApiJson(Map<String, Object?> json) => ExiconEntry(
-    name: _readString(json, const ['name', 'exercise', 'title']) ?? 'unknown',
+    name:
+        _readString(json, const ['name', 'exercise', 'title']) ??
+        _unknownExerciseName,
     description: _readString(
       json,
       const ['description', 'details', 'explanation'],
