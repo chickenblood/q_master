@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'exicon_fetcher.freezed.dart';
@@ -9,6 +10,7 @@ part 'exicon_fetcher.g.dart';
 
 const _exiconEndpoint = 'https://codex.f3nation.com/submit?type=exicon';
 const _unknownExerciseName = 'unknown';
+const _exiconCacheFilename = 'exicon_latest_fetch.json';
 
 @freezed
 class ExiconEntry with _$ExiconEntry {
@@ -70,16 +72,23 @@ final class ExiconFetcher extends _$ExiconFetcher {
         );
       }
 
-      final decoded = await response
-          .transform(utf8.decoder)
-          .transform(json.decoder)
-          .first;
+      final responseBody = await response.transform(utf8.decoder).join();
+      final decoded = jsonDecode(responseBody);
+      await _persistLatestFetch(responseBody);
       final rows = _extractRows(decoded);
       return rows.map(ExiconEntry.fromApiJson).toList(growable: false);
     } finally {
       httpClient.close();
     }
   }
+}
+
+Future<void> _persistLatestFetch(String responseBody) async {
+  try {
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/$_exiconCacheFilename');
+    await file.writeAsString(responseBody, flush: true);
+  } on Object {}
 }
 
 String? _readString(Map<String, Object?> json, List<String> keys) {
