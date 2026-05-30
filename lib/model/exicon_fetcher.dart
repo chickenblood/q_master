@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -74,8 +76,8 @@ final class ExiconFetcher extends _$ExiconFetcher {
 
       final responseBody = await response.transform(utf8.decoder).join();
       final decoded = jsonDecode(responseBody);
-      await _persistLatestFetch(responseBody);
       final rows = _extractRows(decoded);
+      unawaited(_persistLatestFetch(responseBody));
       return rows.map(ExiconEntry.fromApiJson).toList(growable: false);
     } finally {
       httpClient.close();
@@ -88,7 +90,14 @@ Future<void> _persistLatestFetch(String responseBody) async {
     final directory = await getApplicationDocumentsDirectory();
     final file = File('${directory.path}/$_exiconCacheFilename');
     await file.writeAsString(responseBody, flush: true);
-  } on Object {}
+  } on Object catch (error, stackTrace) {
+    developer.log(
+      'Failed to persist latest Exicon fetch.',
+      name: 'ExiconFetcher',
+      error: error,
+      stackTrace: stackTrace,
+    );
+  }
 }
 
 String? _readString(Map<String, Object?> json, List<String> keys) {
