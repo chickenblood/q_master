@@ -1,14 +1,17 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stupid_simple_sheet/stupid_simple_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../l10n/l10n.dart';
+import '../model/exicon_fetcher.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/simple_alert.dart';
 import '../utils/shared_app_prefs.dart';
+import 'exicon_catalog.dart';
 import 'workout_auto_completions.dart';
 import 'workout_constants.dart';
 import 'youtube_video_screen.dart';
@@ -32,7 +35,7 @@ Future<String?> showExercisePicker(
   );
 }
 
-class _ExercisePickerSheet extends StatefulWidget {
+class _ExercisePickerSheet extends ConsumerStatefulWidget {
   final TextEditingController controller;
   final void Function(String) onExerciseAdded;
 
@@ -42,10 +45,23 @@ class _ExercisePickerSheet extends StatefulWidget {
   });
 
   @override
-  State<_ExercisePickerSheet> createState() => _ExercisePickerSheetState();
+  ConsumerState<_ExercisePickerSheet> createState() =>
+      _ExercisePickerSheetState();
 }
 
-class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
+class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
+  static const _orderedFilterCategories = <ExerciseCategory>[
+    ExerciseCategory.core,
+    ExerciseCategory.cardio,
+    ExerciseCategory.strength,
+    ExerciseCategory.chest,
+    ExerciseCategory.shoulders,
+    ExerciseCategory.legs,
+    ExerciseCategory.arms,
+    ExerciseCategory.coupon,
+    ExerciseCategory.fullBody,
+  ];
+
   bool _canAdd = false;
 
   void _addExercise() {
@@ -67,36 +83,16 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     );
   }
 
-  late final Set<ExerciseCategory> _selectedCategories;
+  late final Set<String> _selectedTagKeys;
   late bool _videoFilter;
-
-  static const _orderedCategories = <ExerciseCategory>[
-    .core,
-    .cardio,
-    .strength,
-    .chest,
-    .shoulders,
-    .legs,
-    .arms,
-    .coupon,
-    .fullBody,
-  ];
 
   @override
   void initState() {
     super.initState();
     final prefs = SharedAppPrefs.instance;
-    final savedNames = prefs.selectedCategoryFilters.value;
-    _selectedCategories = savedNames
-        .map((name) {
-          try {
-            return ExerciseCategory.values.byName(name);
-          } on ArgumentError {
-            return null;
-          }
-        })
-        .whereType<ExerciseCategory>()
-        .toSet();
+    _selectedTagKeys = normalizeExerciseFilterKeys(
+      prefs.selectedCategoryFilters.value,
+    );
     _videoFilter = prefs.exerciseVideoFilter.value;
 
     widget.controller.addListener(_updateCanAdd);
@@ -114,15 +110,44 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     super.dispose();
   }
 
-  void _toggleCategory(ExerciseCategory category) {
+  Set<String> _effectiveSelectedTagKeys(Set<String> availableTagKeys) {
+    return _selectedTagKeys.where(availableTagKeys.contains).toSet();
+  }
+
+  List<NormalizedExiconTag> _curatedFilterTags(BuildContext context) {
+    return _orderedFilterCategories
+        .map(
+          (category) => NormalizedExiconTag(
+            key: _tagKeyForCategory(category),
+            label: category.displayLabel(context),
+          ),
+        )
+        .toList(growable: false);
+  }
+
+  String _tagKeyForCategory(ExerciseCategory category) {
+    return switch (category) {
+      ExerciseCategory.fullBody => 'full body',
+      _ => category.name,
+    };
+  }
+
+  void _toggleTag(
+    NormalizedExiconTag tag, {
+    required Set<String> availableTagKeys,
+  }) {
+    final nextSelectedTagKeys = _effectiveSelectedTagKeys(availableTagKeys);
     setState(() {
-      if (!_selectedCategories.add(category)) {
-        _selectedCategories.remove(category);
+      if (!nextSelectedTagKeys.add(tag.key)) {
+        nextSelectedTagKeys.remove(tag.key);
       }
+      _selectedTagKeys
+        ..clear()
+        ..addAll(nextSelectedTagKeys);
     });
-    SharedAppPrefs.instance.selectedCategoryFilters.value = _selectedCategories
-        .map((e) => e.name)
-        .toList();
+
+    final storedKeys = nextSelectedTagKeys.toList()..sort();
+    SharedAppPrefs.instance.selectedCategoryFilters.value = storedKeys;
   }
 
   void _selectExercise(BuildContext context, String exerciseName) {
@@ -157,18 +182,20 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     String description,
   ) => showSimpleAlert(context, title: exerciseName, message: description);
 
-  List<String> get _filteredExercises {
-    return workoutCompletions.entries
-        .where((entry) {
-          if (_videoFilter && entry.value.videoUrl == null) {
+  List<WorkoutCatalogExercise> _filteredExercises(
+    List<WorkoutCatalogExercise> exercises, {
+    required Set<String> selectedTagKeys,
+  }) {
+    return exercises
+        .where((exercise) {
+          if (_videoFilter && exercise.videoUrl == null) {
             return false;
           }
-          if (_selectedCategories.isEmpty) {
+          if (selectedTagKeys.isEmpty) {
             return true;
           }
-          return _selectedCategories.every(entry.value.categories.contains);
+          return selectedTagKeys.every(exercise.filterTagKeys.contains);
         })
-        .map((entry) => entry.key)
         .toList(growable: false);
   }
 
@@ -186,8 +213,13 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     );
   }
 
-  Widget _filterChips(BuildContext context) {
+  Widget _filterChips(
+    BuildContext context, {
+    required List<NormalizedExiconTag> availableTags,
+    required Set<String> selectedTagKeys,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
+    final availableTagKeys = availableTags.map((tag) => tag.key).toSet();
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
       switchInCurve: Curves.easeOut,
@@ -204,16 +236,17 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
             spacing: 8,
             runSpacing: 8,
             children: [
-              for (final category in _orderedCategories)
+              for (final tag in availableTags)
                 FilterChip(
-                  label: Text(category.displayLabel(context)),
-                  selected: _selectedCategories.contains(category),
-                  onSelected: (_) => _toggleCategory(category),
+                  label: Text(tag.label),
+                  selected: selectedTagKeys.contains(tag.key),
+                  onSelected: (_) =>
+                      _toggleTag(tag, availableTagKeys: availableTagKeys),
                   showCheckmark: false,
                   labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
                     fontSize: 12,
                     fontWeight: .w700,
-                    color: _selectedCategories.contains(category)
+                    color: selectedTagKeys.contains(tag.key)
                         ? colorScheme.onPrimary
                         : colorScheme.onSurfaceVariant,
                   ),
@@ -221,7 +254,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                   selectedColor: colorScheme.primary,
                   side: BorderSide(
                     width: 1.5,
-                    color: _selectedCategories.contains(category)
+                    color: selectedTagKeys.contains(tag.key)
                         ? colorScheme.primary
                         : colorScheme.outlineVariant,
                   ),
@@ -274,7 +307,47 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     );
   }
 
-  Widget _exerciseGrid(BuildContext context, {required int gridColumnCount}) {
+  Widget _stateSliver(
+    BuildContext context, {
+    required IconData icon,
+    required String message,
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return SliverFillRemaining(
+      hasScrollBody: false,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 32, color: colorScheme.onSurfaceVariant),
+              const SizedBox(height: 12),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              if (actionLabel != null && onAction != null) ...[
+                const SizedBox(height: 16),
+                ElevatedButton(onPressed: onAction, child: Text(actionLabel)),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _exerciseGrid(
+    BuildContext context, {
+    required int gridColumnCount,
+    required List<WorkoutCatalogExercise> exercises,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -284,14 +357,14 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
         mainAxisExtent: 72,
       ),
       delegate: SliverChildBuilderDelegate((context, index) {
-        if (index >= _filteredExercises.length) {
+        if (index >= exercises.length) {
           return null;
         }
-        final exerciseName = _filteredExercises[index];
-        final exerciseEntry = workoutCompletions[exerciseName]!;
-        final videoUrl = exerciseEntry.videoUrl;
+        final exercise = exercises[index];
+        final exerciseName = exercise.name;
+        final videoUrl = exercise.videoUrl;
         final hasVideo = videoUrl != null;
-        final description = exerciseEntry.description;
+        final description = exercise.description;
         final hasDescription =
             description != null && description.trim().isNotEmpty;
         final isSelected = widget.controller.text == exerciseName;
@@ -370,6 +443,18 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
     final isLandscape = MediaQuery.orientationOf(context) == .landscape;
     final gridColumnCount = isLandscape ? 4 : 2;
     final colorScheme = Theme.of(context).colorScheme;
+    final exiconEntries = ref.watch(exiconFetcherProvider);
+    final catalog = exiconEntries.maybeWhen(
+      data: buildWorkoutCatalog,
+      orElse: () => const <WorkoutCatalogExercise>[],
+    );
+    final availableTags = _curatedFilterTags(context);
+    final availableTagKeys = availableTags.map((tag) => tag.key).toSet();
+    final selectedTagKeys = _effectiveSelectedTagKeys(availableTagKeys);
+    final filteredExercises = _filteredExercises(
+      catalog,
+      selectedTagKeys: selectedTagKeys,
+    );
 
     return SafeArea(
       // Add additional top padding to allow the content behind to be visible
@@ -397,6 +482,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                         Expanded(
                           child: WorkoutAutocompleteTextField(
                             textEditingController: widget.controller,
+                            tagFilter: selectedTagKeys,
                             minLines: 1,
                             maxLines: 1,
                             onSubmitted: _addExercise,
@@ -430,18 +516,65 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                         const SizedBox(width: 8),
                       ],
                     ),
-                    _filterChips(context),
+                    _filterChips(
+                      context,
+                      availableTags: availableTags,
+                      selectedTagKeys: selectedTagKeys,
+                    ),
                   ],
                 ),
               ),
               Expanded(
                 child: CustomScrollView(
                   slivers: [
-                    SliverSafeArea(
-                      bottom: true,
-                      sliver: _exerciseGrid(
+                    exiconEntries.when(
+                      data: (_) {
+                        if (catalog.isEmpty) {
+                          return _stateSliver(
+                            context,
+                            icon: AdaptiveIcons.notes,
+                            message: L10n.of(
+                              context,
+                            )!.exercisePickerEmptyCatalogLabel,
+                          );
+                        }
+
+                        if (filteredExercises.isEmpty) {
+                          return _stateSliver(
+                            context,
+                            icon: Icons.filter_alt_off,
+                            message: L10n.of(
+                              context,
+                            )!.exercisePickerEmptyFilteredLabel,
+                          );
+                        }
+
+                        return SliverSafeArea(
+                          bottom: true,
+                          sliver: _exerciseGrid(
+                            context,
+                            gridColumnCount: gridColumnCount,
+                            exercises: filteredExercises,
+                          ),
+                        );
+                      },
+                      loading: () => SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Center(
+                          child: CircularProgressIndicator.adaptive(),
+                        ),
+                      ),
+                      error: (_, _) => _stateSliver(
                         context,
-                        gridColumnCount: gridColumnCount,
+                        icon: Icons.cloud_off,
+                        message: L10n.of(
+                          context,
+                        )!.exercisePickerLoadErrorMessage,
+                        actionLabel: L10n.of(
+                          context,
+                        )!.exercisePickerRetryButtonLabel,
+                        onAction: () =>
+                            ref.read(exiconFetcherProvider.notifier).refresh(),
                       ),
                     ),
                   ],

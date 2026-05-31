@@ -14,7 +14,7 @@ const _exiconEndpoint = 'https://codex.f3nation.com/api/exicon';
 const _exiconCacheFilename = 'exicon_latest_fetch.json';
 
 @freezed
-class ExiconTag with _$ExiconTag {
+abstract class ExiconTag with _$ExiconTag {
   const factory ExiconTag({
     String? id,
     required String name,
@@ -41,7 +41,7 @@ class ExiconTag with _$ExiconTag {
 }
 
 @freezed
-class ExiconEntry with _$ExiconEntry {
+abstract class ExiconEntry with _$ExiconEntry {
   const factory ExiconEntry({
     String? id,
     required String name,
@@ -84,17 +84,68 @@ class ExiconEntry with _$ExiconEntry {
   }
 }
 
+/// Provides a list of Exicon entries fetched from the F3 Codex API, along with
+/// a method to refresh the data. The latest successful fetch is also persisted
+/// locally for offline access and faster subsequent loads.
 @riverpod
 final class ExiconFetcher extends _$ExiconFetcher {
   @override
-  Future<List<ExiconEntry>> build() => _fetchEntries();
+  Future<List<ExiconEntry>> build() async {
+    final cachedEntries = await _readLatestEntries();
+    if (cachedEntries != null) {
+      unawaited(_refreshFromNetwork(preserveCurrentStateOnError: true));
+      return cachedEntries;
+    }
+
+    return _fetchEntries();
+  }
 
   Future<void> refresh() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(_fetchEntries);
   }
 
+  Future<void> _refreshFromNetwork({
+    required bool preserveCurrentStateOnError,
+  }) async {
+    try {
+      final entries = await _fetchEntriesFromNetwork();
+      state = AsyncData(entries);
+    } on Object catch (error, stackTrace) {
+      developer.log(
+        'Failed to refresh Exicon data from network.',
+        name: 'ExiconFetcher',
+        error: error,
+        stackTrace: stackTrace,
+      );
+
+      if (!preserveCurrentStateOnError) {
+        state = AsyncError(error, stackTrace);
+      }
+    }
+  }
+
   Future<List<ExiconEntry>> _fetchEntries() async {
+    try {
+      return await _fetchEntriesFromNetwork();
+    } on Object catch (error, stackTrace) {
+      developer.log(
+        'Falling back to cached Exicon data after fetch failure.',
+        name: 'ExiconFetcher',
+        error: error,
+        stackTrace: stackTrace,
+      );
+
+      final cachedEntries = await _readLatestEntries();
+      if (cachedEntries == null) {
+        rethrow;
+      }
+
+      return cachedEntries;
+    }
+  }
+
+  Future<List<ExiconEntry>> _fetchEntriesFromNetwork() async {
     final httpClient = HttpClient();
     final uri = Uri.parse(_exiconEndpoint);
     try {
@@ -108,8 +159,7 @@ final class ExiconFetcher extends _$ExiconFetcher {
       }
 
       final responseBody = await response.transform(utf8.decoder).join();
-      final decoded = jsonDecode(responseBody);
-      final rows = _extractRows(decoded);
+      final rows = _decodeRows(responseBody);
       unawaited(_persistLatestFetch(responseBody));
       return rows.map(ExiconEntry.fromApiJson).toList(growable: false);
     } finally {
@@ -120,7 +170,7 @@ final class ExiconFetcher extends _$ExiconFetcher {
 
 Future<void> _persistLatestFetch(String responseBody) async {
   try {
-    final directory = await getApplicationDocumentsDirectory();
+    final directory = await getApplicationCacheDirectory();
     final file = File('${directory.path}/$_exiconCacheFilename');
     await file.writeAsString(responseBody, flush: true);
   } on Object catch (error, stackTrace) {
@@ -131,6 +181,40 @@ Future<void> _persistLatestFetch(String responseBody) async {
       stackTrace: stackTrace,
     );
   }
+}
+
+Future<String?> _readLatestFetch() async {
+  try {
+    final directory = await getApplicationCacheDirectory();
+    final file = File('${directory.path}/$_exiconCacheFilename');
+    if (!await file.exists()) {
+      return null;
+    }
+    return await file.readAsString();
+  } on Object catch (error, stackTrace) {
+    developer.log(
+      'Failed to read cached Exicon fetch.',
+      name: 'ExiconFetcher',
+      error: error,
+      stackTrace: stackTrace,
+    );
+    return null;
+  }
+}
+
+Future<List<ExiconEntry>?> _readLatestEntries() async {
+  final cachedResponseBody = await _readLatestFetch();
+  if (cachedResponseBody == null) {
+    return null;
+  }
+
+  final rows = _decodeRows(cachedResponseBody);
+  return rows.map(ExiconEntry.fromApiJson).toList(growable: false);
+}
+
+List<Map<String, Object?>> _decodeRows(String responseBody) {
+  final decoded = jsonDecode(responseBody);
+  return _extractRows(decoded);
 }
 
 /// Reads a non-empty string from a single schema-defined field.

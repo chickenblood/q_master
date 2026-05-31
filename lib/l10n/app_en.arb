@@ -232,6 +232,22 @@
     "@exerciseFilterVideoLabel": {
       "description": "Filter pill label that filters exercises to only those with an associated video in the exercise picker."
     },
+    "exercisePickerLoadErrorMessage": "Could not load exercises.",
+    "@exercisePickerLoadErrorMessage": {
+      "description": "Message shown in the exercise picker when Exicon data cannot be loaded from the network or cache."
+    },
+    "exercisePickerRetryButtonLabel": "Try Again",
+    "@exercisePickerRetryButtonLabel": {
+      "description": "Button label shown in the exercise picker to retry loading Exicon data."
+    },
+    "exercisePickerEmptyCatalogLabel": "No exercises are available right now.",
+    "@exercisePickerEmptyCatalogLabel": {
+      "description": "Message shown in the exercise picker when the Exicon catalog loads successfully but contains no exercises."
+    },
+    "exercisePickerEmptyFilteredLabel": "No exercises match these filters.",
+    "@exercisePickerEmptyFilteredLabel": {
+      "description": "Message shown in the exercise picker when the current filter combination matches no exercises."
+    },
     "pasteExercisesButtonLabel": "Paste Exercises",
     "@pasteExercisesButtonLabel": {
       "description": "Accessibility label for the paste button in a section header, which pastes clipboard lines as individual exercises."
