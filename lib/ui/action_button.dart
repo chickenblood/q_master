@@ -25,13 +25,13 @@ class ActionButton extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final isLight = Theme.of(context).brightness == Brightness.light;
     final isDisabled = onPressed == null;
-    final disabledBg = colorScheme.onSurface.withOpacity(0.12);
-    final disabledFg = colorScheme.onSurface.withOpacity(0.38);
+    final disabledBg = colorScheme.onSurface.withValues(alpha: 0.12);
+    final disabledFg = colorScheme.onSurface.withValues(alpha: 0.38);
     final textColor = isDisabled
         ? disabledFg
         : (outlined && isLight ? colorScheme.onSurface : colorScheme.onPrimary);
     final borderColor = isDisabled
-        ? colorScheme.outline.withOpacity(0.38)
+        ? colorScheme.outline.withValues(alpha: 0.38)
         : colorScheme.outline;
     return PlatformTextButton(
       onPressed: onPressed,
@@ -48,7 +48,7 @@ class ActionButton extends StatelessWidget {
             BoxShadow(
               color: outlined || isDisabled
                   ? Colors.transparent
-                  : colorScheme.primary.withOpacity(0.35),
+                  : colorScheme.primary.withValues(alpha: 0.35),
               blurRadius: 20,
               offset: Offset(0, 6),
             ),
