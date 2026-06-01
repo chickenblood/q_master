@@ -124,7 +124,7 @@ fun WearApp(viewModel: WorkoutsViewModel) {
 
 @Composable
 fun MainListScreen(
-    viewModel: WorkoutsViewModel, 
+    viewModel: WorkoutsViewModel,
     onItemSelected: (Int) -> Unit,
     onShowDebug: () -> Unit
 ) {
@@ -176,15 +176,17 @@ fun MainListScreen(
             } else {
                 item {
                     Text(
-                        text = if (errorMessage != null) 
-                            "Sync Error: $errorMessage" 
-                        else 
+                        text = if (errorMessage != null)
+                            "Sync Error: $errorMessage"
+                        else
                             stringResource(R.string.syncInstructionsText),
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(horizontal = 8.dp)
                     )
                 }
+            }
+            if (errorMessage != null) {
                 item {
                     Button(
                         onClick = onShowDebug,
@@ -333,8 +335,7 @@ fun SectionListScreen(section: WorkoutSection) {
 @WearPreviewFontScales
 @Composable
 fun DefaultPreview() {
-    WorkoutRepository.updateWorkouts(stockContent)
-    val viewModel = WorkoutsViewModel()
+    val viewModel = androidx.compose.runtime.remember { WorkoutsViewModel() }
     WearApp(viewModel)
 }
 
