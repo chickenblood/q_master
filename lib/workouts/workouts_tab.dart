@@ -354,7 +354,7 @@ final class _WorkoutTile extends StatelessWidget {
             ),
           ),
         ),
-        const Divider(),
+        Divider(indent: 16, endIndent: isIOS ? 16 : 24),
       ],
     );
   }
