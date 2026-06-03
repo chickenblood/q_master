@@ -38,26 +38,30 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
 
   Future<void> _handleGenerateWorkout() async {
     final prompt = _promptTextController.text.trim();
-    if (prompt.isNotEmpty) {
-      setState(() => _isGenerating = true);
-      Workout? workout;
-      try {
-        final jsonResponse = await _client.requestWorkout(prompt);
+    if (prompt.isEmpty) return;
 
-        final jsonWorkout = jsonDecode(jsonResponse) as Map<String, Object?>;
-        workout = Workout.fromJson(jsonWorkout);
+    setState(() => _isGenerating = true);
+    var shouldResetLoading = true;
+    try {
+      final jsonResponse = await _client.requestWorkout(prompt);
 
-        if (!mounted) return;
-        Navigator.of(context).pop(workout);
-      } catch (e) {
-        if (!mounted) return;
-        showSimpleAlert(
-          context,
-          title: L10n.of(context)!.generateWorkoutErrorTitle,
-          message: e.toString(),
-        );
+      final jsonWorkout = jsonDecode(jsonResponse) as Map<String, Object?>;
+      final workout = Workout.fromJson(jsonWorkout);
+
+      if (!mounted) return;
+      shouldResetLoading = false;
+      Navigator.of(context).pop(workout);
+    } catch (e) {
+      if (!mounted) return;
+      showSimpleAlert(
+        context,
+        title: L10n.of(context)!.generateWorkoutErrorTitle,
+        message: e.toString(),
+      );
+    } finally {
+      if (mounted && shouldResetLoading) {
+        setState(() => _isGenerating = false);
       }
-      setState(() => _isGenerating = false);
     }
   }
 
