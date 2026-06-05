@@ -71,7 +71,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     );
     final workout = widget.originalWorkout;
     if (workout != null) {
-      _storedWorkout = workout.copyWith();
+      _storedWorkout = workout;
       _updateUiFromWorkout(workout);
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
