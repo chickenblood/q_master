@@ -74,7 +74,8 @@ class WorkoutsTab extends ConsumerWidget {
     if (workout != null) {
       // Add the workout to the store before invoking the editor
       final listNotifier = ref.read(workoutListProvider.notifier);
-      listNotifier.add(workout);
+      await listNotifier.add(workout);
+      if (!context.mounted) return;
 
       await _invokeWorkoutEditor(
         context,

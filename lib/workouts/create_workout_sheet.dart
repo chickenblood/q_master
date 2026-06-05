@@ -528,8 +528,9 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
               color: isEnabled ? enabledColor : disabledColor,
             ),
             onPressed: isEnabled
-                ? () {
-                    final savedWorkout = _saveWorkout();
+                ? () async {
+                    final savedWorkout = await _saveWorkout();
+                    if (!mounted) return;
                     setState(() {
                       _storedWorkout = savedWorkout;
                       _displayMode = .display;
@@ -781,13 +782,13 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     ),
   );
 
-  Workout _saveWorkout() {
+  Future<Workout> _saveWorkout() async {
     final workoutToSave = _buildWorkoutFromUi().copyWith(date: DateTime.now());
     final listNotifier = ref.read(workoutListProvider.notifier);
     if (widget.originalWorkout == null) {
-      listNotifier.add(workoutToSave);
+      await listNotifier.add(workoutToSave);
     } else if (_storedWorkout != null) {
-      listNotifier.replace(_storedWorkout!, workoutToSave);
+      await listNotifier.replace(_storedWorkout!, workoutToSave);
     } else {
       assert(false, 'Unable to save workout: _storedWorkout is null');
     }

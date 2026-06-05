@@ -17,11 +17,14 @@ part 'workout_list.g.dart';
 final class WorkoutList extends _$WorkoutList {
   static final _logger = Logger();
   final _watch = WatchConnectivity();
+  var _dataIsLoaded = false;
   String? _cachedFilename;
   AppLifecycleListener? _appLifecycleListener;
 
   @override
   List<Workout> build() {
+    // This is just to force a sync on background of the app during testing.
+    // It's not really necessary since the app syncs on every save.
     if (_appLifecycleListener == null) {
       _appLifecycleListener = AppLifecycleListener(onPause: _syncToWatch);
       ref.onDispose(() {
@@ -29,8 +32,11 @@ final class WorkoutList extends _$WorkoutList {
         _appLifecycleListener = null;
       });
     }
-    state = [];
-    _loadFromDisk();
+    if (!_dataIsLoaded) {
+      // Set initial state while we load from disk.
+      state = [];
+      _loadFromDisk();
+    }
     return state;
   }
 
@@ -44,6 +50,7 @@ final class WorkoutList extends _$WorkoutList {
   }
 
   Future<void> _loadFromDisk() async {
+    _dataIsLoaded = true;
     try {
       final file = File(await _filename());
       if (!(await file.exists())) {
@@ -117,11 +124,23 @@ final class WorkoutList extends _$WorkoutList {
   }
 
   Future<void> _save({required List<Workout> updatedWorkouts}) async {
-    final file = File(await _filename());
-    await file.create(recursive: true);
-    final json = jsonEncode(updatedWorkouts);
-    await file.writeAsString(json);
+    final previousState = state;
     state = updatedWorkouts;
+
+    try {
+      final file = File(await _filename());
+      await file.create(recursive: true);
+      final json = jsonEncode(updatedWorkouts);
+      await file.writeAsString(json);
+    } on Object catch (error, stackTrace) {
+      state = previousState;
+      _logger.e(
+        'Failed to persist workouts to disk.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
 
     await _syncToWatch();
   }
@@ -135,7 +154,7 @@ final class WorkoutList extends _$WorkoutList {
     return _save(updatedWorkouts: updatedWorkouts);
   }
 
-  Future<void> add(Workout workout) async {
+  Future<void> add(Workout workout) {
     return _mutateAndSave((updatedWorkouts) {
       // New items go to the front of the list.
       updatedWorkouts.insert(0, workout);
@@ -144,7 +163,7 @@ final class WorkoutList extends _$WorkoutList {
     });
   }
 
-  Future<void> remove(Workout workout) async {
+  Future<void> remove(Workout workout) {
     return _mutateAndSave((updatedWorkouts) {
       final removed = updatedWorkouts.remove(workout);
       if (!removed) {
@@ -154,7 +173,7 @@ final class WorkoutList extends _$WorkoutList {
     });
   }
 
-  Future<void> replace(Workout existingWorkout, Workout newWorkout) async {
+  Future<void> replace(Workout existingWorkout, Workout newWorkout) {
     return _mutateAndSave((updatedWorkouts) {
       final index = updatedWorkouts.indexOf(existingWorkout);
       assert(index != -1);
@@ -167,7 +186,7 @@ final class WorkoutList extends _$WorkoutList {
     });
   }
 
-  Future<void> move(int fromIndex, int toIndex) async {
+  Future<void> move(int fromIndex, int toIndex) {
     return _mutateAndSave((updatedWorkouts) {
       if (fromIndex < 0 || fromIndex >= updatedWorkouts.length) {
         debugPrint('Unable to move workout: source index out of range');
@@ -185,7 +204,7 @@ final class WorkoutList extends _$WorkoutList {
     });
   }
 
-  Future<void> duplicate(Workout workout) async {
+  Future<void> duplicate(Workout workout) {
     return _mutateAndSave((updatedWorkouts) {
       // Copy workout, but give the copy the current time and date.
       final newWorkout = workout.copyWith(date: DateTime.now());
