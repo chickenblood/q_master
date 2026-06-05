@@ -168,7 +168,8 @@ final class WorkoutList extends _$WorkoutList {
       }
 
       final workout = updatedWorkouts.removeAt(fromIndex);
-      updatedWorkouts.insert(toIndex, workout);
+      final targetIndex = toIndex.clamp(0, updatedWorkouts.length);
+      updatedWorkouts.insert(targetIndex, workout);
       return true;
     });
   }
