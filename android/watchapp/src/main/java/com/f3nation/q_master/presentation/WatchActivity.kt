@@ -181,7 +181,7 @@ fun MainListScreen(
                 item {
                     Text(
                         text = if (errorMessage != null)
-                            stringResource(R.string.syncErrorText, errorMessage ?: "")
+                            stringResource(R.string.syncErrorText, errorMessage)
                         else
                             stringResource(R.string.syncInstructionsText),
                         fontWeight = FontWeight.Bold,
