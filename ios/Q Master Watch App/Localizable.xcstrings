@@ -20,7 +20,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add some workouts using Q Master on the phone to get started"
+            "value" : "Add some beatdowns using Q Master on the phone to get started"
           }
         }
       }
@@ -32,7 +32,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Workouts"
+            "value" : "Beatdowns"
           }
         }
       }
