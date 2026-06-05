@@ -24,7 +24,6 @@ import 'package:flutter/material.dart';
 
 const _f3Red = Color(0xFFE53935);
 const _f3RedLight = Color(0xFFD32F2F); // WCAG AA on white
-const _errorRed = Color(0xFFCF6679);
 
 // ─── Timer tile colors ─────────────────────────────────────────────────────
 // Resolved per-brightness. Dark uses tinted near-black backgrounds with bright
@@ -220,7 +219,7 @@ ThemeData darkTheme() {
       onSurfaceVariant: textSecondary,
       outline: border,
       outlineVariant: Color(0xFF373737),
-      error: _errorRed,
+      error: _f3Red,
       onError: Colors.white,
     ),
     scaffoldBackgroundColor: bgPage,
@@ -397,7 +396,7 @@ ThemeData lightTheme() {
       onSurfaceVariant: textSecondary,
       outline: border,
       outlineVariant: Color(0xFFDDDDDD),
-      error: Color(0xFFB00020),
+      error: _f3RedLight,
       onError: Colors.white,
     ),
     scaffoldBackgroundColor: bgPage,
