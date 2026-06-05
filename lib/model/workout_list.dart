@@ -17,33 +17,63 @@ part 'workout_list.g.dart';
 final class WorkoutList extends _$WorkoutList {
   static final _logger = Logger();
   final _watch = WatchConnectivity();
-  String? _filename;
+  String? _cachedFilename;
   AppLifecycleListener? _appLifecycleListener;
-  Future<void>? _initialLoad;
 
   @override
   List<Workout> build() {
-    ref.onDispose(() => _appLifecycleListener?.dispose());
-    unawaited(_ensureInitialized());
-    return [];
+    if (_appLifecycleListener == null) {
+      _appLifecycleListener = AppLifecycleListener(onPause: _syncToWatch);
+      ref.onDispose(() {
+        _appLifecycleListener?.dispose();
+        _appLifecycleListener = null;
+      });
+    }
+    state = [];
+    _loadFromDisk();
+    return state;
   }
 
-  Future<void> _ensureInitialized() => _initialLoad ??= _initialize();
+  Future<String> _filename() async {
+    if (_cachedFilename != null) {
+      return _cachedFilename!;
+    }
+    final directory = await getApplicationDocumentsDirectory();
+    _cachedFilename = '${directory.path}/workouts.json';
+    return _cachedFilename!;
+  }
 
-  Future<void> _initialize() async {
-    _appLifecycleListener ??= AppLifecycleListener(onPause: _syncToWatch);
-
+  Future<void> _loadFromDisk() async {
     try {
-      final filename = await _ensureFilename();
-      final file = File(filename);
-      if (!await file.exists()) {
+      final file = File(await _filename());
+      if (!(await file.exists())) {
+        state = [];
         return;
       }
 
       final json = await file.readAsString();
-      final newWorkouts = (jsonDecode(json) as List)
-          .map((e) => Workout.fromJson(_migrateJson(e as Map<String, Object?>)))
-          .toList();
+      final decoded = jsonDecode(json);
+      if (decoded is! List) {
+        throw const FormatException('Expected persisted workouts to be a list');
+      }
+
+      final newWorkouts = <Workout>[];
+      for (final entry in decoded) {
+        try {
+          if (entry is! Map) {
+            _logger.w('Skipping malformed workout entry: expected map.');
+            continue;
+          }
+          final migrated = _migrateJson(Map<String, Object?>.from(entry));
+          newWorkouts.add(Workout.fromJson(migrated));
+        } on Object catch (error, stackTrace) {
+          _logger.w(
+            'Skipping malformed workout entry during load.',
+            error: error,
+            stackTrace: stackTrace,
+          );
+        }
+      }
 
       state = newWorkouts;
       await _syncToWatch();
@@ -53,17 +83,8 @@ final class WorkoutList extends _$WorkoutList {
         error: error,
         stackTrace: stackTrace,
       );
+      state = [];
     }
-  }
-
-  Future<String> _ensureFilename() async {
-    if (_filename != null) {
-      return _filename!;
-    }
-
-    final directory = await getApplicationDocumentsDirectory();
-    _filename = '${directory.path}/workouts.json';
-    return _filename!;
   }
 
   Future<void> _syncToWatch() async {
@@ -96,8 +117,7 @@ final class WorkoutList extends _$WorkoutList {
   }
 
   Future<void> _save({required List<Workout> updatedWorkouts}) async {
-    final filename = await _ensureFilename();
-    final file = File(filename);
+    final file = File(await _filename());
     await file.create(recursive: true);
     final json = jsonEncode(updatedWorkouts);
     await file.writeAsString(json);
@@ -106,26 +126,17 @@ final class WorkoutList extends _$WorkoutList {
     await _syncToWatch();
   }
 
-  Future<void> _runAfterInitialLoad(Future<void> Function() action) async {
-    await _ensureInitialized();
-    await action();
+  Future<void> _mutateAndSave(bool Function(List<Workout>) mutate) async {
+    final updatedWorkouts = List.of(state);
+    final didMutate = mutate(updatedWorkouts);
+    if (!didMutate) {
+      return;
+    }
+    return _save(updatedWorkouts: updatedWorkouts);
   }
 
-  void _mutateAndSave(bool Function(List<Workout>) mutate) {
-    unawaited(
-      _runAfterInitialLoad(() async {
-        final updatedWorkouts = List.of(state);
-        final didMutate = mutate(updatedWorkouts);
-        if (!didMutate) {
-          return;
-        }
-        await _save(updatedWorkouts: updatedWorkouts);
-      }),
-    );
-  }
-
-  void add(Workout workout) {
-    _mutateAndSave((updatedWorkouts) {
+  Future<void> add(Workout workout) async {
+    return _mutateAndSave((updatedWorkouts) {
       // New items go to the front of the list.
       updatedWorkouts.insert(0, workout);
       // Save updated list to disk.
@@ -133,8 +144,8 @@ final class WorkoutList extends _$WorkoutList {
     });
   }
 
-  void remove(Workout workout) {
-    _mutateAndSave((updatedWorkouts) {
+  Future<void> remove(Workout workout) async {
+    return _mutateAndSave((updatedWorkouts) {
       final removed = updatedWorkouts.remove(workout);
       if (!removed) {
         debugPrint('Unable to remove workout');
@@ -143,8 +154,8 @@ final class WorkoutList extends _$WorkoutList {
     });
   }
 
-  void replace(Workout existingWorkout, Workout newWorkout) {
-    _mutateAndSave((updatedWorkouts) {
+  Future<void> replace(Workout existingWorkout, Workout newWorkout) async {
+    return _mutateAndSave((updatedWorkouts) {
       final index = updatedWorkouts.indexOf(existingWorkout);
       assert(index != -1);
       if (index == -1) {
@@ -156,8 +167,8 @@ final class WorkoutList extends _$WorkoutList {
     });
   }
 
-  void move(int fromIndex, int toIndex) {
-    _mutateAndSave((updatedWorkouts) {
+  Future<void> move(int fromIndex, int toIndex) async {
+    return _mutateAndSave((updatedWorkouts) {
       if (fromIndex < 0 || fromIndex >= updatedWorkouts.length) {
         debugPrint('Unable to move workout: source index out of range');
         return false;
@@ -174,8 +185,8 @@ final class WorkoutList extends _$WorkoutList {
     });
   }
 
-  void duplicate(Workout workout) {
-    _mutateAndSave((updatedWorkouts) {
+  Future<void> duplicate(Workout workout) async {
+    return _mutateAndSave((updatedWorkouts) {
       // Copy workout, but give the copy the current time and date.
       final newWorkout = workout.copyWith(date: DateTime.now());
       updatedWorkouts.insert(0, newWorkout);
@@ -215,7 +226,7 @@ Map<String, Object?> _migrateJson(Map<String, Object?> json) {
       for (final section in sectionsList)
         if (section is Map)
           {
-            'name': section['name'] as String,
+            'name': (section['name'] as String?) ?? '',
             'exercises': _migrateExerciseList(section['exercises']),
           },
     ];
@@ -228,7 +239,8 @@ Map<String, Object?> _migrateJson(Map<String, Object?> json) {
 /// — into a plain `List<String>`.
 List<String> _migrateExerciseList(Object? exercises) {
   if (exercises == null) return [];
-  return (exercises as List)
+  if (exercises is! List) return [];
+  return exercises
       .map((e) {
         if (e is String) return e;
         if (e is Map) return (e['name'] as String?) ?? '';
