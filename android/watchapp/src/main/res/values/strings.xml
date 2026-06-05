@@ -3,4 +3,11 @@
     <string name="exercisesTitle">Exercises</string>
     <string name="workoutsTitle">Beatdowns</string>
     <string name="syncInstructionsText">Add some beatdowns using Q Master on the phone to get started</string>
+    <string name="syncErrorText">Sync Error: %1$s</string>
+    <string name="showDebugInfoButton">Show Debug Info</string>
+    <string name="debugInfoTitle">Debug Info</string>
+    <string name="debugErrorText">Error: %1$s</string>
+    <string name="debugDetailsText">Details: %1$s</string>
+    <string name="noneLabel">None</string>
+    <string name="noAdditionalInfoLabel">No additional info</string>
 </resources>

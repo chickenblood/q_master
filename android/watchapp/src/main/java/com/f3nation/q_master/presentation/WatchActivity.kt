@@ -177,7 +177,7 @@ fun MainListScreen(
                 item {
                     Text(
                         text = if (errorMessage != null)
-                            "Sync Error: $errorMessage"
+                            stringResource(R.string.syncErrorText, errorMessage ?: "")
                         else
                             stringResource(R.string.syncInstructionsText),
                         fontWeight = FontWeight.Bold,
@@ -195,7 +195,7 @@ fun MainListScreen(
                             containerColor = MaterialTheme.colorScheme.errorContainer
                         )
                     ) {
-                        Text("Show Debug Info")
+                        Text(stringResource(R.string.showDebugInfoButton))
                     }
                 }
             }
@@ -213,7 +213,7 @@ fun DebugInfoScreen(viewModel: WorkoutsViewModel) {
         TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
             item {
                 Text(
-                    text = "Debug Info",
+                    text = stringResource(R.string.debugInfoTitle),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
@@ -221,14 +221,20 @@ fun DebugInfoScreen(viewModel: WorkoutsViewModel) {
             }
             item {
                 Text(
-                    text = "Error: ${errorMessage ?: "None"}",
+                    text = stringResource(
+                        R.string.debugErrorText,
+                        errorMessage ?: stringResource(R.string.noneLabel)
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error
                 )
             }
             item {
                 Text(
-                    text = "Details: ${debugInfo ?: "No additional info"}",
+                    text = stringResource(
+                        R.string.debugDetailsText,
+                        debugInfo ?: stringResource(R.string.noAdditionalInfoLabel)
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.padding(top = 4.dp)
                 )
