@@ -24,10 +24,11 @@ final class WorkoutList extends _$WorkoutList {
   @override
   List<Workout> build() {
     ref.onDispose(() => _appLifecycleListener?.dispose());
-    _initialLoad ??= _initialize();
-    unawaited(_initialLoad);
+    unawaited(_ensureInitialized());
     return [];
   }
+
+  Future<void> _ensureInitialized() => _initialLoad ??= _initialize();
 
   Future<void> _initialize() async {
     _appLifecycleListener ??= AppLifecycleListener(onPause: _syncToWatch);
@@ -106,9 +107,7 @@ final class WorkoutList extends _$WorkoutList {
   }
 
   Future<void> _runAfterInitialLoad(Future<void> Function() action) async {
-    if (_initialLoad != null) {
-      await _initialLoad;
-    }
+    await _ensureInitialized();
     await action();
   }
 
