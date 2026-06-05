@@ -83,6 +83,7 @@ class _DeckState extends State<_Deck> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _slideController.removeStatusListener(_onSlideComplete);
     _slideController.dispose();
     super.dispose();
   }
