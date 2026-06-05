@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -17,27 +18,51 @@ final class WorkoutList extends _$WorkoutList {
   static final _logger = Logger();
   final _watch = WatchConnectivity();
   String? _filename;
+  AppLifecycleListener? _appLifecycleListener;
+  Future<void>? _initialLoad;
 
   @override
   List<Workout> build() {
-    () async {
-      // Sync with watch when the app is backgrounded.
-      AppLifecycleListener(onPause: _syncToWatch);
+    ref.onDispose(() => _appLifecycleListener?.dispose());
+    _initialLoad ??= _initialize();
+    unawaited(_initialLoad);
+    return [];
+  }
 
-      final directory = await getApplicationDocumentsDirectory();
-      _filename = '${directory.path}/workouts.json';
-      final file = File(_filename!);
-      if (!file.existsSync()) {
+  Future<void> _initialize() async {
+    _appLifecycleListener ??= AppLifecycleListener(onPause: _syncToWatch);
+
+    try {
+      final filename = await _ensureFilename();
+      final file = File(filename);
+      if (!await file.exists()) {
         return;
       }
-      final json = file.readAsStringSync();
+
+      final json = await file.readAsString();
       final newWorkouts = (jsonDecode(json) as List)
           .map((e) => Workout.fromJson(_migrateJson(e as Map<String, Object?>)))
           .toList();
+
       state = newWorkouts;
       await _syncToWatch();
-    }();
-    return [];
+    } on Object catch (error, stackTrace) {
+      _logger.e(
+        'Failed to initialize workouts from disk.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  Future<String> _ensureFilename() async {
+    if (_filename != null) {
+      return _filename!;
+    }
+
+    final directory = await getApplicationDocumentsDirectory();
+    _filename = '${directory.path}/workouts.json';
+    return _filename!;
   }
 
   Future<void> _syncToWatch() async {
@@ -70,56 +95,85 @@ final class WorkoutList extends _$WorkoutList {
   }
 
   Future<void> _save({required List<Workout> updatedWorkouts}) async {
-    final file = File(_filename!)..createSync();
+    final filename = await _ensureFilename();
+    final file = File(filename);
+    await file.create(recursive: true);
     final json = jsonEncode(updatedWorkouts);
-    file.writeAsStringSync(json);
+    await file.writeAsString(json);
     state = updatedWorkouts;
 
     await _syncToWatch();
   }
 
+  Future<void> _runAfterInitialLoad(Future<void> Function() action) async {
+    if (_initialLoad != null) {
+      await _initialLoad;
+    }
+    await action();
+  }
+
   void add(Workout workout) {
-    final updatedWorkouts = List.of(state);
-    // New items go to the front of the list.
-    updatedWorkouts.insert(0, workout);
-    // Save updated list to disk.
-    _save(updatedWorkouts: updatedWorkouts);
+    unawaited(
+      _runAfterInitialLoad(() async {
+        final updatedWorkouts = List.of(state);
+        // New items go to the front of the list.
+        updatedWorkouts.insert(0, workout);
+        // Save updated list to disk.
+        await _save(updatedWorkouts: updatedWorkouts);
+      }),
+    );
   }
 
   void remove(Workout workout) {
-    final updatedWorkouts = List.of(state);
-    if (updatedWorkouts.remove(workout)) {
-      _save(updatedWorkouts: updatedWorkouts);
-    } else {
-      debugPrint('Unable to remove workout');
-    }
+    unawaited(
+      _runAfterInitialLoad(() async {
+        final updatedWorkouts = List.of(state);
+        if (updatedWorkouts.remove(workout)) {
+          await _save(updatedWorkouts: updatedWorkouts);
+        } else {
+          debugPrint('Unable to remove workout');
+        }
+      }),
+    );
   }
 
   void replace(Workout existingWorkout, Workout newWorkout) {
-    final index = state.indexOf(existingWorkout);
-    assert(index != -1);
-    if (index == -1) {
-      debugPrint('Unable to replace workout');
-      return;
-    }
-    final updatedWorkouts = List.of(state);
-    updatedWorkouts[index] = newWorkout;
-    _save(updatedWorkouts: updatedWorkouts);
+    unawaited(
+      _runAfterInitialLoad(() async {
+        final index = state.indexOf(existingWorkout);
+        assert(index != -1);
+        if (index == -1) {
+          debugPrint('Unable to replace workout');
+          return;
+        }
+        final updatedWorkouts = List.of(state);
+        updatedWorkouts[index] = newWorkout;
+        await _save(updatedWorkouts: updatedWorkouts);
+      }),
+    );
   }
 
   void move(int fromIndex, int toIndex) {
-    final updatedWorkouts = List.of(state);
-    final workout = updatedWorkouts.removeAt(fromIndex);
-    updatedWorkouts.insert(toIndex, workout);
-    _save(updatedWorkouts: updatedWorkouts);
+    unawaited(
+      _runAfterInitialLoad(() async {
+        final updatedWorkouts = List.of(state);
+        final workout = updatedWorkouts.removeAt(fromIndex);
+        updatedWorkouts.insert(toIndex, workout);
+        await _save(updatedWorkouts: updatedWorkouts);
+      }),
+    );
   }
 
   void duplicate(Workout workout) {
-    final updatedWorkouts = List.of(state);
-    // Copy workout, but give the copy the current time and date.
-    final newWorkout = workout.copyWith(date: DateTime.now());
-    updatedWorkouts.insert(0, newWorkout);
-    _save(updatedWorkouts: updatedWorkouts);
+    unawaited(
+      _runAfterInitialLoad(() async {
+        final updatedWorkouts = List.of(state);
+        // Copy workout, but give the copy the current time and date.
+        final newWorkout = workout.copyWith(date: DateTime.now());
+        updatedWorkouts.insert(0, newWorkout);
+        await _save(updatedWorkouts: updatedWorkouts);
+      }),
+    );
   }
 }
 
