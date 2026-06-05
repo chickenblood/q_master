@@ -20,16 +20,17 @@ final class DismissibleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Dismissible(
       key: key!,
       confirmDismiss: confirmDismiss,
       onDismissed: (direction) => onDismissed(direction),
       background: Container(
         padding: backgroundPadding,
-        color: Colors.red,
+        color: scheme.error,
         child: Row(
           mainAxisAlignment: .end,
-          children: [const Icon(Icons.delete, color: Colors.white)],
+          children: [Icon(Icons.delete, color: scheme.onError)],
         ),
       ),
       direction: enabled ? .endToStart : .none,

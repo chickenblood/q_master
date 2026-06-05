@@ -74,7 +74,7 @@ class _SettingsSheet extends ConsumerWidget {
     final segmentedStyle = SegmentedButton.styleFrom(
       backgroundColor: Colors.transparent,
       foregroundColor: inactiveSegmentColor,
-      selectedForegroundColor: Colors.white,
+      selectedForegroundColor: colorScheme.onPrimary,
       selectedBackgroundColor: colorScheme.primary,
       side: BorderSide(color: segmentBorderColor, width: 1.5),
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
@@ -178,7 +178,7 @@ class _SettingsSheet extends ConsumerWidget {
                       ),
                       thumbColor: WidgetStateProperty.resolveWith(
                         (states) => states.contains(WidgetState.selected)
-                            ? Colors.white
+                            ? colorScheme.onPrimary
                             : null,
                       ),
                       onChanged: (value) =>
