@@ -140,8 +140,7 @@ class _GameTile extends StatelessWidget {
                       color: textColor,
                     ),
                     textScaleFactor: min(
-                      // ignore: deprecated_member_use
-                      MediaQuery.textScaleFactorOf(context),
+                      MediaQuery.textScalerOf(context).scale(1.0),
                       1.4,
                     ),
                   ),
@@ -177,8 +176,7 @@ class _GameTile extends StatelessWidget {
                   softWrap: true,
                   maxLines: 1,
                   textScaleFactor: min(
-                    // ignore: deprecated_member_use
-                    MediaQuery.textScaleFactorOf(context),
+                    MediaQuery.textScalerOf(context).scale(1.0),
                     1.4,
                   ),
                 ),
