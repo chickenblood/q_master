@@ -123,6 +123,21 @@ fun WearApp(viewModel: WorkoutsViewModel) {
 }
 
 @Composable
+private fun AppNameEdgeButton() {
+    EdgeButton(
+        onClick = {},
+        enabled = false,
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            ),
+    ) {
+        Text(text = stringResource(R.string.app_name))
+    }
+}
+
+@Composable
 fun MainListScreen(
     viewModel: WorkoutsViewModel,
     onItemSelected: (Int) -> Unit,
@@ -136,18 +151,7 @@ fun MainListScreen(
     ScreenScaffold(
         scrollState = listState,
         edgeButton = {
-            EdgeButton(
-                onClick = { /*TODO*/ },
-                enabled = false,
-                colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    ),
-
-                ) {
-                Text(text = stringResource(R.string.app_name))
-            }
+            AppNameEdgeButton()
         },
     ) { contentPadding ->
         TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
@@ -250,18 +254,7 @@ fun WorkoutListScreen(workout: Workout, onItemSelected: (Int) -> Unit) {
     ScreenScaffold(
         scrollState = listState,
         edgeButton = {
-            EdgeButton(
-                onClick = { /*TODO*/ },
-                enabled = false,
-                colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    ),
-
-                ) {
-                Text(text = stringResource(R.string.app_name))
-            }
+            AppNameEdgeButton()
         }
     ) { contentPadding -> // ScreenScaffold provides default padding; adjust as needed
         TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
@@ -297,18 +290,7 @@ fun SectionListScreen(section: WorkoutSection) {
     ScreenScaffold(
         scrollState = listState,
         edgeButton = {
-            EdgeButton(
-                onClick = { /*TODO*/ },
-                enabled = false,
-                colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    ),
-
-                ) {
-                Text(text = stringResource(R.string.app_name))
-            }
+            AppNameEdgeButton()
         }
     ) { contentPadding -> // ScreenScaffold provides default padding; adjust as needed
         TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
