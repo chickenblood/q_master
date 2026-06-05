@@ -202,7 +202,6 @@ TextTheme _textTheme(Color primary, Color secondary) => TextTheme(
 ThemeData darkTheme() {
   const bgPage = Color(0xFF080808);
   const bgSurface = Color(0xFF0D0D0D);
-  const bgRaised = Color(0xFF141414);
   const border = Color(0xFF252525);
   const textPrimary = Color(0xFFF0F0F0);
   const textSecondary = Color(0xFF808080);
