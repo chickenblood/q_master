@@ -158,6 +158,15 @@ final class WorkoutList extends _$WorkoutList {
 
   void move(int fromIndex, int toIndex) {
     _mutateAndSave((updatedWorkouts) {
+      if (fromIndex < 0 || fromIndex >= updatedWorkouts.length) {
+        debugPrint('Unable to move workout: source index out of range');
+        return false;
+      }
+      if (toIndex < 0 || toIndex > updatedWorkouts.length) {
+        debugPrint('Unable to move workout: destination index out of range');
+        return false;
+      }
+
       final workout = updatedWorkouts.removeAt(fromIndex);
       updatedWorkouts.insert(toIndex, workout);
       return true;
