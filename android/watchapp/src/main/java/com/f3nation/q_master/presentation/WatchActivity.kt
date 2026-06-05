@@ -147,6 +147,7 @@ fun MainListScreen(
     val transformationSpec = rememberTransformationSpec()
     val workouts by viewModel.workouts.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+    val currentErrorMessage = errorMessage
 
     ScreenScaffold(
         scrollState = listState,
@@ -180,8 +181,8 @@ fun MainListScreen(
             } else {
                 item {
                     Text(
-                        text = if (errorMessage != null)
-                            stringResource(R.string.syncErrorText, errorMessage)
+                        text = if (currentErrorMessage != null)
+                            stringResource(R.string.syncErrorText, currentErrorMessage)
                         else
                             stringResource(R.string.syncInstructionsText),
                         fontWeight = FontWeight.Bold,
@@ -190,7 +191,7 @@ fun MainListScreen(
                     )
                 }
             }
-            if (errorMessage != null) {
+            if (currentErrorMessage != null) {
                 item {
                     Button(
                         onClick = onShowDebug,
