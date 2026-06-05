@@ -112,68 +112,66 @@ final class WorkoutList extends _$WorkoutList {
     await action();
   }
 
-  void add(Workout workout) {
+  void _mutateAndSave(bool Function(List<Workout>) mutate) {
     unawaited(
       _runAfterInitialLoad(() async {
         final updatedWorkouts = List.of(state);
-        // New items go to the front of the list.
-        updatedWorkouts.insert(0, workout);
-        // Save updated list to disk.
+        final didMutate = mutate(updatedWorkouts);
+        if (!didMutate) {
+          return;
+        }
         await _save(updatedWorkouts: updatedWorkouts);
       }),
     );
+  }
+
+  void add(Workout workout) {
+    _mutateAndSave((updatedWorkouts) {
+      // New items go to the front of the list.
+      updatedWorkouts.insert(0, workout);
+      // Save updated list to disk.
+      return true;
+    });
   }
 
   void remove(Workout workout) {
-    unawaited(
-      _runAfterInitialLoad(() async {
-        final updatedWorkouts = List.of(state);
-        if (updatedWorkouts.remove(workout)) {
-          await _save(updatedWorkouts: updatedWorkouts);
-        } else {
-          debugPrint('Unable to remove workout');
-        }
-      }),
-    );
+    _mutateAndSave((updatedWorkouts) {
+      final removed = updatedWorkouts.remove(workout);
+      if (!removed) {
+        debugPrint('Unable to remove workout');
+      }
+      return removed;
+    });
   }
 
   void replace(Workout existingWorkout, Workout newWorkout) {
-    unawaited(
-      _runAfterInitialLoad(() async {
-        final index = state.indexOf(existingWorkout);
-        assert(index != -1);
-        if (index == -1) {
-          debugPrint('Unable to replace workout');
-          return;
-        }
-        final updatedWorkouts = List.of(state);
-        updatedWorkouts[index] = newWorkout;
-        await _save(updatedWorkouts: updatedWorkouts);
-      }),
-    );
+    _mutateAndSave((updatedWorkouts) {
+      final index = updatedWorkouts.indexOf(existingWorkout);
+      assert(index != -1);
+      if (index == -1) {
+        debugPrint('Unable to replace workout');
+        return false;
+      }
+      updatedWorkouts[index] = newWorkout;
+      return true;
+    });
   }
 
   void move(int fromIndex, int toIndex) {
-    unawaited(
-      _runAfterInitialLoad(() async {
-        final updatedWorkouts = List.of(state);
-        final workout = updatedWorkouts.removeAt(fromIndex);
-        updatedWorkouts.insert(toIndex, workout);
-        await _save(updatedWorkouts: updatedWorkouts);
-      }),
-    );
+    _mutateAndSave((updatedWorkouts) {
+      final workout = updatedWorkouts.removeAt(fromIndex);
+      updatedWorkouts.insert(toIndex, workout);
+      return true;
+    });
   }
 
   void duplicate(Workout workout) {
-    unawaited(
-      _runAfterInitialLoad(() async {
-        final updatedWorkouts = List.of(state);
-        // Copy workout, but give the copy the current time and date.
-        final newWorkout = workout.copyWith(date: DateTime.now());
-        updatedWorkouts.insert(0, newWorkout);
-        await _save(updatedWorkouts: updatedWorkouts);
-      }),
-    );
+    _mutateAndSave((updatedWorkouts) {
+      // Copy workout, but give the copy the current time and date.
+      final newWorkout = workout.copyWith(date: DateTime.now());
+      updatedWorkouts.insert(0, newWorkout);
+      return true;
+    });
   }
 }
 
