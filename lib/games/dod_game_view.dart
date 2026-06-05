@@ -5,15 +5,17 @@ import '../l10n/l10n.dart';
 import '../ui/adaptive_icons.dart';
 import 'dodecahedron_shader.dart';
 
+const _defaultDodHeroTag = 'dod_game';
+
 final class DodGameView extends StatelessWidget {
   final String heroTag;
 
-  const DodGameView({super.key, this.heroTag = ''});
+  const DodGameView({super.key, this.heroTag = _defaultDodHeroTag});
 
   @override
   Widget build(BuildContext context) {
     return Hero(
-      tag: Object() /* ignore heroTag for now */,
+      tag: heroTag,
       child: PlatformScaffold(
         backgroundColor: Colors.black,
         material: (_, _) => MaterialScaffoldData(extendBodyBehindAppBar: true),

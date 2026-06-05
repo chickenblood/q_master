@@ -9,15 +9,20 @@ import '../model/deck_of_pain.dart';
 import '../model/pain_card.dart';
 import '../ui/adaptive_icons.dart';
 
+const _defaultDeckOfPainHeroTag = 'deck_of_pain_game';
+
 final class DeckOfPainGameView extends StatelessWidget {
   final String heroTag;
 
-  const DeckOfPainGameView({super.key, this.heroTag = ''});
+  const DeckOfPainGameView({
+    super.key,
+    this.heroTag = _defaultDeckOfPainHeroTag,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Hero(
-      tag: Object() /* ignore heroTag for now */,
+      tag: heroTag,
       child: PlatformScaffold(
         iosContentPadding: true, // Fixes app bar underlap for landscape.
         backgroundColor: Colors.black,
