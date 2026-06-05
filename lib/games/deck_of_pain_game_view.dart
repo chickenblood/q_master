@@ -344,6 +344,12 @@ class _CardFlipViewState extends State<_CardFlipView>
   void didUpdateWidget(covariant _CardFlipView oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.isFlipped != widget.isFlipped) {
+      if (!widget.shouldAnimate) {
+        // Snap immediately when animation is disabled for this card.
+        _animator.value = widget.isFlipped ? 0 : pi;
+        return;
+      }
+
       // Set to current position and animate to target
       _animator.value = oldWidget.isFlipped ? 0 : pi;
       _animator.forward();
