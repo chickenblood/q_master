@@ -25,3 +25,9 @@
 
 # Keep the Play Services Wearable classes themselves
 -keep class com.google.android.gms.wearable.** { *; }
+
+# Path provider on Android relies on Flutter utility classes accessed across
+# plugin/engine boundaries. Keep these to avoid ClassNotFoundException in
+# release builds when minification is enabled.
+-keep class io.flutter.util.PathUtils { *; }
+-keep class io.flutter.embedding.engine.loader.FlutterLoader { *; }
