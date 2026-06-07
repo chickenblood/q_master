@@ -13,7 +13,7 @@ import 'workout.dart';
 
 part 'workout_list.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 final class WorkoutList extends _$WorkoutList {
   static final _logger = Logger();
   final _watch = WatchConnectivity();
