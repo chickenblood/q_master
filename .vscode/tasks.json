@@ -24,7 +24,7 @@
                 },
                 "background": {
                     "activeOnStart": true,
-                    "beginsPattern": "^\\[INFO\\] (Generating|Building).*",
+                    "beginsPattern": "^\\[INFO\\] (Generating|Building).*$",
                     "endsPattern": "^\\[INFO\\] (Succeeded|Failed) after.*"
                 }
             },
@@ -92,6 +92,32 @@
             "problemMatcher": [],
             "runOptions": {
                 "runOn": "folderOpen"
+            }
+        },
+        {
+            "label": "Build Android App Bundle (Release)",
+            "type": "shell",
+            "command": "flutter",
+            "args": ["build", "appbundle", "--release"],
+            "group": "build",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Install Play-like Split APKs (Release)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/.vscode/install_play_like_splits.sh"
+            ],
+            "group": "build",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
             }
         }
     ]
