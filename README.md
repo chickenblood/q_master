@@ -102,8 +102,25 @@ Build Wear app:
   `./android/gradlew -p android :watchapp:bundleRelease`
   The output AAB will be under build/watchapp/outputs/bundle/release/watchapp-release.aab
 
+### Android Minification Gotcha
+
+If release builds are minified (`isMinifyEnabled = true`), R8 can strip Flutter utility classes used by `path_provider`, which can break workout save/load at runtime.
+
+Symptom seen in logcat:
+`ClassNotFoundException: io.flutter.util.PathUtils`
+
+Fix: keep these classes in `android/app/proguard-rules.pro`:
+
+```pro
+-keep class io.flutter.util.PathUtils { *; }
+-keep class io.flutter.embedding.engine.loader.FlutterLoader { *; }
+```
+
+After updating rules, rebuild and reinstall the release artifacts.
+
 ### Marketing URL
 https://q-master-7346a.web.app/download.html
+https://q-master-7346a.web.app/download-summer.html
 
 Deploy website:
   `firebase deploy --only hosting --project q-master-7346a`
