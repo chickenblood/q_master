@@ -120,6 +120,7 @@ After updating rules, rebuild and reinstall the release artifacts.
 
 ### Marketing URL
 https://q-master-7346a.web.app/download.html
+https://q-master-7346a.web.app/download-summer.html
 
 Deploy website:
   `firebase deploy --only hosting --project q-master-7346a`
