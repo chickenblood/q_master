@@ -16,3 +16,6 @@
     java.lang.Object writeReplace();
     java.lang.Object readResolve();
 }
+
+# Keep attributes required for readable stack traces
+-keepattributes SourceFile,LineNumberTable
