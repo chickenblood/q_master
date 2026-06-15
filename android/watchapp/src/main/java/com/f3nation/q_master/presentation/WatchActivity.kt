@@ -46,8 +46,6 @@ import com.f3nation.q_master.data.Workout
 import com.f3nation.q_master.data.WorkoutRepository
 import com.f3nation.q_master.data.WorkoutSection
 import com.f3nation.q_master.data.toWorkout
-import java.io.ByteArrayInputStream
-import java.io.ObjectInputStream
 
 class WorkoutsViewModel : ViewModel() {
     val workouts = WorkoutRepository.workouts
@@ -63,6 +61,17 @@ class WatchActivity : ComponentActivity() {
         // Enable edge-to-edge support for Android 15+
         enableEdgeToEdge()
         WorkoutRepository.init(this)
+
+        // If the local database is empty and there's no phone connection, populate with sample data
+        if (WorkoutRepository.workouts.value.isEmpty()) {
+            Wearable.getNodeClient(this).connectedNodes.addOnSuccessListener { nodes ->
+                // nodes.isEmpty() means no phones/other devices are reachable
+                if (nodes.isEmpty() && WorkoutRepository.workouts.value.isEmpty()) {
+                    WorkoutRepository.useSampleData()
+                }
+            }
+        }
+
         setContent {
             WearApp(viewModel)
         }
@@ -327,17 +336,3 @@ fun DefaultPreview() {
     val viewModel = androidx.compose.runtime.remember { WorkoutsViewModel() }
     WearApp(viewModel)
 }
-
-val sampleExercises = listOf("30 high knees", "10 Bonnie Blairs", "20 side-shuttle hops")
-val sampleSections = listOf(
-    WorkoutSection("warmup", sampleExercises),
-    WorkoutSection("thang", sampleExercises),
-    WorkoutSection("mary", sampleExercises),
-)
-val stockContent = listOf(
-    Workout("Workout 1", "Date 1", sampleSections),
-    Workout("Workout 2", "Date 2", sampleSections),
-    Workout("Workout 3", "Date 3", sampleSections),
-    Workout("Workout 4", "Date 4", sampleSections),
-    Workout("Workout 5", "Date 5", sampleSections),
-)
