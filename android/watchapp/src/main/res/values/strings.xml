@@ -10,4 +10,5 @@
     <string name="debugDetailsText">Details: %1$s</string>
     <string name="noneLabel">None</string>
     <string name="noAdditionalInfoLabel">No additional info</string>
+    <string name="sampleBeatdownsButton">Sample beatdowns</string>
 </resources>

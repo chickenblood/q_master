@@ -10,6 +10,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -62,16 +63,6 @@ class WatchActivity : ComponentActivity() {
         enableEdgeToEdge()
         WorkoutRepository.init(this)
 
-        // If the local database is empty and there's no phone connection, populate with sample data
-        if (WorkoutRepository.workouts.value.isEmpty()) {
-            Wearable.getNodeClient(this).connectedNodes.addOnSuccessListener { nodes ->
-                // nodes.isEmpty() means no phones/other devices are reachable
-                if (nodes.isEmpty() && WorkoutRepository.workouts.value.isEmpty()) {
-                    WorkoutRepository.useSampleData()
-                }
-            }
-        }
-
         setContent {
             WearApp(viewModel)
         }
@@ -95,6 +86,8 @@ fun WearApp(viewModel: WorkoutsViewModel) {
                         navController.navigate("workout_list/$index")
                     }, onShowDebug = {
                         navController.navigate("debug_info")
+                    }, onUseSampleData = {
+                        WorkoutRepository.useSampleData()
                     })
                 }
 
@@ -150,7 +143,8 @@ private fun AppNameEdgeButton() {
 fun MainListScreen(
     viewModel: WorkoutsViewModel,
     onItemSelected: (Int) -> Unit,
-    onShowDebug: () -> Unit
+    onShowDebug: () -> Unit,
+    onUseSampleData: () -> Unit
 ) {
     val listState = rememberTransformingLazyColumnState()
     val transformationSpec = rememberTransformationSpec()
@@ -194,10 +188,25 @@ fun MainListScreen(
                             stringResource(R.string.syncErrorText, currentErrorMessage)
                         else
                             stringResource(R.string.syncInstructionsText),
+                        style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(horizontal = 8.dp)
                     )
+                }
+                item {
+                    Button(
+                        onClick = onUseSampleData,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(40.dp)
+                            .padding(top = 4.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.sampleBeatdownsButton),
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
                 }
             }
             if (currentErrorMessage != null) {
