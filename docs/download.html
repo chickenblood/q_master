@@ -352,7 +352,7 @@
         <img src="gloom.png" alt="The November Gloom" class="hero-image">
 
         <a href="https://apps.apple.com/app/id6756852098" target="_blank" class="corner-logo-link">
-            <img src="logo.png" alt="F3 Hangar 1 Logo" class="corner-logo">
+            <img src="logo.png" alt="F3 Hangar 1 Logo" class="corner-logo" onclick="redirectStore(event)">
         </a>
     </div>
 
@@ -423,6 +423,20 @@
         setTimeout(() => {
             video.remove();
         }, 1000);
+    }
+
+    function redirectStore(event) {
+        // Check the user agent string for Android
+        const isAndroid = /Android/i.test(navigator.userAgent);
+
+        if (isAndroid) {
+            // Prevent the default iOS App Store link from opening
+            event.preventDefault();
+
+            // Open the Play Store link in a new tab instead
+            window.open("https://play.google.com/store/apps/details?id=com.f3nation.q_master", "_blank", "noopener");
+        }
+        // If it's not Android (iOS or Desktop), it just follows the default href
     }
 </script>
 
