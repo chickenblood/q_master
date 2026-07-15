@@ -64,27 +64,23 @@ class GamesTab extends StatelessWidget {
               children: [
                 Expanded(
                   child: Center(
-                    child: Transform.rotate(
+                    child: _GameTile(
+                      title: L10n.of(context)!.dodGameTileTitle,
+                      subtitle: 'Kermit‘s',
+                      imagePath: 'assets/images/DoD.png',
                       angle: _degToRad(5.0),
-                      child: _GameTile(
-                        title: L10n.of(context)!.dodGameTileTitle,
-                        subtitle: 'Kermit‘s',
-                        imagePath: 'assets/images/DoD.png',
-                        onTap: (tag) => _showDodGame(context, tag),
-                      ),
+                      onTap: (tag) => _showDodGame(context, tag),
                     ),
                   ),
                 ),
                 Expanded(
                   child: Center(
-                    child: Transform.rotate(
+                    child: _GameTile(
+                      title: L10n.of(context)!.dopGameTileTitle,
+                      imagePath: 'assets/images/DoP.png',
+                      textColor: Colors.black,
                       angle: _degToRad(-5.0),
-                      child: _GameTile(
-                        title: L10n.of(context)!.dopGameTileTitle,
-                        imagePath: 'assets/images/DoP.png',
-                        textColor: Colors.black,
-                        onTap: (tag) => _showDeckOfPainGame(context, tag),
-                      ),
+                      onTap: (tag) => _showDeckOfPainGame(context, tag),
                     ),
                   ),
                 ),
@@ -104,6 +100,7 @@ class _GameTile extends StatelessWidget {
   final String? subtitle;
   final Color? textColor;
   final String? imagePath;
+  final double angle;
   final Function(String)? onTap;
 
   const _GameTile({
@@ -111,6 +108,7 @@ class _GameTile extends StatelessWidget {
     this.subtitle,
     this.textColor,
     this.imagePath,
+    this.angle = 0,
     this.onTap,
   });
 
@@ -119,69 +117,73 @@ class _GameTile extends StatelessWidget {
     padding: const EdgeInsets.symmetric(horizontal: 22.0),
     child: Hero(
       tag: title,
-      child: Material(
-        color: Colors.transparent,
-        clipBehavior: .hardEdge,
-        child: InkWell(
-          onTap: () => onTap?.call(title),
-          borderRadius: BorderRadius.circular(16.0),
-          child: Stack(
-            children: [
-              if (subtitle != null)
+      child: Transform.rotate(
+        angle: angle,
+        child: Material(
+          color: Colors.transparent,
+          clipBehavior: .hardEdge,
+          child: InkWell(
+            onTap: () => onTap?.call(title),
+            borderRadius: BorderRadius.circular(16.0),
+            child: Stack(
+              children: [
+                if (subtitle != null)
+                  Positioned(
+                    top: 8.0,
+                    left: 8.0,
+                    right: 8.0,
+                    child: AutoSizeText(
+                      subtitle!,
+                      style: Theme.of(context).textTheme.headlineSmall!
+                          .copyWith(
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.bold,
+                            color: textColor,
+                          ),
+                      textScaleFactor: min(
+                        MediaQuery.textScalerOf(context).scale(1.0),
+                        1.4,
+                      ),
+                    ),
+                  ),
+                Ink(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16.0),
+                    image: imagePath != null
+                        ? DecorationImage(
+                            image: AssetImage(imagePath!),
+                            fit: .contain,
+                          )
+                        : null,
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      width: 1.0,
+                    ),
+                  ),
+                  child: AspectRatio(aspectRatio: 2 / 3),
+                ),
                 Positioned(
-                  top: 8.0,
-                  left: 8.0,
-                  right: 8.0,
+                  bottom: 4,
+                  left: 4,
+                  right: 16, // Larger padding on right to account 'A'
+                  // in card graphic.
                   child: AutoSizeText(
-                    subtitle!,
-                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                      fontStyle: FontStyle.italic,
+                    title,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineMedium!.copyWith(
                       fontWeight: FontWeight.bold,
                       color: textColor,
                     ),
+                    softWrap: true,
+                    maxLines: 1,
                     textScaleFactor: min(
                       MediaQuery.textScalerOf(context).scale(1.0),
                       1.4,
                     ),
                   ),
                 ),
-              Ink(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16.0),
-                  image: imagePath != null
-                      ? DecorationImage(
-                          image: AssetImage(imagePath!),
-                          fit: .contain,
-                        )
-                      : null,
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    width: 1.0,
-                  ),
-                ),
-                child: AspectRatio(aspectRatio: 2 / 3),
-              ),
-              Positioned(
-                bottom: 4,
-                left: 4,
-                right: 16, // Larger padding on right to account 'A'
-                // in card graphic.
-                child: AutoSizeText(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
-                  softWrap: true,
-                  maxLines: 1,
-                  textScaleFactor: min(
-                    MediaQuery.textScalerOf(context).scale(1.0),
-                    1.4,
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
