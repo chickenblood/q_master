@@ -254,6 +254,21 @@ final class WorkoutList extends _$WorkoutList {
     });
   }
 
+  /// Reads a single workout from a file.
+  void addFromFile(String filename) {
+    final file = File(filename);
+    if (!file.existsSync()) {
+      return;
+    }
+    final data = file.readAsStringSync();
+    final json = jsonDecode(data);
+    // Give incoming data the current date.
+    // TODO: This may not be in the correct format for a workout. We should
+    // catch the error if that is the case.
+    final workout = Workout.fromJson(json).copyWith(date: DateTime.now());
+    add(workout);
+  }
+
   Future<void> remove(Workout workout) {
     return _mutateAndSave((updatedWorkouts) {
       final removed = updatedWorkouts.remove(workout);
