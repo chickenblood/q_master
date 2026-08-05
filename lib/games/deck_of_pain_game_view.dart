@@ -142,15 +142,13 @@ class _DeckState extends State<_Deck> with TickerProviderStateMixin {
         children: [
           // Revealed when last card is slid off and no more are available.
           if (_topCard == null || _bottomCard == null)
-            AutoSizeText(
+            PlatformText(
               L10n.of(context)!.dopAllDoneLabel,
               textAlign: .center,
               style: TextTheme.of(
                 context,
               ).displayLarge!.copyWith(color: Colors.white),
-              maxLines: 2,
-              minFontSize: 18,
-              overflow: TextOverflow.fade,
+              textScaler: .noScaling,
             ),
           if (_bottomCard != null)
             _CardFlipView(
@@ -224,16 +222,16 @@ class _FrontCardView extends StatelessWidget {
             children: [
               Align(
                 alignment: Alignment.center,
-                child: PlatformText(
+                child: AutoSizeText(
                   painCard.description,
                   textAlign: .center,
-                  overflow: .fade,
+                  overflow: TextOverflow.fade,
                   maxLines: 5,
+                  minFontSize: 18,
                   style: textStyle.copyWith(
-                    fontWeight: .bold,
-                    color: painCard.suit.color,
+                   fontWeight: .bold,
+                   color: painCard.suit.color,
                   ),
-                  textScaler: .noScaling,
                 ),
               ),
               // Top left decoration
