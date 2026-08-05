@@ -219,6 +219,7 @@ class _FrontCardView extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
+              // Top left decoration
               Row(
                 children: [
                   Column(
@@ -255,6 +256,7 @@ class _FrontCardView extends StatelessWidget {
                   ),
                 ),
               ),
+              // Bottom right decoration
               Row(
                 mainAxisAlignment: .end,
                 children: [
