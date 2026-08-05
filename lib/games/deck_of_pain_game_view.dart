@@ -148,7 +148,7 @@ class _DeckState extends State<_Deck> with TickerProviderStateMixin {
               style: TextTheme.of(
                 context,
               ).displayLarge!.copyWith(color: Colors.white),
-              textScaler: .noScaling,
+              textScaler: TextScaler.noScaling,
             ),
           if (_bottomCard != null)
             _CardFlipView(
@@ -229,8 +229,8 @@ class _FrontCardView extends StatelessWidget {
                   maxLines: 5,
                   minFontSize: 18,
                   style: textStyle.copyWith(
-                   fontWeight: .bold,
-                   color: painCard.suit.color,
+                    fontWeight: .bold,
+                    color: painCard.suit.color,
                   ),
                 ),
               ),
