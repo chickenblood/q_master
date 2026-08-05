@@ -194,8 +194,8 @@ class _FrontCardView extends StatelessWidget {
   }) {
     return PlatformText(
       text,
-      textAlign: .center,
-      style: style.copyWith(fontWeight: .bold, color: color),
+      textAlign: TextAlign.center,
+      style: style.copyWith(fontWeight: FontWeight.bold, color: color),
       textScaler: .noScaling,
     );
   }
@@ -245,12 +245,12 @@ class _FrontCardView extends StatelessWidget {
                 child: Center(
                   child: AutoSizeText(
                     painCard.description,
-                    textAlign: .center,
+                    textAlign: TextAlign.center,
                     overflow: TextOverflow.fade,
                     maxLines: 5,
                     minFontSize: 18,
                     style: textStyle.copyWith(
-                      fontWeight: .bold,
+                      fontWeight: FontWeight.bold,
                       color: painCard.suit.color,
                     ),
                   ),
