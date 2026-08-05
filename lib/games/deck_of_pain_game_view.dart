@@ -219,25 +219,26 @@ class _FrontCardView extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: Column(
-                  mainAxisSize: .min,
-                  children: [
-                    _buildText(
-                      context,
-                      text: painCard.displayName,
-                      style: textStyle,
-                      color: painCard.suit.color,
-                    ),
-                    _buildText(
-                      context,
-                      text: painCard.suit.symbol,
-                      style: textStyle,
-                      color: painCard.suit.color,
-                    ),
-                  ],
-                ),
+              Row(
+                children: [
+                  Column(
+                    mainAxisSize: .min,
+                    children: [
+                      _buildText(
+                        context,
+                        text: painCard.displayName,
+                        style: textStyle,
+                        color: painCard.suit.color,
+                      ),
+                      _buildText(
+                        context,
+                        text: painCard.suit.symbol,
+                        style: textStyle,
+                        color: painCard.suit.color,
+                      ),
+                    ],
+                  ),
+                ],
               ),
               Expanded(
                 child: Center(
