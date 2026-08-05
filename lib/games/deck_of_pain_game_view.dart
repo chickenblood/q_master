@@ -138,7 +138,7 @@ class _DeckState extends State<_Deck> with TickerProviderStateMixin {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Stack(
-        alignment: Alignment.center,
+        alignment: .center,
         children: [
           // Revealed when last card is slid off and no more are available.
           if (_topCard == null || _bottomCard == null)
@@ -148,7 +148,7 @@ class _DeckState extends State<_Deck> with TickerProviderStateMixin {
               style: TextTheme.of(
                 context,
               ).displayLarge!.copyWith(color: Colors.white),
-              textScaler: TextScaler.noScaling,
+              textScaler: .noScaling,
             ),
           if (_bottomCard != null)
             _CardFlipView(
@@ -217,50 +217,12 @@ class _FrontCardView extends StatelessWidget {
         aspectRatio: 2 / 3,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Stack(
-            fit: .expand,
+          child: Column(
             children: [
-              Align(
-                alignment: Alignment.center,
-                child: AutoSizeText(
-                  painCard.description,
-                  textAlign: .center,
-                  overflow: TextOverflow.fade,
-                  maxLines: 5,
-                  minFontSize: 18,
-                  style: textStyle.copyWith(
-                    fontWeight: .bold,
-                    color: painCard.suit.color,
-                  ),
-                ),
-              ),
               // Top left decoration
-              Align(
-                alignment: Alignment.topLeft,
-                child: Column(
-                  mainAxisSize: .min,
-                  children: [
-                    _buildText(
-                      context,
-                      text: painCard.displayName,
-                      style: textStyle,
-                      color: painCard.suit.color,
-                    ),
-                    _buildText(
-                      context,
-                      text: painCard.suit.symbol,
-                      style: textStyle,
-                      color: painCard.suit.color,
-                    ),
-                  ],
-                ),
-              ),
-              // Bottom right decoration
-              Align(
-                alignment: Alignment.bottomRight,
-                child: Transform.rotate(
-                  angle: pi, // Rotate 180 degrees
-                  child: Column(
+              Row(
+                children: [
+                  Column(
                     mainAxisSize: .min,
                     children: [
                       _buildText(
@@ -277,7 +239,48 @@ class _FrontCardView extends StatelessWidget {
                       ),
                     ],
                   ),
+                ],
+              ),
+              Expanded(
+                child: Center(
+                  child: AutoSizeText(
+                    painCard.description,
+                    textAlign: .center,
+                    overflow: .fade,
+                    maxLines: 5,
+                    minFontSize: 18,
+                    style: textStyle.copyWith(
+                      fontWeight: .bold,
+                      color: painCard.suit.color,
+                    ),
+                  ),
                 ),
+              ),
+              // Bottom right decoration
+              Row(
+                mainAxisAlignment: .end,
+                children: [
+                  Transform.rotate(
+                    angle: pi,
+                    child: Column(
+                      mainAxisSize: .min,
+                      children: [
+                        _buildText(
+                          context,
+                          text: painCard.displayName,
+                          style: textStyle,
+                          color: painCard.suit.color,
+                        ),
+                        _buildText(
+                          context,
+                          text: painCard.suit.symbol,
+                          style: textStyle,
+                          color: painCard.suit.color,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
