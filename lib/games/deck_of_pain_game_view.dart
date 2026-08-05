@@ -142,15 +142,13 @@ class _DeckState extends State<_Deck> with TickerProviderStateMixin {
         children: [
           // Revealed when last card is slid off and no more are available.
           if (_topCard == null || _bottomCard == null)
-            AutoSizeText(
+            PlatformText(
               L10n.of(context)!.dopAllDoneLabel,
-              textAlign: .center,
-              style: TextTheme.of(context).displayLarge!.copyWith(
-                color: Colors.white,
-              ),
-              maxLines: 2,
-              minFontSize: 18,
-              overflow: .fade,
+              textAlign: TextAlign.center,
+              style: TextTheme.of(
+                context,
+              ).displayLarge!.copyWith(color: Colors.white),
+              textScaler: TextScaler.noScaling,
             ),
           if (_bottomCard != null)
             _CardFlipView(
