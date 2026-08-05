@@ -243,16 +243,16 @@ class _FrontCardView extends StatelessWidget {
               ),
               Expanded(
                 child: Center(
-                  child: PlatformText(
+                  child: AutoSizeText(
                     painCard.description,
                     textAlign: .center,
-                    overflow: .fade,
+                    overflow: TextOverflow.fade,
                     maxLines: 5,
+                    minFontSize: 18,
                     style: textStyle.copyWith(
                       fontWeight: .bold,
                       color: painCard.suit.color,
                     ),
-                    textScaler: .noScaling,
                   ),
                 ),
               ),
