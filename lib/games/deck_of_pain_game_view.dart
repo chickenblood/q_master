@@ -138,17 +138,17 @@ class _DeckState extends State<_Deck> with TickerProviderStateMixin {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Stack(
-        alignment: Alignment.center,
+        alignment: .center,
         children: [
           // Revealed when last card is slid off and no more are available.
           if (_topCard == null || _bottomCard == null)
             PlatformText(
               L10n.of(context)!.dopAllDoneLabel,
-              textAlign: TextAlign.center,
+              textAlign: .center,
               style: TextTheme.of(
                 context,
               ).displayLarge!.copyWith(color: Colors.white),
-              textScaler: TextScaler.noScaling,
+              textScaler: .noScaling,
             ),
           if (_bottomCard != null)
             _CardFlipView(
@@ -256,7 +256,7 @@ class _FrontCardView extends StatelessWidget {
                 ),
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: .end,
                 children: [
                   Transform.rotate(
                     angle: pi,
