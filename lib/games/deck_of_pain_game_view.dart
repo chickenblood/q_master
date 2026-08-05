@@ -256,28 +256,30 @@ class _FrontCardView extends StatelessWidget {
                   ),
                 ),
               ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: Transform.rotate(
-                  angle: pi,
-                  child: Column(
-                    mainAxisSize: .min,
-                    children: [
-                      _buildText(
-                        context,
-                        text: painCard.displayName,
-                        style: textStyle,
-                        color: painCard.suit.color,
-                      ),
-                      _buildText(
-                        context,
-                        text: painCard.suit.symbol,
-                        style: textStyle,
-                        color: painCard.suit.color,
-                      ),
-                    ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Transform.rotate(
+                    angle: pi,
+                    child: Column(
+                      mainAxisSize: .min,
+                      children: [
+                        _buildText(
+                          context,
+                          text: painCard.displayName,
+                          style: textStyle,
+                          color: painCard.suit.color,
+                        ),
+                        _buildText(
+                          context,
+                          text: painCard.suit.symbol,
+                          style: textStyle,
+                          color: painCard.suit.color,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
