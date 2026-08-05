@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/ui/media_query.dart';
@@ -141,13 +142,15 @@ class _DeckState extends State<_Deck> with TickerProviderStateMixin {
         children: [
           // Revealed when last card is slid off and no more are available.
           if (_topCard == null || _bottomCard == null)
-            PlatformText(
+            AutoSizeText(
               L10n.of(context)!.dopAllDoneLabel,
               textAlign: .center,
-              style: TextTheme.of(
-                context,
-              ).displayLarge!.copyWith(color: Colors.white),
-              textScaler: .noScaling,
+              style: TextTheme.of(context).displayLarge!.copyWith(
+                color: Colors.white,
+              ),
+              maxLines: 2,
+              minFontSize: 18,
+              overflow: .fade,
             ),
           if (_bottomCard != null)
             _CardFlipView(
@@ -216,24 +219,8 @@ class _FrontCardView extends StatelessWidget {
         aspectRatio: 2 / 3,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Stack(
-            fit: .expand,
+          child: Column(
             children: [
-              Align(
-                alignment: Alignment.center,
-                child: PlatformText(
-                  painCard.description,
-                  textAlign: .center,
-                  overflow: .fade,
-                  maxLines: 5,
-                  style: textStyle.copyWith(
-                    fontWeight: .bold,
-                    color: painCard.suit.color,
-                  ),
-                  textScaler: .noScaling,
-                ),
-              ),
-              // Top left decoration
               Align(
                 alignment: Alignment.topLeft,
                 child: Column(
@@ -254,11 +241,25 @@ class _FrontCardView extends StatelessWidget {
                   ],
                 ),
               ),
-              // Bottom right decoration
+              Expanded(
+                child: Center(
+                  child: PlatformText(
+                    painCard.description,
+                    textAlign: .center,
+                    overflow: .fade,
+                    maxLines: 5,
+                    style: textStyle.copyWith(
+                      fontWeight: .bold,
+                      color: painCard.suit.color,
+                    ),
+                    textScaler: .noScaling,
+                  ),
+                ),
+              ),
               Align(
                 alignment: Alignment.bottomRight,
                 child: Transform.rotate(
-                  angle: pi, // Rotate 180 degrees
+                  angle: pi,
                   child: Column(
                     mainAxisSize: .min,
                     children: [
