@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/ui/media_query.dart';
@@ -141,13 +142,15 @@ class _DeckState extends State<_Deck> with TickerProviderStateMixin {
         children: [
           // Revealed when last card is slid off and no more are available.
           if (_topCard == null || _bottomCard == null)
-            PlatformText(
+            AutoSizeText(
               L10n.of(context)!.dopAllDoneLabel,
               textAlign: .center,
               style: TextTheme.of(
                 context,
               ).displayLarge!.copyWith(color: Colors.white),
-              textScaler: .noScaling,
+              maxLines: 2,
+              minFontSize: 18,
+              overflow: TextOverflow.fade,
             ),
           if (_bottomCard != null)
             _CardFlipView(
