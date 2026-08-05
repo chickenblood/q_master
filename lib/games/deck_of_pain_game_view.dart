@@ -144,7 +144,7 @@ class _DeckState extends State<_Deck> with TickerProviderStateMixin {
           if (_topCard == null || _bottomCard == null)
             PlatformText(
               L10n.of(context)!.dopAllDoneLabel,
-              textAlign: TextAlign.center,
+              textAlign: .center,
               style: TextTheme.of(
                 context,
               ).displayLarge!.copyWith(color: Colors.white),
