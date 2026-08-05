@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/ui/media_query.dart';
@@ -147,7 +148,7 @@ class _DeckState extends State<_Deck> with TickerProviderStateMixin {
               style: TextTheme.of(
                 context,
               ).displayLarge!.copyWith(color: Colors.white),
-              textScaler: .noScaling,
+              textScaler: TextScaler.noScaling,
             ),
           if (_bottomCard != null)
             _CardFlipView(
@@ -221,16 +222,16 @@ class _FrontCardView extends StatelessWidget {
             children: [
               Align(
                 alignment: Alignment.center,
-                child: PlatformText(
+                child: AutoSizeText(
                   painCard.description,
                   textAlign: .center,
-                  overflow: .fade,
+                  overflow: TextOverflow.fade,
                   maxLines: 5,
+                  minFontSize: 18,
                   style: textStyle.copyWith(
                     fontWeight: .bold,
                     color: painCard.suit.color,
                   ),
-                  textScaler: .noScaling,
                 ),
               ),
               // Top left decoration
