@@ -135,7 +135,8 @@ class _DeckState extends State<_Deck> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final isPortrait = MediaQuery.orientationOf(context) == .portrait;
+    final isPortrait =
+        MediaQuery.orientationOf(context) == Orientation.portrait;
     final isTablet = MediaUtils.isTablet(context);
     final isPhonePortrait = isPortrait && !isTablet;
 
