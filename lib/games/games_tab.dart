@@ -2,11 +2,13 @@ import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../l10n/l10n.dart';
 import '../settings/settings_sheet.dart';
+import '../ui/media_query.dart';
 import 'deck_of_pain_game_view.dart';
 import 'dod_game_view.dart';
 
@@ -16,8 +18,23 @@ class GamesTab extends StatelessWidget {
   void _showDodGame(BuildContext context, String tag) =>
       _presentModalSheet(context, DodGameView(heroTag: tag));
 
-  void _showDeckOfPainGame(BuildContext context, String tag) =>
-      _presentModalSheet(context, DeckOfPainGameView(heroTag: tag));
+  Future<void> _showDeckOfPainGame(BuildContext context, String tag) async {
+    final shouldLockPortrait = !MediaUtils.isTablet(context);
+    if (shouldLockPortrait) {
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    }
+
+    try {
+      await _presentModalSheet(context, DeckOfPainGameView(heroTag: tag));
+    } finally {
+      if (shouldLockPortrait) {
+        await SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+      }
+    }
+  }
 
   Future<void> _presentModalSheet(BuildContext context, Widget child) async {
     // Stop the screen from sleeping while the beatdown browser is shown.

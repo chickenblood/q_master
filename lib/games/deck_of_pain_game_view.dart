@@ -135,54 +135,45 @@ class _DeckState extends State<_Deck> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final isPortrait =
-        MediaQuery.orientationOf(context) == Orientation.portrait;
-    final isTablet = MediaUtils.isTablet(context);
-    final isPhonePortrait = isPortrait && !isTablet;
-
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: isPhonePortrait ? 16 : 8),
-      child: SafeArea(
-        top: false,
-        bottom: isPhonePortrait,
-        child: Stack(
-          alignment: .center,
-          children: [
-            // Revealed when last card is slid off and no more are available.
-            if (_topCard == null || _bottomCard == null)
-              PlatformText(
-                L10n.of(context)!.dopAllDoneLabel,
-                textAlign: .center,
-                style: TextTheme.of(
-                  context,
-                ).displayLarge!.copyWith(color: Colors.white),
-                textScaler: .noScaling,
-              ),
-            if (_bottomCard != null)
-              _CardFlipView(
-                key: ValueKey(_bottomCard),
-                isFlipped: true,
-                shouldAnimate: false, // Don't animate until it becomes top card
-                front: _FrontCardView(painCard: _bottomCard!),
-                back: const _BackCardView(),
-              ),
-            // Top card - interactive, slides off when tapped
-            if (_topCard != null)
-              SlideTransition(
-                position: _slideAnimation,
-                child: GestureDetector(
-                  onTap: _handleTap,
-                  child: _CardFlipView(
-                    key: ValueKey(_topCard),
-                    isFlipped: _topCardFlipped,
-                    shouldAnimate: true,
-                    front: _FrontCardView(painCard: _topCard!),
-                    back: const _BackCardView(),
-                  ),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Stack(
+        alignment: .center,
+        children: [
+          // Revealed when last card is slid off and no more are available.
+          if (_topCard == null || _bottomCard == null)
+            PlatformText(
+              L10n.of(context)!.dopAllDoneLabel,
+              textAlign: .center,
+              style: TextTheme.of(
+                context,
+              ).displayLarge!.copyWith(color: Colors.white),
+              textScaler: .noScaling,
+            ),
+          if (_bottomCard != null)
+            _CardFlipView(
+              key: ValueKey(_bottomCard),
+              isFlipped: true,
+              shouldAnimate: false, // Don't animate until it becomes top card
+              front: _FrontCardView(painCard: _bottomCard!),
+              back: const _BackCardView(),
+            ),
+          // Top card - interactive, slides off when tapped
+          if (_topCard != null)
+            SlideTransition(
+              position: _slideAnimation,
+              child: GestureDetector(
+                onTap: _handleTap,
+                child: _CardFlipView(
+                  key: ValueKey(_topCard),
+                  isFlipped: _topCardFlipped,
+                  shouldAnimate: true,
+                  front: _FrontCardView(painCard: _topCard!),
+                  back: const _BackCardView(),
                 ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
