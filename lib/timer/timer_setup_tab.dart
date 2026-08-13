@@ -96,6 +96,9 @@ class TimerSetupTab extends ConsumerWidget {
           ).clamp(maxScaleFactor: 1.6),
         ),
         leading: const SettingsActionButton(),
+        cupertino: (_, __) => CupertinoNavigationBarData(
+          backgroundColor: Colors.transparent,
+        ),
       ),
       body: SafeArea(
         bottom: true,
