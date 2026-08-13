@@ -122,11 +122,12 @@ final class TimerScreen extends ConsumerWidget {
     final formatter = timerType == .tabata
         ? formatDuration
         : formatPreciseDuration;
+    final showAppBarContent = isPortrait || isTablet;
     return PlatformScaffold(
-      appBar: isPortrait || isTablet
-          ? PlatformAppBar(
-              automaticallyImplyLeading: true,
-              title: Text(
+      appBar: PlatformAppBar(
+        automaticallyImplyLeading: true,
+        title: showAppBarContent
+            ? Text(
                 L10n.of(context)!.timerPageTitle,
                 style: Theme.of(
                   context,
@@ -134,12 +135,13 @@ final class TimerScreen extends ConsumerWidget {
                 textScaler: MediaQuery.textScalerOf(
                   context,
                 ).clamp(maxScaleFactor: 1.6),
-              ),
-
-              cupertino: (appBarContext, _) => CupertinoNavigationBarData(
-                backgroundColor: Colors.transparent,
-                // Action buttons – iOS only
-                trailing: PlatformIconButton(
+              )
+            : null,
+        cupertino: (appBarContext, _) => CupertinoNavigationBarData(
+          backgroundColor: Colors.transparent,
+          // Action buttons – iOS only, portrait/tablet only
+          trailing: showAppBarContent
+              ? PlatformIconButton(
                   icon: Icon(
                     PlatformIcons(context).refresh,
                     color: Theme.of(
@@ -147,10 +149,10 @@ final class TimerScreen extends ConsumerWidget {
                     ).colorScheme.secondary, // Red from theme
                   ),
                   onPressed: () => _resetTimer(ref),
-                ),
-              ),
-            )
-          : null,
+                )
+              : null,
+        ),
+      ),
       body: SafeArea(
         child: switch (notifier.timerState) {
           .preparing => _layoutTiles(
