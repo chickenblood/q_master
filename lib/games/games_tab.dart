@@ -15,10 +15,23 @@ import 'dod_game_view.dart';
 class GamesTab extends StatelessWidget {
   const GamesTab({super.key});
 
-  void _showDodGame(BuildContext context, String tag) =>
-      _presentModalSheet(context, DodGameView(heroTag: tag));
+  Future<void> _showDodGame(BuildContext context, String tag) =>
+      _withPortraitLock(
+        context: context,
+        action: () => _presentModalSheet(context, DodGameView(heroTag: tag)),
+      );
 
-  Future<void> _showDeckOfPainGame(BuildContext context, String tag) async {
+  Future<void> _showDeckOfPainGame(BuildContext context, String tag) =>
+      _withPortraitLock(
+        context: context,
+        action: () =>
+            _presentModalSheet(context, DeckOfPainGameView(heroTag: tag)),
+      );
+
+  Future<void> _withPortraitLock({
+    required BuildContext context,
+    required Future<void> Function() action,
+  }) async {
     final shouldLockPortrait = !MediaUtils.isTablet(context);
     if (shouldLockPortrait) {
       await SystemChrome.setPreferredOrientations([
@@ -28,7 +41,7 @@ class GamesTab extends StatelessWidget {
     }
 
     try {
-      await _presentModalSheet(context, DeckOfPainGameView(heroTag: tag));
+      await action();
     } finally {
       if (shouldLockPortrait) {
         await SystemChrome.setPreferredOrientations(DeviceOrientation.values);
