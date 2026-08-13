@@ -17,9 +17,26 @@ part 'workout_list.g.dart';
 final class WorkoutList extends _$WorkoutList {
   static final _logger = Logger();
   final _watch = WatchConnectivity();
+  final Future<String> Function() _filenameProvider;
+  final Future<void> Function()? _beforeDiskLoad;
+  final Future<void> Function()? _beforeDiskSave;
   var _dataIsLoaded = false;
+  Future<void>? _initialLoadFuture;
   String? _cachedFilename;
   AppLifecycleListener? _appLifecycleListener;
+
+  WorkoutList({
+    Future<String> Function()? filenameProvider,
+    Future<void> Function()? beforeDiskLoad,
+    Future<void> Function()? beforeDiskSave,
+  }) : _filenameProvider = filenameProvider ?? _defaultFilename,
+       _beforeDiskLoad = beforeDiskLoad,
+       _beforeDiskSave = beforeDiskSave;
+
+  static Future<String> _defaultFilename() async {
+    final directory = await getApplicationDocumentsDirectory();
+    return '${directory.path}/workouts.json';
+  }
 
   @override
   List<Workout> build() {
@@ -35,91 +52,149 @@ final class WorkoutList extends _$WorkoutList {
     if (!_dataIsLoaded) {
       // Set initial state while we load from disk.
       state = [];
-      _loadFromDisk();
+      loadFromDisk();
     }
     return state;
+  }
+
+  Future<void> loadFromDisk() {
+    if (_initialLoadFuture != null) {
+      return _initialLoadFuture!;
+    }
+    _initialLoadFuture = _loadFromDisk();
+    return _initialLoadFuture!;
   }
 
   Future<String> _filename() async {
     if (_cachedFilename != null) {
       return _cachedFilename!;
     }
-    final directory = await getApplicationDocumentsDirectory();
-    _cachedFilename = '${directory.path}/workouts.json';
+    _cachedFilename = await _filenameProvider();
     return _cachedFilename!;
   }
 
+  Future<List<Workout>?> _decodeWorkoutsFromJsonString(String json) async {
+    final decoded = jsonDecode(json);
+    if (decoded is! List) {
+      throw const FormatException('Expected persisted workouts to be a list');
+    }
+
+    final newWorkouts = <Workout>[];
+    for (final entry in decoded) {
+      try {
+        if (entry is! Map) {
+          _logger.w('Skipping malformed workout entry: expected map.');
+          continue;
+        }
+        final migrated = _migrateJson(Map<String, Object?>.from(entry));
+        newWorkouts.add(Workout.fromJson(migrated));
+      } on Object catch (error, stackTrace) {
+        _logger.w(
+          'Skipping malformed workout entry during load.',
+          error: error,
+          stackTrace: stackTrace,
+        );
+      }
+    }
+
+    return newWorkouts;
+  }
+
   Future<void> _loadFromDisk() async {
-    _dataIsLoaded = true;
     try {
+      final lastKnownState = List<Workout>.of(state);
+      if (_beforeDiskLoad != null) {
+        await _beforeDiskLoad();
+      }
+
       final file = File(await _filename());
       if (!(await file.exists())) {
-        state = [];
+        state = lastKnownState.isNotEmpty ? lastKnownState : const [];
+        _dataIsLoaded = true;
         return;
       }
 
-      final json = await file.readAsString();
-      final decoded = jsonDecode(json);
-      if (decoded is! List) {
-        throw const FormatException('Expected persisted workouts to be a list');
-      }
-
-      final newWorkouts = <Workout>[];
-      for (final entry in decoded) {
-        try {
-          if (entry is! Map) {
-            _logger.w('Skipping malformed workout entry: expected map.');
-            continue;
+      late final List<Workout>? decodedWorkouts;
+      try {
+        decodedWorkouts = await _decodeWorkoutsFromJsonString(
+          await file.readAsString(),
+        );
+      } on Object {
+        final backupFile = File('${file.path}.bak');
+        if (await backupFile.exists()) {
+          try {
+            decodedWorkouts = await _decodeWorkoutsFromJsonString(
+              await backupFile.readAsString(),
+            );
+            await file.writeAsString(
+              jsonEncode(
+                decodedWorkouts!.map((workout) => workout.toJson()).toList(),
+              ),
+            );
+          } on Object {
+            decodedWorkouts = null;
           }
-          final migrated = _migrateJson(Map<String, Object?>.from(entry));
-          newWorkouts.add(Workout.fromJson(migrated));
-        } on Object catch (error, stackTrace) {
-          _logger.w(
-            'Skipping malformed workout entry during load.',
-            error: error,
-            stackTrace: stackTrace,
-          );
+        } else {
+          decodedWorkouts = null;
         }
       }
 
-      state = newWorkouts;
+      if (decodedWorkouts == null) {
+        throw const FormatException(
+          'No valid persisted workouts were available',
+        );
+      }
+
+      state = decodedWorkouts;
+      _dataIsLoaded = true;
       await _syncToWatch();
     } on Object catch (error, stackTrace) {
+      final preservedState = List<Workout>.of(state);
       _logger.e(
         'Failed to initialize workouts from disk.',
         error: error,
         stackTrace: stackTrace,
       );
-      state = [];
+      state = preservedState.isNotEmpty ? preservedState : const [];
+      _dataIsLoaded = true;
+    } finally {
+      _initialLoadFuture = null;
     }
   }
 
   Future<void> _syncToWatch() async {
-    final workoutsArray = state.map((e) => e.toJson()).toList();
-    final isPaired = await _watch.isPaired;
-    final isReachable = await _watch.isReachable;
-    if (isPaired) {
-      try {
-        final payload = {
-          'workouts': workoutsArray,
-          'date': DateTime.now().toIso8601String(),
-        };
+    try {
+      final workoutsArray = state.map((e) => e.toJson()).toList();
+      final isPaired = await _watch.isPaired;
+      final isReachable = await _watch.isReachable;
+      if (!isPaired) {
+        return;
+      }
 
-        if (Platform.isAndroid) {
-          // Realtime push when connected; fall back to context sync when not
-          // reachable.
-          if (isReachable) {
-            await _watch.sendMessage(payload);
-          } else {
-            await _watch.updateApplicationContext(payload);
-          }
+      final payload = {
+        'workouts': workoutsArray,
+        'date': DateTime.now().toIso8601String(),
+      };
+
+      if (Platform.isAndroid) {
+        // Realtime push when connected; fall back to context sync when not
+        // reachable.
+        if (isReachable) {
+          await _watch.sendMessage(payload);
         } else {
-          // Standard sync for iOS/watchOS
           await _watch.updateApplicationContext(payload);
         }
-      } on PlatformException catch (e) {
-        _logger.e('Sync failure. Reachable: $isReachable', error: e);
+      } else {
+        // Standard sync for iOS/watchOS
+        await _watch.updateApplicationContext(payload);
       }
+    } on PlatformException catch (e) {
+      _logger.e('Sync failure.', error: e);
+    } on MissingPluginException catch (e) {
+      _logger.w(
+        'Watch connectivity plugin unavailable; skipping sync.',
+        error: e,
+      );
     }
   }
 
@@ -130,8 +205,20 @@ final class WorkoutList extends _$WorkoutList {
     try {
       final file = File(await _filename());
       await file.create(recursive: true);
-      final json = jsonEncode(updatedWorkouts);
-      await file.writeAsString(json);
+      final json = jsonEncode(updatedWorkouts.map((w) => w.toJson()).toList());
+      final tempFile = File('${file.path}.tmp');
+      final backupFile = File('${file.path}.bak');
+      if (_beforeDiskSave != null) {
+        await _beforeDiskSave();
+      }
+      if (await file.exists()) {
+        await backupFile.writeAsString(await file.readAsString());
+      }
+      await tempFile.writeAsString(json);
+      if (await file.exists()) {
+        await file.delete();
+      }
+      await tempFile.rename(file.path);
     } on Object catch (error, stackTrace) {
       state = previousState;
       _logger.e(
@@ -146,6 +233,10 @@ final class WorkoutList extends _$WorkoutList {
   }
 
   Future<void> _mutateAndSave(bool Function(List<Workout>) mutate) async {
+    if (!_dataIsLoaded) {
+      await loadFromDisk();
+    }
+
     final updatedWorkouts = List.of(state);
     final didMutate = mutate(updatedWorkouts);
     if (!didMutate) {
