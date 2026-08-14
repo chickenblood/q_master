@@ -137,7 +137,10 @@ final class Timer extends _$Timer {
     final allRoundsCompleted = switch (state.timerType) {
       // There is only one round for stopwatch and countdown timers,
       // so they are complete when the running time exceeds the work interval.
-      .stopwatch || .countdown => runningTime > workInterval,
+      .stopwatch ||
+      // Adds a 1-second buffer to ensure the last work phase is completed
+      // and "recover" is played before stopping the timer.
+      .countdown => runningTime > (state.workInterval + Duration(seconds: 1)),
       .tabata => runningTime > (totalRoundTime * state.rounds * state.cycles),
     };
 

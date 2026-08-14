@@ -268,20 +268,24 @@ class TimerSetupTab extends ConsumerWidget {
                                 timer,
                               ),
                             ),
-                            _IntervalSetupRow(
-                              label: l10n.timerSettingsWorkLabel,
-                              value: formatDuration(
-                                Duration(
-                                  seconds: prefs.workIntervalSeconds.value,
+                            if ([
+                              TimerType.tabata.index,
+                              TimerType.countdown.index,
+                            ].contains(prefs.timerType.value))
+                              _IntervalSetupRow(
+                                label: l10n.timerSettingsWorkLabel,
+                                value: formatDuration(
+                                  Duration(
+                                    seconds: prefs.workIntervalSeconds.value,
+                                  ),
+                                ),
+                                valueColor: TimerColors.workFg(context),
+                                onTap: () => _showTimeIntervalPicker(
+                                  context,
+                                  prefs.workIntervalSeconds,
+                                  timer,
                                 ),
                               ),
-                              valueColor: TimerColors.workFg(context),
-                              onTap: () => _showTimeIntervalPicker(
-                                context,
-                                prefs.workIntervalSeconds,
-                                timer,
-                              ),
-                            ),
                             if (prefs.timerType.value ==
                                 TimerType
                                     .tabata
