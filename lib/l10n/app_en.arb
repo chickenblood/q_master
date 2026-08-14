@@ -324,6 +324,10 @@
     "@timerTypeTabataLabel": {
       "description": "Segment control label for the Tabata interval timer mode."
     },
+    "timerTypeCountdownLabel": "Countdown",
+    "@timerTypeCountdownLabel": {
+      "description": "Segment control label for the countdown timer mode."
+    },
     "timerModeLabel": "Mode",
     "@timerModeLabel": {
       "description": "Label for the timer mode selector (e.g., Stopwatch/Tabata)."

@@ -13,7 +13,8 @@ part 'timer.g.dart';
 
 enum TimerType {
   stopwatch,
-  tabata;
+  tabata,
+  countdown;
 
   static TimerType fromIndex(int index) => TimerType.values[index];
 }
@@ -133,8 +134,12 @@ final class Timer extends _$Timer {
     final currentSecond = totalStopWatchTime.inSeconds;
 
     // Check if all rounds are completed
-    final allRoundsCompleted =
-        runningTime > (totalRoundTime * state.rounds * state.cycles);
+    final allRoundsCompleted = switch (state.timerType) {
+      // There is only one round for stopwatch and countdown timers,
+      // so they are complete when the running time exceeds the work interval.
+      .stopwatch || .countdown => runningTime > workInterval,
+      .tabata => runningTime > (totalRoundTime * state.rounds * state.cycles),
+    };
 
     if (!allRoundsCompleted) {
       // Play phase sounds at the start of each phase
@@ -263,6 +268,12 @@ final class Timer extends _$Timer {
   Duration get workInterval => state.workInterval;
 
   Duration get elapsedTime => calculateElapsedTime();
+
+  /// For countdown timer.
+  Duration get remainingCountdownTime {
+    var remaining = calculateElapsedTime();
+    return workInterval > remaining ? workInterval - remaining : Duration.zero;
+  }
 
   Duration get remainingPrepareTime => state.prepareInterval > state.elapsedTime
       ? state.prepareInterval - state.elapsedTime

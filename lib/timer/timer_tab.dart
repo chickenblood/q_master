@@ -116,8 +116,8 @@ final class TimerScreen extends ConsumerWidget {
     final timerType = notifier.timerType;
     final isPortrait = MediaQuery.of(context).orientation == .portrait;
     final isTablet = MediaUtils.isTablet(context);
-    final workTime = timerType == .tabata
-        ? notifier.remainingWorkTime
+    final workTime = timerType == .tabata || timerType == .countdown
+        ? notifier.remainingCountdownTime
         : notifier.elapsedTime;
     final formatter = timerType == .tabata
         ? formatDuration

@@ -16,6 +16,8 @@ import 'timer_tab.dart';
 
 /// TimerSetupTab — matches Option 3 "Timer Tab (Setup-First)" mock
 class TimerSetupTab extends ConsumerWidget {
+  const TimerSetupTab({super.key});
+
   void _showTimeIntervalPicker(
     BuildContext context,
     ValueNotifier<int> timeNotifier,
@@ -42,7 +44,42 @@ class TimerSetupTab extends ConsumerWidget {
     );
   }
 
-  void _showRoundsPicker(
+  void showCyclesPicker(
+    BuildContext context,
+    ValueNotifier<int> cyclesNotifier,
+    Timer timer,
+  ) {
+    showPlatformModalSheet(
+      context: context,
+      material: MaterialModalSheetData(
+        constraints: BoxConstraints.tight(const Size.fromHeight(250)),
+      ),
+      builder: (context) => SafeArea(
+        child: SizedBox(
+          height: 250,
+          child: CupertinoPicker(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            itemExtent: 60,
+            scrollController: FixedExtentScrollController(
+              initialItem: cyclesNotifier.value - 1,
+            ),
+            onSelectedItemChanged: (index) {
+              cyclesNotifier.value = index + 1;
+              timer.reset();
+            },
+            children: List.generate(
+              8,
+              (i) => Center(
+                child: Text('${i + 1}', style: const TextStyle(fontSize: 22)),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void showRoundsPicker(
     BuildContext context,
     ValueNotifier<int> roundsNotifier,
     Timer timer,
@@ -77,8 +114,6 @@ class TimerSetupTab extends ConsumerWidget {
     );
   }
 
-  const TimerSetupTab({super.key});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = L10n.of(context)!;
@@ -96,9 +131,8 @@ class TimerSetupTab extends ConsumerWidget {
           ).clamp(maxScaleFactor: 1.6),
         ),
         leading: const SettingsActionButton(),
-        cupertino: (_, __) => CupertinoNavigationBarData(
-          backgroundColor: Colors.transparent,
-        ),
+        cupertino: (_, _) =>
+            CupertinoNavigationBarData(backgroundColor: Colors.transparent),
       ),
       body: SafeArea(
         bottom: true,
@@ -115,6 +149,7 @@ class TimerSetupTab extends ConsumerWidget {
                     prefs.workIntervalSeconds,
                     prefs.restIntervalSeconds,
                     prefs.rounds,
+                    prefs.cycles,
                   ]),
                   builder: (context, _) => Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -159,6 +194,10 @@ class TimerSetupTab extends ConsumerWidget {
                                     ButtonSegment(
                                       value: 1,
                                       label: Text(l10n.timerTypeTabataLabel),
+                                    ),
+                                    ButtonSegment(
+                                      value: 2,
+                                      label: Text(l10n.timerTypeCountdownLabel),
                                     ),
                                   ],
                                   selected: {prefs.timerType.value},
@@ -261,20 +300,35 @@ class TimerSetupTab extends ConsumerWidget {
                                   timer,
                                 ),
                               ),
-                            if (prefs.timerType.value == TimerType.tabata.index)
+                            if (prefs.timerType.value ==
+                                TimerType.tabata.index) ...[
                               _IntervalSetupRow(
                                 label: l10n.timerSettingsRoundsLabel,
                                 value: prefs.rounds.value.toString(),
                                 valueColor: Theme.of(
                                   context,
                                 ).colorScheme.onSurface,
-                                onTap: () => _showRoundsPicker(
+                                onTap: () => showRoundsPicker(
                                   context,
                                   prefs.rounds,
                                   timer,
                                 ),
+                                showDivider: true,
+                              ),
+                              _IntervalSetupRow(
+                                label: l10n.timerSettingsCyclesLabel,
+                                value: prefs.cycles.value.toString(),
+                                valueColor: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface,
+                                onTap: () => showCyclesPicker(
+                                  context,
+                                  prefs.cycles,
+                                  timer,
+                                ),
                                 showDivider: false,
                               ),
+                            ],
                           ],
                         ),
                       ),
