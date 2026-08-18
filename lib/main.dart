@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audio_session/audio_session.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
@@ -73,6 +75,7 @@ class _MainApp extends ConsumerStatefulWidget with WidgetsBindingObserver {
 
 final class _MainAppState extends ConsumerState<_MainApp> {
   final tabPages = [WorkoutsTab(), GamesTab(), TimerSetupTab(), NearMeTab()];
+  StreamSubscription<List<SharedMediaFile>>? _sharedMediaSubscription;
 
   @override
   void initState() {
@@ -80,31 +83,49 @@ final class _MainAppState extends ConsumerState<_MainApp> {
     configureReceivingShares();
   }
 
+  @override
+  void dispose() {
+    _sharedMediaSubscription?.cancel();
+    super.dispose();
+  }
+
   Future<void> configureReceivingShares() async {
-    final handler = ShareHandlerPlatform.instance;
-    final media = await handler.getInitialSharedMedia();
+    final initialMedia = await ReceiveSharingIntent.instance.getInitialMedia();
 
-    void handleReceivedMedia(SharedMedia media) {
-      final attachments = media.attachments;
-
-      for (final attachment in attachments ?? []) {
-        if (attachment?.path.endsWith('.qmw') ?? false) {
+    void handleReceivedMedia(List<SharedMediaFile> media) {
+      for (final attachment in media) {
+        if (attachment.path.endsWith('.qmw')) {
           final listNotifier = ref.read(workoutListProvider.notifier);
-          listNotifier.addFromFile(attachment!.path);
+          listNotifier.addFromFile(attachment.path);
           return;
         }
       }
-      showSimpleAlert(
-        widget._navigatorKey.currentContext!,
-        message: 'Invalid workout data received',
-      );
+
+      if (mounted) {
+        showSimpleAlert(
+          widget._navigatorKey.currentContext!,
+          message: 'Invalid workout data received',
+        );
+      }
     }
 
-    if (media != null) {
-      handleReceivedMedia(media);
+    if (initialMedia.isNotEmpty) {
+      handleReceivedMedia(initialMedia);
     }
 
-    handler.sharedMediaStream.listen(handleReceivedMedia);
+    _sharedMediaSubscription = ReceiveSharingIntent.instance
+        .getMediaStream()
+        .listen(
+          handleReceivedMedia,
+          onError: (_) {
+            if (mounted) {
+              showSimpleAlert(
+                widget._navigatorKey.currentContext!,
+                message: 'Invalid workout data received',
+              );
+            }
+          },
+        );
   }
 
   // Determine whether to show the tab bar based on the selected tab, device

@@ -1,0 +1,39 @@
+# Uncomment the next line to define a global platform for your project
+platform :ios, '18.0'
+
+target 'Q Master Watch App' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for Q Master Watch App
+
+end
+
+target 'QMasterComplicationExtension' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for QMasterComplicationExtension
+
+end
+
+target 'Runner' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for Runner
+
+  target 'RunnerTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+end
+
+target 'ShareExtension' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for ShareExtension
+
+end

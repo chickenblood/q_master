@@ -82,7 +82,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<!-- Add for share_handler start -->
+	<!-- Add for receive_sharing_intent start -->
 
 	<!-- Custom group id set in Build Settings -> User-Defined -->
 	<key>AppGroupId</key>
@@ -116,7 +116,7 @@
 			</array>
 		</dict>
 	</array>
-	<!-- Add for share_handler end -->
+	<!-- Add for receive_sharing_intent end -->
 
 	<key>UTExportedTypeDeclarations</key>
 	<array>

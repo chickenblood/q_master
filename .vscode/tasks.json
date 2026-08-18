@@ -43,7 +43,7 @@
             "command": "dart",
             "args": ["run", "build_runner", "build", "--delete-conflicting-outputs"],
             "group": "build",
-            "problemMatcher": "$dart-build_runner",
+            "problemMatcher": [],
             "presentation": {
                 "reveal": "silent",
                 "panel": "shared"
@@ -55,7 +55,7 @@
             "command": "flutter",
             "args": ["analyze", "--no-fatal-infos"],
             "group": "test",
-            "problemMatcher": "$dart-analysis",
+            "problemMatcher": [],
             "presentation": {
                 "reveal": "silent",
                 "panel": "shared"
@@ -70,7 +70,7 @@
                 "kind": "test",
                 "isDefault": true
             },
-            "problemMatcher": "$dart-test",
+            "problemMatcher": [],
             "presentation": {
                 "reveal": "always",
                 "panel": "shared"

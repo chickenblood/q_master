@@ -3,7 +3,7 @@ import UIKit
 
 class SceneDelegate: FlutterSceneDelegate {
   // Handle warm AirDrop delivery: app is already running and receives a file via AirDrop.
-  // This is called before the URL is passed to share_handler, so we can copy it while
+  // This is called before the URL is passed to receive_sharing_intent, so we can copy it while
   // the security scope is still active.
   override func scene(
     _ scene: UIScene,
