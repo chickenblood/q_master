@@ -107,6 +107,7 @@ final class _MainAppState extends ConsumerState<_MainApp> {
           message: 'Invalid workout data received',
         );
       }
+      ReceiveSharingIntent.instance.reset();
     }
 
     if (initialMedia.isNotEmpty) {

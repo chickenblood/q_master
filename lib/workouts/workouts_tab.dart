@@ -120,7 +120,7 @@ class WorkoutsTab extends ConsumerWidget {
 
     // Share as plain text (for Slack) and json (for another Q Master user on
     // Airdrop)
-    final plainText = workout.formattedText(context);
+    final plainText = workout.formattedText;
     final text = XFile.fromData(utf8.encode(plainText), mimeType: 'text/plain');
 
     final jsonText = workout.formattedJson;

@@ -1,5 +1,6 @@
 import Flutter
 import UIKit
+import receive_sharing_intent
 
 class SceneDelegate: FlutterSceneDelegate {
   // Handle warm AirDrop delivery: app is already running and receives a file via AirDrop.
@@ -12,7 +13,26 @@ class SceneDelegate: FlutterSceneDelegate {
     for context in URLContexts where context.url.isFileURL {
       _ = context.url.stableAirDropCopy()
     }
+
+    // Work-around to prevent other libraries like flutter_branch_sdk from absorbing links meant to be handled by receive_sharing_intent.
+    if ReceiveSharingIntentPlugin.instance.scene(scene, openURLContexts: URLContexts) {
+      return
+    }
+
     super.scene(scene, openURLContexts: URLContexts)
+  }
+
+  // Optional - only needed when multiple libraries handle incoming URLs.
+  // Called on a cold start when the scene connects. The shared URL (if any)
+  // is delivered here via connectionOptions instead of the launchOptions.
+  override func scene(
+      _ scene: UIScene,
+      willConnectTo session: UISceneSession,
+      options connectionOptions: UIScene.ConnectionOptions
+  ) {
+      // Work-around to prevent other libraries like flutter_branch_sdk from absorbing links meant to be handled by receive_sharing_intent.
+      _ = ReceiveSharingIntentPlugin.instance.scene(scene, willConnectTo: session, options: connectionOptions)
+      super.scene(scene, willConnectTo: session, options: connectionOptions)
   }
 }
 
@@ -25,7 +45,7 @@ extension URL {
     defer { if accessed { stopAccessingSecurityScopedResource() } }
 
     let inbox = FileManager.default
-      .urls(for: .documentDirectory, in: .userDomainMask)[0]
+      .urls(for: .cachesDirectory, in: .userDomainMask)[0]
       .appendingPathComponent("Inbox")
     let dest = inbox.appendingPathComponent(lastPathComponent)
 
