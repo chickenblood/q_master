@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 import '../ui/adaptive_icons.dart';
 
@@ -19,15 +19,19 @@ class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = YoutubePlayerController(
-      initialVideoId: widget.videoId,
-      flags: const YoutubePlayerFlags(autoPlay: true),
+    _controller = YoutubePlayerController.fromVideoId(
+      videoId: widget.videoId,
+      autoPlay: true,
+      params: const YoutubePlayerParams(
+        showControls: true,
+        showFullscreenButton: true,
+      ),
     );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller.close();
     super.dispose();
   }
 
@@ -48,15 +52,7 @@ class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
           ),
         ),
         body: Center(
-          child: YoutubePlayer(
-            controller: _controller,
-            showVideoProgressIndicator: true,
-            progressIndicatorColor: Colors.white,
-            progressColors: const ProgressBarColors(
-              playedColor: Colors.white,
-              handleColor: Colors.white,
-            ),
-          ),
+          child: YoutubePlayer(controller: _controller, aspectRatio: 16 / 9),
         ),
       ),
     );

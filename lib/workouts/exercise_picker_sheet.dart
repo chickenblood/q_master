@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stupid_simple_sheet/stupid_simple_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../l10n/l10n.dart';
 import '../model/exicon_fetcher.dart';
@@ -160,7 +159,7 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
 
   Future<void> _openExerciseVideo(BuildContext context, Uri videoUrl) async {
     if (defaultTargetPlatform == .iOS || defaultTargetPlatform == .android) {
-      final videoId = YoutubePlayer.convertUrlToId(videoUrl.toString());
+      final videoId = _extractYoutubeVideoId(videoUrl);
       if (videoId == null) {
         await launchUrl(videoUrl, mode: .externalApplication);
         return;
@@ -174,6 +173,47 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
     } else {
       await launchUrl(videoUrl, mode: .externalApplication);
     }
+  }
+
+  String? _extractYoutubeVideoId(Uri url) {
+    final host = url.host.toLowerCase();
+    if (host.contains('youtu.be')) {
+      final firstSegment = url.pathSegments.isEmpty
+          ? null
+          : url.pathSegments.first;
+      return _normalizeYoutubeId(firstSegment);
+    }
+
+    if (!host.contains('youtube.com') &&
+        !host.contains('youtube-nocookie.com')) {
+      return null;
+    }
+
+    final fromQuery = _normalizeYoutubeId(url.queryParameters['v']);
+    if (fromQuery != null) {
+      return fromQuery;
+    }
+
+    final embedIndex = url.pathSegments.indexOf('embed');
+    if (embedIndex >= 0 && embedIndex + 1 < url.pathSegments.length) {
+      return _normalizeYoutubeId(url.pathSegments[embedIndex + 1]);
+    }
+
+    final shortsIndex = url.pathSegments.indexOf('shorts');
+    if (shortsIndex >= 0 && shortsIndex + 1 < url.pathSegments.length) {
+      return _normalizeYoutubeId(url.pathSegments[shortsIndex + 1]);
+    }
+
+    return null;
+  }
+
+  String? _normalizeYoutubeId(String? candidate) {
+    if (candidate == null || candidate.isEmpty) {
+      return null;
+    }
+
+    final match = RegExp(r'^[A-Za-z0-9_-]{11}$').firstMatch(candidate);
+    return match?.group(0);
   }
 
   Future<void> _showExerciseDescription(
