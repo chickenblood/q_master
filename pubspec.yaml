@@ -1,7 +1,7 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 3.4.1+508
+version: 3.4.1+509
 
 environment:
   sdk: ^3.10.0
@@ -39,20 +39,7 @@ dependencies: # keep sorted alphabetically
   watch_connectivity: ^0.2.8
   webview_flutter: ^4.13.0
   webview_flutter_android: ^4.10.11
-  youtube_player_flutter: ^9.1.3
-
-
-# flutter_inappwebview_android 1.1.3 uses proguard-android.txt which AGP 9 no longer supports.
-# Override to 1.2.0-beta.3 which uses proguard-android-optimize.txt.
-# Remove once youtube_player_flutter upgrades its flutter_inappwebview dependency.
-dependency_overrides:
-  flutter_inappwebview: 6.2.0-beta.3
-  flutter_inappwebview_android: 1.2.0-beta.3
-  flutter_inappwebview_ios: 1.2.0-beta.3
-  flutter_inappwebview_macos: 1.2.0-beta.3
-  flutter_inappwebview_platform_interface: 1.4.0-beta.3
-  flutter_inappwebview_web: 1.2.0-beta.3
-  flutter_inappwebview_windows: 0.7.0-beta.3
+  youtube_player_iframe: ^6.0.2
 
 dev_dependencies: # keep sorted alphabetically
   build_runner: ^2.10.4
