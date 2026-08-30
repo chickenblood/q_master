@@ -1,7 +1,7 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 3.4.1+510
+version: 3.4.1+511
 
 environment:
   sdk: ^3.10.0
@@ -19,6 +19,7 @@ dependencies: # keep sorted alphabetically
     sdk: flutter
   flutter_platform_widgets: ^9.0.0
   flutter_riverpod: ^3.0.3
+  flutter_secure_storage: ^10.3.1
   flutter_widget_from_html_core: ^0.17.2
   freezed_annotation: ^3.1.0
   intl: any
