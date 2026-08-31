@@ -264,6 +264,18 @@
     "@shareWorkoutText": {
       "description": "Context menu item to share a workout."
     },
+    "postToBackblastText": "Post to Slackblast",
+    "@postToBackblastText": {
+      "description": "Context menu item to share a workout directly to an F3 Nation backblast."
+    },
+    "shareToBackblastComingSoonAlertTitle": "Coming Soon",
+    "@shareToBackblastComingSoonAlertTitle": {
+      "description": "Title of the alert shown when Share to Backblast is tapped before the feature is available."
+    },
+    "shareToBackblastComingSoonAlertDescription": "Sharing a workout directly to an F3 Nation backblast is coming soon.",
+    "@shareToBackblastComingSoonAlertDescription": {
+      "description": "Body text of the alert shown when Share to Backblast is tapped before the feature is available."
+    },
     "deleteWorkoutText": "Delete",
     "@deleteWorkoutText": {
       "description": "Context menu item to delete a workout."
@@ -287,6 +299,42 @@
     "okAction": "OK",
     "@okAction": {
       "description": "OK button used in simple alert dialogs throughout the app."
+    },
+    "saveAction": "Save",
+    "@saveAction": {
+      "description": "Save button used in alerts and dialogs throughout the app."
+    },
+    "clearAction": "Clear",
+    "@clearAction": {
+      "description": "Clear button used to remove a stored value in alerts and dialogs throughout the app."
+    },
+    "f3NationSettingsTitle": "F3 Nation",
+    "@f3NationSettingsTitle": {
+      "description": "Settings card header for F3 Nation API integration settings."
+    },
+    "f3NationApiKeySettingsLabel": "API Key",
+    "@f3NationApiKeySettingsLabel": {
+      "description": "Settings row label for the F3 Nation API key."
+    },
+    "f3NationApiKeyConfiguredStatus": "Configured",
+    "@f3NationApiKeyConfiguredStatus": {
+      "description": "Status shown next to the F3 Nation API key row when a key is stored."
+    },
+    "f3NationApiKeyNotConfiguredStatus": "Not Set",
+    "@f3NationApiKeyNotConfiguredStatus": {
+      "description": "Status shown next to the F3 Nation API key row when no key is stored."
+    },
+    "f3NationApiKeyDialogTitle": "F3 Nation API Key",
+    "@f3NationApiKeyDialogTitle": {
+      "description": "Title of the dialog used to enter an F3 Nation API key."
+    },
+    "f3NationApiKeyDialogDescription": "Used to fetch and update backblasts via the F3 Nation API.",
+    "@f3NationApiKeyDialogDescription": {
+      "description": "Body text of the dialog used to enter an F3 Nation API key."
+    },
+    "f3NationApiKeyDialogHint": "Paste your API key",
+    "@f3NationApiKeyDialogHint": {
+      "description": "Hint text shown in the empty F3 Nation API key text field."
     },
     "dodShakeToRollDiceMessage": "Shake or tap to roll",
     "@dodShakeToRollDiceMessage": {

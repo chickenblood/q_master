@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../l10n/l10n.dart';
+import '../model/f3_nation_credentials.dart';
 import '../model/timer.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_modal_sheet.dart';
@@ -50,6 +51,59 @@ class _SettingsSheet extends ConsumerWidget {
         SizedBox(height: 180, child: Text(l10n.settingsAboutDialogDescription)),
       ],
     );
+  }
+
+  Future<void> _showApiKeyDialog(BuildContext context, WidgetRef ref) async {
+    final l10n = L10n.of(context)!;
+    final currentKey = ref.read(f3NationApiKeyProvider).asData?.value;
+    final controller = TextEditingController(text: currentKey ?? '');
+
+    final result = await showAdaptiveDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog.adaptive(
+        title: PlatformText(l10n.f3NationApiKeyDialogTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            PlatformText(l10n.f3NationApiKeyDialogDescription),
+            const SizedBox(height: 12),
+            PlatformTextField(
+              controller: controller,
+              autofocus: true,
+              autocorrect: false,
+              hintText: l10n.f3NationApiKeyDialogHint,
+              onSubmitted: (_) =>
+                  Navigator.of(dialogContext).pop(controller.text.trim()),
+            ),
+          ],
+        ),
+        actions: [
+          PlatformDialogAction(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: PlatformText(l10n.cancelAction),
+          ),
+          PlatformDialogAction(
+            cupertino: (_, _) =>
+                CupertinoDialogActionData(isDestructiveAction: true),
+            onPressed: () => Navigator.of(dialogContext).pop(''),
+            child: PlatformText(l10n.clearAction),
+          ),
+          PlatformDialogAction(
+            cupertino: (_, _) =>
+                CupertinoDialogActionData(isDefaultAction: true),
+            onPressed: () =>
+                Navigator.of(dialogContext).pop(controller.text.trim()),
+            child: PlatformText(l10n.saveAction),
+          ),
+        ],
+      ),
+    );
+
+    if (result == null) return;
+    await ref
+        .read(f3NationApiKeyProvider.notifier)
+        .setApiKey(result.isEmpty ? null : result);
   }
 
   Widget _content(
@@ -194,6 +248,42 @@ class _SettingsSheet extends ConsumerWidget {
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     onTap: () => _showAboutDialog(context),
+                  ),
+                ],
+              ),
+            ),
+            _SettingsCard(
+              header: l10n.f3NationSettingsTitle,
+              child: Column(
+                children: [
+                  _SettingsRow(
+                    label: l10n.f3NationApiKeySettingsLabel,
+                    labelStyle: rowLabelStyle,
+                    showDivider: false,
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          ref
+                                      .watch(f3NationApiKeyProvider)
+                                      .asData
+                                      ?.value
+                                      ?.isNotEmpty ==
+                                  true
+                              ? l10n.f3NationApiKeyConfiguredStatus
+                              : l10n.f3NationApiKeyNotConfiguredStatus,
+                          style: TextTheme.of(context).bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          context.platformIcons.rightChevron,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ],
+                    ),
+                    onTap: () => _showApiKeyDialog(context, ref),
                   ),
                 ],
               ),

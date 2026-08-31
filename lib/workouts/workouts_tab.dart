@@ -14,6 +14,7 @@ import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_menu.dart';
 import '../ui/adaptive_modal_sheet.dart';
 import '../ui/dismissible_row.dart';
+import '../ui/menu_icons.dart';
 import '../utils/datetime_utils.dart';
 import 'beatdown_browser_screen.dart';
 import 'create_workout_sheet.dart';
@@ -122,6 +123,27 @@ class WorkoutsTab extends ConsumerWidget {
     );
   }
 
+  Future<void> _shareToBackblast(BuildContext context, Workout workout) =>
+      showAdaptiveDialog(
+        context: context,
+        builder: (BuildContext dialogContext) => AlertDialog.adaptive(
+          title: PlatformText(
+            L10n.of(dialogContext)!.shareToBackblastComingSoonAlertTitle,
+          ),
+          content: PlatformText(
+            L10n.of(dialogContext)!.shareToBackblastComingSoonAlertDescription,
+          ),
+          actions: [
+            PlatformDialogAction(
+              cupertino: (_, _) =>
+                  CupertinoDialogActionData(isDefaultAction: true),
+              onPressed: () => Navigator.pop(dialogContext),
+              child: PlatformText(L10n.of(dialogContext)!.okAction),
+            ),
+          ],
+        ),
+      );
+
   Future<Workout?> _invokeWorkoutEditor(
     BuildContext context, {
     Workout? workout,
@@ -200,6 +222,7 @@ class WorkoutsTab extends ConsumerWidget {
                   workout: workouts[index],
                   onInvokeWorkoutEditor: _invokeWorkoutEditor,
                   onShareWorkout: _shareWorkout,
+                  onShareToBackblast: _shareToBackblast,
                 ),
                 onReorderItem: listNotifier.move,
               )
@@ -232,6 +255,8 @@ final class _WorkoutTile extends StatelessWidget {
   })
   onInvokeWorkoutEditor;
   final void Function(BuildContext context, Workout workout) onShareWorkout;
+  final Future<void> Function(BuildContext context, Workout workout)
+  onShareToBackblast;
 
   const _WorkoutTile({
     required super.key,
@@ -239,6 +264,7 @@ final class _WorkoutTile extends StatelessWidget {
     required this.workout,
     required this.onInvokeWorkoutEditor,
     required this.onShareWorkout,
+    required this.onShareToBackblast,
   });
 
   Future<bool?> _confirmDelete(BuildContext context) => showAdaptiveDialog(
@@ -336,6 +362,8 @@ final class _WorkoutTile extends StatelessWidget {
                   onDuplicate: () => _duplicateWorkout(workout),
                   onShare: (buttonContext) =>
                       onShareWorkout(buttonContext, workout),
+                  onShareToBackblast: (buttonContext) =>
+                      onShareToBackblast(buttonContext, workout),
                   onDelete: () => _deleteWorkout(context, workout),
                 ),
                 if (isIOS) ...[
@@ -399,11 +427,13 @@ final class _SectionChip extends StatelessWidget {
 final class _OverflowMenu extends StatelessWidget {
   final void Function() onDuplicate;
   final void Function(BuildContext) onShare;
+  final void Function(BuildContext) onShareToBackblast;
   final void Function() onDelete;
 
   const _OverflowMenu({
     required this.onDuplicate,
     required this.onShare,
+    required this.onShareToBackblast,
     required this.onDelete,
   });
 
@@ -420,6 +450,11 @@ final class _OverflowMenu extends StatelessWidget {
             onPressed: () => onDuplicate(),
             icon: Icons.copy,
             text: L10n.of(context)!.duplicateWorkoutText,
+          ),
+          AdaptiveMenuItem(
+            onPressed: () => onShareToBackblast(menuContext),
+            icon: Menu.slack,
+            text: L10n.of(context)!.shareToBackblastText,
           ),
           AdaptiveMenuItem(
             onPressed: () => onShare(menuContext),

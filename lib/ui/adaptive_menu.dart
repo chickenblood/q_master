@@ -31,10 +31,8 @@ final class AdaptiveMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) => PlatformWidget(
     cupertino: (context, platform) => PullDownButton(
-      buttonBuilder: (_, showMenu) => CupertinoButton(
-        onPressed: showMenu,
-        child: icon,
-      ),
+      buttonBuilder: (_, showMenu) =>
+          CupertinoButton(onPressed: showMenu, child: icon),
       itemBuilder: (context) => menuChildren
           .map(
             (item) => PullDownMenuItem(
