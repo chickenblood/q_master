@@ -179,7 +179,7 @@ final class F3NationFetcher extends _$F3NationFetcher {
 
   /// Lists event instances at [aoOrgId] from [from] through [to], sorted
   /// earliest first. The default window is the previous seven days through
-  /// tomorrow.
+  /// today.
   ///
   /// The API's `startDate` query filter does not reliably restrict results
   /// to an exact date, so a page of instances is fetched and filtered here.
@@ -190,7 +190,7 @@ final class F3NationFetcher extends _$F3NationFetcher {
   }) async {
     final today = _dateOnly(DateTime.now());
     final start = _dateOnly(from ?? today.subtract(const Duration(days: 7)));
-    final end = _dateOnly(to ?? today.add(const Duration(days: 1)));
+    final end = _dateOnly(to ?? today);
     final json = await _get(
       '/event-instance',
       queryParameters: {'aoOrgId': aoOrgId, 'pageSize': 500},
@@ -225,7 +225,8 @@ final class F3NationFetcher extends _$F3NationFetcher {
   /// backblastRich, meta, PAX counts, etc.) untouched.
   Future<F3EventInstance> updateBackblast({
     required int eventInstanceId,
-    required String backblast,
+    required String name,
+    required List<Map<String, Object?>> backblastRich,
   }) async {
     final payload = Map<String, Object?>.of(
       await _get('/event-instance/id/$eventInstanceId'),
@@ -250,7 +251,8 @@ final class F3NationFetcher extends _$F3NationFetcher {
     payload.remove('org');
     payload.remove('location');
 
-    payload['backblast'] = backblast;
+    payload['name'] = name;
+    payload['backblastRich'] = backblastRich;
     payload['backblastTs'] = DateTime.now().millisecondsSinceEpoch / 1000;
 
     final response = await _post('/event-instance', body: payload);

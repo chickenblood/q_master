@@ -244,7 +244,8 @@ class _SlackblastPickerSheetState
     try {
       await _fetcher.updateBackblast(
         eventInstanceId: event.id,
-        backblast: widget.workout.formattedText(context),
+        name: widget.workout.name,
+        backblastRich: widget.workout.richTextForSlackPost,
       );
       if (!mounted) return;
       await showSimpleAlert(

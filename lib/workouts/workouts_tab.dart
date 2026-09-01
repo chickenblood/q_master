@@ -118,7 +118,7 @@ class WorkoutsTab extends ConsumerWidget {
 
     SharePlus.instance.share(
       ShareParams(
-        text: workout.formattedText(context),
+        text: workout.formattedText,
         sharePositionOrigin: sharePositionRect,
       ),
     );
