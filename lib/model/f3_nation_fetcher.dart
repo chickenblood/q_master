@@ -123,7 +123,7 @@ abstract class F3EventInstance with _$F3EventInstance {
 ///
 /// Requires an API key to be configured via [F3NationApiKey] before any
 /// method is called.
-@riverpod
+@Riverpod(keepAlive: true)
 final class F3NationFetcher extends _$F3NationFetcher {
   @override
   FutureOr<void> build() {}
@@ -179,7 +179,7 @@ final class F3NationFetcher extends _$F3NationFetcher {
 
   /// Lists event instances at [aoOrgId] from [from] through [to], sorted
   /// earliest first. The default window is the previous seven days through
-  /// today.
+  /// tomorrow.
   ///
   /// The API's `startDate` query filter does not reliably restrict results
   /// to an exact date, so a page of instances is fetched and filtered here.
@@ -190,7 +190,7 @@ final class F3NationFetcher extends _$F3NationFetcher {
   }) async {
     final today = _dateOnly(DateTime.now());
     final start = _dateOnly(from ?? today.subtract(const Duration(days: 7)));
-    final end = _dateOnly(to ?? today);
+    final end = _dateOnly(to ?? today.add(const Duration(days: 1)));
     final json = await _get(
       '/event-instance',
       queryParameters: {'aoOrgId': aoOrgId, 'pageSize': 500},
