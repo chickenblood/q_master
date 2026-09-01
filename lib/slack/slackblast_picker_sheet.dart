@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/l10n.dart';
 import '../model/f3_nation_fetcher.dart';
@@ -248,7 +249,7 @@ class _SlackblastPickerSheetState
         backblastRich: widget.workout.richTextForSlackPost,
       );
       if (!mounted) return;
-      await showSimpleAlert(
+      await _showPostSuccessAlert(
         context,
         title: L10n.of(context)!.slackblastPostSuccessTitle,
         message: L10n.of(context)!.slackblastPostSuccessMessage,
@@ -272,6 +273,36 @@ class _SlackblastPickerSheetState
       if (mounted) setState(() => _isPosting = false);
     }
   }
+
+  /// Confirms a successful post and optionally opens the installed Slack app.
+  Future<void> _showPostSuccessAlert(
+    BuildContext context, {
+    required String title,
+    required String message,
+  }) => showAdaptiveDialog<void>(
+    context: context,
+    builder: (dialogContext) => AlertDialog.adaptive(
+      title: PlatformText(title),
+      content: PlatformText(message),
+      actions: [
+        PlatformDialogAction(
+          onPressed: () async {
+            await launchUrl(
+              Uri.parse('slack://open'),
+              mode: LaunchMode.externalApplication,
+            );
+            if (dialogContext.mounted) Navigator.of(dialogContext).pop();
+          },
+          child: PlatformText(L10n.of(dialogContext)!.goToSlackAction),
+        ),
+        PlatformDialogAction(
+          cupertino: (_, _) => CupertinoDialogActionData(isDefaultAction: true),
+          onPressed: () => Navigator.of(dialogContext).pop(),
+          child: PlatformText(L10n.of(dialogContext)!.closeAction),
+        ),
+      ],
+    ),
+  );
 
   /// Formats an event's date, time, and name for its selectable list row.
   String _eventLabel(F3EventInstanceSummary event) {

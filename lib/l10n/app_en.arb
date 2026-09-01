@@ -312,6 +312,14 @@
     "@slackblastPostSuccessMessage": {
       "description": "Confirmation shown after a workout is posted to a backblast."
     },
+    "goToSlackAction": "Go to Slack",
+    "@goToSlackAction": {
+      "description": "Action that opens Slack after posting a backblast."
+    },
+    "closeAction": "Close",
+    "@closeAction": {
+      "description": "Action that dismisses a completed dialog."
+    },
     "slackblastPostErrorTitle": "Could Not Post Backblast",
     "@slackblastPostErrorTitle": {
       "description": "Title shown when posting a workout to a backblast fails."

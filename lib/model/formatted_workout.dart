@@ -22,19 +22,34 @@ extension FormatttedOutput on Workout {
     return result.toString();
   }
 
-  /// Formats the workout as Slack Block Kit section blocks using the same
-  /// markdown content as [formattedText].
+  /// Formats workout sections as Slack's structured `rich_text` blocks.
   List<Map<String, Object?>> get richTextForSlackPost => [
     for (final section in sections)
-      _slackMarkdownSection(
-        ['*${section.name.toUpperCase()}*', ...section.exercises].join('\n'),
+      _slackRichTextSection(
+        title: section.name.toUpperCase(),
+        lines: section.exercises,
       ),
-    _slackMarkdownSection('*ANNOUNCEMENTS:*'),
-    _slackMarkdownSection('*COT:*'),
+    _slackRichTextSection(title: 'ANNOUNCEMENTS:'),
+    _slackRichTextSection(title: 'COT:'),
   ];
 }
 
-Map<String, Object?> _slackMarkdownSection(String text) => {
-  'type': 'section',
-  'text': {'type': 'mrkdwn', 'text': text, 'verbatim': false},
+Map<String, Object?> _slackRichTextSection({
+  required String title,
+  List<String> lines = const [],
+}) => {
+  'type': 'rich_text',
+  'elements': [
+    {
+      'type': 'rich_text_section',
+      'elements': [
+        {
+          'type': 'text',
+          'text': title,
+          'style': {'bold': true},
+        },
+        if (lines.isNotEmpty) {'type': 'text', 'text': '\n${lines.join('\n')}'},
+      ],
+    },
+  ],
 };

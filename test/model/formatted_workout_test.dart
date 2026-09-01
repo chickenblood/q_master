@@ -15,32 +15,66 @@ void main() {
 
     expect(workout.richTextForSlackPost, [
       {
-        'type': 'section',
-        'text': {
-          'type': 'mrkdwn',
-          'text': '*WARMUP*\nSSH x 20',
-          'verbatim': false,
-        },
+        'type': 'rich_text',
+        'elements': [
+          {
+            'type': 'rich_text_section',
+            'elements': [
+              {
+                'type': 'text',
+                'text': 'WARMUP',
+                'style': {'bold': true},
+              },
+              {'type': 'text', 'text': '\nSSH x 20'},
+            ],
+          },
+        ],
       },
       {
-        'type': 'section',
-        'text': {
-          'type': 'mrkdwn',
-          'text': '*THANG*\nMerkins x 10',
-          'verbatim': false,
-        },
+        'type': 'rich_text',
+        'elements': [
+          {
+            'type': 'rich_text_section',
+            'elements': [
+              {
+                'type': 'text',
+                'text': 'THANG',
+                'style': {'bold': true},
+              },
+              {'type': 'text', 'text': '\nMerkins x 10'},
+            ],
+          },
+        ],
       },
       {
-        'type': 'section',
-        'text': {
-          'type': 'mrkdwn',
-          'text': '*ANNOUNCEMENTS:*',
-          'verbatim': false,
-        },
+        'type': 'rich_text',
+        'elements': [
+          {
+            'type': 'rich_text_section',
+            'elements': [
+              {
+                'type': 'text',
+                'text': 'ANNOUNCEMENTS:',
+                'style': {'bold': true},
+              },
+            ],
+          },
+        ],
       },
       {
-        'type': 'section',
-        'text': {'type': 'mrkdwn', 'text': '*COT:*', 'verbatim': false},
+        'type': 'rich_text',
+        'elements': [
+          {
+            'type': 'rich_text_section',
+            'elements': [
+              {
+                'type': 'text',
+                'text': 'COT:',
+                'style': {'bold': true},
+              },
+            ],
+          },
+        ],
       },
     ]);
   });
