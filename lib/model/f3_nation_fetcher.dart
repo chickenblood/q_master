@@ -252,6 +252,7 @@ final class F3NationFetcher extends _$F3NationFetcher {
     payload.remove('location');
 
     payload['name'] = name;
+    payload.remove('backblast');
     payload['backblastRich'] = backblastRich;
     payload['backblastTs'] = DateTime.now().millisecondsSinceEpoch / 1000;
 
