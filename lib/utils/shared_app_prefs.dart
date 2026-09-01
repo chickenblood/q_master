@@ -34,6 +34,8 @@ final class SharedAppPrefs extends ChangeNotifier {
 
   late final ValueNotifier<List<String>> selectedCategoryFilters;
   late final ValueNotifier<bool> exerciseVideoFilter;
+  late final ValueNotifier<int?> lastSlackblastRegionId;
+  late final ValueNotifier<int?> lastSlackblastAoId;
 
   SharedAppPrefs._(this._prefs) {
     exercisesPerPage = _valueSetup<int>('exercises_per_page', 8);
@@ -54,6 +56,10 @@ final class SharedAppPrefs extends ChangeNotifier {
       const [],
     );
     exerciseVideoFilter = _valueSetup<bool>('exercise_video_filter', false);
+    lastSlackblastRegionId = _nullableIntValueSetup(
+      'last_slackblast_region_id',
+    );
+    lastSlackblastAoId = _nullableIntValueSetup('last_slackblast_ao_id');
   }
 
   ValueNotifier<T> _valueSetup<T>(String key, T defaultValue) {
@@ -81,6 +87,20 @@ final class SharedAppPrefs extends ChangeNotifier {
     final notifier = ValueNotifier<T>(getter(key) ?? defaultValue);
     notifier.addListener(() {
       setter(key, notifier.value);
+      notifyListeners();
+    });
+    return notifier;
+  }
+
+  ValueNotifier<int?> _nullableIntValueSetup(String key) {
+    final notifier = ValueNotifier<int?>(_prefs.getInt(key));
+    notifier.addListener(() {
+      final value = notifier.value;
+      if (value == null) {
+        _prefs.remove(key);
+      } else {
+        _prefs.setInt(key, value);
+      }
       notifyListeners();
     });
     return notifier;

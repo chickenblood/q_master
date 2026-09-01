@@ -13,8 +13,10 @@ final class F3NationCredentialsStore {
     FlutterSecureStorage storage = const FlutterSecureStorage(),
   }) : _storage = storage;
 
+  /// Reads the stored API key, or `null` if the user has not configured one.
   Future<String?> readApiKey() => _storage.read(key: _apiKeyStorageKey);
 
+  /// Stores [apiKey], or removes the existing key when it is null or empty.
   Future<void> writeApiKey(String? apiKey) {
     if (apiKey == null || apiKey.isEmpty) {
       return _storage.delete(key: _apiKeyStorageKey);

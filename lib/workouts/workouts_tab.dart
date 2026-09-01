@@ -10,6 +10,7 @@ import '../model/formatted_workout.dart';
 import '../model/workout.dart';
 import '../model/workout_list.dart';
 import '../settings/settings_sheet.dart';
+import '../slack/slackblast_picker_sheet.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_menu.dart';
 import '../ui/adaptive_modal_sheet.dart';
@@ -123,26 +124,8 @@ class WorkoutsTab extends ConsumerWidget {
     );
   }
 
-  Future<void> _shareToBackblast(BuildContext context, Workout workout) =>
-      showAdaptiveDialog(
-        context: context,
-        builder: (BuildContext dialogContext) => AlertDialog.adaptive(
-          title: PlatformText(
-            L10n.of(dialogContext)!.shareToBackblastComingSoonAlertTitle,
-          ),
-          content: PlatformText(
-            L10n.of(dialogContext)!.shareToBackblastComingSoonAlertDescription,
-          ),
-          actions: [
-            PlatformDialogAction(
-              cupertino: (_, _) =>
-                  CupertinoDialogActionData(isDefaultAction: true),
-              onPressed: () => Navigator.pop(dialogContext),
-              child: PlatformText(L10n.of(dialogContext)!.okAction),
-            ),
-          ],
-        ),
-      );
+  Future<void> _showSlackblastPicker(BuildContext context, Workout workout) =>
+      showSlackblastPicker(context, workout: workout);
 
   Future<Workout?> _invokeWorkoutEditor(
     BuildContext context, {
@@ -222,7 +205,7 @@ class WorkoutsTab extends ConsumerWidget {
                   workout: workouts[index],
                   onInvokeWorkoutEditor: _invokeWorkoutEditor,
                   onShareWorkout: _shareWorkout,
-                  onShareToBackblast: _shareToBackblast,
+                  onShareToBackblast: _showSlackblastPicker,
                 ),
                 onReorderItem: listNotifier.move,
               )
@@ -447,14 +430,14 @@ final class _OverflowMenu extends StatelessWidget {
         ),
         menuChildren: [
           AdaptiveMenuItem(
+            onPressed: () => onShareToBackblast(menuContext),
+            icon: Menu.slack,
+            text: L10n.of(context)!.postToBackblastText,
+          ),
+          AdaptiveMenuItem(
             onPressed: () => onDuplicate(),
             icon: Icons.copy,
             text: L10n.of(context)!.duplicateWorkoutText,
-          ),
-          AdaptiveMenuItem(
-            onPressed: () => onShareToBackblast(menuContext),
-            icon: Menu.slack,
-            text: L10n.of(context)!.shareToBackblastText,
           ),
           AdaptiveMenuItem(
             onPressed: () => onShare(menuContext),

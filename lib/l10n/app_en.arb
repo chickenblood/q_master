@@ -268,13 +268,53 @@
     "@postToBackblastText": {
       "description": "Context menu item to share a workout directly to an F3 Nation backblast."
     },
-    "shareToBackblastComingSoonAlertTitle": "Coming Soon",
-    "@shareToBackblastComingSoonAlertTitle": {
-      "description": "Title of the alert shown when Share to Backblast is tapped before the feature is available."
+    "slackblastRegionsTitle": "Region",
+    "@slackblastRegionsTitle": {
+      "description": "Title for the region selection section of the Slackblast picker."
     },
-    "shareToBackblastComingSoonAlertDescription": "Sharing a workout directly to an F3 Nation backblast is coming soon.",
-    "@shareToBackblastComingSoonAlertDescription": {
-      "description": "Body text of the alert shown when Share to Backblast is tapped before the feature is available."
+    "slackblastRegionSearchHint": "Search regions",
+    "@slackblastRegionSearchHint": {
+      "description": "Hint for the region search field in the Slackblast picker."
+    },
+    "slackblastRegionsEmptyLabel": "No regions match this search.",
+    "@slackblastRegionsEmptyLabel": {
+      "description": "Empty-state message when the Slackblast region search has no matches."
+    },
+    "slackblastAosTitle": "AO",
+    "@slackblastAosTitle": {
+      "description": "Title for the AO selection section of the Slackblast picker."
+    },
+    "slackblastAoSearchHint": "Search AOs",
+    "@slackblastAoSearchHint": {
+      "description": "Hint for the AO search field in the Slackblast picker."
+    },
+    "slackblastAosEmptyLabel": "No AOs match this search.",
+    "@slackblastAosEmptyLabel": {
+      "description": "Empty-state message when the selected Slackblast region has no AOs."
+    },
+    "slackblastDatesTitle": "Date",
+    "@slackblastDatesTitle": {
+      "description": "Title for the event-date selection section of the Slackblast picker."
+    },
+    "slackblastDatesEmptyLabel": "No upcoming events are available for this AO.",
+    "@slackblastDatesEmptyLabel": {
+      "description": "Empty-state message when the selected Slackblast AO has no upcoming events."
+    },
+    "slackblastLoadErrorMessage": "Could not load Slackblast options.",
+    "@slackblastLoadErrorMessage": {
+      "description": "Error message shown when the Slackblast picker cannot load data from F3 Nation."
+    },
+    "slackblastPostSuccessTitle": "Backblast Posted",
+    "@slackblastPostSuccessTitle": {
+      "description": "Title shown after a workout is posted to a backblast."
+    },
+    "slackblastPostSuccessMessage": "Your workout was posted to the selected backblast.",
+    "@slackblastPostSuccessMessage": {
+      "description": "Confirmation shown after a workout is posted to a backblast."
+    },
+    "slackblastPostErrorTitle": "Could Not Post Backblast",
+    "@slackblastPostErrorTitle": {
+      "description": "Title shown when posting a workout to a backblast fails."
     },
     "deleteWorkoutText": "Delete",
     "@deleteWorkoutText": {

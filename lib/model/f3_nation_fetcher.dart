@@ -139,7 +139,15 @@ final class F3NationFetcher extends _$F3NationFetcher {
         'pageSize': 100,
       },
     );
-    return _readList(json, 'orgs').map(F3Region.fromApiJson).toList();
+    final regions = _readList(json, 'orgs').map(F3Region.fromApiJson).toList()
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    return regions;
+  }
+
+  /// Fetches the Region with [regionId] directly from the organization API.
+  Future<F3Region> fetchRegion({required int regionId}) async {
+    final json = await _get('/org/id/$regionId');
+    return F3Region.fromApiJson(_readObject(json, 'org'));
   }
 
   /// Lists AOs under the region with the given [regionId], optionally
@@ -158,19 +166,31 @@ final class F3NationFetcher extends _$F3NationFetcher {
         'pageSize': 200,
       },
     );
-    return _readList(json, 'orgs').map(F3Ao.fromApiJson).toList();
+    final aos = _readList(json, 'orgs').map(F3Ao.fromApiJson).toList()
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    return aos;
   }
 
-  /// Lists event instances at [aoOrgId] on or after [from] (defaults to
-  /// today), sorted earliest first.
+  /// Fetches the AO with [aoId] directly from the organization API.
+  Future<F3Ao> fetchAo({required int aoId}) async {
+    final json = await _get('/org/id/$aoId');
+    return F3Ao.fromApiJson(_readObject(json, 'org'));
+  }
+
+  /// Lists event instances at [aoOrgId] from [from] through [to], sorted
+  /// earliest first. The default window is the previous seven days through
+  /// today.
   ///
   /// The API's `startDate` query filter does not reliably restrict results
   /// to an exact date, so a page of instances is fetched and filtered here.
   Future<List<F3EventInstanceSummary>> listAvailableDates({
     required int aoOrgId,
     DateTime? from,
+    DateTime? to,
   }) async {
-    final cutoff = _dateOnly(from ?? DateTime.now());
+    final today = _dateOnly(DateTime.now());
+    final start = _dateOnly(from ?? today.subtract(const Duration(days: 7)));
+    final end = _dateOnly(to ?? today);
     final json = await _get(
       '/event-instance',
       queryParameters: {'aoOrgId': aoOrgId, 'pageSize': 500},
@@ -178,7 +198,11 @@ final class F3NationFetcher extends _$F3NationFetcher {
     final instances =
         _readList(json, 'eventInstances')
             .map(F3EventInstanceSummary.fromApiJson)
-            .where((instance) => !instance.startDate.isBefore(cutoff))
+            .where(
+              (instance) =>
+                  !instance.startDate.isBefore(start) &&
+                  !instance.startDate.isAfter(end),
+            )
             .toList()
           ..sort((a, b) => a.startDate.compareTo(b.startDate));
     return instances;
@@ -360,6 +384,12 @@ List<Map<String, Object?>> _readList(Map<String, Object?> json, String key) {
   final value = json[key];
   if (value is! List) return const [];
   return value.whereType<Map>().map(Map<String, Object?>.from).toList();
+}
+
+Map<String, Object?> _readObject(Map<String, Object?> json, String key) {
+  final value = json[key];
+  if (value is Map) return Map<String, Object?>.from(value);
+  throw FormatException('Expected an object at "$key".');
 }
 
 int? _readInt(Map<String, Object?> json, String key) {
