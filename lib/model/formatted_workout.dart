@@ -22,15 +22,23 @@ extension FormatttedOutput on Workout {
     return result.toString();
   }
 
-  /// Formats workout sections as Slack's structured `rich_text` blocks.
+  /// Formats workout sections in a single Slack `rich_text` block.
   List<Map<String, Object?>> get richTextForSlackPost => [
-    for (final section in sections)
-      _slackRichTextSection(
-        title: section.name.toUpperCase(),
-        lines: section.exercises,
-      ),
-    _slackRichTextSection(title: 'ANNOUNCEMENTS:'),
-    _slackRichTextSection(title: 'COT:'),
+    {
+      'type': 'rich_text',
+      'elements': [
+        for (final section in sections) ...[
+          _slackRichTextSection(
+            title: section.name.toUpperCase(),
+            lines: section.exercises,
+          ),
+          _slackBlankSection(),
+        ],
+        _slackRichTextSection(title: 'ANNOUNCEMENTS:'),
+        _slackBlankSection(),
+        _slackRichTextSection(title: 'COT:'),
+      ],
+    },
   ];
 }
 
@@ -38,18 +46,22 @@ Map<String, Object?> _slackRichTextSection({
   required String title,
   List<String> lines = const [],
 }) => {
-  'type': 'rich_text',
+  'type': 'rich_text_section',
   'elements': [
     {
-      'type': 'rich_text_section',
-      'elements': [
-        {
-          'type': 'text',
-          'text': title,
-          'style': {'bold': true},
-        },
-        if (lines.isNotEmpty) {'type': 'text', 'text': '\n${lines.join('\n')}'},
-      ],
+      'type': 'text',
+      'text': title,
+      'style': {'bold': true},
     },
+    if (lines.isNotEmpty) {'type': 'text', 'text': '\n${lines.join('\n')}'},
+  ],
+};
+
+// Adds a blank line between sections, since Slack doesn't support multiple
+// newlines in a single section.
+Map<String, Object?> _slackBlankSection() => {
+  'type': 'rich_text_section',
+  'elements': [
+    {'type': 'text', 'text': '\n'},
   ],
 };

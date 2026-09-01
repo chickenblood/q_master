@@ -28,11 +28,12 @@ void main() {
               {'type': 'text', 'text': '\nSSH x 20'},
             ],
           },
-        ],
-      },
-      {
-        'type': 'rich_text',
-        'elements': [
+          {
+            'type': 'rich_text_section',
+            'elements': [
+              {'type': 'text', 'text': '\n'},
+            ],
+          },
           {
             'type': 'rich_text_section',
             'elements': [
@@ -44,11 +45,12 @@ void main() {
               {'type': 'text', 'text': '\nMerkins x 10'},
             ],
           },
-        ],
-      },
-      {
-        'type': 'rich_text',
-        'elements': [
+          {
+            'type': 'rich_text_section',
+            'elements': [
+              {'type': 'text', 'text': '\n'},
+            ],
+          },
           {
             'type': 'rich_text_section',
             'elements': [
@@ -59,11 +61,12 @@ void main() {
               },
             ],
           },
-        ],
-      },
-      {
-        'type': 'rich_text',
-        'elements': [
+          {
+            'type': 'rich_text_section',
+            'elements': [
+              {'type': 'text', 'text': '\n'},
+            ],
+          },
           {
             'type': 'rich_text_section',
             'elements': [
