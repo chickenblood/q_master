@@ -11,6 +11,7 @@ import 'package:shake/shake.dart';
 import 'firebase_options.dart';
 import 'games/games_tab.dart';
 import 'l10n/l10n.dart';
+import 'model/f3_nation_credentials.dart';
 import 'near_me/near_me_tab.dart';
 import 'theme/theme.dart';
 import 'timer/timer_setup_tab.dart';
@@ -25,6 +26,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedAppPrefs.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await F3NationApiKey.ensureInitialized();
   runApp(ProviderScope(child: MainApp()));
 }
 

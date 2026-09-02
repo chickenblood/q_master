@@ -121,8 +121,8 @@ abstract class F3EventInstance with _$F3EventInstance {
 /// Client for the F3 Nation API (https://api.f3nation.com/docs), providing a
 /// drill-down path from regions to AOs to event instances.
 ///
-/// Requires an API key to be configured via [F3NationApiKey] before any
-/// method is called.
+/// Requires an API key supplied by Firebase Remote Config before any method is
+/// called.
 @Riverpod(keepAlive: true)
 final class F3NationFetcher extends _$F3NationFetcher {
   @override
@@ -264,7 +264,7 @@ final class F3NationFetcher extends _$F3NationFetcher {
     String path, {
     Map<String, Object?> queryParameters = const {},
   }) async {
-    final apiKey = await ref.read(f3NationApiKeyProvider.future);
+    final apiKey = F3NationApiKey.value;
     if (apiKey == null || apiKey.isEmpty) {
       throw const F3NationApiException('No F3 Nation API key is configured.');
     }
@@ -309,7 +309,7 @@ final class F3NationFetcher extends _$F3NationFetcher {
     String path, {
     required Map<String, Object?> body,
   }) async {
-    final apiKey = await ref.read(f3NationApiKeyProvider.future);
+    final apiKey = F3NationApiKey.value;
     if (apiKey == null || apiKey.isEmpty) {
       throw const F3NationApiException('No F3 Nation API key is configured.');
     }
