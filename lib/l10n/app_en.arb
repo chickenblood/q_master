@@ -312,6 +312,32 @@
     "@slackblastPostSuccessMessage": {
       "description": "Confirmation shown after a workout is posted to a backblast."
     },
+    "slackblastPostConfirmationTitle": "Region: {region}\nAO: {ao}\nDate: {date}",
+    "@slackblastPostConfirmationTitle": {
+      "description": "Selected F3 Nation backblast destination shown in the confirmation dialog title.",
+      "placeholders": {
+        "region": {
+          "type": "String",
+          "example": "Bay Area"
+        },
+        "ao": {
+          "type": "String",
+          "example": "Hangar 1"
+        },
+        "date": {
+          "type": "String",
+          "example": "Aug 28, 2026"
+        }
+      }
+    },
+    "slackblastPostConfirmationMessage": "Are you sure you want to fill this Backblast?",
+    "@slackblastPostConfirmationMessage": {
+      "description": "Question shown in the Slackblast confirmation dialog body."
+    },
+    "fillBackblastAction": "Fill Backblast",
+    "@fillBackblastAction": {
+      "description": "Default confirmation action that fills the selected F3 Nation backblast."
+    },
     "goToSlackAction": "Go to Slack",
     "@goToSlackAction": {
       "description": "Action that opens Slack after posting a backblast."

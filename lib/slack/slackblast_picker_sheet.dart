@@ -241,6 +241,16 @@ class _SlackblastPickerSheetState
   /// Posts the workout text to [event] and reports the result to the user.
   Future<void> _postBackblast(F3EventInstanceSummary event) async {
     if (_isPosting) return;
+    final region = _selectedRegion;
+    final ao = _selectedAo;
+    if (region == null || ao == null) return;
+    final confirmed = await _confirmPost(
+      context,
+      region: region,
+      ao: ao,
+      event: event,
+    );
+    if (!confirmed || !mounted) return;
     setState(() => _isPosting = true);
     try {
       await _fetcher.updateBackblast(
@@ -272,6 +282,43 @@ class _SlackblastPickerSheetState
       );
       if (mounted) setState(() => _isPosting = false);
     }
+  }
+
+  /// Asks the user to confirm the selected destination before posting.
+  Future<bool> _confirmPost(
+    BuildContext context, {
+    required F3Region region,
+    required F3Ao ao,
+    required F3EventInstanceSummary event,
+  }) async {
+    final l10n = L10n.of(context)!;
+    return await showAdaptiveDialog<bool>(
+          context: context,
+          builder: (dialogContext) => AlertDialog.adaptive(
+            title: PlatformText(l10n.slackblastPostConfirmationMessage),
+            content: PlatformText(
+              l10n.slackblastPostConfirmationTitle(
+                region.name,
+                ao.name,
+                DateFormat.yMMMd().format(event.startDate),
+              ),
+              style: Theme.of(dialogContext).textTheme.titleSmall,
+            ),
+            actions: [
+              PlatformDialogAction(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: PlatformText(l10n.cancelAction),
+              ),
+              PlatformDialogAction(
+                cupertino: (_, _) =>
+                    CupertinoDialogActionData(isDefaultAction: true),
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                child: PlatformText(l10n.fillBackblastAction),
+              ),
+            ],
+          ),
+        ) ??
+        false;
   }
 
   /// Confirms a successful post and optionally opens the installed Slack app.
