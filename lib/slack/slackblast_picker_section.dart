@@ -105,23 +105,27 @@ class SlackblastPickerSection<T> extends StatelessWidget {
           );
         }
 
-        return Column(
-          children: [
-            for (final item in items)
-              PlatformListTile(
-                title: PlatformText(
-                  itemLabel(item),
-                  style: itemTextStyle?.call(context, item),
+        return Visibility(
+          // Hide the list if there's only one item and it's already selected.
+          visible: items.length != 1 || selectedItem == null,
+          child: Column(
+            children: [
+              for (final item in items)
+                PlatformListTile(
+                  title: PlatformText(
+                    itemLabel(item),
+                    style: itemTextStyle?.call(context, item),
+                  ),
+                  trailing: item == selectedItem
+                      ? Icon(
+                          context.platformIcons.checkMark,
+                          color: Theme.of(context).colorScheme.primary,
+                        )
+                      : null,
+                  onTap: () => onSelect(item),
                 ),
-                trailing: item == selectedItem
-                    ? Icon(
-                        context.platformIcons.checkMark,
-                        color: Theme.of(context).colorScheme.primary,
-                      )
-                    : null,
-                onTap: () => onSelect(item),
-              ),
-          ],
+            ],
+          ),
         );
       },
     );
