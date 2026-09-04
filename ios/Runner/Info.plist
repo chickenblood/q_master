@@ -26,8 +26,6 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
-	<!-- Opened files (e.g. .qmw workouts) are handled via receive_sharing_intent, not
-	     Navigator routing, so disable Flutter's default URL-to-route deep linking. -->
 	<key>FlutterDeepLinkingEnabled</key>
 	<false/>
 	<key>ITSAppUsesNonExemptEncryption</key>
@@ -65,7 +63,7 @@
 	</dict>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
-    	<string>slack</string>
+		<string>slack</string>
 	</array>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
@@ -86,12 +84,8 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<!-- Add for receive_sharing_intent start -->
-
-	<!-- Custom group id set in Build Settings -> User-Defined -->
 	<key>AppGroupId</key>
 	<string>$(CUSTOM_GROUP_ID)</string>
-
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -106,7 +100,7 @@
 
 	<!-- Add/Customize for AirDrop support -->
 	<key>LSSupportsOpeningDocumentsInPlace</key>
-	<true />
+	<true/>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -116,12 +110,10 @@
 			<string>Owner</string>
 			<key>LSItemContentTypes</key>
 			<array>
-            	<string>com.f3nation.qmaster.workout</string>
+				<string>com.f3nation.qmaster.workout</string>
 			</array>
 		</dict>
 	</array>
-	<!-- Add for receive_sharing_intent end -->
-
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>
@@ -131,14 +123,14 @@
 			<string>Q Master workout file</string>
 			<key>UTTypeConformsTo</key>
 			<array>
-				<string>public.json</string>
+				<!--string>public.json</string-->
+				<string>public.data</string>
 				<string>public.content</string>
 			</array>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>
 				<array>
-					<!-- QMaster workout -->
 					<string>qmw</string>
 				</array>
 			</dict>

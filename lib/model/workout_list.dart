@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:accessing_security_scoped_resource/accessing_security_scoped_resource.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
@@ -255,7 +256,14 @@ final class WorkoutList extends _$WorkoutList {
   }
 
   /// Reads a single workout from a file.
-  void addFromFile(String filename) {
+  Future<void> addFromFile(String filename) async {
+    // Special handling for iOS secure URLs like those received over AirDrop.
+    final isIOSSecureURL = Platform.isIOS && filename.startsWith('/private');
+
+    if (isIOSSecureURL) {
+      await AccessingSecurityScopedResource()
+          .startAccessingSecurityScopedResourceWithFilePath(filename);
+    }
     final file = File(filename);
     if (!file.existsSync()) {
       return;
@@ -266,7 +274,12 @@ final class WorkoutList extends _$WorkoutList {
     // TODO: This may not be in the correct format for a workout. We should
     // catch the error if that is the case.
     final workout = Workout.fromJson(json).copyWith(date: DateTime.now());
-    add(workout);
+    await add(workout);
+
+    if (isIOSSecureURL) {
+      await AccessingSecurityScopedResource()
+          .stopAccessingSecurityScopedResourceWithFilePath(filename);
+    }
   }
 
   Future<void> remove(Workout workout) {

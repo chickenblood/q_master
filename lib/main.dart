@@ -8,13 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:shake/shake.dart';
+import 'package:zikzak_share_handler/zikzak_share_handler.dart';
 
 import 'firebase_options.dart';
 import 'games/games_tab.dart';
 import 'l10n/l10n.dart';
-import 'model/f3_nation_credentials.dart';
 import 'model/workout_list.dart';
 import 'near_me/near_me_tab.dart';
 import 'theme/theme.dart';
@@ -75,7 +74,7 @@ class _MainApp extends ConsumerStatefulWidget with WidgetsBindingObserver {
 
 final class _MainAppState extends ConsumerState<_MainApp> {
   final tabPages = [WorkoutsTab(), GamesTab(), TimerSetupTab(), NearMeTab()];
-  StreamSubscription<List<SharedMediaFile>>? _sharedMediaSubscription;
+  late final StreamSubscription<SharedMedia> _sharedMediaSubscription;
 
   @override
   void initState() {
@@ -85,15 +84,18 @@ final class _MainAppState extends ConsumerState<_MainApp> {
 
   @override
   void dispose() {
-    _sharedMediaSubscription?.cancel();
+    _sharedMediaSubscription.cancel();
     super.dispose();
   }
 
   Future<void> configureReceivingShares() async {
-    final initialMedia = await ReceiveSharingIntent.instance.getInitialMedia();
+    final initialMedia = await ShareHandlerPlatform.instance
+        .getInitialSharedMedia();
 
-    void handleReceivedMedia(List<SharedMediaFile> media) {
-      for (final attachment in media) {
+    void handleReceivedMedia(SharedMedia media) {
+      if (media.attachments == null) return;
+
+      for (final attachment in media.attachments!) {
         if (attachment.path.endsWith('.qmw')) {
           final listNotifier = ref.read(workoutListProvider.notifier);
           listNotifier.addFromFile(attachment.path);
@@ -107,15 +109,14 @@ final class _MainAppState extends ConsumerState<_MainApp> {
           message: 'Invalid workout data received',
         );
       }
-      ReceiveSharingIntent.instance.reset();
+      ShareHandlerPlatform.instance.resetInitialSharedMedia();
     }
 
-    if (initialMedia.isNotEmpty) {
+    if (initialMedia != null) {
       handleReceivedMedia(initialMedia);
     }
 
-    _sharedMediaSubscription = ReceiveSharingIntent.instance
-        .getMediaStream()
+    _sharedMediaSubscription = ShareHandlerPlatform.instance.sharedMediaStream
         .listen(
           handleReceivedMedia,
           onError: (_) {

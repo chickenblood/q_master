@@ -20,10 +20,10 @@
                     $extensionItem.attachments,
                     $attachment,
                     (
-                        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.json&quot;
+                        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.json"
                     )
-                ).@count &gt; 0
-            ).@count &gt; 0
+                ).@count > 0
+            ).@count > 0
 	    	</string>
 		</dict>
 		<key>NSExtensionMainStoryboard</key>

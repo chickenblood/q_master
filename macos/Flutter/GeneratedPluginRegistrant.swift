@@ -5,6 +5,7 @@
 import FlutterMacOS
 import Foundation
 
+import accessing_security_scoped_resource
 import audio_session
 import firebase_ai
 import firebase_analytics
@@ -20,8 +21,10 @@ import speech_to_text
 import url_launcher_macos
 import wakelock_plus
 import webview_flutter_wkwebview
+import zikzak_share_handler_macos
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
+  AccessingSecurityScopedResourcePlugin.register(with: registry.registrar(forPlugin: "AccessingSecurityScopedResourcePlugin"))
   AudioSessionPlugin.register(with: registry.registrar(forPlugin: "AudioSessionPlugin"))
   FirebaseAIPlugin.register(with: registry.registrar(forPlugin: "FirebaseAIPlugin"))
   FirebaseAnalyticsPlugin.register(with: registry.registrar(forPlugin: "FirebaseAnalyticsPlugin"))
@@ -37,4 +40,5 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   UrlLauncherPlugin.register(with: registry.registrar(forPlugin: "UrlLauncherPlugin"))
   WakelockPlusMacosPlugin.register(with: registry.registrar(forPlugin: "WakelockPlusMacosPlugin"))
   WebViewFlutterPlugin.register(with: registry.registrar(forPlugin: "WebViewFlutterPlugin"))
+  ShareHandlerMacosPlatform.register(with: registry.registrar(forPlugin: "ShareHandlerMacosPlatform"))
 }

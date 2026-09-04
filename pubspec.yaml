@@ -1,12 +1,13 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 3.4.1+524
+version: 3.4.1+526
 
 environment:
   sdk: ^3.10.0
 
 dependencies: # keep sorted alphabetically
+  accessing_security_scoped_resource: ^3.5.0
   audio_session: ^0.2.2
   auto_size_text: ^3.0.0
   cupertino_icons: ^1.0.2
@@ -30,7 +31,6 @@ dependencies: # keep sorted alphabetically
   package_info_plus: ^9.0.0
   path_provider: ^2.1.5
   pull_down_button: ^0.10.2
-  receive_sharing_intent: ^1.9.0
   riverpod_annotation: ^4.0.0
   shake: ^3.0.0
   share_plus: ^12.0.1
@@ -43,6 +43,7 @@ dependencies: # keep sorted alphabetically
   webview_flutter: ^4.13.0
   webview_flutter_android: ^4.10.11
   youtube_player_iframe: ^6.0.2
+  zikzak_share_handler: ^1.0.1
 
 dev_dependencies: # keep sorted alphabetically
   build_runner: ^2.10.4
