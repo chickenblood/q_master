@@ -34,6 +34,8 @@
 	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Q Master needs access to your photo library to save and share workout media.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app needs access to your location to show nearby workouts.</string>
 	<key>NSMicrophoneUsageDescription</key>
