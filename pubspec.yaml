@@ -1,20 +1,20 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 3.4.1+528
+version: 3.4.1+529
 
 environment:
   sdk: ^3.10.0
 
 dependencies: # keep sorted alphabetically
   accessing_security_scoped_resource: ^3.5.0
-  audio_session: ^0.2.2
+  audio_session: ^0.2.4
   auto_size_text: ^3.0.0
   cupertino_icons: ^1.0.2
   dots_indicator: ^4.0.1
-  firebase_ai: ^3.12.2
+  firebase_ai: ^3.14.1
   firebase_analytics: ^12.5.0
-  firebase_core: ^4.10.0
+  firebase_core: ^4.14.0
   firebase_remote_config: ^6.6.0
   flutter:
     sdk: flutter
@@ -28,17 +28,17 @@ dependencies: # keep sorted alphabetically
   json_annotation: ^4.9.0
   just_audio: ^0.10.5
   logger: ^2.6.2
-  package_info_plus: ^9.0.0
+  package_info_plus: ^9.0.1
   path_provider: ^2.1.5
   pull_down_button: ^0.10.2
   riverpod_annotation: ^4.0.0
   shake: ^3.0.0
   share_plus: ^12.0.1
   shared_preferences: ^2.5.4
-  speech_to_text: ^7.3.0
+  speech_to_text: ^7.4.0
   stupid_simple_sheet: ^0.9.1+1
   url_launcher: ^6.3.2
-  wakelock_plus: ^1.4.0
+  wakelock_plus: ^1.5.2
   watch_connectivity: ^0.2.8
   webview_flutter: ^4.13.0
   webview_flutter_android: ^4.10.11
