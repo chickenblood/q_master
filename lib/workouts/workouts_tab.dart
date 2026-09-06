@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -180,9 +181,9 @@ class WorkoutsTab extends ConsumerWidget {
     final workouts = ref.watch(workoutListProvider);
     final listNotifier = ref.read(workoutListProvider.notifier);
     return SafeArea(
-      child: PlatformScaffold(
-        appBar: PlatformAppBar(
-          leading: SettingsActionButton(),
+      child: GlassScaffold(
+        appBar: GlassAppBar(
+          leading: SettingsGlassButton(),
           title: Text(
             L10n.of(context)!.workoutsTabTitle,
             style: Theme.of(
@@ -192,22 +193,25 @@ class WorkoutsTab extends ConsumerWidget {
               context,
             ).clamp(maxScaleFactor: 1.6),
           ),
-          cupertino: (appBarContext, _) => CupertinoNavigationBarData(
-            backgroundColor: Colors.transparent,
-            trailing: PlatformIconButton(
+          actions: [
+            GlassButton(
+              shape: LiquidRoundedSuperellipse(borderRadius: 48),
               icon: Icon(
                 PlatformIcons(context).add,
-                color: Theme.of(appBarContext).colorScheme.onSurface,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
-              cupertino: (context, platform) =>
-                  CupertinoIconButtonData(padding: EdgeInsets.only(left: 16)),
-              onPressed: () => _showWorkoutCreationPicker(context, ref),
+              onTap: () => _showWorkoutCreationPicker(context, ref),
             ),
-          ),
+          ],
         ),
         body: workouts.isNotEmpty
             ? ReorderableListView.builder(
                 header: Theme.of(context).platform == .iOS
+                    ? SizedBox.fromSize(
+                        size: const Size.fromHeight(kToolbarHeight),
+                      )
+                    : null,
+                footer: Theme.of(context).platform == .iOS
                     ? SizedBox.fromSize(
                         size: const Size.fromHeight(kToolbarHeight),
                       )
@@ -224,19 +228,6 @@ class WorkoutsTab extends ConsumerWidget {
                 onReorderItem: listNotifier.move,
               )
             : _emptyContentPlaceholder(context),
-        material: (innerContext, _) => MaterialScaffoldData(
-          floatingActionButton: Builder(
-            builder: (fabContext) => FloatingActionButton(
-              backgroundColor: Theme.of(fabContext).colorScheme.primary,
-              foregroundColor: Theme.of(fabContext).colorScheme.onPrimary,
-              child: Icon(
-                PlatformIcons(fabContext).add,
-                color: Theme.of(fabContext).colorScheme.onPrimary,
-              ),
-              onPressed: () => _showWorkoutCreationPicker(fabContext, ref),
-            ),
-          ),
-        ),
       ),
     );
   }

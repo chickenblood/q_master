@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:q_master/utils/shared_app_prefs.dart';
 
 import '../l10n/l10n.dart';
@@ -119,8 +120,8 @@ class TimerSetupTab extends ConsumerWidget {
     final l10n = L10n.of(context)!;
     final timer = ref.read(timerProvider.notifier);
     final prefs = SharedAppPrefs.instance;
-    return PlatformScaffold(
-      appBar: PlatformAppBar(
+    return GlassScaffold(
+      appBar: GlassAppBar(
         title: Text(
           l10n.timerSetupTabTitle,
           style: Theme.of(
@@ -130,9 +131,7 @@ class TimerSetupTab extends ConsumerWidget {
             context,
           ).clamp(maxScaleFactor: 1.6),
         ),
-        leading: const SettingsActionButton(),
-        cupertino: (_, _) =>
-            CupertinoNavigationBarData(backgroundColor: Colors.transparent),
+        leading: const SettingsGlassButton(),
       ),
       body: SafeArea(
         bottom: true,

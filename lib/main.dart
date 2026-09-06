@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:shake/shake.dart';
 import 'package:zikzak_share_handler/zikzak_share_handler.dart';
 
@@ -28,9 +29,10 @@ enum Tab { workouts, games, timer, location }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await LiquidGlassWidgets.initialize();
   await SharedAppPrefs.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(ProviderScope(child: _MainApp()));
+  runApp(LiquidGlassWidgets.wrap(child: ProviderScope(child: _MainApp())));
 }
 
 class _MainApp extends ConsumerStatefulWidget with WidgetsBindingObserver {
@@ -132,7 +134,7 @@ final class _MainAppState extends ConsumerState<_MainApp> {
 
   // Determine whether to show the tab bar based on the selected tab, device
   // and orientation.
-  bool shouldShowTabBar(BuildContext context) {
+  bool _shouldShowTabBar(BuildContext context) {
     final isTablet = MediaUtils.isTablet(context);
     final selectedIndex = widget._tabController.index(context);
     // We want a full screen timer on phones in landscape mode.
@@ -151,7 +153,10 @@ final class _MainAppState extends ConsumerState<_MainApp> {
         iosUseZeroPaddingForAppbarPlatformIcon: true,
       ),
       builder: (_) => ListenableBuilder(
-        listenable: SharedAppPrefs.instance.theme,
+        listenable: Listenable.merge([
+          SharedAppPrefs.instance.theme,
+          widget._tabController,
+        ]),
         builder: (_, _) => PlatformTheme(
           materialLightTheme: lightTheme(),
           materialDarkTheme: darkTheme(),
@@ -171,130 +176,47 @@ final class _MainAppState extends ConsumerState<_MainApp> {
               debugShowCheckedModeBanner: false,
               home: Builder(
                 builder: (context) {
-                  // Red 2px top-of-tab indicator for active tab — Option 3 identity.
-                  BottomNavigationBarItem tabItem(IconData icon, String label) {
-                    const double iconBoxHeight = 40;
-                    const double iconSize = 24;
-                    final theme = Theme.of(context);
-                    final colorScheme = theme.colorScheme;
-                    // Removed unused isDark variable
-                    final indicator = Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      child: Center(
-                        child: Container(
-                          width: 28,
-                          height: 2,
-                          decoration: BoxDecoration(
-                            color: colorScheme.primary,
-                            borderRadius: const BorderRadius.vertical(
-                              bottom: Radius.circular(2),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                    Widget iconWidget({bool active = false}) => SizedBox(
-                      height: iconBoxHeight,
-                      width: iconBoxHeight,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          if (active) indicator,
-                          // Shift icon down by 4 pixels
-                          Positioned(
-                            top: 4,
-                            left: 0,
-                            right: 0,
-                            child: Icon(
-                              icon,
-                              size: iconSize,
-                              color: active
-                                  ? colorScheme.onSurface
-                                  : colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                    return BottomNavigationBarItem(
-                      icon: iconWidget(active: false),
-                      activeIcon: iconWidget(active: true),
-                      label: label,
-                    );
-                  }
+                  final theme = Theme.of(context);
+                  final colorScheme = theme.colorScheme;
 
-                  return PlatformTabScaffold(
-                    tabController: widget._tabController,
-                    bodyBuilder: (_, index) => _TabsContainer(
-                      selectedIndex: index,
+                  return GlassScaffold(
+                    body: _TabsContainer(
+                      selectedIndex: widget._tabController.index(context),
                       children: tabPages,
                     ),
-                    material3Tabs: (tabBarContext, _) {
-                      // Removed unused isDark variable
-                      final theme = Theme.of(tabBarContext);
-                      final colorScheme = theme.colorScheme;
-                      return MaterialNavigationBarData(
-                        indicatorColor: Colors.transparent,
-                        labelTextStyle: WidgetStateProperty.resolveWith((
-                          states,
-                        ) {
-                          final isSelected = states.contains(
-                            WidgetState.selected,
-                          );
-                          final color = isSelected
-                              ? colorScheme.onSurface
-                              : colorScheme.onSurfaceVariant;
-                          return theme.textTheme.labelMedium?.copyWith(
-                            color: color,
-                          );
-                        }),
-                      );
-                    },
-                    materialBuilder: (tabBarContext, _, index) =>
-                        MaterialTabScaffoldData(
-                          height: shouldShowTabBar(tabBarContext) ? null : 0,
-                          tabsBackgroundColor: shouldShowTabBar(tabBarContext)
-                              ? null
-                              : Colors.transparent,
-                        ),
-                    cupertinoTabs: (tabBarContext, _) {
-                      // Removed unused isDark variable
-                      final theme = Theme.of(tabBarContext);
-                      final colorScheme = theme.colorScheme;
-                      return CupertinoTabBarData(
-                        activeColor: colorScheme.onSurface,
-                        inactiveColor: colorScheme.onSurfaceVariant,
-                      );
-                    },
-                    cupertinoBuilder: (tabBarContext, _, index) =>
-                        CupertinoTabScaffoldData(
-                          navBarHeight: shouldShowTabBar(tabBarContext)
-                              ? null
-                              : 0,
-                          tabsBackgroundColor: shouldShowTabBar(tabBarContext)
-                              ? null
-                              : Colors.transparent,
-                        ),
-                    items: [
-                      tabItem(
-                        AdaptiveIcons.history,
-                        L10n.of(context)!.workoutsTabTitle,
-                      ),
-                      tabItem(
-                        AdaptiveIcons.sports,
-                        L10n.of(context)!.gamesTabTitle,
-                      ),
-                      tabItem(
-                        AdaptiveIcons.timer,
-                        L10n.of(context)!.timerPageTitle,
-                      ),
-                      tabItem(
-                        AdaptiveIcons.location,
-                        L10n.of(context)!.nearMeTabTitle,
-                      ),
-                    ],
+                    bottomBar: _shouldShowTabBar(context)
+                        ? SafeArea(
+                            bottom: false,
+                            child: GlassTabBar.bottom(
+                              selectedIndex: widget._tabController.index(
+                                context,
+                              ),
+                              onTabSelected: (index) => widget._tabController
+                                  .setIndex(context, index),
+                              tabs: [
+                                GlassTab(
+                                  icon: Icon(AdaptiveIcons.history),
+                                  label: L10n.of(context)!.workoutsTabTitle,
+                                  glowColor: colorScheme.onSurface,
+                                ),
+                                GlassTab(
+                                  icon: Icon(AdaptiveIcons.sports),
+                                  label: L10n.of(context)!.gamesTabTitle,
+                                  glowColor: colorScheme.onSurface,
+                                ),
+                                GlassTab(
+                                  icon: Icon(AdaptiveIcons.timer),
+                                  label: L10n.of(context)!.timerPageTitle,
+                                  glowColor: colorScheme.onSurface,
+                                ),
+                                GlassTab(
+                                  icon: Icon(AdaptiveIcons.location),
+                                  label: L10n.of(context)!.nearMeTabTitle,
+                                ),
+                              ],
+                            ),
+                          )
+                        : null,
                   );
                 },
               ),

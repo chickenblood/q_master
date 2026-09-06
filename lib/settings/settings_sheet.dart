@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../l10n/l10n.dart';
@@ -20,6 +21,23 @@ final class SettingsActionButton extends StatelessWidget {
         : EdgeInsets.only(right: 10),
     icon: Icon(context.platformIcons.gearSolid),
     onPressed: () async {
+      final navigator = Navigator.of(context, rootNavigator: true);
+      return showAdaptiveModalSheet(
+        context: navigator.context,
+        child: const _SettingsSheet(),
+      );
+    },
+  );
+}
+
+final class SettingsGlassButton extends StatelessWidget {
+  const SettingsGlassButton({super.key});
+
+  @override
+  Widget build(BuildContext context) => GlassButton(
+    icon: Icon(context.platformIcons.gearSolid),
+    shape: LiquidRoundedSuperellipse(borderRadius: 48),
+    onTap: () async {
       final navigator = Navigator.of(context, rootNavigator: true);
       return showAdaptiveModalSheet(
         context: navigator.context,
@@ -207,30 +225,31 @@ class _SettingsSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final prefs = SharedAppPrefs.instance;
-    return PlatformScaffold(
-      body: SafeArea(
-        child: CustomScrollView(
-          physics: BottomSheetScrollPhysics(),
-          slivers: [
-            SliverAppBar(
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              leading: PlatformIconButton(
-                padding: EdgeInsets.only(right: 14),
-                icon: Icon(AdaptiveIcons.close),
-                onPressed: () => Navigator.pop(context),
+    return GlassScaffold(
+      body: Material(
+        child: SafeArea(
+          child: CustomScrollView(
+            physics: BottomSheetScrollPhysics(),
+            slivers: [
+              SliverAppBar(
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                leading: GlassButton(
+                  icon: Icon(AdaptiveIcons.close),
+                  onTap: () => Navigator.pop(context),
+                ),
+                title: Text(
+                  L10n.of(context)!.settingsDialogTitle,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+                  textScaler: MediaQuery.textScalerOf(
+                    context,
+                  ).clamp(maxScaleFactor: 1.6),
+                ),
               ),
-              title: Text(
-                L10n.of(context)!.settingsDialogTitle,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-                textScaler: MediaQuery.textScalerOf(
-                  context,
-                ).clamp(maxScaleFactor: 1.6),
-              ),
-            ),
-            _content(context, prefs: prefs, ref: ref),
-          ],
+              _content(context, prefs: prefs, ref: ref),
+            ],
+          ),
         ),
       ),
     );

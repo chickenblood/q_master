@@ -4,6 +4,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../l10n/l10n.dart';
@@ -67,9 +68,9 @@ class GamesTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLandscape = MediaQuery.orientationOf(context) == .landscape;
-    return PlatformScaffold(
-      appBar: PlatformAppBar(
-        leading: const SettingsActionButton(),
+    return GlassScaffold(
+      appBar: GlassAppBar(
+        leading: const SettingsGlassButton(),
         title: Text(
           L10n.of(context)!.gamesTabTitle,
           style: Theme.of(
@@ -79,8 +80,6 @@ class GamesTab extends StatelessWidget {
             context,
           ).clamp(maxScaleFactor: 1.6),
         ),
-        cupertino: (appBarContext, _) =>
-            CupertinoNavigationBarData(backgroundColor: Colors.transparent),
       ),
       body: SafeArea(
         child: Center(

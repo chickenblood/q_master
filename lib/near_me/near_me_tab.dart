@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
@@ -45,9 +46,9 @@ class NearMeTab extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => PlatformScaffold(
-    appBar: PlatformAppBar(
-      leading: SettingsActionButton(),
+  Widget build(BuildContext context) => GlassScaffold(
+    appBar: GlassAppBar(
+      leading: const SettingsGlassButton(),
       title: Text(
         L10n.of(context)!.nearMeTabTitle,
         style: Theme.of(
@@ -55,14 +56,13 @@ class NearMeTab extends StatelessWidget {
         ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
         textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.6),
       ),
-      trailingActions: [
-        PlatformIconButton(
+      actions: [
+        GlassButton(
+          shape: LiquidRoundedSuperellipse(borderRadius: 48),
           icon: Icon(PlatformIcons(context).refresh),
-          onPressed: () => controller.reload(),
+          onTap: () => controller.reload(),
         ),
       ],
-      cupertino: (appBarContext, _) =>
-          CupertinoNavigationBarData(backgroundColor: Colors.transparent),
     ),
     body: SafeArea(child: WebViewWidget(controller: controller)),
   );
