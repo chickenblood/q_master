@@ -171,7 +171,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           ),
           PlatformDialogAction(
             cupertino: (_, _) =>
-                CupertinoDialogActionData(isDefaultAction: true),
+                CupertinoDialogActionData(isDestructiveAction: true),
             onPressed: () => Navigator.of(innerContext).pop(controller.text),
             child: PlatformText(buttonTitle),
           ),
@@ -736,19 +736,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                 : Icon(AdaptiveIcons.close),
             cupertino: (context, platform) =>
                 CupertinoIconButtonData(padding: EdgeInsets.only(right: 8)),
-            onPressed: () {
-              if (_displayMode == .display) {
-                Navigator.of(context).pop();
-                return;
-              }
-              final storedWorkout = _storedWorkout;
-              setState(() {
-                _displayMode = .display;
-                if (storedWorkout != null) {
-                  _updateUiFromWorkout(storedWorkout);
-                }
-              });
-            },
+            onPressed: _handleCancel,
           ),
           title: Column(
             mainAxisSize: MainAxisSize.min,
@@ -793,6 +781,61 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       assert(false, 'Unable to save workout: _storedWorkout is null');
     }
     return workoutToSave;
+  }
+
+  Future<void> _handleCancel() async {
+    if (_displayMode == .display) {
+      Navigator.of(context).pop();
+      return;
+    }
+    if (!(await _confirmDiscardChanges())) {
+      return;
+    }
+
+    final storedWorkout = _storedWorkout;
+    setState(() {
+      _displayMode = .display;
+      if (storedWorkout != null) {
+        _updateUiFromWorkout(storedWorkout);
+      }
+    });
+  }
+
+  Future<bool> _confirmDiscardChanges() async {
+    // Return early if there are no changes to discard
+    final editedWorkout = _buildWorkoutFromUi();
+    if (editedWorkout == _storedWorkout) {
+      return true;
+    }
+
+    return (await showAdaptiveDialog(
+          context: context,
+          builder: (BuildContext innerContext) => AlertDialog.adaptive(
+            title: PlatformText(
+              L10n.of(innerContext)!.confirmDiscardChangesAlertTitle,
+            ),
+            content: PlatformText(
+              L10n.of(innerContext)!.confirmDiscardChangesAlertMessage,
+            ),
+            actions: [
+              PlatformDialogAction(
+                cupertino: (_, _) =>
+                    CupertinoDialogActionData(isDefaultAction: true),
+                onPressed: () => Navigator.of(innerContext).pop(false),
+                child: PlatformText(L10n.of(innerContext)!.cancelAction),
+              ),
+              PlatformDialogAction(
+                cupertino: (_, _) =>
+                    CupertinoDialogActionData(isDestructiveAction: true),
+                onPressed: () => Navigator.of(innerContext).pop(true),
+                child: PlatformText(
+                  L10n.of(innerContext)!.confirmDiscardChangesAlertButton,
+                ),
+              ),
+            ],
+          ),
+        ) ??
+        false);
   }
 
   /// Builds a [Workout] object from the current state of the UI fields and

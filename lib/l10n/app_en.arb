@@ -102,6 +102,18 @@
     "@captureVoiceInputStopButton": {
       "description": "Label for the stop button in the voice capture dialog."
     },
+    "confirmDiscardChangesAlertTitle": "Discard?",
+    "@confirmDiscardChangesAlertTitle": {
+      "description": "Alert title shown when the user attempts to discard changes."
+    },
+    "confirmDiscardChangesAlertMessage": "Are you sure you want to discard your changes?",
+    "@confirmDiscardChangesAlertMessage": {
+      "description": "Alert message shown when the user attempts to discard changes."
+    },
+    "confirmDiscardChangesAlertButton": "Discard Changes",
+    "@confirmDiscardChangesAlertButton": {
+      "description": "Label for the button that confirms discarding changes in the alert dialog."
+    },
     "editWorkoutDialogTitle": "Edit Beatdown",
     "@editWorkoutDialogTitle": {
       "description": "Title of the bottom sheet for editing an existing beatdown."
@@ -366,8 +378,6 @@
     "@deleteWorkoutConfirmAction": {
       "description": "Destructive confirm button in the delete workout alert."
     },
-    "okAction": "OK",
-    "@okAction": {},
     "cancelAction": "Cancel",
     "@cancelAction": {
       "description": "Cancel button used in alerts and dialogs throughout the app."
