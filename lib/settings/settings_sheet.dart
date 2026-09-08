@@ -35,8 +35,9 @@ final class SettingsGlassButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => GlassButton(
+    width: 44,
+    height: 44,
     icon: Icon(context.platformIcons.gearSolid),
-    shape: LiquidRoundedSuperellipse(borderRadius: 48),
     onTap: () async {
       final navigator = Navigator.of(context, rootNavigator: true);
       return showAdaptiveModalSheet(
@@ -226,26 +227,31 @@ class _SettingsSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final prefs = SharedAppPrefs.instance;
     return GlassScaffold(
+      appBar: GlassAppBar(
+        toolbarHeight: kToolbarHeight,
+        leading: GlassButton(
+          width: 44,
+          height: 44,
+          icon: Icon(AdaptiveIcons.close),
+          onTap: () => Navigator.pop(context),
+        ),
+        title: Text(
+          L10n.of(context)!.settingsDialogTitle,
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+          textScaler: MediaQuery.textScalerOf(
+            context,
+          ).clamp(maxScaleFactor: 1.6),
+        ),
+      ),
       body: Material(
         child: SafeArea(
           child: CustomScrollView(
             physics: BottomSheetScrollPhysics(),
             slivers: [
-              SliverAppBar(
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                leading: GlassButton(
-                  icon: Icon(AdaptiveIcons.close),
-                  onTap: () => Navigator.pop(context),
-                ),
-                title: Text(
-                  L10n.of(context)!.settingsDialogTitle,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-                  textScaler: MediaQuery.textScalerOf(
-                    context,
-                  ).clamp(maxScaleFactor: 1.6),
-                ),
+              SliverPadding(
+                padding: const EdgeInsets.only(top: kToolbarHeight),
               ),
               _content(context, prefs: prefs, ref: ref),
             ],

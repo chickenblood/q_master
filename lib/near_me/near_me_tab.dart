@@ -58,6 +58,8 @@ class NearMeTab extends StatelessWidget {
       ),
       actions: [
         GlassButton(
+          width: 44,
+          height: 44,
           shape: LiquidRoundedSuperellipse(borderRadius: 48),
           icon: Icon(PlatformIcons(context).refresh),
           onTap: () => controller.reload(),

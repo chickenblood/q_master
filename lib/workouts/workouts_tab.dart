@@ -183,6 +183,7 @@ class WorkoutsTab extends ConsumerWidget {
     return SafeArea(
       child: GlassScaffold(
         appBar: GlassAppBar(
+          toolbarHeight: 44,
           leading: SettingsGlassButton(),
           title: Text(
             L10n.of(context)!.workoutsTabTitle,
@@ -195,7 +196,8 @@ class WorkoutsTab extends ConsumerWidget {
           ),
           actions: [
             GlassButton(
-              shape: LiquidRoundedSuperellipse(borderRadius: 48),
+              width: 44,
+              height: 44,
               icon: Icon(
                 PlatformIcons(context).add,
                 color: Theme.of(context).colorScheme.onSurface,

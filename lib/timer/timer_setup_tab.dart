@@ -12,6 +12,7 @@ import '../model/timer.dart';
 import '../settings/settings_sheet.dart';
 import '../theme/theme.dart';
 import '../ui/action_button.dart';
+import '../ui/media_query.dart';
 import '../utils/datetime_utils.dart';
 import 'timer_tab.dart';
 
@@ -117,6 +118,9 @@ class TimerSetupTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final useBottomPadding =
+        MediaUtils.isTablet(context) ||
+        MediaQuery.of(context).orientation == .portrait;
     final l10n = L10n.of(context)!;
     final timer = ref.read(timerProvider.notifier);
     final prefs = SharedAppPrefs.instance;
@@ -140,7 +144,7 @@ class TimerSetupTab extends ConsumerWidget {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.fromLTRB(12, 56, 12, 12),
                 child: ListenableBuilder(
                   listenable: Listenable.merge([
                     prefs.timerType,
@@ -341,7 +345,12 @@ class TimerSetupTab extends ConsumerWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 24),
+              padding: EdgeInsets.fromLTRB(
+                12,
+                0,
+                12,
+                useBottomPadding ? 68 : 0,
+              ),
               child: SizedBox(
                 height: 62,
                 child: ActionButton(
