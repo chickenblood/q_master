@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:audio_session/audio_session.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -249,9 +248,8 @@ Future<void> _configureAudioSession() async {
   );
 }
 
-/// Wraps tabs on Android so that it supports nested navigation and remembers
-/// the navigation stack when switching tabs. On iOS, the CupertinoTabScaffold
-/// already provides this behavior.
+/// Wraps tabs so that it supports nested navigation and remembers
+/// the navigation stack when switching tabs.
 final class _TabsContainer extends StatelessWidget {
   final List<Widget> children;
   final int selectedIndex;
@@ -261,10 +259,7 @@ final class _TabsContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (defaultTargetPlatform == .android) {
-      return IndexedStack(index: selectedIndex, children: children);
-    }
-    return children[selectedIndex];
+    return IndexedStack(index: selectedIndex, children: children);
   }
 }
 
@@ -275,11 +270,8 @@ final class _TabWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (defaultTargetPlatform == .android) {
-      return CupertinoTabView(
-        onGenerateRoute: (_) => MaterialPageRoute(builder: (_) => child),
-      );
-    }
-    return child;
+    return CupertinoTabView(
+      onGenerateRoute: (_) => MaterialPageRoute(builder: (_) => child),
+    );
   }
 }
