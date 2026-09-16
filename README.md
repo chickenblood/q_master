@@ -102,6 +102,15 @@ Build Wear app:
   `./android/gradlew -p android :watchapp:bundleRelease`
   The output AAB will be under build/watchapp/outputs/bundle/release/watchapp-release.aab
 
+### Cloud Functions
+Cloud functions are used to call F3 Nation RPCs from https://api.f3nation.com/docs that require a secure API key.
+To deploy cloud functions:
+
+```
+npm run build
+firebase deploy --only functions
+```
+
 ### Android Minification Gotcha
 
 If release builds are minified (`isMinifyEnabled = true`), R8 can strip Flutter utility classes used by `path_provider`, which can break workout save/load at runtime.

@@ -1,6 +1,7 @@
 {
   "projects": {
-    "qmaster": "q-master-7346a"
+    "qmaster": "q-master-7346a",
+    "default": "q-master-7346a"
   },
   "targets": {},
   "etags": {}

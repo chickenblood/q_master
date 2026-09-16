@@ -415,7 +415,7 @@ class _SlackblastPickerSheetState
                     onSelect: _selectRegion,
                     emptyLabel: l10n.slackblastRegionsEmptyLabel,
                     errorLabel: l10n.slackblastLoadErrorMessage,
-                    onRetry: () async {
+                    onRetry: () {
                       setState(
                         () => _regionsFuture = _fetcher.listRegions(
                           searchTerm: _regionSearchController.text.trim(),

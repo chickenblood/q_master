@@ -1,18 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'dart:io';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import 'f3_nation_credentials.dart';
 
 part 'f3_nation_fetcher.freezed.dart';
 part 'f3_nation_fetcher.g.dart';
 
 const _f3NationApiHost = 'api.f3nation.com';
-const _f3NationClientId = 'q_master';
 
 /// Raised when a request to the F3 Nation API fails, either due to a
 /// transport error, a non-2xx response, or an unexpected response shape.
@@ -256,7 +253,7 @@ final class F3NationFetcher extends _$F3NationFetcher {
     payload['backblastRich'] = backblastRich;
     payload['backblastTs'] = DateTime.now().millisecondsSinceEpoch / 1000;
 
-    final response = await _post('/event-instance', body: payload);
+    final response = await _postEventInstance(payload);
     return F3EventInstance.fromApiJson(response);
   }
 
@@ -264,92 +261,35 @@ final class F3NationFetcher extends _$F3NationFetcher {
     String path, {
     Map<String, Object?> queryParameters = const {},
   }) async {
-    final apiKey = F3NationApiKey.value;
-    if (apiKey == null || apiKey.isEmpty) {
-      throw const F3NationApiException('No F3 Nation API key is configured.');
-    }
-
     final uri = _buildUri(path, queryParameters);
-    final httpClient = HttpClient();
     try {
-      final request = await httpClient.getUrl(uri);
-      request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $apiKey');
-      request.headers.set('Client', _f3NationClientId);
-      final response = await request.close();
-      final body = await response.transform(utf8.decoder).join();
+      final result = await FirebaseFunctions.instance
+          .httpsCallable('getEventData')
+          .call({'url': uri.toString()});
 
-      if (response.statusCode != HttpStatus.ok) {
-        throw F3NationApiException(
-          _readErrorMessage(body) ?? 'Request to $path failed',
-          statusCode: response.statusCode,
-        );
-      }
+      return result.data;
+    } on FirebaseFunctionsException catch (e) {
+      developer.log('Cloud Function error: ${e.code} - ${e.message}');
 
-      final decoded = jsonDecode(body);
-      if (decoded is Map<String, Object?>) {
-        return decoded;
-      }
-      throw F3NationApiException('Unexpected response format for $path');
-    } on F3NationApiException {
-      rethrow;
-    } on Object catch (error, stackTrace) {
-      developer.log(
-        'F3 Nation API request failed: $path',
-        name: 'F3NationFetcher',
-        error: error,
-        stackTrace: stackTrace,
-      );
-      throw F3NationApiException('Request to $path failed: $error');
-    } finally {
-      httpClient.close();
+      throw F3NationApiException('Request to $path failed: $e');
     }
   }
+}
 
-  Future<Map<String, Object?>> _post(
-    String path, {
-    required Map<String, Object?> body,
-  }) async {
-    final apiKey = F3NationApiKey.value;
-    if (apiKey == null || apiKey.isEmpty) {
-      throw const F3NationApiException('No F3 Nation API key is configured.');
-    }
+// Writing to the event requires the API key, which we do not want to store
+// locally, so we use a secure Cloud Function.
+Future<Map<String, Object?>> _postEventInstance(
+  Map<String, Object?> payload,
+) async {
+  try {
+    final result = await FirebaseFunctions.instance
+        .httpsCallable('postEventInstance')
+        .call(payload);
 
-    final uri = Uri.https(_f3NationApiHost, '/v1$path');
-    final httpClient = HttpClient();
-    try {
-      final request = await httpClient.postUrl(uri);
-      request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $apiKey');
-      request.headers.set('Client', _f3NationClientId);
-      request.headers.contentType = ContentType.json;
-      request.write(jsonEncode(body));
-      final response = await request.close();
-      final responseBody = await response.transform(utf8.decoder).join();
-
-      if (response.statusCode != HttpStatus.ok) {
-        throw F3NationApiException(
-          _readErrorMessage(responseBody) ?? 'Request to $path failed',
-          statusCode: response.statusCode,
-        );
-      }
-
-      final decoded = jsonDecode(responseBody);
-      if (decoded is Map<String, Object?>) {
-        return decoded;
-      }
-      throw F3NationApiException('Unexpected response format for $path');
-    } on F3NationApiException {
-      rethrow;
-    } on Object catch (error, stackTrace) {
-      developer.log(
-        'F3 Nation API request failed: $path',
-        name: 'F3NationFetcher',
-        error: error,
-        stackTrace: stackTrace,
-      );
-      throw F3NationApiException('Request to $path failed: $error');
-    } finally {
-      httpClient.close();
-    }
+    return result.data;
+  } on FirebaseFunctionsException catch (e) {
+    developer.log('Cloud Function error: ${e.code} - ${e.message}');
+    rethrow;
   }
 }
 

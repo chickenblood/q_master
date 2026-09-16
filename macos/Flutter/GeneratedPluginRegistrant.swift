@@ -7,12 +7,12 @@ import Foundation
 
 import accessing_security_scoped_resource
 import audio_session
+import cloud_functions
 import firebase_ai
 import firebase_analytics
 import firebase_app_check
 import firebase_auth
 import firebase_core
-import firebase_remote_config
 import just_audio
 import package_info_plus
 import share_plus
@@ -26,12 +26,12 @@ import zikzak_share_handler_macos
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   AccessingSecurityScopedResourcePlugin.register(with: registry.registrar(forPlugin: "AccessingSecurityScopedResourcePlugin"))
   AudioSessionPlugin.register(with: registry.registrar(forPlugin: "AudioSessionPlugin"))
+  FirebaseFunctionsPlugin.register(with: registry.registrar(forPlugin: "FirebaseFunctionsPlugin"))
   FirebaseAIPlugin.register(with: registry.registrar(forPlugin: "FirebaseAIPlugin"))
   FirebaseAnalyticsPlugin.register(with: registry.registrar(forPlugin: "FirebaseAnalyticsPlugin"))
   FirebaseAppCheckPlugin.register(with: registry.registrar(forPlugin: "FirebaseAppCheckPlugin"))
   FLTFirebaseAuthPlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseAuthPlugin"))
   FLTFirebaseCorePlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseCorePlugin"))
-  FirebaseRemoteConfigPlugin.register(with: registry.registrar(forPlugin: "FirebaseRemoteConfigPlugin"))
   JustAudioPlugin.register(with: registry.registrar(forPlugin: "JustAudioPlugin"))
   FPPPackageInfoPlusPlugin.register(with: registry.registrar(forPlugin: "FPPPackageInfoPlusPlugin"))
   SharePlusMacosPlugin.register(with: registry.registrar(forPlugin: "SharePlusMacosPlugin"))
