@@ -17,7 +17,7 @@ Create sections for the workout. Examples of good names are "Warmup",
 "Thang", and "Mary" or "Repeat 5x" (for repeated rounds). Each section should
 have a name and a list of exercises.
 Section names shoud be used for repeated circuits.
-*Never* use a repeat instruction as an exercise names.
+*Never* use a repeat instruction as an exercise name.
 Do not include any empty sections.
 
 Assume 45 minutes overall duration if the user does not specify otherwise in
