@@ -57,18 +57,29 @@ export const getEventData = onCall(
   }
 );
 
-// Call the F3 Nation API POST endpoint for creating a new event instance.
-export const postEventInstance = onCall(
+// Call the F3 Nation API POST endpoint by providing the correct URL.
+// https://api.f3nation.com/docs
+export const postEventData = onCall(
   { secrets: [f3ApiKey] },
   async (request) => {
-    const response = await fetch("https://api.f3nation.com/v1/event-instance", {
+    let url = request.data?.url;
+    if (!url) {
+      throw new HttpsError("invalid-argument", "URL must be provided.");
+    }
+
+    let payload = request.data?.payload;
+    if (!payload) {
+      throw new HttpsError("invalid-argument", "Payload must be provided.");
+    }
+
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Client": "q_master",
         "Authorization": `Bearer ${f3ApiKey.value()}`,
       },
-      body: JSON.stringify(request.data || {}),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {

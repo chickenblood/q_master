@@ -253,7 +253,7 @@ final class F3NationFetcher extends _$F3NationFetcher {
     payload['backblastRich'] = backblastRich;
     payload['backblastTs'] = DateTime.now().millisecondsSinceEpoch / 1000;
 
-    final response = await _postEventInstance(payload);
+    final response = await _post('/event-instance', payload: payload);
     return F3EventInstance.fromApiJson(response);
   }
 
@@ -278,13 +278,15 @@ final class F3NationFetcher extends _$F3NationFetcher {
 
 // Writing to the event requires the API key, which we do not want to store
 // locally, so we use a secure Cloud Function.
-Future<Map<String, Object?>> _postEventInstance(
-  Map<String, Object?> payload,
-) async {
+Future<Map<String, Object?>> _post(
+  String path, {
+  required Map<String, Object?> payload,
+}) async {
+  final uri = _buildUri(path, const {});
   try {
     final result = await FirebaseFunctions.instance
-        .httpsCallable('postEventInstance')
-        .call(payload);
+        .httpsCallable('postEventData')
+        .call({'url': uri.toString(), 'payload': payload});
 
     return result.data;
   } on FirebaseFunctionsException catch (e) {
