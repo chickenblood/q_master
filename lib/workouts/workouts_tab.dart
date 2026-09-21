@@ -208,16 +208,12 @@ class WorkoutsTab extends ConsumerWidget {
         ),
         body: workouts.isNotEmpty
             ? ReorderableListView.builder(
-                header: Theme.of(context).platform == .iOS
-                    ? SizedBox.fromSize(
-                        size: const Size.fromHeight(kToolbarHeight),
-                      )
-                    : null,
-                footer: Theme.of(context).platform == .iOS
-                    ? SizedBox.fromSize(
-                        size: const Size.fromHeight(kToolbarHeight),
-                      )
-                    : null,
+                header: SizedBox.fromSize(
+                  size: const Size.fromHeight(kToolbarHeight),
+                ),
+                footer: SizedBox.fromSize(
+                  size: const Size.fromHeight(kToolbarHeight),
+                ),
                 itemCount: workouts.length,
                 itemBuilder: (context, index) => _WorkoutTile(
                   key: ValueKey(workouts[index]),

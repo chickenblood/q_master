@@ -270,8 +270,10 @@ final class _TabWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoTabView(
-      onGenerateRoute: (_) => MaterialPageRoute(builder: (_) => child),
+    return Material(
+      child: CupertinoTabView(
+        onGenerateRoute: (_) => MaterialPageRoute(builder: (_) => child),
+      ),
     );
   }
 }
