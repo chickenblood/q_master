@@ -188,6 +188,7 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                           ? SafeArea(
                               bottom: false,
                               child: GlassTabBar.bottom(
+                                selectedIconColor: colorScheme.primary,
                                 selectedIndex: widget._tabController.index(
                                   context,
                                 ),
@@ -197,22 +198,18 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                                   GlassTab(
                                     icon: Icon(AdaptiveIcons.history),
                                     label: L10n.of(context)!.workoutsTabTitle,
-                                    glowColor: colorScheme.primary,
                                   ),
                                   GlassTab(
                                     icon: Icon(AdaptiveIcons.sports),
                                     label: L10n.of(context)!.gamesTabTitle,
-                                    glowColor: colorScheme.primary,
                                   ),
                                   GlassTab(
                                     icon: Icon(AdaptiveIcons.timer),
                                     label: L10n.of(context)!.timerPageTitle,
-                                    glowColor: colorScheme.primary,
                                   ),
                                   GlassTab(
                                     icon: Icon(AdaptiveIcons.location),
                                     label: L10n.of(context)!.nearMeTabTitle,
-                                    glowColor: colorScheme.primary,
                                   ),
                                 ],
                               ),
