@@ -1,7 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:pull_down_button/pull_down_button.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 final class AdaptiveMenuItem {
   final String text;
@@ -30,19 +29,19 @@ final class AdaptiveMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => PlatformWidget(
-    cupertino: (context, platform) => PullDownButton(
-      buttonBuilder: (_, showMenu) =>
-          CupertinoButton(onPressed: showMenu, child: icon),
-      itemBuilder: (context) => menuChildren
-          .map(
-            (item) => PullDownMenuItem(
-              title: item.text,
-              icon: item.icon,
-              isDestructive: item.isDestructive,
-              onTap: item.onPressed,
-            ),
-          )
-          .toList(),
+    cupertino: (context, platform) => GlassPullDownButton(
+      menuWidth: 250,
+      icon: icon,
+      items: [
+        ...menuChildren.map(
+          (item) => GlassMenuItem(
+            title: item.text,
+            icon: Icon(item.icon),
+            isDestructive: item.isDestructive,
+            onTap: item.onPressed,
+          ),
+        ),
+      ],
     ),
     material: (context, platform) => MenuAnchor(
       consumeOutsideTap: true,
