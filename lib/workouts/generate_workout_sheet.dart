@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:q_master/ai_clients/gemini_client.dart';
 import 'package:q_master/ui/simple_alert.dart';
 
@@ -101,10 +102,9 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformScaffold(
-      appBar: PlatformAppBar(
-        leading: PlatformIconButton(
-          padding: EdgeInsets.only(right: 22),
+    return GlassScaffold(
+      appBar: GlassAppBar(
+        leading: GlassIconButton(
           icon: Icon(AdaptiveIcons.close),
           onPressed: () => Navigator.of(context).pop(),
         ),
@@ -117,13 +117,11 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
             context,
           ).clamp(maxScaleFactor: 1.6),
         ),
-        cupertino: (appBarContext, _) =>
-            CupertinoNavigationBarData(backgroundColor: Colors.transparent),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            padding: const EdgeInsets.fromLTRB(16, kToolbarHeight + 16, 16, 16),
             child: Column(
               children: [
                 PlatformTextField(

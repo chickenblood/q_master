@@ -57,15 +57,20 @@ class NearMeTab extends StatelessWidget {
         textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.6),
       ),
       actions: [
-        GlassButton(
-          width: 44,
-          height: 44,
-          shape: LiquidRoundedSuperellipse(borderRadius: 48),
+        GlassIconButton(
           icon: Icon(PlatformIcons(context).refresh),
-          onTap: () => controller.reload(),
+          onPressed: () => controller.reload(),
         ),
       ],
     ),
-    body: SafeArea(child: WebViewWidget(controller: controller)),
+    body: SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.only(
+          top: kToolbarHeight,
+          bottom: kTextTabBarHeight,
+        ),
+        child: WebViewWidget(controller: controller),
+      ),
+    ),
   );
 }

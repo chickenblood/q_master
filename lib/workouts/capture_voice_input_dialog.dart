@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:logger/logger.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
@@ -346,27 +347,17 @@ final class _CaptureVoiceInputDialogState
   Widget build(BuildContext context) {
     final l10n = L10n.of(context)!;
 
-    return PlatformScaffold(
-      appBar: PlatformAppBar(
+    return GlassScaffold(
+      appBar: GlassAppBar(
         title: PlatformText(
           l10n.captureVoiceInputPrompt,
           style: Theme.of(
             context,
           ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
         ),
-        cupertino: (appBarContext, _) => CupertinoNavigationBarData(
-          backgroundColor: Colors.transparent,
-          leading: PlatformIconButton(
-            padding: const EdgeInsets.only(right: 22),
-            icon: Icon(AdaptiveIcons.close),
-            onPressed: _cancelAndClose,
-          ),
-        ),
-        material: (appBarContext, _) => MaterialAppBarData(
-          leading: PlatformIconButton(
-            icon: Icon(AdaptiveIcons.close),
-            onPressed: _cancelAndClose,
-          ),
+        leading: GlassIconButton(
+          icon: Icon(AdaptiveIcons.close),
+          onPressed: _cancelAndClose,
         ),
       ),
       body: SafeArea(

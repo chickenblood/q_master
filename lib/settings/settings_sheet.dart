@@ -34,11 +34,9 @@ final class SettingsGlassButton extends StatelessWidget {
   const SettingsGlassButton({super.key});
 
   @override
-  Widget build(BuildContext context) => GlassButton(
-    width: 44,
-    height: 44,
+  Widget build(BuildContext context) => GlassIconButton(
     icon: Icon(context.platformIcons.gearSolid),
-    onTap: () async {
+    onPressed: () async {
       final navigator = Navigator.of(context, rootNavigator: true);
       return showAdaptiveModalSheet(
         context: navigator.context,
@@ -228,12 +226,9 @@ class _SettingsSheet extends ConsumerWidget {
     final prefs = SharedAppPrefs.instance;
     return GlassScaffold(
       appBar: GlassAppBar(
-        toolbarHeight: kToolbarHeight,
-        leading: GlassButton(
-          width: 44,
-          height: 44,
+        leading: GlassIconButton(
           icon: Icon(AdaptiveIcons.close),
-          onTap: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           L10n.of(context)!.settingsDialogTitle,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 import '../ui/adaptive_icons.dart';
@@ -38,21 +38,20 @@ class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: PlatformScaffold(
-        material: (_, _) => MaterialScaffoldData(extendBodyBehindAppBar: true),
-        appBar: PlatformAppBar(
+      child: GlassScaffold(
+        appBar: GlassAppBar(
           backgroundColor: Colors.transparent,
-          cupertino: (_, _) => CupertinoNavigationBarData(
-            backgroundColor: Colors.transparent,
-            enableBackgroundFilterBlur: false,
-          ),
-          leading: PlatformIconButton(
+          leading: GlassIconButton(
             icon: Icon(AdaptiveIcons.close, color: Colors.white),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ),
         body: Center(
-          child: YoutubePlayer(controller: _controller, aspectRatio: 16 / 9),
+          child: YoutubePlayer(
+            controller: _controller,
+            aspectRatio: 16 / 9,
+            initParams: const YoutubePlayerParams(showControls: false),
+          ),
         ),
       ),
     );

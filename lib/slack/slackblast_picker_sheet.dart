@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/l10n.dart';
@@ -375,30 +376,31 @@ class _SlackblastPickerSheetState
   @override
   Widget build(BuildContext context) {
     final l10n = L10n.of(context)!;
-    return PlatformScaffold(
+    return GlassScaffold(
+      appBar: GlassAppBar(
+        backgroundColor: Colors.transparent,
+        leading: GlassIconButton(
+          icon: Icon(AdaptiveIcons.close),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          l10n.postToBackblastText,
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+          textScaler: MediaQuery.textScalerOf(
+            context,
+          ).clamp(maxScaleFactor: 1.6),
+        ),
+      ),
       body: SafeArea(
         child: Stack(
           children: [
             CustomScrollView(
               physics: BottomSheetScrollPhysics(),
               slivers: [
-                SliverAppBar(
-                  pinned: true,
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  leading: PlatformIconButton(
-                    padding: const EdgeInsets.only(right: 14),
-                    icon: Icon(AdaptiveIcons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  title: Text(
-                    l10n.postToBackblastText,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                    textScaler: MediaQuery.textScalerOf(
-                      context,
-                    ).clamp(maxScaleFactor: 1.6),
-                  ),
+                SliverPadding(
+                  padding: const EdgeInsets.only(top: kToolbarHeight),
                 ),
                 SliverToBoxAdapter(
                   child: SlackblastPickerSection<F3Region>(

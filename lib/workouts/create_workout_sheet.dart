@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
@@ -498,13 +499,11 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   List<Widget> _rightAppBarButtonActions(BuildContext context) {
     if (_displayMode == .display) {
       return [
-        PlatformIconButton(
-          padding: EdgeInsets.only(left: 0, right: 0),
+        GlassIconButton(
           icon: Icon(PlatformIcons(context).edit),
           onPressed: () => setState(() => _displayMode = .edit),
         ),
-        PlatformIconButton(
-          padding: EdgeInsets.only(right: 2),
+        GlassIconButton(
           icon: Icon(PlatformIcons(context).playArrowSolid),
           onPressed: () => widget.onShowBeatdownBrowser?.call(
             context,
@@ -521,8 +520,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           final isEnabled = _workoutCreationEnabled;
           final enabledColor = theme.colorScheme.primary;
           final disabledColor = theme.colorScheme.onSurfaceVariant;
-          return PlatformIconButton(
-            padding: EdgeInsets.only(right: 4),
+          return GlassIconButton(
             icon: Icon(
               PlatformIcons(context).checkMark,
               color: isEnabled ? enabledColor : disabledColor,
@@ -723,50 +721,54 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   );
 
   @override
-  Widget build(BuildContext context) => PlatformScaffold(
-    body: CustomScrollView(
-      primary: true,
-      slivers: [
-        SliverAppBar(
-          centerTitle: Theme.of(context).platform == .iOS,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          leading: PlatformIconButton(
-            icon: _displayMode == .display
-                ? Icon(PlatformIcons(context).back)
-                : Icon(AdaptiveIcons.close),
-            cupertino: (context, platform) =>
-                CupertinoIconButtonData(padding: EdgeInsets.only(right: 8)),
-            onPressed: _handleCancel,
-          ),
-          title: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              PlatformText(
-                _titleForAppBar(),
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.3,
-                ),
-                textScaler: MediaQuery.textScalerOf(
-                  context,
-                ).clamp(maxScaleFactor: 1.5),
-              ),
-              if (_displayMode == .display && _storedWorkout != null)
-                PlatformText(
-                  _storedWorkout!.date.formattedForDisplay(),
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-            ],
-          ),
-          actions: _rightAppBarButtonActions(context),
-          pinned: true,
+  Widget build(BuildContext context) => GlassScaffold(
+    appBar: GlassAppBar(
+      backgroundColor: Colors.transparent,
+      leading: GlassIconButton(
+        icon: Icon(
+          _displayMode == .display
+              ? PlatformIcons(context).back
+              : AdaptiveIcons.close,
         ),
-        ...content(context),
-        if (_displayMode == .display) _displayFooter(context),
-        // Add padding when the picker is up, so we can scroll the content
-        // above the keyboard and picker without it being obscured
-        if (_pickerIsShown) SliverFillRemaining(child: SizedBox(height: 800)),
-      ],
+        onPressed: _handleCancel,
+      ),
+      title: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          PlatformText(
+            _titleForAppBar(),
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.3,
+            ),
+            textScaler: MediaQuery.textScalerOf(
+              context,
+            ).clamp(maxScaleFactor: 1.5),
+          ),
+          if (_displayMode == .display && _storedWorkout != null)
+            PlatformText(
+              _storedWorkout!.date.formattedForDisplay(),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+        ],
+      ),
+      actions: _rightAppBarButtonActions(context),
+    ),
+    body: SafeArea(
+      child: CustomScrollView(
+        primary: true,
+        slivers: [
+          SliverPadding(padding: const EdgeInsets.only(top: kToolbarHeight)),
+          ...content(context),
+          if (_displayMode == .display) _displayFooter(context),
+          // Add padding when the picker is up, so we can scroll the content
+          // above the keyboard and picker without it being obscured
+          SliverPadding(
+            padding: const EdgeInsets.only(bottom: kTextTabBarHeight),
+          ),
+          if (_pickerIsShown) SliverFillRemaining(child: SizedBox(height: 800)),
+        ],
+      ),
     ),
   );
 

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:q_master/ui/media_query.dart';
 
 import '../l10n/l10n.dart';
@@ -24,12 +25,11 @@ final class DeckOfPainGameView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Hero(
       tag: heroTag,
-      child: PlatformScaffold(
-        iosContentPadding: true, // Fixes app bar underlap for landscape.
+      child: GlassScaffold(
         backgroundColor: Colors.black,
-        appBar: PlatformAppBar(
+        appBar: GlassAppBar(
           backgroundColor: Colors.transparent,
-          leading: PlatformIconButton(
+          leading: GlassIconButton(
             icon: Icon(AdaptiveIcons.close, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),

@@ -195,14 +195,12 @@ class WorkoutsTab extends ConsumerWidget {
             ).clamp(maxScaleFactor: 1.6),
           ),
           actions: [
-            GlassButton(
-              width: 44,
-              height: 44,
+            GlassIconButton(
               icon: Icon(
                 PlatformIcons(context).add,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
-              onTap: () => _showWorkoutCreationPicker(context, ref),
+              onPressed: () => _showWorkoutCreationPicker(context, ref),
             ),
           ],
         ),
@@ -212,7 +210,7 @@ class WorkoutsTab extends ConsumerWidget {
                   size: const Size.fromHeight(kToolbarHeight),
                 ),
                 footer: SizedBox.fromSize(
-                  size: const Size.fromHeight(kToolbarHeight),
+                  size: const Size.fromHeight(kTextTabBarHeight),
                 ),
                 itemCount: workouts.length,
                 itemBuilder: (context, index) => _WorkoutTile(

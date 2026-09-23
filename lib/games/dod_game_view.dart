@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import '../l10n/l10n.dart';
 import '../ui/adaptive_icons.dart';
@@ -16,12 +17,11 @@ final class DodGameView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Hero(
       tag: heroTag,
-      child: PlatformScaffold(
+      child: GlassScaffold(
         backgroundColor: Colors.black,
-        material: (_, _) => MaterialScaffoldData(extendBodyBehindAppBar: true),
-        appBar: PlatformAppBar(
+        appBar: GlassAppBar(
           backgroundColor: Colors.transparent,
-          leading: PlatformIconButton(
+          leading: GlassIconButton(
             icon: Icon(AdaptiveIcons.close, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),

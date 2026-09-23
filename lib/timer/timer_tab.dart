@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import '../l10n/l10n.dart';
 import '../model/timer.dart';
@@ -122,10 +123,9 @@ final class TimerScreen extends ConsumerWidget {
     final formatter = timerType == .tabata
         ? formatDuration
         : formatPreciseDuration;
-    return PlatformScaffold(
+    return GlassScaffold(
       appBar: isPortrait || isTablet
-          ? PlatformAppBar(
-              automaticallyImplyLeading: true,
+          ? GlassAppBar(
               title: Text(
                 L10n.of(context)!.timerPageTitle,
                 style: Theme.of(
@@ -135,11 +135,9 @@ final class TimerScreen extends ConsumerWidget {
                   context,
                 ).clamp(maxScaleFactor: 1.6),
               ),
-
-              cupertino: (appBarContext, _) => CupertinoNavigationBarData(
-                backgroundColor: Colors.transparent,
+              actions: [
                 // Action buttons – iOS only
-                trailing: PlatformIconButton(
+                GlassIconButton(
                   icon: Icon(
                     PlatformIcons(context).refresh,
                     color: Theme.of(
@@ -148,7 +146,7 @@ final class TimerScreen extends ConsumerWidget {
                   ),
                   onPressed: () => _resetTimer(ref),
                 ),
-              ),
+              ],
             )
           : null,
       body: SafeArea(
@@ -220,9 +218,9 @@ final class TimerScreen extends ConsumerWidget {
           ),
         },
       ),
-      material: (innerContext, _) => MaterialScaffoldData(
-        floatingActionButton: _androidResetFAB(innerContext, ref: ref),
-      ),
+      // material: (innerContext, _) => MaterialScaffoldData(
+      //   floatingActionButton: _androidResetFAB(innerContext, ref: ref),
+      // ),
     );
   }
 }

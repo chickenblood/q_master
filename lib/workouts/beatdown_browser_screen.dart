@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
@@ -121,7 +122,7 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
           pageIndex: _pageIndex.value,
           exercisesPerPage: exercisesPerPage,
         );
-        return PlatformScaffold(
+        return GlassScaffold(
           body: SafeArea(
             child: GestureDetector(
               onScaleStart: _handleScaleStart,
@@ -193,7 +194,11 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                   ),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: kTextTabBarHeight,
+                      ),
                       child: PageView.builder(
                         controller: _pageController,
                         itemCount: pages.length,
