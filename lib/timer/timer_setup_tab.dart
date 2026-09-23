@@ -125,7 +125,7 @@ class TimerSetupTab extends ConsumerWidget {
     final timer = ref.read(timerProvider.notifier);
     final prefs = SharedAppPrefs.instance;
     return GlassScaffold(
-      appBar: GlassAppBar(
+      appBar: GlassAppBar.pinned(
         title: Text(
           l10n.timerSetupTabTitle,
           style: Theme.of(
@@ -135,7 +135,7 @@ class TimerSetupTab extends ConsumerWidget {
             context,
           ).clamp(maxScaleFactor: 1.6),
         ),
-        leading: const SettingsGlassButton(),
+        leading: [settingsGlassBarItem(id: 'left_item', context: context)],
       ),
       body: SafeArea(
         bottom: true,

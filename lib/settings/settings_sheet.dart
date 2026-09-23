@@ -30,6 +30,21 @@ final class SettingsActionButton extends StatelessWidget {
   );
 }
 
+/// Button to invoke teh settings sheet.
+GlassBarItem settingsGlassBarItem({
+  required String id,
+  required BuildContext context,
+}) => GlassBarItem.icon(
+  icon: Icon(context.platformIcons.gearSolid),
+  onTap: () async {
+    final navigator = Navigator.of(context, rootNavigator: true);
+    return showAdaptiveModalSheet(
+      context: navigator.context,
+      child: const _SettingsSheet(),
+    );
+  },
+);
+
 final class SettingsGlassButton extends StatelessWidget {
   const SettingsGlassButton({super.key});
 

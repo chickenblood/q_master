@@ -182,9 +182,8 @@ class WorkoutsTab extends ConsumerWidget {
     final listNotifier = ref.read(workoutListProvider.notifier);
     return SafeArea(
       child: GlassScaffold(
-        appBar: GlassAppBar(
-          toolbarHeight: 44,
-          leading: SettingsGlassButton(),
+        appBar: GlassAppBar.pinned(
+          leading: [settingsGlassBarItem(id: 'left_item', context: context)],
           title: Text(
             L10n.of(context)!.workoutsTabTitle,
             style: Theme.of(
@@ -195,12 +194,13 @@ class WorkoutsTab extends ConsumerWidget {
             ).clamp(maxScaleFactor: 1.6),
           ),
           actions: [
-            GlassIconButton(
+            GlassBarItem.icon(
+              id: 'right_item',
               icon: Icon(
                 PlatformIcons(context).add,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
-              onPressed: () => _showWorkoutCreationPicker(context, ref),
+              onTap: () => _showWorkoutCreationPicker(context, ref),
             ),
           ],
         ),

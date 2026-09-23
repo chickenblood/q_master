@@ -47,8 +47,8 @@ class NearMeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => GlassScaffold(
-    appBar: GlassAppBar(
-      leading: const SettingsGlassButton(),
+    appBar: GlassAppBar.pinned(
+      leading: [settingsGlassBarItem(id: 'left_item', context: context)],
       title: Text(
         L10n.of(context)!.nearMeTabTitle,
         style: Theme.of(
@@ -57,9 +57,9 @@ class NearMeTab extends StatelessWidget {
         textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.6),
       ),
       actions: [
-        GlassIconButton(
+        GlassBarItem.icon(
           icon: Icon(PlatformIcons(context).refresh),
-          onPressed: () => controller.reload(),
+          onTap: () => controller.reload(),
         ),
       ],
     ),

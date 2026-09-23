@@ -69,8 +69,8 @@ class GamesTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final isLandscape = MediaQuery.orientationOf(context) == .landscape;
     return GlassScaffold(
-      appBar: GlassAppBar(
-        leading: const SettingsGlassButton(),
+      appBar: GlassAppBar.pinned(
+        leading: [settingsGlassBarItem(id: 'left_item', context: context)],
         title: Text(
           L10n.of(context)!.gamesTabTitle,
           style: Theme.of(

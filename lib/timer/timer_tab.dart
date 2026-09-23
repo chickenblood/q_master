@@ -44,6 +44,7 @@ final class TimerScreen extends ConsumerWidget {
           crossAxisAlignment: .stretch,
           mainAxisSize: .max,
           children: [
+            SizedBox(height: kToolbarHeight),
             Expanded(
               flex: 2,
               child: Column(
@@ -125,7 +126,7 @@ final class TimerScreen extends ConsumerWidget {
         : formatPreciseDuration;
     return GlassScaffold(
       appBar: isPortrait || isTablet
-          ? GlassAppBar(
+          ? GlassAppBar.pinned(
               title: Text(
                 L10n.of(context)!.timerPageTitle,
                 style: Theme.of(
@@ -137,14 +138,14 @@ final class TimerScreen extends ConsumerWidget {
               ),
               actions: [
                 // Action buttons – iOS only
-                GlassIconButton(
+                GlassBarItem.icon(
                   icon: Icon(
                     PlatformIcons(context).refresh,
                     color: Theme.of(
                       context,
                     ).colorScheme.secondary, // Red from theme
                   ),
-                  onPressed: () => _resetTimer(ref),
+                  onTap: () => _resetTimer(ref),
                 ),
               ],
             )

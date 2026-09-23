@@ -496,47 +496,44 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     ];
   }
 
-  List<Widget> _rightAppBarButtonActions(BuildContext context) {
+  List<GlassBarItem> _rightAppBarButtonItems(BuildContext context) {
     if (_displayMode == .display) {
       return [
-        GlassIconButton(
+        GlassBarItem.icon(
           icon: Icon(PlatformIcons(context).edit),
-          onPressed: () => setState(() => _displayMode = .edit),
+          onTap: () => setState(() => _displayMode = .edit),
         ),
-        GlassIconButton(
+        GlassBarItem.icon(
+          id: 'right_item',
           icon: Icon(PlatformIcons(context).playArrowSolid),
-          onPressed: () => widget.onShowBeatdownBrowser?.call(
+          onTap: () => widget.onShowBeatdownBrowser?.call(
             context,
             _buildWorkoutFromUi(),
           ),
         ),
       ];
     }
+    final theme = Theme.of(context);
+    final isEnabled = _workoutCreationEnabled;
+    final enabledColor = theme.colorScheme.primary;
+    final disabledColor = theme.colorScheme.onSurfaceVariant;
     return [
-      ListenableBuilder(
-        listenable: Listenable.merge([_nameTextController]),
-        builder: (_, _) {
-          final theme = Theme.of(context);
-          final isEnabled = _workoutCreationEnabled;
-          final enabledColor = theme.colorScheme.primary;
-          final disabledColor = theme.colorScheme.onSurfaceVariant;
-          return GlassIconButton(
-            icon: Icon(
-              PlatformIcons(context).checkMark,
-              color: isEnabled ? enabledColor : disabledColor,
-            ),
-            onPressed: isEnabled
-                ? () async {
-                    final savedWorkout = await _saveWorkout();
-                    if (!mounted) return;
-                    setState(() {
-                      _storedWorkout = savedWorkout;
-                      _displayMode = .display;
-                    });
-                  }
-                : null,
-          );
-        },
+      GlassBarItem.icon(
+        id: 'right_item',
+        icon: Icon(
+          PlatformIcons(context).checkMark,
+          color: isEnabled ? enabledColor : disabledColor,
+        ),
+        onTap: isEnabled
+            ? () async {
+                final savedWorkout = await _saveWorkout();
+                if (!mounted) return;
+                setState(() {
+                  _storedWorkout = savedWorkout;
+                  _displayMode = .display;
+                });
+              }
+            : () {},
       ),
     ];
   }
@@ -722,37 +719,43 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
 
   @override
   Widget build(BuildContext context) => GlassScaffold(
-    appBar: GlassAppBar(
-      backgroundColor: Colors.transparent,
-      leading: GlassIconButton(
-        icon: Icon(
-          _displayMode == .display
-              ? PlatformIcons(context).back
-              : AdaptiveIcons.close,
-        ),
-        onPressed: _handleCancel,
-      ),
-      title: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          PlatformText(
-            _titleForAppBar(),
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.3,
+    appBar: ListenableBuilder(
+      listenable: _nameTextController,
+      builder: (_, _) => GlassAppBar.pinned(
+        backgroundColor: Colors.transparent,
+        leading: [
+          GlassBarItem.icon(
+            id: 'left_item',
+            icon: Icon(
+              _displayMode == .display
+                  ? PlatformIcons(context).back
+                  : AdaptiveIcons.close,
             ),
-            textScaler: MediaQuery.textScalerOf(
-              context,
-            ).clamp(maxScaleFactor: 1.5),
+            onTap: _handleCancel,
           ),
-          if (_displayMode == .display && _storedWorkout != null)
-            PlatformText(
-              _storedWorkout!.date.formattedForDisplay(),
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
         ],
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            PlatformText(
+              _titleForAppBar(),
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.3,
+              ),
+              textScaler: MediaQuery.textScalerOf(
+                context,
+              ).clamp(maxScaleFactor: 1.5),
+            ),
+            if (_displayMode == .display && _storedWorkout != null)
+              PlatformText(
+                _storedWorkout!.date.formattedForDisplay(),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+          ],
+        ),
+        actions: _rightAppBarButtonItems(context),
       ),
-      actions: _rightAppBarButtonActions(context),
     ),
     body: SafeArea(
       child: CustomScrollView(
