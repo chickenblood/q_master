@@ -514,7 +514,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       ];
     }
     final theme = Theme.of(context);
-    final isEnabled = _workoutCreationEnabled;
+    final isEnabled = _storedWorkout != _buildWorkoutFromUi();
     final enabledColor = theme.colorScheme.primary;
     final disabledColor = theme.colorScheme.onSurfaceVariant;
     return [
@@ -524,6 +524,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           PlatformIcons(context).checkMark,
           color: isEnabled ? enabledColor : disabledColor,
         ),
+        enabled: isEnabled,
         onTap: isEnabled
             ? () async {
                 final savedWorkout = await _saveWorkout();

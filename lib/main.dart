@@ -138,7 +138,7 @@ final class _MainAppState extends ConsumerState<_MainApp> {
     final selectedIndex = widget._tabController.index(context);
     // We want a full screen timer on phones in landscape mode.
     final isTimerTab = Tab.values[selectedIndex] == .timer;
-    final isLandscape =
+    final isLandscape = MediaQuery.orientationOf(context) == .landscape;
 
     return isTablet || !(isTimerTab && isLandscape);
   }
