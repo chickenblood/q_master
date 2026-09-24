@@ -137,7 +137,7 @@ class _SettingsSheet extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Expanded(
-                          child: Slider.adaptive(
+                          child: GlassSlider(
                             value: prefs.exercisesPerPage.value.toDouble(),
                             min: 1,
                             max: SharedAppPrefs.maxExercisesPerPage.toDouble(),
@@ -201,18 +201,9 @@ class _SettingsSheet extends ConsumerWidget {
                   _SettingsRow(
                     label: l10n.motorboatSoundSettingsLabel,
                     labelStyle: rowLabelStyle,
-                    trailing: Switch.adaptive(
+                    trailing: GlassSwitch(
                       value: prefs.motorboatSoundEnabled.value,
-                      trackColor: WidgetStateProperty.resolveWith(
-                        (states) => states.contains(WidgetState.selected)
-                            ? Theme.of(context).colorScheme.primary
-                            : null,
-                      ),
-                      thumbColor: WidgetStateProperty.resolveWith(
-                        (states) => states.contains(WidgetState.selected)
-                            ? colorScheme.onPrimary
-                            : null,
-                      ),
+                      activeColor: Theme.of(context).colorScheme.primary,
                       onChanged: (value) =>
                           prefs.motorboatSoundEnabled.value = value,
                     ),

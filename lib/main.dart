@@ -139,7 +139,6 @@ final class _MainAppState extends ConsumerState<_MainApp> {
     // We want a full screen timer on phones in landscape mode.
     final isTimerTab = Tab.values[selectedIndex] == .timer;
     final isLandscape =
-        MediaQuery.orientationOf(context) == Orientation.landscape;
 
     return isTablet || !(isTimerTab && isLandscape);
   }
@@ -152,10 +151,7 @@ final class _MainAppState extends ConsumerState<_MainApp> {
         iosUseZeroPaddingForAppbarPlatformIcon: true,
       ),
       builder: (_) => ListenableBuilder(
-        listenable: Listenable.merge([
-          SharedAppPrefs.instance.theme,
-          widget._tabController,
-        ]),
+        listenable: SharedAppPrefs.instance.theme,
         builder: (_, _) => PlatformTheme(
           materialLightTheme: lightTheme(),
           materialDarkTheme: darkTheme(),
@@ -179,42 +175,46 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                   final colorScheme = theme.colorScheme;
 
                   return Material(
-                    child: GlassScaffold(
-                      body: _TabsContainer(
-                        selectedIndex: widget._tabController.index(context),
-                        children: tabPages,
-                      ),
-                      bottomBar: _shouldShowTabBar(context)
-                          ? SafeArea(
-                              bottom: false,
-                              child: GlassTabBar.bottom(
-                                selectedIconColor: colorScheme.primary,
-                                selectedIndex: widget._tabController.index(
-                                  context,
-                                ),
-                                onTabSelected: (index) => widget._tabController
-                                    .setIndex(context, index),
-                                tabs: [
-                                  GlassTab(
-                                    icon: Icon(AdaptiveIcons.history),
-                                    label: L10n.of(context)!.workoutsTabTitle,
-                                  ),
-                                  GlassTab(
-                                    icon: Icon(AdaptiveIcons.sports),
-                                    label: L10n.of(context)!.gamesTabTitle,
-                                  ),
-                                  GlassTab(
-                                    icon: Icon(AdaptiveIcons.timer),
-                                    label: L10n.of(context)!.timerPageTitle,
-                                  ),
-                                  GlassTab(
-                                    icon: Icon(AdaptiveIcons.location),
-                                    label: L10n.of(context)!.nearMeTabTitle,
-                                  ),
-                                ],
+                    child: ListenableBuilder(
+                      listenable: widget._tabController,
+                      builder: (_, _) => SafeArea(
+                        bottom: false,
+                        child: GlassScaffold(
+                          body: _TabsContainer(
+                            selectedIndex: widget._tabController.index(context),
+                            children: tabPages,
+                          ),
+                          bottomBar: Visibility(
+                            visible: _shouldShowTabBar(context),
+                            child: GlassTabBar.bottom(
+                              selectedIconColor: colorScheme.primary,
+                              selectedIndex: widget._tabController.index(
+                                context,
                               ),
-                            )
-                          : null,
+                              onTabSelected: (index) => widget._tabController
+                                  .setIndex(context, index),
+                              tabs: [
+                                GlassTab(
+                                  icon: Icon(AdaptiveIcons.history),
+                                  label: L10n.of(context)!.workoutsTabTitle,
+                                ),
+                                GlassTab(
+                                  icon: Icon(AdaptiveIcons.sports),
+                                  label: L10n.of(context)!.gamesTabTitle,
+                                ),
+                                GlassTab(
+                                  icon: Icon(AdaptiveIcons.timer),
+                                  label: L10n.of(context)!.timerPageTitle,
+                                ),
+                                GlassTab(
+                                  icon: Icon(AdaptiveIcons.location),
+                                  label: L10n.of(context)!.nearMeTabTitle,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   );
                 },
