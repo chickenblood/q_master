@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:stupid_simple_sheet/stupid_simple_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -70,15 +71,10 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
     // Clear text so that the user can easily add another exercise.
     widget.controller.clear();
 
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    scaffoldMessenger.showSnackBar(
-      SnackBar(
-        content: GestureDetector(
-          onTap: () => scaffoldMessenger.hideCurrentSnackBar(),
-          child: Text(L10n.of(context)!.exerciseAddedSnackbarMessage),
-        ),
-        duration: const Duration(seconds: 1),
-      ),
+    GlassToast.show(
+      context,
+      message: L10n.of(context)!.exerciseAddedSnackbarMessage,
+      type: .success,
     );
   }
 
