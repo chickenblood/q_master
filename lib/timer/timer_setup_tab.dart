@@ -188,27 +188,26 @@ class TimerSetupTab extends ConsumerWidget {
                               const SizedBox(height: 10),
                               SizedBox(
                                 width: double.infinity,
-                                child: SegmentedButton<int>(
+                                child: GlassSegmentedControl(
                                   segments: [
-                                    ButtonSegment(
-                                      value: 0,
-                                      label: Text(l10n.timerTypeStopwatchLabel),
+                                    GlassSegment(
+                                      label: l10n.timerTypeStopwatchLabel,
                                     ),
-                                    ButtonSegment(
-                                      value: 1,
-                                      label: Text(l10n.timerTypeTabataLabel),
+                                    GlassSegment(
+                                      label: l10n.timerTypeTabataLabel,
                                     ),
-                                    ButtonSegment(
-                                      value: 2,
-                                      label: Text(l10n.timerTypeCountdownLabel),
+                                    GlassSegment(
+                                      label: l10n.timerTypeCountdownLabel,
                                     ),
                                   ],
-                                  selected: {prefs.timerType.value},
-                                  onSelectionChanged: (newSelection) {
-                                    prefs.timerType.value = newSelection.single;
+                                  selectedIndex: prefs.timerType.value,
+                                  onSegmentSelected: (index) {
+                                    prefs.timerType.value = index;
                                     timer.reset();
                                   },
-                                  showSelectedIcon: false,
+                                  indicatorColor: Theme.of(
+                                    context,
+                                  ).colorScheme.primary,
                                 ),
                               ),
                             ],
