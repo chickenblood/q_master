@@ -95,16 +95,8 @@ class WorkoutsTab extends ConsumerWidget {
     WidgetRef ref,
   ) async {
     final navigator = Navigator.of(context, rootNavigator: true);
-    final colorScheme = Theme.of(context).colorScheme;
 
-    final result = await showModalBottomSheet<WorkoutCreationType>(
-      context: navigator.context,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        side: BorderSide(color: colorScheme.outlineVariant),
-      ),
-      builder: (context) => const WorkoutCreationPicker(),
-    );
+    final result = await showWorkoutCreationPicker(navigator.context);
     if (!context.mounted) return;
 
     if (result == .manual) {

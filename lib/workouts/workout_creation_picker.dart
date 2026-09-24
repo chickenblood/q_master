@@ -1,13 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import '../l10n/l10n.dart';
 import '../ui/adaptive_icons.dart';
 
 enum WorkoutCreationType { manual, generate }
 
+Future<WorkoutCreationType?> showWorkoutCreationPicker(BuildContext context) {
+  /*
+  return showModalBottomSheet<WorkoutCreationType>(
+    context: context,
+    shape: RoundedRectangleBorder(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+    ),
+    builder: (context) => const _WorkoutCreationPicker(),
+  );
+  */
+
+  return GlassSheet.show(
+    context: context,
+    builder: (_) => _WorkoutCreationPicker(),
+  );
+}
+
 /// WorkoutCreationPicker — Unified entry sheet for new workout creation
-class WorkoutCreationPicker extends StatelessWidget {
-  const WorkoutCreationPicker({super.key});
+class _WorkoutCreationPicker extends StatelessWidget {
+  const _WorkoutCreationPicker({super.key});
 
   @override
   Widget build(BuildContext context) {
