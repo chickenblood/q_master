@@ -173,28 +173,19 @@ class _SettingsSheet extends ConsumerWidget {
                     labelStyle: rowLabelStyle,
                     trailing: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 250),
-                      child: SegmentedButton<ThemeMode>(
-                        style: segmentedStyle,
-                        showSelectedIcon: false,
+                      child: GlassSegmentedControl(
                         segments: [
-                          ButtonSegment(
-                            value: ThemeMode.system,
-                            label: Text(l10n.themeSettingsSystemLabel),
-                          ),
-                          ButtonSegment(
-                            value: ThemeMode.light,
-                            label: Text(l10n.themeSettingsLightLabel),
-                          ),
-                          ButtonSegment(
-                            value: ThemeMode.dark,
-                            label: Text(l10n.themeSettingsDarkLabel),
-                          ),
+                          GlassSegment(label: l10n.themeSettingsSystemLabel),
+                          GlassSegment(label: l10n.themeSettingsLightLabel),
+                          GlassSegment(label: l10n.themeSettingsDarkLabel),
                         ],
-                        selected: {ThemeMode.values[prefs.theme.value]},
-                        onSelectionChanged: (newSelection) {
-                          prefs.theme.value = newSelection.single.index;
+                        selectedIndex:
+                            ThemeMode.values[prefs.theme.value].index,
+                        onSegmentSelected: (index) {
+                          prefs.theme.value = index;
                           timer.reset();
                         },
+                        indicatorColor: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),
