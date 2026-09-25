@@ -144,7 +144,7 @@ class TimerSetupTab extends ConsumerWidget {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(12, 56, 12, 12),
+                padding: const EdgeInsets.fromLTRB(0, 56, 0, 12),
                 child: ListenableBuilder(
                   listenable: Listenable.merge([
                     prefs.timerType,
@@ -158,185 +158,128 @@ class TimerSetupTab extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       // Mode selector
-                      Card(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.surfaceContainerHighest,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(
-                            color: Theme.of(context).colorScheme.outlineVariant,
-                          ),
+                      GlassGroupedSection(
+                        header: Text(
+                          l10n.timerModeLabel
+                              .toUpperCase(), // Localized: "Mode"
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(
+                                letterSpacing: .1,
+                                color: Theme.of(context).colorScheme.primary,
+                                textBaseline: TextBaseline.alphabetic,
+                              ),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(14),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                l10n.timerModeLabel
-                                    .toUpperCase(), // Localized: "Mode"
-                                style: Theme.of(context).textTheme.labelLarge
-                                    ?.copyWith(
-                                      letterSpacing: .1,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary,
-                                      textBaseline: TextBaseline.alphabetic,
-                                    ),
-                              ),
-                              const SizedBox(height: 10),
-                              SizedBox(
-                                width: double.infinity,
-                                child: GlassSegmentedControl(
-                                  segments: [
-                                    GlassSegment(
-                                      label: l10n.timerTypeStopwatchLabel,
-                                    ),
-                                    GlassSegment(
-                                      label: l10n.timerTypeTabataLabel,
-                                    ),
-                                    GlassSegment(
-                                      label: l10n.timerTypeCountdownLabel,
-                                    ),
-                                  ],
-                                  selectedIndex: prefs.timerType.value,
-                                  onSegmentSelected: (index) {
-                                    prefs.timerType.value = index;
-                                    timer.reset();
-                                  },
-                                  indicatorColor: Theme.of(
-                                    context,
-                                  ).colorScheme.primary,
-                                ),
-                              ),
+                        children: [
+                          GlassSegmentedControl(
+                            segments: [
+                              GlassSegment(label: l10n.timerTypeStopwatchLabel),
+                              GlassSegment(label: l10n.timerTypeTabataLabel),
+                              GlassSegment(label: l10n.timerTypeCountdownLabel),
                             ],
+                            selectedIndex: prefs.timerType.value,
+                            onSegmentSelected: (index) {
+                              prefs.timerType.value = index;
+                              timer.reset();
+                            },
+                            indicatorColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
                           ),
-                        ),
+                        ],
                       ),
                       const SizedBox(height: 10),
                       // Interval card
-                      Card(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.surfaceContainerHighest,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(
-                            color: Theme.of(context).colorScheme.outlineVariant,
-                          ),
+                      GlassGroupedSection(
+                        header: Text(
+                          l10n.timerIntervalsLabel
+                              .toUpperCase(), // Localized: "Intervals — tap to change"
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(
+                                letterSpacing: 1.0,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: .stretch,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 16,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.surface,
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.outlineVariant,
-                                  ),
-                                ),
-                              ),
-                              child: Text(
-                                l10n.timerIntervalsLabel
-                                    .toUpperCase(), // Localized: "Intervals — tap to change"
-                                style: Theme.of(context).textTheme.labelLarge
-                                    ?.copyWith(
-                                      letterSpacing: 1.0,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary,
-                                    ),
+                        children: [
+                          _IntervalSetupRow(
+                            label: l10n.timerSettingsPrepareLabel,
+                            value: formatDuration(
+                              Duration(
+                                seconds: prefs.prepareIntervalSeconds.value,
                               ),
                             ),
+                            valueColor: TimerColors.prepareFg(context),
+                            onTap: () => _showTimeIntervalPicker(
+                              context,
+                              prefs.prepareIntervalSeconds,
+                              timer,
+                            ),
+                          ),
+                          if ([
+                            TimerType.tabata.index,
+                            TimerType.countdown.index,
+                          ].contains(prefs.timerType.value))
                             _IntervalSetupRow(
-                              label: l10n.timerSettingsPrepareLabel,
+                              label: l10n.timerSettingsWorkLabel,
                               value: formatDuration(
                                 Duration(
-                                  seconds: prefs.prepareIntervalSeconds.value,
+                                  seconds: prefs.workIntervalSeconds.value,
                                 ),
                               ),
-                              valueColor: TimerColors.prepareFg(context),
+                              valueColor: TimerColors.workFg(context),
                               onTap: () => _showTimeIntervalPicker(
                                 context,
-                                prefs.prepareIntervalSeconds,
+                                prefs.workIntervalSeconds,
                                 timer,
                               ),
                             ),
-                            if ([
-                              TimerType.tabata.index,
-                              TimerType.countdown.index,
-                            ].contains(prefs.timerType.value))
-                              _IntervalSetupRow(
-                                label: l10n.timerSettingsWorkLabel,
-                                value: formatDuration(
-                                  Duration(
-                                    seconds: prefs.workIntervalSeconds.value,
-                                  ),
-                                ),
-                                valueColor: TimerColors.workFg(context),
-                                onTap: () => _showTimeIntervalPicker(
-                                  context,
-                                  prefs.workIntervalSeconds,
-                                  timer,
+                          if (prefs.timerType.value ==
+                              TimerType
+                                  .tabata
+                                  .index) // Only show rest interval for Tabata
+                            _IntervalSetupRow(
+                              label: l10n.timerSettingsRestLabel,
+                              value: formatDuration(
+                                Duration(
+                                  seconds: prefs.restIntervalSeconds.value,
                                 ),
                               ),
-                            if (prefs.timerType.value ==
-                                TimerType
-                                    .tabata
-                                    .index) // Only show rest interval for Tabata
-                              _IntervalSetupRow(
-                                label: l10n.timerSettingsRestLabel,
-                                value: formatDuration(
-                                  Duration(
-                                    seconds: prefs.restIntervalSeconds.value,
-                                  ),
-                                ),
-                                valueColor: TimerColors.restFg(context),
-                                onTap: () => _showTimeIntervalPicker(
-                                  context,
-                                  prefs.restIntervalSeconds,
-                                  timer,
-                                ),
+                              valueColor: TimerColors.restFg(context),
+                              onTap: () => _showTimeIntervalPicker(
+                                context,
+                                prefs.restIntervalSeconds,
+                                timer,
                               ),
-                            if (prefs.timerType.value ==
-                                TimerType.tabata.index) ...[
-                              _IntervalSetupRow(
-                                label: l10n.timerSettingsRoundsLabel,
-                                value: prefs.rounds.value.toString(),
-                                valueColor: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface,
-                                onTap: () => showRoundsPicker(
-                                  context,
-                                  prefs.rounds,
-                                  timer,
-                                ),
-                                showDivider: true,
+                            ),
+                          if (prefs.timerType.value ==
+                              TimerType.tabata.index) ...[
+                            _IntervalSetupRow(
+                              label: l10n.timerSettingsRoundsLabel,
+                              value: prefs.rounds.value.toString(),
+                              valueColor: Theme.of(
+                                context,
+                              ).colorScheme.onSurface,
+                              onTap: () => showRoundsPicker(
+                                context,
+                                prefs.rounds,
+                                timer,
                               ),
-                              _IntervalSetupRow(
-                                label: l10n.timerSettingsCyclesLabel,
-                                value: prefs.cycles.value.toString(),
-                                valueColor: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface,
-                                onTap: () => showCyclesPicker(
-                                  context,
-                                  prefs.cycles,
-                                  timer,
-                                ),
-                                showDivider: false,
+                              showDivider: true,
+                            ),
+                            _IntervalSetupRow(
+                              label: l10n.timerSettingsCyclesLabel,
+                              value: prefs.cycles.value.toString(),
+                              valueColor: Theme.of(
+                                context,
+                              ).colorScheme.onSurface,
+                              onTap: () => showCyclesPicker(
+                                context,
+                                prefs.cycles,
+                                timer,
                               ),
-                            ],
+                              showDivider: false,
+                            ),
                           ],
-                        ),
+                        ],
                       ),
                     ],
                   ),

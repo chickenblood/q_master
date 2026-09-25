@@ -5,7 +5,6 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../l10n/l10n.dart';
-import '../model/timer.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_modal_sheet.dart';
 import '../ui/cupertino_sheet_fork.dart';
@@ -90,10 +89,6 @@ class _SettingsSheet extends ConsumerWidget {
     required WidgetRef ref,
   }) {
     final l10n = L10n.of(context)!;
-    final timer = ref.read(timerProvider.notifier);
-    final colorScheme = Theme.of(context).colorScheme;
-    final inactiveSegmentColor = colorScheme.onSurfaceVariant;
-    final segmentBorderColor = colorScheme.outline;
     final rowValueStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
       fontSize: 16,
       fontWeight: FontWeight.w700,
@@ -102,16 +97,6 @@ class _SettingsSheet extends ConsumerWidget {
     final rowLabelStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
       fontSize: 16,
       fontWeight: FontWeight.w500,
-    );
-    final segmentedStyle = SegmentedButton.styleFrom(
-      backgroundColor: Colors.transparent,
-      foregroundColor: inactiveSegmentColor,
-      selectedForegroundColor: colorScheme.onPrimary,
-      selectedBackgroundColor: colorScheme.primary,
-      side: BorderSide(color: segmentBorderColor, width: 1.5),
-      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
-      visualDensity: VisualDensity.compact,
-      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
 
     // Timer settings removed
@@ -163,7 +148,6 @@ class _SettingsSheet extends ConsumerWidget {
                 ],
               ),
             ),
-            // Timer settings card removed
             _SettingsCard(
               header: l10n.generalSettingsTitle,
               child: Column(
@@ -183,7 +167,6 @@ class _SettingsSheet extends ConsumerWidget {
                             ThemeMode.values[prefs.theme.value].index,
                         onSegmentSelected: (index) {
                           prefs.theme.value = index;
-                          timer.reset();
                         },
                         indicatorColor: Theme.of(context).colorScheme.primary,
                       ),
@@ -262,41 +245,16 @@ final class _SettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cardBg = Theme.of(context).colorScheme.surface;
-    final cardBorder = Theme.of(context).colorScheme.outlineVariant;
-    final headerBg = Theme.of(context).colorScheme.surfaceContainerHighest;
-
-    return Container(
+    return GlassGroupedSection(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: cardBorder),
+      header: Text(
+        header.toUpperCase(),
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+          letterSpacing: 1.0,
+          color: Theme.of(context).colorScheme.primary,
+        ),
       ),
-      child: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: headerBg,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(8),
-              ),
-              border: Border(bottom: BorderSide(color: cardBorder)),
-            ),
-            child: Text(
-              header.toUpperCase(),
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                letterSpacing: 1.0,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-          ),
-          child,
-        ],
-      ),
+      children: [child],
     );
   }
 }
