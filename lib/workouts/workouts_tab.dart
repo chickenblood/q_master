@@ -175,7 +175,7 @@ class WorkoutsTab extends ConsumerWidget {
     return SafeArea(
       child: GlassScaffold(
         appBar: GlassAppBar.pinned(
-          leading: [settingsGlassBarItem(id: 'left_item', context: context)],
+          leading: [settingsGlassBarItem(id: 'left-item', context: context)],
           title: Text(
             L10n.of(context)!.workoutsTabTitle,
             style: Theme.of(

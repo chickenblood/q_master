@@ -34,6 +34,7 @@ GlassBarItem settingsGlassBarItem({
   required String id,
   required BuildContext context,
 }) => GlassBarItem.icon(
+  id: id,
   icon: Icon(context.platformIcons.gearSolid),
   onTap: () async {
     final navigator = Navigator.of(context, rootNavigator: true);
@@ -205,11 +206,14 @@ class _SettingsSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final prefs = SharedAppPrefs.instance;
     return GlassScaffold(
-      appBar: GlassAppBar(
-        leading: GlassIconButton(
-          icon: Icon(AdaptiveIcons.close),
-          onPressed: () => Navigator.pop(context),
-        ),
+      appBar: GlassAppBar.pinned(
+        leading: [
+          GlassBarItem.icon(
+            id: 'left-item',
+            icon: Icon(AdaptiveIcons.close),
+            onTap: () => Navigator.pop(context),
+          ),
+        ],
         title: Text(
           L10n.of(context)!.settingsDialogTitle,
           style: Theme.of(

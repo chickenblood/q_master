@@ -48,7 +48,7 @@ class NearMeTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) => GlassScaffold(
     appBar: GlassAppBar.pinned(
-      leading: [settingsGlassBarItem(id: 'left_item', context: context)],
+      leading: [settingsGlassBarItem(id: 'left-item', context: context)],
       title: Text(
         L10n.of(context)!.nearMeTabTitle,
         style: Theme.of(

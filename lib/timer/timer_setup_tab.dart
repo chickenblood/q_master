@@ -135,7 +135,7 @@ class TimerSetupTab extends ConsumerWidget {
             context,
           ).clamp(maxScaleFactor: 1.6),
         ),
-        leading: [settingsGlassBarItem(id: 'left_item', context: context)],
+        leading: [settingsGlassBarItem(id: 'left-item', context: context)],
       ),
       body: SafeArea(
         bottom: true,

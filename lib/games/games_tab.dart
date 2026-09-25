@@ -70,7 +70,7 @@ class GamesTab extends StatelessWidget {
     final isLandscape = MediaQuery.orientationOf(context) == .landscape;
     return GlassScaffold(
       appBar: GlassAppBar.pinned(
-        leading: [settingsGlassBarItem(id: 'left_item', context: context)],
+        leading: [settingsGlassBarItem(id: 'left-item', context: context)],
         title: Text(
           L10n.of(context)!.gamesTabTitle,
           style: Theme.of(
