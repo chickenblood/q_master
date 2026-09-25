@@ -31,6 +31,7 @@ class TimerSetupTab extends ConsumerWidget {
         constraints: BoxConstraints.tight(const Size.fromHeight(250)),
       ),
       builder: (context) => SafeArea(
+        bottom: false,
         child: CupertinoTimerPicker(
           mode: CupertinoTimerPickerMode.ms,
           alignment: Alignment.bottomCenter,
@@ -46,45 +47,11 @@ class TimerSetupTab extends ConsumerWidget {
     );
   }
 
-  void showCyclesPicker(
-    BuildContext context,
-    ValueNotifier<int> cyclesNotifier,
-    Timer timer,
-  ) {
-    showPlatformModalSheet(
-      context: context,
-      material: MaterialModalSheetData(
-        constraints: BoxConstraints.tight(const Size.fromHeight(250)),
-      ),
-      builder: (context) => SafeArea(
-        child: SizedBox(
-          height: 250,
-          child: CupertinoPicker(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            itemExtent: 60,
-            scrollController: FixedExtentScrollController(
-              initialItem: cyclesNotifier.value - 1,
-            ),
-            onSelectedItemChanged: (index) {
-              cyclesNotifier.value = index + 1;
-              timer.reset();
-            },
-            children: List.generate(
-              8,
-              (i) => Center(
-                child: Text('${i + 1}', style: const TextStyle(fontSize: 22)),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void showRoundsPicker(
+  void showIntegerPicker(
     BuildContext context,
     ValueNotifier<int> roundsNotifier,
     Timer timer,
+    int maxValue,
   ) {
     showPlatformModalSheet(
       context: context,
@@ -92,6 +59,7 @@ class TimerSetupTab extends ConsumerWidget {
         constraints: BoxConstraints.tight(const Size.fromHeight(250)),
       ),
       builder: (context) => SafeArea(
+        bottom: false,
         child: SizedBox(
           height: 250,
           child: CupertinoPicker(
@@ -105,7 +73,7 @@ class TimerSetupTab extends ConsumerWidget {
               timer.reset();
             },
             children: List.generate(
-              20,
+              maxValue,
               (i) => Center(
                 child: Text('${i + 1}', style: const TextStyle(fontSize: 22)),
               ),
@@ -258,10 +226,11 @@ class TimerSetupTab extends ConsumerWidget {
                               valueColor: Theme.of(
                                 context,
                               ).colorScheme.onSurface,
-                              onTap: () => showRoundsPicker(
+                              onTap: () => showIntegerPicker(
                                 context,
                                 prefs.rounds,
                                 timer,
+                                20,
                               ),
                               showDivider: true,
                             ),
@@ -271,10 +240,11 @@ class TimerSetupTab extends ConsumerWidget {
                               valueColor: Theme.of(
                                 context,
                               ).colorScheme.onSurface,
-                              onTap: () => showCyclesPicker(
+                              onTap: () => showIntegerPicker(
                                 context,
                                 prefs.cycles,
                                 timer,
+                                8,
                               ),
                               showDivider: false,
                             ),
@@ -291,7 +261,7 @@ class TimerSetupTab extends ConsumerWidget {
                 12,
                 0,
                 12,
-                useBottomPadding ? 68 : 0,
+                useBottomPadding ? kTextTabBarHeight + 20 : 0,
               ),
               child: SizedBox(
                 height: 62,

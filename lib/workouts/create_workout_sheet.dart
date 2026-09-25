@@ -301,50 +301,24 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
             if (_displayMode == DisplayMode.edit)
               Padding(
                 padding: _headerInsets,
-                child: PlatformTextField(
+                child: GlassTextField(
                   controller: _nameTextController,
                   enabled: _displayMode == DisplayMode.edit,
-                  textCapitalization: TextCapitalization.sentences,
+                  //textCapitalization: TextCapitalization.sentences,
                   focusNode: _focusNode,
-                  material: (_, _) => MaterialTextFieldData(
-                    decoration: InputDecoration(
-                      border: const UnderlineInputBorder(),
-                      enabledBorder: const UnderlineInputBorder(),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.primary,
-                          width: 2,
-                        ),
-                      ),
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 18),
-                    ),
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 22,
-                      letterSpacing: -0.3,
-                    ),
-                    cursorColor: Theme.of(context).colorScheme.primary,
-                    textAlign: TextAlign.left,
+                  textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 22,
+                    letterSpacing: -0.3,
                   ),
-                  cupertino: (_, _) => CupertinoTextFieldData(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Theme.of(context).colorScheme.outline,
-                          width: 1.5,
-                        ),
-                      ),
-                    ),
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 22,
-                      letterSpacing: -0.3,
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    cursorColor: Theme.of(context).colorScheme.primary,
-                    textAlign: TextAlign.left,
+                  suffixIcon: Icon(
+                    PlatformIcons(context).clear,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
+                  onSuffixTap: () {
+                    _nameTextController.clear();
+                    _focusNode.requestFocus();
+                  },
                 ),
               ),
           ]),
@@ -514,7 +488,9 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       ];
     }
     final theme = Theme.of(context);
-    final isEnabled = _storedWorkout != _buildWorkoutFromUi();
+    final isEnabled =
+        _nameTextController.text.isNotEmpty &&
+        _storedWorkout != _buildWorkoutFromUi();
     final enabledColor = theme.colorScheme.primary;
     final disabledColor = theme.colorScheme.onSurfaceVariant;
     return [
@@ -726,7 +702,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
         backgroundColor: Colors.transparent,
         leading: [
           GlassBarItem.icon(
-            id: 'left_item',
+            id: 'left-item',
             icon: Icon(
               _displayMode == .display
                   ? PlatformIcons(context).back

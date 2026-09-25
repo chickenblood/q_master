@@ -166,9 +166,7 @@ class _SettingsSheet extends ConsumerWidget {
                         ],
                         selectedIndex:
                             ThemeMode.values[prefs.theme.value].index,
-                        onSegmentSelected: (index) {
-                          prefs.theme.value = index;
-                        },
+                        onSegmentSelected: (index) => prefs.theme.value = index,
                         indicatorColor: Theme.of(context).colorScheme.primary,
                       ),
                     ),

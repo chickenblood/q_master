@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -172,51 +171,49 @@ class WorkoutsTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final workouts = ref.watch(workoutListProvider);
     final listNotifier = ref.read(workoutListProvider.notifier);
-    return SafeArea(
-      child: GlassScaffold(
-        appBar: GlassAppBar.pinned(
-          leading: [settingsGlassBarItem(id: 'left-item', context: context)],
-          title: Text(
-            L10n.of(context)!.workoutsTabTitle,
-            style: Theme.of(
-              context,
-            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-            textScaler: MediaQuery.textScalerOf(
-              context,
-            ).clamp(maxScaleFactor: 1.6),
-          ),
-          actions: [
-            GlassBarItem.icon(
-              id: 'right_item',
-              icon: Icon(
-                PlatformIcons(context).add,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              onTap: () => _showWorkoutCreationPicker(context, ref),
-            ),
-          ],
+    return GlassScaffold(
+      appBar: GlassAppBar.pinned(
+        leading: [settingsGlassBarItem(id: 'left-item', context: context)],
+        title: Text(
+          L10n.of(context)!.workoutsTabTitle,
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+          textScaler: MediaQuery.textScalerOf(
+            context,
+          ).clamp(maxScaleFactor: 1.6),
         ),
-        body: workouts.isNotEmpty
-            ? ReorderableListView.builder(
-                header: SizedBox.fromSize(
-                  size: const Size.fromHeight(kToolbarHeight),
-                ),
-                footer: SizedBox.fromSize(
-                  size: const Size.fromHeight(kTextTabBarHeight),
-                ),
-                itemCount: workouts.length,
-                itemBuilder: (context, index) => _WorkoutTile(
-                  key: ValueKey(workouts[index]),
-                  listNotifier: listNotifier,
-                  workout: workouts[index],
-                  onInvokeWorkoutEditor: _invokeWorkoutEditor,
-                  onShareWorkout: _shareWorkout,
-                  onShareToBackblast: _showSlackblastPicker,
-                ),
-                onReorderItem: listNotifier.move,
-              )
-            : _emptyContentPlaceholder(context),
+        actions: [
+          GlassBarItem.icon(
+            id: 'right_item',
+            icon: Icon(
+              PlatformIcons(context).add,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            onTap: () => _showWorkoutCreationPicker(context, ref),
+          ),
+        ],
       ),
+      body: workouts.isNotEmpty
+          ? ReorderableListView.builder(
+              header: SizedBox.fromSize(
+                size: const Size.fromHeight(kToolbarHeight),
+              ),
+              footer: SizedBox.fromSize(
+                size: const Size.fromHeight(kTextTabBarHeight),
+              ),
+              itemCount: workouts.length,
+              itemBuilder: (context, index) => _WorkoutTile(
+                key: ValueKey(workouts[index]),
+                listNotifier: listNotifier,
+                workout: workouts[index],
+                onInvokeWorkoutEditor: _invokeWorkoutEditor,
+                onShareWorkout: _shareWorkout,
+                onShareToBackblast: _showSlackblastPicker,
+              ),
+              onReorderItem: listNotifier.move,
+            )
+          : _emptyContentPlaceholder(context),
     );
   }
 }
@@ -278,7 +275,6 @@ final class _WorkoutTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const padding = EdgeInsets.symmetric(horizontal: 16, vertical: 14);
     final isIOS = Theme.of(context).platform == TargetPlatform.iOS;
     const maxSectionsToDisplayInTile = 3;
     return Column(
@@ -294,11 +290,7 @@ final class _WorkoutTile extends StatelessWidget {
           onDismissed: (direction) {
             if (direction == .endToStart) listNotifier.remove(workout);
           },
-          child: PlatformListTile(
-            material: (context, platform) =>
-                MaterialListTileData(contentPadding: padding),
-            cupertino: (context, platform) =>
-                CupertinoListTileData(padding: padding),
+          child: GlassListTile(
             title: PlatformText(
               workout.name,
               style: TextTheme.of(context).titleMedium,
@@ -331,26 +323,13 @@ final class _WorkoutTile extends StatelessWidget {
                 ),
               ],
             ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _OverflowMenu(
-                  onDuplicate: () => _duplicateWorkout(workout),
-                  onShare: (buttonContext) =>
-                      onShareWorkout(buttonContext, workout),
-                  onShareToBackblast: (buttonContext) =>
-                      onShareToBackblast(buttonContext, workout),
-                  onDelete: () => _deleteWorkout(context, workout),
-                ),
-                if (isIOS) ...[
-                  const SizedBox(width: 6),
-                  Icon(
-                    CupertinoIcons.chevron_forward,
-                    size: 18,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ],
-              ],
+            trailing: _OverflowMenu(
+              onDuplicate: () => _duplicateWorkout(workout),
+              onShare: (buttonContext) =>
+                  onShareWorkout(buttonContext, workout),
+              onShareToBackblast: (buttonContext) =>
+                  onShareToBackblast(buttonContext, workout),
+              onDelete: () => _deleteWorkout(context, workout),
             ),
             onTap: () => onInvokeWorkoutEditor(
               context,

@@ -177,15 +177,17 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                   return Material(
                     child: ListenableBuilder(
                       listenable: widget._tabController,
-                      builder: (_, _) => SafeArea(
-                        bottom: false,
-                        child: GlassScaffold(
-                          body: _TabsContainer(
+                      builder: (_, _) => GlassScaffold(
+                        body: SafeArea(
+                          child: _TabsContainer(
                             selectedIndex: widget._tabController.index(context),
                             children: tabPages,
                           ),
-                          bottomBar: Visibility(
-                            visible: _shouldShowTabBar(context),
+                        ),
+                        bottomBar: Visibility(
+                          visible: _shouldShowTabBar(context),
+                          child: SafeArea(
+                            bottom: false,
                             child: GlassTabBar.bottom(
                               selectedIconColor: colorScheme.primary,
                               selectedIndex: widget._tabController.index(

@@ -124,13 +124,13 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
             padding: const EdgeInsets.fromLTRB(16, kToolbarHeight + 16, 16, 16),
             child: Column(
               children: [
-                PlatformTextField(
+                GlassTextField(
                   controller: _promptTextController,
                   focusNode: _promptFocusNode,
                   autofocus: true,
                   textInputAction: .done,
                   maxLines: 5,
-                  hintText: L10n.of(context)!.generateWorkoutPromptHint,
+                  placeholder: L10n.of(context)!.generateWorkoutPromptHint,
                   keyboardType: .multiline,
                   onTapOutside: (event) => _promptFocusNode.unfocus(),
                   onSubmitted: (_) => _handleGenerateWorkout(),

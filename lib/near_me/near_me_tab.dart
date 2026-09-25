@@ -67,7 +67,7 @@ class NearMeTab extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(
           top: kToolbarHeight,
-          bottom: kTextTabBarHeight,
+          bottom: kTextTabBarHeight + 4,
         ),
         child: WebViewWidget(controller: controller),
       ),
