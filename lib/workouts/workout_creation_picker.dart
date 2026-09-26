@@ -6,23 +6,14 @@ import '../ui/adaptive_icons.dart';
 
 enum WorkoutCreationType { manual, generate }
 
-Future<WorkoutCreationType?> showWorkoutCreationPicker(BuildContext context) {
-  /*
-  return showModalBottomSheet<WorkoutCreationType>(
-    context: context,
-    shape: RoundedRectangleBorder(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
-    ),
-    builder: (context) => const _WorkoutCreationPicker(),
-  );
-  */
-
-  return GlassSheet.show(
-    context: context,
-    builder: (_) => _WorkoutCreationPicker(),
-  );
-}
+Future<WorkoutCreationType?> showWorkoutCreationPicker({
+  required BuildContext context,
+  required GlassMorphAnchor anchor,
+}) => GlassModalSheet.show(
+  morphFrom: anchor,
+  context: context,
+  builder: (_) => _WorkoutCreationPicker(),
+);
 
 /// WorkoutCreationPicker — Unified entry sheet for new workout creation
 class _WorkoutCreationPicker extends StatelessWidget {

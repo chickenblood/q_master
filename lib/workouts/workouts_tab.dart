@@ -22,10 +22,34 @@ import '../utils/datetime_utils.dart';
 import 'beatdown_browser_screen.dart';
 import 'create_workout_sheet.dart';
 import 'generate_workout_sheet.dart';
-import 'workout_creation_picker.dart';
+import 'workout_creation_picker.dart' as creation_picker;
 
 class WorkoutsTab extends ConsumerWidget {
   const WorkoutsTab({super.key});
+
+  /// Shows the workout creation picker modal sheet.
+  ///
+  /// [context] the build context.
+  /// [ref] the widget reference for accessing providers.
+  static Future<void> showWorkoutCreationPicker({
+    required BuildContext context,
+    required WidgetRef ref,
+    required GlassMorphAnchor anchor,
+  }) async {
+    final navigator = Navigator.of(context, rootNavigator: true);
+
+    final result = await creation_picker.showWorkoutCreationPicker(
+      context: navigator.context,
+      anchor: anchor,
+    );
+    if (!context.mounted) return;
+
+    if (result == .manual) {
+      await _invokeWorkoutEditor(context, displayMode: DisplayMode.edit);
+    } else if (result == .generate) {
+      await _showGenerateWorkoutModal(context, ref);
+    }
+  }
 
   Widget _emptyContentPlaceholder(BuildContext context) => SafeArea(
     child: Center(
@@ -63,7 +87,7 @@ class WorkoutsTab extends ConsumerWidget {
     ),
   );
 
-  Future<void> _showGenerateWorkoutModal(
+  static Future<void> _showGenerateWorkoutModal(
     BuildContext context,
     WidgetRef ref,
   ) async {
@@ -89,23 +113,10 @@ class WorkoutsTab extends ConsumerWidget {
     }
   }
 
-  Future<void> _showWorkoutCreationPicker(
+  static Future<void> _shareWorkout(
     BuildContext context,
-    WidgetRef ref,
+    Workout workout,
   ) async {
-    final navigator = Navigator.of(context, rootNavigator: true);
-
-    final result = await showWorkoutCreationPicker(navigator.context);
-    if (!context.mounted) return;
-
-    if (result == .manual) {
-      await _invokeWorkoutEditor(context, displayMode: DisplayMode.edit);
-    } else if (result == .generate) {
-      await _showGenerateWorkoutModal(context, ref);
-    }
-  }
-
-  Future<void> _shareWorkout(BuildContext context, Workout workout) async {
     // Get rect of button to present popovers from on iPad.
     final box = context.findRenderObject() as RenderBox;
     final sharePositionRect = box.localToGlobal(Offset.zero) & box.size;
@@ -133,7 +144,7 @@ class WorkoutsTab extends ConsumerWidget {
   Future<void> _showSlackblastPicker(BuildContext context, Workout workout) =>
       showSlackblastPicker(context, workout: workout);
 
-  Future<Workout?> _invokeWorkoutEditor(
+  static Future<Workout?> _invokeWorkoutEditor(
     BuildContext context, {
     Workout? workout,
     required DisplayMode displayMode,
@@ -149,8 +160,7 @@ class WorkoutsTab extends ConsumerWidget {
       ),
     ),
   );
-
-  Future<void> _showBeatdownBrowser(
+  static Future<void> _showBeatdownBrowser(
     BuildContext context,
     Workout workout,
   ) async {
@@ -183,16 +193,6 @@ class WorkoutsTab extends ConsumerWidget {
             context,
           ).clamp(maxScaleFactor: 1.6),
         ),
-        actions: [
-          GlassBarItem.icon(
-            id: 'right_item',
-            icon: Icon(
-              PlatformIcons(context).add,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-            onTap: () => _showWorkoutCreationPicker(context, ref),
-          ),
-        ],
       ),
       body: workouts.isNotEmpty
           ? ReorderableListView.builder(

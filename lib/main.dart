@@ -177,46 +177,54 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                   return Material(
                     child: ListenableBuilder(
                       listenable: widget._tabController,
-                      builder: (_, _) => GlassScaffold(
-                        body: SafeArea(
-                          child: _TabsContainer(
-                            selectedIndex: widget._tabController.index(context),
-                            children: tabPages,
-                          ),
-                        ),
-                        bottomBar: Visibility(
-                          visible: _shouldShowTabBar(context),
-                          child: SafeArea(
-                            bottom: false,
-                            child: GlassTabBar.bottom(
-                              selectedIconColor: colorScheme.primary,
-                              selectedIndex: widget._tabController.index(
-                                context,
-                              ),
-                              onTabSelected: (index) => widget._tabController
-                                  .setIndex(context, index),
-                              tabs: [
-                                GlassTab(
-                                  icon: Icon(AdaptiveIcons.history),
-                                  label: L10n.of(context)!.workoutsTabTitle,
-                                ),
-                                GlassTab(
-                                  icon: Icon(AdaptiveIcons.sports),
-                                  label: L10n.of(context)!.gamesTabTitle,
-                                ),
-                                GlassTab(
-                                  icon: Icon(AdaptiveIcons.timer),
-                                  label: L10n.of(context)!.timerPageTitle,
-                                ),
-                                GlassTab(
-                                  icon: Icon(AdaptiveIcons.location),
-                                  label: L10n.of(context)!.nearMeTabTitle,
-                                ),
-                              ],
+                      builder: (context, _) {
+                        final selectedIndex = widget._tabController.index(
+                          context,
+                        );
+                        return GlassScaffold(
+                          statusBarStyle: GlassStatusBarStyle.none,
+                          body: SafeArea(
+                            child: _TabsContainer(
+                              selectedIndex: selectedIndex,
+                              children: tabPages,
                             ),
                           ),
-                        ),
-                      ),
+                          bottomBar: Visibility(
+                            visible: _shouldShowTabBar(context),
+                            child: SafeArea(
+                              bottom: false,
+                              child: GlassTabBar.minimizable(
+                                selectedIconColor: colorScheme.primary,
+                                selectedIndex: selectedIndex,
+                                onTabSelected: (index) => widget._tabController
+                                    .setIndex(context, index),
+                                tabs: [
+                                  GlassTab(
+                                    icon: Icon(AdaptiveIcons.history),
+                                    label: L10n.of(context)!.workoutsTabTitle,
+                                  ),
+                                  GlassTab(
+                                    icon: Icon(AdaptiveIcons.sports),
+                                    label: L10n.of(context)!.gamesTabTitle,
+                                  ),
+                                  GlassTab(
+                                    icon: Icon(AdaptiveIcons.timer),
+                                    label: L10n.of(context)!.timerPageTitle,
+                                  ),
+                                  GlassTab(
+                                    icon: Icon(AdaptiveIcons.location),
+                                    label: L10n.of(context)!.nearMeTabTitle,
+                                  ),
+                                ],
+                                trailingButton:
+                                    selectedIndex == Tab.workouts.index
+                                    ? _addWorkoutButton(ref: ref)
+                                    : null,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   );
                 },
@@ -227,6 +235,25 @@ final class _MainAppState extends ConsumerState<_MainApp> {
       ),
     );
   }
+}
+
+/// A trailing button next to the tab bar for creating a new workout.
+GlassTabBarTrailingButton? _addWorkoutButton({required WidgetRef ref}) {
+  return GlassTabBarTrailingButton(
+    icon: GlassMorphTrigger(
+      builder: (context, anchor) {
+        return GestureDetector(
+          child: Icon(PlatformIcons(context).add),
+          onTap: () => WorkoutsTab.showWorkoutCreationPicker(
+            context: context,
+            ref: ref,
+            anchor: anchor,
+          ),
+        );
+      },
+    ),
+    onTap: () {},
+  );
 }
 
 // Configure the audio session to not interrupt other audio apps.
