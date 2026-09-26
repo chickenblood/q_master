@@ -291,6 +291,10 @@ final class _WorkoutTile extends StatelessWidget {
             if (direction == .endToStart) listNotifier.remove(workout);
           },
           child: GlassListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 12,
+            ),
             title: PlatformText(
               workout.name,
               style: TextTheme.of(context).titleMedium,
