@@ -74,12 +74,23 @@ class _MainApp extends ConsumerStatefulWidget with WidgetsBindingObserver {
 }
 
 final class _MainAppState extends ConsumerState<_MainApp> {
-  final tabPages = [WorkoutsTab(), GamesTab(), TimerSetupTab(), NearMeTab()];
+  final _tabPages = <Widget>[];
+  // Handle minimizing the tab bar when scrolling down.
+  final _minimizeController = GlassTabBarMinimizeController(
+    behavior: .onScrollDown,
+  );
+  final _workoutsScrollController = ScrollController();
   late final StreamSubscription<SharedMedia> _sharedMediaSubscription;
 
   @override
   void initState() {
     super.initState();
+    _tabPages.addAll([
+      WorkoutsTab(scrollController: _workoutsScrollController),
+      GamesTab(),
+      TimerSetupTab(),
+      NearMeTab(),
+    ]);
     configureReceivingShares();
   }
 
@@ -186,7 +197,7 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                             top: false,
                             child: _TabsContainer(
                               selectedIndex: selectedIndex,
-                              children: tabPages,
+                              children: _tabPages,
                             ),
                           ),
                           bottomBar: Visibility(
@@ -226,6 +237,10 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                                           anchor: anchor,
                                         )
                                       : null,
+                                  minimizeController: _minimizeController,
+                                  scrollController: _workoutsScrollController,
+                                  onMinimizedTabTap: () =>
+                                      _minimizeController.expand(),
                                 ),
                               ),
                             ),

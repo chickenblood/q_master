@@ -25,7 +25,9 @@ import 'generate_workout_sheet.dart';
 import 'workout_creation_picker.dart' as creation_picker;
 
 class WorkoutsTab extends ConsumerWidget {
-  const WorkoutsTab({super.key});
+  final ScrollController? _scrollController;
+  const WorkoutsTab({super.key, ScrollController? scrollController})
+    : _scrollController = scrollController;
 
   /// Shows the workout creation picker modal sheet.
   ///
@@ -197,6 +199,7 @@ class WorkoutsTab extends ConsumerWidget {
       body: workouts.isNotEmpty
           ? SafeArea(
               child: ReorderableListView.builder(
+                scrollController: _scrollController,
                 header: SizedBox.fromSize(
                   size: const Size.fromHeight(kToolbarHeight),
                 ),
