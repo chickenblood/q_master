@@ -17,7 +17,7 @@ Future<WorkoutCreationType?> showWorkoutCreationPicker({
 
 /// WorkoutCreationPicker — Unified entry sheet for new workout creation
 class _WorkoutCreationPicker extends StatelessWidget {
-  const _WorkoutCreationPicker({super.key});
+  const _WorkoutCreationPicker();
 
   @override
   Widget build(BuildContext context) {

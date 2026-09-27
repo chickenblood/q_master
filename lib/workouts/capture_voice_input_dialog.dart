@@ -230,8 +230,10 @@ final class _CaptureVoiceInputDialogState
       await _speechToText.listen(
         onResult: _handleSpeechResult,
         onSoundLevelChange: _handleSoundLevelChange,
-        listenFor: _maxRecordDuration,
-        pauseFor: const Duration(seconds: 2),
+        listenOptions: SpeechListenOptions(
+          listenFor: _maxRecordDuration,
+          pauseFor: const Duration(seconds: 2),
+        ),
       );
       return true;
     } on ListenFailedException catch (error, stackTrace) {
@@ -260,8 +262,10 @@ final class _CaptureVoiceInputDialogState
         await _speechToText.listen(
           onResult: _handleSpeechResult,
           onSoundLevelChange: _handleSoundLevelChange,
-          listenFor: _maxRecordDuration,
-          pauseFor: const Duration(seconds: 2),
+          listenOptions: SpeechListenOptions(
+            listenFor: _maxRecordDuration,
+            pauseFor: const Duration(seconds: 2),
+          ),
         );
         return true;
       } on ListenFailedException catch (retryError, retryStackTrace) {

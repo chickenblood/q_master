@@ -29,7 +29,7 @@ final class SettingsActionButton extends StatelessWidget {
   );
 }
 
-/// Button to invoke teh settings sheet.
+/// Button to invoke the settings sheet.
 GlassBarItem settingsGlassBarItem({
   required String id,
   required BuildContext context,

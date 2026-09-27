@@ -20,19 +20,6 @@ final class TimerScreen extends ConsumerWidget {
     await notifier.reset();
   }
 
-  // The FAB is only for Android. We use app bar actions on iOS.
-  Widget? _androidResetFAB(BuildContext context, {required WidgetRef ref}) {
-    return FloatingActionButton(
-      heroTag: 'ResetTimerFAB',
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      onPressed: () => _resetTimer(ref),
-      child: Icon(
-        PlatformIcons(context).refreshBold,
-        color: Theme.of(context).colorScheme.onPrimary, // White from theme
-      ),
-    );
-  }
-
   Widget _layoutTiles(
     L10n l10n, {
     required bool isPortrait,
