@@ -195,23 +195,25 @@ class WorkoutsTab extends ConsumerWidget {
         ),
       ),
       body: workouts.isNotEmpty
-          ? ReorderableListView.builder(
-              header: SizedBox.fromSize(
-                size: const Size.fromHeight(kToolbarHeight),
+          ? SafeArea(
+              child: ReorderableListView.builder(
+                header: SizedBox.fromSize(
+                  size: const Size.fromHeight(kToolbarHeight),
+                ),
+                footer: SizedBox.fromSize(
+                  size: const Size.fromHeight(kTextTabBarHeight),
+                ),
+                itemCount: workouts.length,
+                itemBuilder: (context, index) => _WorkoutTile(
+                  key: ValueKey(workouts[index]),
+                  listNotifier: listNotifier,
+                  workout: workouts[index],
+                  onInvokeWorkoutEditor: _invokeWorkoutEditor,
+                  onShareWorkout: _shareWorkout,
+                  onShareToBackblast: _showSlackblastPicker,
+                ),
+                onReorderItem: listNotifier.move,
               ),
-              footer: SizedBox.fromSize(
-                size: const Size.fromHeight(kTextTabBarHeight),
-              ),
-              itemCount: workouts.length,
-              itemBuilder: (context, index) => _WorkoutTile(
-                key: ValueKey(workouts[index]),
-                listNotifier: listNotifier,
-                workout: workouts[index],
-                onInvokeWorkoutEditor: _invokeWorkoutEditor,
-                onShareWorkout: _shareWorkout,
-                onShareToBackblast: _showSlackblastPicker,
-              ),
-              onReorderItem: listNotifier.move,
             )
           : _emptyContentPlaceholder(context),
     );

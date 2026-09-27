@@ -182,8 +182,8 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                           context,
                         );
                         return GlassScaffold(
-                          statusBarStyle: GlassStatusBarStyle.none,
                           body: SafeArea(
+                            top: false,
                             child: _TabsContainer(
                               selectedIndex: selectedIndex,
                               children: tabPages,
