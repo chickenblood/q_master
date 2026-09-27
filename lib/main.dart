@@ -193,33 +193,40 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                             visible: _shouldShowTabBar(context),
                             child: SafeArea(
                               bottom: false,
-                              child: GlassTabBar.minimizable(
-                                selectedIconColor: colorScheme.primary,
-                                selectedIndex: selectedIndex,
-                                onTabSelected: (index) => widget._tabController
-                                    .setIndex(context, index),
-                                tabs: [
-                                  GlassTab(
-                                    icon: Icon(AdaptiveIcons.history),
-                                    label: L10n.of(context)!.workoutsTabTitle,
-                                  ),
-                                  GlassTab(
-                                    icon: Icon(AdaptiveIcons.sports),
-                                    label: L10n.of(context)!.gamesTabTitle,
-                                  ),
-                                  GlassTab(
-                                    icon: Icon(AdaptiveIcons.timer),
-                                    label: L10n.of(context)!.timerPageTitle,
-                                  ),
-                                  GlassTab(
-                                    icon: Icon(AdaptiveIcons.location),
-                                    label: L10n.of(context)!.nearMeTabTitle,
-                                  ),
-                                ],
-                                trailingButton:
-                                    selectedIndex == Tab.workouts.index
-                                    ? _addWorkoutButton(ref: ref)
-                                    : null,
+                              child: GlassMorphTrigger(
+                                builder: (_, anchor) => GlassTabBar.minimizable(
+                                  selectedIconColor: colorScheme.primary,
+                                  selectedIndex: selectedIndex,
+                                  onTabSelected: (index) => widget
+                                      ._tabController
+                                      .setIndex(context, index),
+                                  tabs: [
+                                    GlassTab(
+                                      icon: Icon(AdaptiveIcons.history),
+                                      label: L10n.of(context)!.workoutsTabTitle,
+                                    ),
+                                    GlassTab(
+                                      icon: Icon(AdaptiveIcons.sports),
+                                      label: L10n.of(context)!.gamesTabTitle,
+                                    ),
+                                    GlassTab(
+                                      icon: Icon(AdaptiveIcons.timer),
+                                      label: L10n.of(context)!.timerPageTitle,
+                                    ),
+                                    GlassTab(
+                                      icon: Icon(AdaptiveIcons.location),
+                                      label: L10n.of(context)!.nearMeTabTitle,
+                                    ),
+                                  ],
+                                  trailingButton:
+                                      selectedIndex == Tab.workouts.index
+                                      ? _addWorkoutButton(
+                                          context: context,
+                                          ref: ref,
+                                          anchor: anchor,
+                                        )
+                                      : null,
+                                ),
                               ),
                             ),
                           ),
@@ -238,21 +245,18 @@ final class _MainAppState extends ConsumerState<_MainApp> {
 }
 
 /// A trailing button next to the tab bar for creating a new workout.
-GlassTabBarTrailingButton? _addWorkoutButton({required WidgetRef ref}) {
+GlassTabBarTrailingButton? _addWorkoutButton({
+  required BuildContext context,
+  required WidgetRef ref,
+  required GlassMorphAnchor anchor,
+}) {
   return GlassTabBarTrailingButton(
-    icon: GlassMorphTrigger(
-      builder: (context, anchor) {
-        return GestureDetector(
-          child: Icon(PlatformIcons(context).add),
-          onTap: () => WorkoutsTab.showWorkoutCreationPicker(
-            context: context,
-            ref: ref,
-            anchor: anchor,
-          ),
-        );
-      },
+    icon: Icon(PlatformIcons(context).add),
+    onTap: () => WorkoutsTab.showWorkoutCreationPicker(
+      context: context,
+      ref: ref,
+      anchor: anchor,
     ),
-    onTap: () {},
   );
 }
 
