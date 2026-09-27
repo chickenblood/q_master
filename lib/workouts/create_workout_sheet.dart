@@ -41,7 +41,7 @@ final class CreateWorkoutSheet extends ConsumerStatefulWidget {
 }
 
 final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
-  static const _headerInsets = EdgeInsets.only(left: 16.0, right: 16.0);
+  static const _headerInsets = EdgeInsets.symmetric(horizontal: 16.0);
 
   final _focusNode = FocusNode();
   final _nameTextController = TextEditingController();
@@ -109,7 +109,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
         _sections.values.any((exercises) => exercises.isNotEmpty);
   }
 
-  String _titleForAppBar() {
+  String _titleTextForAppBar() {
     if (_displayMode == DisplayMode.edit) {
       return widget.originalWorkout == null
           ? L10n.of(context)!.createWorkoutDialogTitle
@@ -296,37 +296,6 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       SliverSafeArea(
         top: false,
         bottom: false,
-        sliver: SliverList(
-          delegate: SliverChildListDelegate([
-            if (_displayMode == DisplayMode.edit)
-              Padding(
-                padding: _headerInsets,
-                child: GlassTextField(
-                  controller: _nameTextController,
-                  enabled: _displayMode == DisplayMode.edit,
-                  //textCapitalization: TextCapitalization.sentences,
-                  focusNode: _focusNode,
-                  textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 22,
-                    letterSpacing: -0.3,
-                  ),
-                  suffixIcon: Icon(
-                    PlatformIcons(context).clear,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  onSuffixTap: () {
-                    _nameTextController.clear();
-                    _focusNode.requestFocus();
-                  },
-                ),
-              ),
-          ]),
-        ),
-      ),
-      SliverSafeArea(
-        top: false,
-        bottom: false,
         sliver: SliverReorderableList(
           itemCount: sectionOrder.length,
           itemBuilder: (context, sectionIndex) {
@@ -475,7 +444,10 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       return [
         GlassBarItem.icon(
           icon: Icon(PlatformIcons(context).edit),
-          onTap: () => setState(() => _displayMode = .edit),
+          onTap: () => setState(() {
+            _displayMode = .edit;
+            _focusNode.requestFocus();
+          }),
         ),
         GlassBarItem.icon(
           id: 'right_item',
@@ -711,26 +683,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
             onTap: _handleCancel,
           ),
         ],
-        title: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            PlatformText(
-              _titleForAppBar(),
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.3,
-              ),
-              textScaler: MediaQuery.textScalerOf(
-                context,
-              ).clamp(maxScaleFactor: 1.5),
-            ),
-            if (_displayMode == .display && _storedWorkout != null)
-              PlatformText(
-                _storedWorkout!.date.formattedForDisplay(),
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-          ],
-        ),
+        title: _titleForAppBar(context),
         actions: _rightAppBarButtonItems(context),
       ),
     ),
@@ -751,6 +704,47 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       ),
     ),
   );
+
+  // Returns the title widget for the app bar based on the current display mode.
+  Widget _titleForAppBar(BuildContext context) {
+    if (_displayMode == .display) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          PlatformText(
+            _titleTextForAppBar(),
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.3,
+            ),
+            textScaler: MediaQuery.textScalerOf(
+              context,
+            ).clamp(maxScaleFactor: 1.5),
+          ),
+          if (_storedWorkout != null)
+            PlatformText(
+              _storedWorkout!.date.formattedForDisplay(),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+        ],
+      );
+    } else {
+      return Padding(
+        padding: _headerInsets,
+        child: GlassTextField(
+          controller: _nameTextController,
+          enabled: _displayMode == .edit,
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6),
+          focusNode: _focusNode,
+          textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w800,
+            fontSize: 18,
+            letterSpacing: -0.3,
+          ),
+        ),
+      );
+    }
+  }
 
   Future<Workout> _saveWorkout() async {
     final workoutToSave = _buildWorkoutFromUi().copyWith(date: DateTime.now());
