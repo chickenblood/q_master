@@ -5,9 +5,9 @@
     "@appBarTitle": {
       "description": "Main app name shown in the navigation bar."
     },
-    "workoutsTabTitle": "Beatdowns",
+    "workoutsTabTitle": "Beatdns",
     "@workoutsTabTitle": {
-      "description": "Label for the Beatdowns tab in bottom navigation."
+      "description": "Label for the Beatdowns tab in bottom navigation. Abbreviated to fit inside tab when the plus button is showing"
     },
     "gamesTabTitle": "Games",
     "@gamesTabTitle": {
