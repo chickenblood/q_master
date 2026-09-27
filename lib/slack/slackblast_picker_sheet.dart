@@ -376,115 +376,117 @@ class _SlackblastPickerSheetState
   @override
   Widget build(BuildContext context) {
     final l10n = L10n.of(context)!;
-    return GlassScaffold(
-      appBar: GlassAppBar(
-        backgroundColor: Colors.transparent,
-        leading: GlassIconButton(
-          icon: Icon(AdaptiveIcons.close),
-          onPressed: () => Navigator.pop(context),
+    return Material(
+      child: GlassScaffold(
+        appBar: GlassAppBar(
+          backgroundColor: Colors.transparent,
+          leading: GlassIconButton(
+            icon: Icon(AdaptiveIcons.close),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: PlatformText(
+            l10n.postToBackblastText,
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+            textScaler: MediaQuery.textScalerOf(
+              context,
+            ).clamp(maxScaleFactor: 1.6),
+          ),
         ),
-        title: Text(
-          l10n.postToBackblastText,
-          style: Theme.of(
-            context,
-          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-          textScaler: MediaQuery.textScalerOf(
-            context,
-          ).clamp(maxScaleFactor: 1.6),
-        ),
-      ),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            CustomScrollView(
-              physics: BottomSheetScrollPhysics(),
-              slivers: [
-                SliverPadding(
-                  padding: const EdgeInsets.only(top: kToolbarHeight),
-                ),
-                SliverToBoxAdapter(
-                  child: SlackblastPickerSection<F3Region>(
-                    title: l10n.slackblastRegionsTitle,
-                    headerChild: SlackblastSearchField(
-                      controller: _regionSearchController,
-                      focusNode: _regionSearchFocusNode,
-                      hintText: l10n.slackblastRegionSearchHint,
-                      onChanged: _updateRegionSearch,
-                    ),
-                    future: _regionsFuture,
-                    itemLabel: (region) => region.name,
-                    selectedItem: _selectedRegion,
-                    onSelect: _selectRegion,
-                    emptyLabel: l10n.slackblastRegionsEmptyLabel,
-                    errorLabel: l10n.slackblastLoadErrorMessage,
-                    onRetry: () {
-                      setState(
-                        () => _regionsFuture = _fetcher.listRegions(
-                          searchTerm: _regionSearchController.text.trim(),
-                        ),
-                      );
-                    },
+        body: SafeArea(
+          child: Stack(
+            children: [
+              CustomScrollView(
+                physics: BottomSheetScrollPhysics(),
+                slivers: [
+                  SliverPadding(
+                    padding: const EdgeInsets.only(top: kToolbarHeight),
                   ),
-                ),
-                if (_selectedRegion != null)
                   SliverToBoxAdapter(
-                    child: KeyedSubtree(
-                      key: _aoSectionKey,
-                      child: SlackblastPickerSection<F3Ao>(
-                        title: l10n.slackblastAosTitle,
-                        headerChild: SlackblastSearchField(
-                          controller: _aoSearchController,
-                          focusNode: _aoSearchFocusNode,
-                          hintText: l10n.slackblastAoSearchHint,
-                          onChanged: _updateAoSearch,
-                        ),
-                        future: _aosFuture,
-                        itemLabel: (ao) => ao.name,
-                        selectedItem: _selectedAo,
-                        onSelect: _selectAo,
-                        emptyLabel: l10n.slackblastAosEmptyLabel,
-                        errorLabel: l10n.slackblastLoadErrorMessage,
-                        onRetry: () => setState(
-                          () => _aosFuture = _fetcher.listAos(
-                            regionId: _selectedRegion!.id,
-                            searchTerm: _aoSearchController.text.trim(),
+                    child: SlackblastPickerSection<F3Region>(
+                      title: l10n.slackblastRegionsTitle,
+                      headerChild: SlackblastSearchField(
+                        controller: _regionSearchController,
+                        focusNode: _regionSearchFocusNode,
+                        hintText: l10n.slackblastRegionSearchHint,
+                        onChanged: _updateRegionSearch,
+                      ),
+                      future: _regionsFuture,
+                      itemLabel: (region) => region.name,
+                      selectedItem: _selectedRegion,
+                      onSelect: _selectRegion,
+                      emptyLabel: l10n.slackblastRegionsEmptyLabel,
+                      errorLabel: l10n.slackblastLoadErrorMessage,
+                      onRetry: () {
+                        setState(
+                          () => _regionsFuture = _fetcher.listRegions(
+                            searchTerm: _regionSearchController.text.trim(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  if (_selectedRegion != null)
+                    SliverToBoxAdapter(
+                      child: KeyedSubtree(
+                        key: _aoSectionKey,
+                        child: SlackblastPickerSection<F3Ao>(
+                          title: l10n.slackblastAosTitle,
+                          headerChild: SlackblastSearchField(
+                            controller: _aoSearchController,
+                            focusNode: _aoSearchFocusNode,
+                            hintText: l10n.slackblastAoSearchHint,
+                            onChanged: _updateAoSearch,
+                          ),
+                          future: _aosFuture,
+                          itemLabel: (ao) => ao.name,
+                          selectedItem: _selectedAo,
+                          onSelect: _selectAo,
+                          emptyLabel: l10n.slackblastAosEmptyLabel,
+                          errorLabel: l10n.slackblastLoadErrorMessage,
+                          onRetry: () => setState(
+                            () => _aosFuture = _fetcher.listAos(
+                              regionId: _selectedRegion!.id,
+                              searchTerm: _aoSearchController.text.trim(),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                if (_selectedAo != null)
-                  SliverToBoxAdapter(
-                    child: KeyedSubtree(
-                      key: _dateSectionKey,
-                      child: SlackblastPickerSection<F3EventInstanceSummary>(
-                        title: l10n.slackblastDatesTitle,
-                        future: _datesFuture,
-                        itemLabel: _eventLabel,
-                        itemTextStyle: _eventTextStyle,
-                        selectedItem: null,
-                        onSelect: _postBackblast,
-                        emptyLabel: l10n.slackblastDatesEmptyLabel,
-                        errorLabel: l10n.slackblastLoadErrorMessage,
-                        onRetry: () => setState(
-                          () => _datesFuture = _fetcher.listAvailableDates(
-                            aoOrgId: _selectedAo!.id,
+                  if (_selectedAo != null)
+                    SliverToBoxAdapter(
+                      child: KeyedSubtree(
+                        key: _dateSectionKey,
+                        child: SlackblastPickerSection<F3EventInstanceSummary>(
+                          title: l10n.slackblastDatesTitle,
+                          future: _datesFuture,
+                          itemLabel: _eventLabel,
+                          itemTextStyle: _eventTextStyle,
+                          selectedItem: null,
+                          onSelect: _postBackblast,
+                          emptyLabel: l10n.slackblastDatesEmptyLabel,
+                          errorLabel: l10n.slackblastLoadErrorMessage,
+                          onRetry: () => setState(
+                            () => _datesFuture = _fetcher.listAvailableDates(
+                              aoOrgId: _selectedAo!.id,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                const SliverToBoxAdapter(child: SizedBox(height: 24)),
-              ],
-            ),
-            if (_isPosting)
-              ColoredBox(
-                color: Theme.of(
-                  context,
-                ).colorScheme.scrim.withValues(alpha: 0.4),
-                child: const Center(child: CircularProgressIndicator()),
+                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                ],
               ),
-          ],
+              if (_isPosting)
+                ColoredBox(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.scrim.withValues(alpha: 0.4),
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+            ],
+          ),
         ),
       ),
     );
