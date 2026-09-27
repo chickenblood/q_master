@@ -378,12 +378,13 @@ class _SlackblastPickerSheetState
     final l10n = L10n.of(context)!;
     return Material(
       child: GlassScaffold(
-        appBar: GlassAppBar(
-          backgroundColor: Colors.transparent,
-          leading: GlassIconButton(
-            icon: Icon(AdaptiveIcons.close),
-            onPressed: () => Navigator.pop(context),
-          ),
+        appBar: GlassAppBar.pinned(
+          leading: [
+            GlassBarItem.icon(
+              icon: Icon(AdaptiveIcons.close),
+              onTap: () => Navigator.pop(context),
+            ),
+          ],
           title: PlatformText(
             l10n.postToBackblastText,
             style: Theme.of(
