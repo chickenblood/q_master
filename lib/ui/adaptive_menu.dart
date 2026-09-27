@@ -30,7 +30,7 @@ final class AdaptiveMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) => PlatformWidget(
     cupertino: (context, platform) => GlassPullDownButton(
-      menuWidth: 250,
+      menuWidth: 280,
       icon: icon,
       items: [
         ...menuChildren.map(
