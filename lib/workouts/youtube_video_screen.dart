@@ -39,12 +39,14 @@ class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: GlassScaffold(
-        appBar: GlassAppBar(
+        appBar: GlassAppBar.pinned(
           backgroundColor: Colors.transparent,
-          leading: GlassIconButton(
-            icon: Icon(AdaptiveIcons.close, color: Colors.white),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
+          leading: [
+            GlassBarItem.icon(
+              icon: Icon(AdaptiveIcons.close, color: Colors.white),
+              onTap: () => Navigator.of(context).pop(),
+            ),
+          ],
         ),
         body: Center(
           child: YoutubePlayer(

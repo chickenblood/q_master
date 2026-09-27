@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import '../model/exicon_fetcher.dart';
 import '../utils/text_editing_value_utils.dart';
@@ -216,48 +217,46 @@ class _WorkoutAutocompleteTextFieldState
               highlightText = '';
             }
             return Material(
-              child: SafeArea(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  reverse: widget.optionsViewOpenDirection == .up,
-                  itemCount: options.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final String option = options.elementAt(index);
-                    final startIndex = option.toLowerCase().indexOf(
-                      highlightText,
-                    );
-                    final textStyle = Theme.of(context).textTheme.titleLarge!;
-                    final title = startIndex < 0
-                        ? Text(option, style: textStyle)
-                        : RichText(
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: option.substring(0, startIndex),
-                                  style: textStyle,
+              child: ListView.builder(
+                shrinkWrap: true,
+                reverse: widget.optionsViewOpenDirection == .up,
+                itemCount: options.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final String option = options.elementAt(index);
+                  final startIndex = option.toLowerCase().indexOf(
+                    highlightText,
+                  );
+                  final textStyle = Theme.of(context).textTheme.titleLarge!;
+                  final title = startIndex < 0
+                      ? Text(option, style: textStyle)
+                      : RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: option.substring(0, startIndex),
+                                style: textStyle,
+                              ),
+                              TextSpan(
+                                text: option.substring(
+                                  startIndex,
+                                  startIndex + highlightText.length,
                                 ),
-                                TextSpan(
-                                  text: option.substring(
-                                    startIndex,
-                                    startIndex + highlightText.length,
-                                  ),
-                                  style: textStyle.copyWith(fontWeight: .bold),
+                                style: textStyle.copyWith(fontWeight: .bold),
+                              ),
+                              TextSpan(
+                                text: option.substring(
+                                  startIndex + highlightText.length,
                                 ),
-                                TextSpan(
-                                  text: option.substring(
-                                    startIndex + highlightText.length,
-                                  ),
-                                  style: textStyle,
-                                ),
-                              ],
-                            ),
-                          );
-                    return PlatformListTile(
-                      title: title,
-                      onTap: () => onSelected(option),
-                    );
-                  },
-                ),
+                                style: textStyle,
+                              ),
+                            ],
+                          ),
+                        );
+                  return GlassListTile(
+                    title: title,
+                    onTap: () => onSelected(option),
+                  );
+                },
               ),
             );
           },

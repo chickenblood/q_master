@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
-import 'package:stupid_simple_sheet/stupid_simple_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/l10n.dart';
@@ -24,13 +23,14 @@ Future<String?> showExercisePicker(
   final controller = TextEditingController(text: text)
     ..selection = TextSelection(baseOffset: 0, extentOffset: text?.length ?? 0);
 
-  return Navigator.of(context, rootNavigator: true).push(
-    StupidSimpleSheetRoute(
-      snappingConfig: SheetSnappingConfig([0.7, 1.0], initialSnap: 0.7),
-      child: _ExercisePickerSheet(
-        controller: controller,
-        onExerciseAdded: onExerciseAdded,
-      ), // You control all styling
+  return GlassModalSheet.show(
+    context: context,
+    useRootNavigator: true,
+    dragIndicatorWidth: 64,
+    fullSize: 0.95,
+    builder: (context) => _ExercisePickerSheet(
+      controller: controller,
+      onExerciseAdded: onExerciseAdded,
     ),
   );
 }
@@ -51,15 +51,15 @@ class _ExercisePickerSheet extends ConsumerStatefulWidget {
 
 class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
   static const _orderedFilterCategories = <ExerciseCategory>[
-    ExerciseCategory.core,
-    ExerciseCategory.cardio,
-    ExerciseCategory.strength,
-    ExerciseCategory.chest,
-    ExerciseCategory.shoulders,
-    ExerciseCategory.legs,
-    ExerciseCategory.arms,
-    ExerciseCategory.coupon,
-    ExerciseCategory.fullBody,
+    .core,
+    .cardio,
+    .strength,
+    .chest,
+    .shoulders,
+    .legs,
+    .arms,
+    .coupon,
+    .fullBody,
   ];
 
   bool _canAdd = false;
@@ -233,20 +233,6 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
           return selectedTagKeys.every(exercise.filterTagKeys.contains);
         })
         .toList(growable: false);
-  }
-
-  Widget _dragHandle() {
-    final bottomSheetTheme = Theme.of(context).bottomSheetTheme;
-    final dragHandleSize = bottomSheetTheme.dragHandleSize ?? const Size(60, 4);
-    return Container(
-      width: dragHandleSize.width,
-      height: dragHandleSize.height,
-      margin: const EdgeInsets.only(top: 12, bottom: 12),
-      decoration: BoxDecoration(
-        color: bottomSheetTheme.dragHandleColor!,
-        borderRadius: BorderRadius.circular(2),
-      ),
-    );
   }
 
   Widget _filterChips(
@@ -478,7 +464,6 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
   Widget build(BuildContext context) {
     final isLandscape = MediaQuery.orientationOf(context) == .landscape;
     final gridColumnCount = isLandscape ? 4 : 2;
-    final colorScheme = Theme.of(context).colorScheme;
     final exiconEntries = ref.watch(exiconFetcherProvider);
     final catalog = exiconEntries.maybeWhen(
       data: buildWorkoutCatalog,
@@ -492,19 +477,9 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
       selectedTagKeys: selectedTagKeys,
     );
 
-    return SafeArea(
-      // Add additional top padding to allow the content behind to be visible
-      // when adding a new exercise to the list.
-      minimum: const EdgeInsets.only(top: 180),
-      bottom: false,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: SheetBackground(
-          shape: RoundedRectangleBorder(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            side: BorderSide(color: colorScheme.outlineVariant),
-          ),
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+    return GlassScaffold(
+      body: Material(
+        child: SafeArea(
           child: Column(
             children: [
               Padding(
@@ -512,7 +487,6 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
                 child: Column(
                   mainAxisSize: .min,
                   children: [
-                    _dragHandle(),
                     Row(
                       children: [
                         Expanded(
@@ -562,6 +536,7 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
               ),
               Expanded(
                 child: CustomScrollView(
+                  shrinkWrap: true,
                   slivers: [
                     exiconEntries.when(
                       data: (_) {
@@ -587,6 +562,7 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
 
                         return SliverSafeArea(
                           bottom: true,
+                          minimum: const EdgeInsets.only(bottom: 60),
                           sliver: _exerciseGrid(
                             context,
                             gridColumnCount: gridColumnCount,
