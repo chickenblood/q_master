@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer' as developer;
 
 import 'package:cloud_functions/cloud_functions.dart';
@@ -312,18 +311,6 @@ Uri _buildUri(String path, Map<String, Object?> queryParameters) {
 }
 
 DateTime _dateOnly(DateTime date) => DateTime(date.year, date.month, date.day);
-
-String? _readErrorMessage(String body) {
-  try {
-    final decoded = jsonDecode(body);
-    if (decoded is Map<String, Object?>) {
-      return _readString(decoded, 'message');
-    }
-  } on FormatException {
-    // Fall through to null below.
-  }
-  return null;
-}
 
 List<Map<String, Object?>> _readList(Map<String, Object?> json, String key) {
   final value = json[key];

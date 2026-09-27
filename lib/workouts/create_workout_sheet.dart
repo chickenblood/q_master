@@ -104,11 +104,6 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     );
   }
 
-  bool get _workoutCreationEnabled {
-    return _nameTextController.text.trim().isNotEmpty &&
-        _sections.values.any((exercises) => exercises.isNotEmpty);
-  }
-
   String _titleTextForAppBar() {
     if (_displayMode == DisplayMode.edit) {
       return widget.originalWorkout == null

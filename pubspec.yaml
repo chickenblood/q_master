@@ -1,7 +1,7 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 3.4.1+569
+version: 3.4.1+570
 
 environment:
   sdk: ^3.10.0
@@ -12,7 +12,7 @@ dependencies: # keep sorted alphabetically
   auto_size_text: ^3.0.0
   cloud_functions: ^6.5.0
   cupertino_icons: ^1.0.2
-  dots_indicator: ^4.0.1
+  dots_indicator: ^5.0.0
   firebase_ai: ^4.0.0
   firebase_analytics: ^12.5.0
   firebase_core: ^4.14.0
@@ -31,9 +31,8 @@ dependencies: # keep sorted alphabetically
   logger: ^2.6.2
   package_info_plus: ^10.2.1
   path_provider: ^2.1.5
-  pull_down_button: ^0.10.2
-  riverpod: ^3.4.3
-  riverpod_annotation: ^4.0.7
+  riverpod: ^3.0.1
+  riverpod_annotation: ^4.0.0
   shake: ^3.0.0
   share_plus: ^13.3.0
   shared_preferences: ^2.5.4
