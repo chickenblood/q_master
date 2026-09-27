@@ -100,8 +100,6 @@ class _SettingsSheet extends ConsumerWidget {
       fontWeight: FontWeight.w500,
     );
 
-    // Timer settings removed
-
     return ListenableBuilder(
       listenable: prefs,
       builder: (_, _) => SliverPadding(
@@ -247,16 +245,41 @@ final class _SettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassGroupedSection(
+    final cardBg = Theme.of(context).colorScheme.surface;
+    final cardBorder = Theme.of(context).colorScheme.outlineVariant;
+    final headerBg = Theme.of(context).colorScheme.surfaceContainerHighest;
+
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      header: Text(
-        header.toUpperCase(),
-        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-          letterSpacing: 1.0,
-          color: Theme.of(context).colorScheme.primary,
-        ),
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: cardBorder),
       ),
-      children: [child],
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: headerBg,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(8),
+              ),
+              border: Border(bottom: BorderSide(color: cardBorder)),
+            ),
+            child: Text(
+              header.toUpperCase(),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                letterSpacing: 1.0,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+          child,
+        ],
+      ),
     );
   }
 }
