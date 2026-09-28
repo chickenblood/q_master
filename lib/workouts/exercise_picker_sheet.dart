@@ -270,7 +270,7 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
                     fontWeight: .w700,
                     color: selectedTagKeys.contains(tag.key)
                         ? colorScheme.onPrimary
-                        : colorScheme.onSurfaceVariant,
+                        : colorScheme.onSurface,
                   ),
                   selectedColor: colorScheme.primary,
                 ),
@@ -287,14 +287,14 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
                   size: 18,
                   color: _videoFilter
                       ? colorScheme.onPrimary
-                      : colorScheme.onSurfaceVariant,
+                      : colorScheme.onSurface,
                 ),
                 labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
                   fontSize: 12,
                   fontWeight: .w700,
                   color: _videoFilter
                       ? colorScheme.onPrimary
-                      : colorScheme.onSurfaceVariant,
+                      : colorScheme.onSurface,
                 ),
                 selectedColor: colorScheme.primary,
               ),
@@ -348,90 +348,98 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
     required List<WorkoutCatalogExercise> exercises,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    return SliverGrid(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: gridColumnCount,
-        crossAxisSpacing: 0,
-        mainAxisSpacing: 0,
-        mainAxisExtent: 72,
-      ),
-      delegate: SliverChildBuilderDelegate((context, index) {
-        if (index >= exercises.length) {
-          return null;
-        }
-        final exercise = exercises[index];
-        final exerciseName = exercise.name;
-        final videoUrl = exercise.videoUrl;
-        final hasVideo = videoUrl != null;
-        final description = exercise.description;
-        final hasDescription =
-            description != null && description.trim().isNotEmpty;
-        final isSelected = widget.controller.text == exerciseName;
+    return SliverPadding(
+      // Allow a margin for the frame of the GlassModalSheet to show.
+      padding: const EdgeInsets.symmetric(horizontal: 1),
+      sliver: SliverGrid(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: gridColumnCount,
+          crossAxisSpacing: 0,
+          mainAxisSpacing: 0,
+          mainAxisExtent: 72,
+        ),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          if (index >= exercises.length) {
+            return null;
+          }
+          final exercise = exercises[index];
+          final exerciseName = exercise.name;
+          final videoUrl = exercise.videoUrl;
+          final hasVideo = videoUrl != null;
+          final description = exercise.description;
+          final hasDescription =
+              description != null && description.trim().isNotEmpty;
+          final isSelected = widget.controller.text == exerciseName;
 
-        return GestureDetector(
-          onTap: () => _selectExercise(context, exerciseName),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.zero,
-              border: Border.all(
-                width: isSelected ? 2 : 1,
-                color: isSelected ? colorScheme.primary : colorScheme.outline,
+          return GestureDetector(
+            onTap: () => _selectExercise(context, exerciseName),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.zero,
+                border: Border.all(
+                  width: isSelected ? 2 : 1,
+                  color: isSelected ? colorScheme.primary : colorScheme.outline,
+                ),
               ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Row(
-                crossAxisAlignment: .center,
-                children: [
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: AutoSizeText(
-                        exerciseName,
-                        maxLines: 2,
-                        minFontSize: 11,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          backgroundColor: Colors.transparent,
-                          color: isSelected
-                              ? colorScheme.primary
-                              : colorScheme.onSurface,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                  crossAxisAlignment: .center,
+                  children: [
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: AutoSizeText(
+                          exerciseName,
+                          maxLines: 2,
+                          minFontSize: 11,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                backgroundColor: Colors.transparent,
+                                color: isSelected
+                                    ? colorScheme.primary
+                                    : colorScheme.onSurface,
+                              ),
                         ),
                       ),
                     ),
-                  ),
-                  if (hasVideo || hasDescription)
-                    IconButton(
-                      onPressed: () => hasVideo
-                          ? _openExerciseVideo(context, videoUrl)
-                          : _showExerciseDescription(
-                              context,
-                              exerciseName,
-                              description!,
-                            ),
-                      constraints: const BoxConstraints(
-                        minWidth: 52,
-                        minHeight: 52,
+                    if (hasVideo || hasDescription)
+                      IconButton(
+                        onPressed: () => hasVideo
+                            ? _openExerciseVideo(context, videoUrl)
+                            : _showExerciseDescription(
+                                context,
+                                exerciseName,
+                                description!,
+                              ),
+                        constraints: const BoxConstraints(
+                          minWidth: 52,
+                          minHeight: 52,
+                        ),
+                        visualDensity: VisualDensity.compact,
+                        style: IconButton.styleFrom(
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          foregroundColor: isSelected
+                              ? colorScheme.primary
+                              : colorScheme.onSurface,
+                        ),
+                        icon: Icon(
+                          color: isSelected
+                              ? colorScheme.primary
+                              : colorScheme.onSurface,
+                          hasVideo ? Icons.ondemand_video : AdaptiveIcons.notes,
+                          size: 26,
+                        ),
                       ),
-                      visualDensity: VisualDensity.compact,
-                      style: IconButton.styleFrom(
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        foregroundColor: isSelected
-                            ? colorScheme.primary
-                            : colorScheme.onSurface,
-                      ),
-                      icon: Icon(
-                        hasVideo ? Icons.ondemand_video : AdaptiveIcons.notes,
-                        size: 26,
-                      ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      }),
+          );
+        }),
+      ),
     );
   }
 
