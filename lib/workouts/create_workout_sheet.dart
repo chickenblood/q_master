@@ -345,51 +345,52 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                                     sectionGroup: sectionGroup,
                                   )
                                 : null,
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 5, 8, 5),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Expanded(
-                                    child: PlatformListTile(
-                                      key: ValueKey(
-                                        'exercise_$exercise$exerciseIndex',
-                                      ),
-                                      title: Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          exercise,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge
-                                              ?.copyWith(
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                          maxLines: 2,
-                                          overflow: .ellipsis,
-                                          textAlign: .left,
+                            child: ReorderableDelayedDragStartListener(
+                              enabled: _displayMode == .edit,
+                              index: exerciseIndex,
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(16, 5, 8, 5),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      child: PlatformListTile(
+                                        key: ValueKey(
+                                          'exercise_$exercise$exerciseIndex',
                                         ),
+                                        title: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            exercise,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                            maxLines: 2,
+                                            overflow: .ellipsis,
+                                            textAlign: .left,
+                                          ),
+                                        ),
+                                        material: (context, platform) =>
+                                            MaterialListTileData(
+                                              contentPadding: EdgeInsets.only(
+                                                left: 0,
+                                                right: 8,
+                                              ),
+                                            ),
+                                        cupertino: (context, platform) =>
+                                            CupertinoListTileData(
+                                              padding: EdgeInsets.only(
+                                                left: 0,
+                                                right: 8,
+                                              ),
+                                            ),
                                       ),
-                                      material: (context, platform) =>
-                                          MaterialListTileData(
-                                            contentPadding: EdgeInsets.only(
-                                              left: 0,
-                                              right: 8,
-                                            ),
-                                          ),
-                                      cupertino: (context, platform) =>
-                                          CupertinoListTileData(
-                                            padding: EdgeInsets.only(
-                                              left: 0,
-                                              right: 8,
-                                            ),
-                                          ),
                                     ),
-                                  ),
-                                  if (_displayMode == DisplayMode.edit)
-                                    ReorderableDelayedDragStartListener(
-                                      index: exerciseIndex,
-                                      child: Padding(
+                                    if (_displayMode == DisplayMode.edit)
+                                      Padding(
                                         padding: const EdgeInsets.only(
                                           right: 6.0,
                                         ),
@@ -401,8 +402,8 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                                           size: 24,
                                         ),
                                       ),
-                                    ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           );
