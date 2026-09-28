@@ -27,7 +27,8 @@ Future<String?> showExercisePicker(
     context: context,
     useRootNavigator: true,
     dragIndicatorWidth: 64,
-    fullSize: 0.95,
+    halfSize: 0.6,
+    fullSize: 0.9,
     builder: (context) => _ExercisePickerSheet(
       controller: controller,
       onExerciseAdded: onExerciseAdded,
@@ -259,12 +260,11 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
             runSpacing: 8,
             children: [
               for (final tag in availableTags)
-                FilterChip(
-                  label: Text(tag.label),
+                GlassChip(
+                  label: tag.label,
                   selected: selectedTagKeys.contains(tag.key),
-                  onSelected: (_) =>
+                  onTap: () =>
                       _toggleTag(tag, availableTagKeys: availableTagKeys),
-                  showCheckmark: false,
                   labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
                     fontSize: 12,
                     fontWeight: .w700,
@@ -272,29 +272,17 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
                         ? colorScheme.onPrimary
                         : colorScheme.onSurfaceVariant,
                   ),
-                  backgroundColor: colorScheme.surfaceContainerHighest,
                   selectedColor: colorScheme.primary,
-                  side: BorderSide(
-                    width: 1.5,
-                    color: selectedTagKeys.contains(tag.key)
-                        ? colorScheme.primary
-                        : colorScheme.outlineVariant,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  materialTapTargetSize: .shrinkWrap,
                 ),
-              FilterChip(
-                label: Text(L10n.of(context)!.exerciseFilterVideoLabel),
+              GlassChip(
+                label: L10n.of(context)!.exerciseFilterVideoLabel,
                 selected: _videoFilter,
-                onSelected: (_) => setState(() {
+                onTap: () => setState(() {
                   _videoFilter = !_videoFilter;
                   SharedAppPrefs.instance.exerciseVideoFilter.value =
                       _videoFilter;
                 }),
-                showCheckmark: false,
-                avatar: Icon(
+                icon: Icon(
                   Icons.ondemand_video,
                   size: 18,
                   color: _videoFilter
@@ -308,18 +296,7 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
                       ? colorScheme.onPrimary
                       : colorScheme.onSurfaceVariant,
                 ),
-                backgroundColor: colorScheme.surfaceContainerHighest,
                 selectedColor: colorScheme.primary,
-                side: BorderSide(
-                  width: 1.5,
-                  color: _videoFilter
-                      ? colorScheme.primary
-                      : colorScheme.outlineVariant,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                materialTapTargetSize: .shrinkWrap,
               ),
             ],
           ),
@@ -395,9 +372,6 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
           onTap: () => _selectExercise(context, exerciseName),
           child: Container(
             decoration: BoxDecoration(
-              color: isSelected
-                  ? colorScheme.primary.withValues(alpha: 0.12)
-                  : colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.zero,
               border: Border.all(
                 width: isSelected ? 2 : 1,
@@ -407,7 +381,7 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: .center,
                 children: [
                   Expanded(
                     child: Align(
@@ -419,6 +393,7 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w800,
+                          backgroundColor: Colors.transparent,
                           color: isSelected
                               ? colorScheme.primary
                               : colorScheme.onSurface,
@@ -478,8 +453,9 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
     );
 
     return GlassScaffold(
-      body: Material(
-        child: SafeArea(
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: AdaptiveLiquidGlassLayer(
           child: Column(
             children: [
               Padding(
@@ -536,7 +512,6 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
               ),
               Expanded(
                 child: CustomScrollView(
-                  shrinkWrap: true,
                   slivers: [
                     exiconEntries.when(
                       data: (_) {
