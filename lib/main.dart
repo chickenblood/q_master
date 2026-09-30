@@ -19,6 +19,8 @@ import 'near_me/near_me_tab.dart';
 import 'theme/theme.dart';
 import 'timer/timer_setup_tab.dart';
 import 'ui/adaptive_icons.dart';
+import 'ui/adaptive_scaffold.dart';
+import 'ui/adaptive_tab_bar.dart';
 import 'ui/media_query.dart';
 import 'ui/simple_alert.dart';
 import 'utils/shared_app_prefs.dart';
@@ -192,7 +194,7 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                         final selectedIndex = widget._tabController.index(
                           context,
                         );
-                        return GlassScaffold(
+                        return AdaptiveScaffold(
                           body: SafeArea(
                             top: false,
                             child: _TabsContainer(
@@ -205,31 +207,31 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                             child: SafeArea(
                               bottom: false,
                               child: GlassMorphTrigger(
-                                builder: (_, anchor) => GlassTabBar.minimizable(
+                                builder: (_, anchor) => AdaptiveTabBar(
                                   selectedIconColor: colorScheme.primary,
                                   selectedIndex: selectedIndex,
                                   onTabSelected: (index) => widget
                                       ._tabController
                                       .setIndex(context, index),
-                                  tabs: [
-                                    GlassTab(
+                                  items: [
+                                    AdaptiveTabItem(
                                       icon: Icon(AdaptiveIcons.history),
                                       label: L10n.of(context)!.workoutsTabTitle,
                                     ),
-                                    GlassTab(
+                                    AdaptiveTabItem(
                                       icon: Icon(AdaptiveIcons.sports),
                                       label: L10n.of(context)!.gamesTabTitle,
                                     ),
-                                    GlassTab(
+                                    AdaptiveTabItem(
                                       icon: Icon(AdaptiveIcons.timer),
                                       label: L10n.of(context)!.timerPageTitle,
                                     ),
-                                    GlassTab(
+                                    AdaptiveTabItem(
                                       icon: Icon(AdaptiveIcons.location),
                                       label: L10n.of(context)!.nearMeTabTitle,
                                     ),
                                   ],
-                                  trailingButton:
+                                  accessoryActionButton:
                                       selectedIndex == Tab.workouts.index
                                       ? _addWorkoutButton(
                                           context: context,
@@ -237,10 +239,7 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                                           anchor: anchor,
                                         )
                                       : null,
-                                  minimizeController: _minimizeController,
                                   scrollController: _workoutsScrollController,
-                                  onMinimizedTabTap: () =>
-                                      _minimizeController.expand(),
                                 ),
                               ),
                             ),
@@ -260,12 +259,12 @@ final class _MainAppState extends ConsumerState<_MainApp> {
 }
 
 /// A trailing button next to the tab bar for creating a new workout.
-GlassTabBarTrailingButton? _addWorkoutButton({
+AdaptiveAccessoryActionButton? _addWorkoutButton({
   required BuildContext context,
   required WidgetRef ref,
   required GlassMorphAnchor anchor,
 }) {
-  return GlassTabBarTrailingButton(
+  return AdaptiveAccessoryActionButton(
     icon: Icon(PlatformIcons(context).add),
     onTap: () => WorkoutsTab.showWorkoutCreationPicker(
       context: context,
