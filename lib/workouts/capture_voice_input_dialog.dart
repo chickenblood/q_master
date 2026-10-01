@@ -14,6 +14,7 @@ import 'package:speech_to_text/speech_to_text.dart';
 import '../l10n/l10n.dart';
 import '../ui/action_button.dart';
 import '../ui/adaptive_icons.dart';
+import '../utils/audio_session_coordinator.dart';
 
 const _waveformBarCount = 14;
 const _waveformMinLevel = 0.12;
@@ -115,7 +116,12 @@ final class _CaptureVoiceInputDialogState
   Future<void> _playCue(AudioPlayer player) async {
     try {
       await player.seek(Duration.zero);
-      await player.play();
+      AudioSessionCoordinator.instance.markPlaybackStarted();
+      try {
+        await player.play();
+      } finally {
+        await AudioSessionCoordinator.instance.markPlaybackEnded();
+      }
     } catch (_) {
       // Non-critical UX cue: ignore playback failures.
     }

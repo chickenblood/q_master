@@ -6,6 +6,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../utils/audio_session_coordinator.dart';
 import '../utils/shared_app_prefs.dart';
 
 part 'timer.freezed.dart';
@@ -178,7 +179,12 @@ final class Timer extends _$Timer {
 
   Future<void> _playSound(AudioPlayer player) async {
     await player.seek(Duration.zero);
-    player.play();
+    AudioSessionCoordinator.instance.markPlaybackStarted();
+    async.unawaited(
+      player.play().whenComplete(
+        AudioSessionCoordinator.instance.markPlaybackEnded,
+      ),
+    );
   }
 
   /// Play countdown chimes (3, 2, 1) and final chime based on remaining time.
@@ -193,7 +199,12 @@ final class Timer extends _$Timer {
       if (remainingSeconds == i && _countdownTrackers[phase] != i) {
         // Seek positions: 0=first chime, 1=second, 2=third, 3=final chime
         await _countdownChimePlayer.seek(Duration(seconds: 3 - i));
-        await _countdownChimePlayer.play();
+        AudioSessionCoordinator.instance.markPlaybackStarted();
+        try {
+          await _countdownChimePlayer.play();
+        } finally {
+          await AudioSessionCoordinator.instance.markPlaybackEnded();
+        }
         _countdownTrackers[phase] = i;
       }
     }

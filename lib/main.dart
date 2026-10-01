@@ -284,7 +284,7 @@ Future<void> _configureAudioSession() async {
       avAudioSessionCategoryOptions: .duckOthers,
       avAudioSessionMode: .defaultMode,
       avAudioSessionRouteSharingPolicy: .defaultPolicy,
-      avAudioSessionSetActiveOptions: .none,
+      avAudioSessionSetActiveOptions: .notifyOthersOnDeactivation,
       androidAudioAttributes: const AndroidAudioAttributes(
         contentType: .sonification,
         flags: .none,
