@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:q_master/ai_clients/gemini_client.dart';
+import 'package:q_master/ui/adaptive_app_bar.dart';
 import 'package:q_master/ui/simple_alert.dart';
 
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
 import '../ui/action_button.dart';
 import '../ui/adaptive_icons.dart';
+import '../ui/adaptive_scaffold.dart';
 import 'capture_voice_input_dialog.dart';
 
 final class GenerateWorkoutSheet extends StatefulWidget {
@@ -102,12 +104,14 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return GlassScaffold(
-      appBar: GlassAppBar(
-        leading: GlassIconButton(
-          icon: Icon(AdaptiveIcons.close),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+    return AdaptiveScaffold(
+      appBar: AdaptiveAppBar(
+        leading: [
+          AdaptiveAppBarItem(
+            icon: Icon(AdaptiveIcons.close),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
         title: Text(
           L10n.of(context)!.generateWorkoutDialogTitle,
           style: Theme.of(

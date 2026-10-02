@@ -2,12 +2,13 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import '../l10n/l10n.dart';
 import '../model/timer.dart';
 import '../theme/theme.dart';
+import '../ui/adaptive_app_bar.dart';
 import '../ui/adaptive_icons.dart';
+import '../ui/adaptive_scaffold.dart';
 import '../ui/media_query.dart';
 import '../utils/datetime_utils.dart';
 
@@ -111,9 +112,9 @@ final class TimerScreen extends ConsumerWidget {
     final formatter = timerType == .tabata
         ? formatDuration
         : formatPreciseDuration;
-    return GlassScaffold(
+    return AdaptiveScaffold(
       appBar: isPortrait || isTablet
-          ? GlassAppBar.pinned(
+          ? AdaptiveAppBar(
               title: Text(
                 L10n.of(context)!.timerPageTitle,
                 style: Theme.of(
@@ -125,14 +126,14 @@ final class TimerScreen extends ConsumerWidget {
               ),
               actions: [
                 // Action buttons – iOS only
-                GlassBarItem.icon(
+                AdaptiveAppBarItem(
                   icon: Icon(
                     PlatformIcons(context).refresh,
                     color: Theme.of(
                       context,
                     ).colorScheme.secondary, // Red from theme
                   ),
-                  onTap: () => _resetTimer(ref),
+                  onPressed: () => _resetTimer(ref),
                 ),
               ],
             )

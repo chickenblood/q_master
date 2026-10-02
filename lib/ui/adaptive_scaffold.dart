@@ -14,12 +14,14 @@ final class AdaptiveScaffold extends StatelessWidget {
   final AdaptiveAppBar? appBar;
   final Widget body;
   final AdaptiveTabBar? bottomBar;
+  final Color backgroundColor;
 
   const AdaptiveScaffold({
     super.key,
     required this.body,
     this.appBar,
     this.bottomBar,
+    this.backgroundColor = Colors.transparent,
   });
 
   @override
@@ -30,6 +32,7 @@ final class AdaptiveScaffold extends StatelessWidget {
           : null;
       return Scaffold(
         appBar: appBar,
+        backgroundColor: backgroundColor,
         body: body,
         bottomNavigationBar: bottomBar,
         floatingActionButton: accessoryActionButton != null
@@ -42,7 +45,11 @@ final class AdaptiveScaffold extends StatelessWidget {
             : null,
       );
     },
-    cupertino: (_, _) =>
-        GlassScaffold(appBar: appBar, body: body, bottomBar: bottomBar),
+    cupertino: (_, _) => GlassScaffold(
+      appBar: appBar,
+      backgroundColor: backgroundColor,
+      body: body,
+      bottomBar: bottomBar,
+    ),
   );
 }

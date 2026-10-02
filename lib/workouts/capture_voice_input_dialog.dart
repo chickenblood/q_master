@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:logger/logger.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
@@ -13,7 +12,9 @@ import 'package:speech_to_text/speech_to_text.dart';
 
 import '../l10n/l10n.dart';
 import '../ui/action_button.dart';
+import '../ui/adaptive_app_bar.dart';
 import '../ui/adaptive_icons.dart';
+import '../ui/adaptive_scaffold.dart';
 import '../utils/audio_session_coordinator.dart';
 
 const _waveformBarCount = 14;
@@ -357,18 +358,20 @@ final class _CaptureVoiceInputDialogState
   Widget build(BuildContext context) {
     final l10n = L10n.of(context)!;
 
-    return GlassScaffold(
-      appBar: GlassAppBar(
+    return AdaptiveScaffold(
+      appBar: AdaptiveAppBar(
         title: PlatformText(
           l10n.captureVoiceInputPrompt,
           style: Theme.of(
             context,
           ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
         ),
-        leading: GlassIconButton(
-          icon: Icon(AdaptiveIcons.close),
-          onPressed: _cancelAndClose,
-        ),
+        leading: [
+          AdaptiveAppBarItem(
+            icon: Icon(AdaptiveIcons.close),
+            onPressed: _cancelAndClose,
+          ),
+        ],
       ),
       body: SafeArea(
         child: Stack(

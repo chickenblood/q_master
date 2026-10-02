@@ -5,38 +5,21 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../l10n/l10n.dart';
+import '../ui/adaptive_app_bar.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_modal_sheet.dart';
+import '../ui/adaptive_scaffold.dart';
 import '../ui/cupertino_sheet_fork.dart';
 import '../utils/shared_app_prefs.dart';
 
-final class SettingsActionButton extends StatelessWidget {
-  const SettingsActionButton({super.key});
-
-  @override
-  Widget build(BuildContext context) => PlatformIconButton(
-    padding: Theme.of(context).platform == TargetPlatform.iOS
-        ? EdgeInsets.only(right: 24)
-        : EdgeInsets.only(right: 10),
-    icon: Icon(context.platformIcons.gearSolid),
-    onPressed: () async {
-      final navigator = Navigator.of(context, rootNavigator: true);
-      return showAdaptiveModalSheet(
-        context: navigator.context,
-        child: const _SettingsSheet(),
-      );
-    },
-  );
-}
-
 /// Button to invoke the settings sheet.
-GlassBarItem settingsGlassBarItem({
+AdaptiveAppBarItem settingsGlassBarItem({
   required String id,
   required BuildContext context,
-}) => GlassBarItem.icon(
+}) => AdaptiveAppBarItem(
   id: id,
   icon: Icon(context.platformIcons.gearSolid),
-  onTap: () async {
+  onPressed: () async {
     final navigator = Navigator.of(context, rootNavigator: true);
     return showAdaptiveModalSheet(
       context: navigator.context,
@@ -44,22 +27,6 @@ GlassBarItem settingsGlassBarItem({
     );
   },
 );
-
-final class SettingsGlassButton extends StatelessWidget {
-  const SettingsGlassButton({super.key});
-
-  @override
-  Widget build(BuildContext context) => GlassIconButton(
-    icon: Icon(context.platformIcons.gearSolid),
-    onPressed: () async {
-      final navigator = Navigator.of(context, rootNavigator: true);
-      return showAdaptiveModalSheet(
-        context: navigator.context,
-        child: const _SettingsSheet(),
-      );
-    },
-  );
-}
 
 class _SettingsSheet extends ConsumerWidget {
   const _SettingsSheet();
@@ -201,13 +168,13 @@ class _SettingsSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final prefs = SharedAppPrefs.instance;
-    return GlassScaffold(
-      appBar: GlassAppBar.pinned(
+    return AdaptiveScaffold(
+      appBar: AdaptiveAppBar(
         leading: [
-          GlassBarItem.icon(
+          AdaptiveAppBarItem(
             id: 'left-item',
             icon: Icon(AdaptiveIcons.close),
-            onTap: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(context),
           ),
         ],
         title: Text(

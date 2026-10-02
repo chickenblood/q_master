@@ -3,13 +3,14 @@ import 'dart:math';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:q_master/ui/media_query.dart';
 
 import '../l10n/l10n.dart';
 import '../model/deck_of_pain.dart';
 import '../model/pain_card.dart';
+import '../ui/adaptive_app_bar.dart';
 import '../ui/adaptive_icons.dart';
+import '../ui/adaptive_scaffold.dart';
 
 const _defaultDeckOfPainHeroTag = 'deck_of_pain_game';
 
@@ -25,14 +26,15 @@ final class DeckOfPainGameView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Hero(
       tag: heroTag,
-      child: GlassScaffold(
-        backgroundColor: Colors.black,
-        appBar: GlassAppBar(
+      child: AdaptiveScaffold(
+        appBar: AdaptiveAppBar(
           backgroundColor: Colors.transparent,
-          leading: GlassIconButton(
-            icon: Icon(AdaptiveIcons.close, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
-          ),
+          leading: [
+            AdaptiveAppBarItem(
+              icon: Icon(AdaptiveIcons.close, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
           title: PlatformText(
             L10n.of(context)!.dopGameScreenTitle,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(

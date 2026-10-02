@@ -2,10 +2,10 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
+import '../ui/adaptive_scaffold.dart';
 import '../utils/shared_app_prefs.dart';
 
 // Use theme colorScheme.primary for accent color
@@ -122,7 +122,7 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
           pageIndex: _pageIndex.value,
           exercisesPerPage: exercisesPerPage,
         );
-        return GlassScaffold(
+        return AdaptiveScaffold(
           body: SafeArea(
             child: GestureDetector(
               onScaleStart: _handleScaleStart,

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
+import '../ui/adaptive_app_bar.dart';
 import '../ui/adaptive_icons.dart';
+import '../ui/adaptive_scaffold.dart';
 
 class YoutubeVideoScreen extends StatefulWidget {
   final String videoId;
@@ -38,13 +39,13 @@ class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: GlassScaffold(
-        appBar: GlassAppBar.pinned(
+      child: AdaptiveScaffold(
+        appBar: AdaptiveAppBar(
           backgroundColor: Colors.transparent,
           leading: [
-            GlassBarItem.icon(
+            AdaptiveAppBarItem(
               icon: Icon(AdaptiveIcons.close, color: Colors.white),
-              onTap: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(context).pop(),
             ),
           ],
         ),

@@ -5,13 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import 'package:q_master/settings/settings_sheet.dart';
 import 'package:q_master/utils/shared_app_prefs.dart';
 
 import '../l10n/l10n.dart';
 import '../model/timer.dart';
-import '../settings/settings_sheet.dart';
 import '../theme/theme.dart';
 import '../ui/action_button.dart';
+import '../ui/adaptive_app_bar.dart';
+import '../ui/adaptive_scaffold.dart';
 import '../ui/media_query.dart';
 import '../utils/datetime_utils.dart';
 import 'timer_tab.dart';
@@ -92,8 +94,8 @@ class TimerSetupTab extends ConsumerWidget {
     final l10n = L10n.of(context)!;
     final timer = ref.read(timerProvider.notifier);
     final prefs = SharedAppPrefs.instance;
-    return GlassScaffold(
-      appBar: GlassAppBar.pinned(
+    return AdaptiveScaffold(
+      appBar: AdaptiveAppBar(
         title: Text(
           l10n.timerSetupTabTitle,
           style: Theme.of(

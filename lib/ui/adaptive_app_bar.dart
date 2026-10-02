@@ -6,12 +6,12 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 ///
 /// Each item has an optional [label], a required [icon], an optional [id],
 /// and a required [onPressed] callback.
-final class AdaptiveBarItem {
+final class AdaptiveAppBarItem {
   final String? label;
   final Widget icon;
   final Object? id;
-  final VoidCallback onPressed;
-  const AdaptiveBarItem({
+  final VoidCallback? onPressed;
+  const AdaptiveAppBarItem({
     this.label,
     required this.icon,
     this.id,
@@ -28,14 +28,16 @@ final class AdaptiveBarItem {
 final class AdaptiveAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   final Widget? title;
-  final List<AdaptiveBarItem> leading;
-  final List<AdaptiveBarItem> actions;
+  final List<AdaptiveAppBarItem> leading;
+  final List<AdaptiveAppBarItem> actions;
+  final Color backgroundColor;
 
   const AdaptiveAppBar({
     super.key,
     this.title,
     this.leading = const [],
     this.actions = const [],
+    this.backgroundColor = Colors.transparent,
   });
 
   // TODO: This could be wrong.
@@ -53,25 +55,35 @@ final class AdaptiveAppBar extends StatelessWidget
           .toList();
       return AppBar(
         title: title,
-        leading: Row(children: leadingItems),
+        leading: leadingItems.isNotEmpty ? Row(children: leadingItems) : null,
         actions: actionsItems,
+        backgroundColor: backgroundColor,
       );
     },
     cupertino: (_, _) {
       final leadingItems = leading
           .map(
-            (item) => GlassBarItem.icon(icon: item.icon, onTap: item.onPressed),
+            (item) => GlassBarItem.icon(
+              icon: item.icon,
+              enabled: item.onPressed != null,
+              onTap: item.onPressed ?? () {},
+            ),
           )
           .toList();
       final actionsItems = actions
           .map(
-            (item) => GlassBarItem.icon(icon: item.icon, onTap: item.onPressed),
+            (item) => GlassBarItem.icon(
+              icon: item.icon,
+              enabled: item.onPressed != null,
+              onTap: item.onPressed ?? () {},
+            ),
           )
           .toList();
       return GlassAppBar.pinned(
         title: title,
         leading: leadingItems,
         actions: actionsItems,
+        backgroundColor: backgroundColor,
       );
     },
   );

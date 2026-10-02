@@ -4,11 +4,12 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../l10n/l10n.dart';
 import '../settings/settings_sheet.dart';
+import '../ui/adaptive_app_bar.dart';
+import '../ui/adaptive_scaffold.dart';
 import '../ui/media_query.dart';
 import 'deck_of_pain_game_view.dart';
 import 'dod_game_view.dart';
@@ -68,8 +69,8 @@ class GamesTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLandscape = MediaQuery.orientationOf(context) == .landscape;
-    return GlassScaffold(
-      appBar: GlassAppBar.pinned(
+    return AdaptiveScaffold(
+      appBar: AdaptiveAppBar(
         leading: [settingsGlassBarItem(id: 'left-item', context: context)],
         title: Text(
           L10n.of(context)!.gamesTabTitle,

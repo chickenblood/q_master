@@ -4,15 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/l10n.dart';
 import '../model/f3_nation_fetcher.dart';
 import '../model/formatted_workout.dart';
 import '../model/workout.dart';
+import '../ui/adaptive_app_bar.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_modal_sheet.dart';
+import '../ui/adaptive_scaffold.dart';
 import '../ui/cupertino_sheet_fork.dart';
 import '../ui/simple_alert.dart';
 import '../utils/shared_app_prefs.dart';
@@ -377,12 +378,12 @@ class _SlackblastPickerSheetState
   Widget build(BuildContext context) {
     final l10n = L10n.of(context)!;
     return Material(
-      child: GlassScaffold(
-        appBar: GlassAppBar.pinned(
+      child: AdaptiveScaffold(
+        appBar: AdaptiveAppBar(
           leading: [
-            GlassBarItem.icon(
+            AdaptiveAppBarItem(
               icon: Icon(AdaptiveIcons.close),
-              onTap: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(context),
             ),
           ],
           title: PlatformText(

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import '../l10n/l10n.dart';
+import '../ui/adaptive_app_bar.dart';
 import '../ui/adaptive_icons.dart';
+import '../ui/adaptive_scaffold.dart';
 import 'dodecahedron_shader.dart';
 
 const _defaultDodHeroTag = 'dod_game';
@@ -17,14 +18,16 @@ final class DodGameView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Hero(
       tag: heroTag,
-      child: GlassScaffold(
+      child: AdaptiveScaffold(
         backgroundColor: Colors.black,
-        appBar: GlassAppBar(
+        appBar: AdaptiveAppBar(
           backgroundColor: Colors.transparent,
-          leading: GlassIconButton(
-            icon: Icon(AdaptiveIcons.close, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
-          ),
+          leading: [
+            AdaptiveAppBarItem(
+              icon: Icon(AdaptiveIcons.close, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
           title: PlatformText(
             L10n.of(context)!.dodShakeToRollDiceMessage,
             textScaler: MediaQuery.textScalerOf(

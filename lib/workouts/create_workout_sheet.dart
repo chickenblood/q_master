@@ -9,7 +9,9 @@ import '../model/workout.dart';
 import '../model/workout_list.dart';
 import '../theme/theme.dart';
 import '../ui/action_button.dart';
+import '../ui/adaptive_app_bar.dart';
 import '../ui/adaptive_icons.dart';
+import '../ui/adaptive_scaffold.dart';
 import '../ui/dismissible_row.dart';
 import '../utils/datetime_utils.dart';
 import 'exercise_picker_sheet.dart';
@@ -435,20 +437,20 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     ];
   }
 
-  List<GlassBarItem> _rightAppBarButtonItems(BuildContext context) {
+  List<AdaptiveAppBarItem> _rightAppBarButtonItems(BuildContext context) {
     if (_displayMode == .display) {
       return [
-        GlassBarItem.icon(
+        AdaptiveAppBarItem(
           icon: Icon(PlatformIcons(context).edit),
-          onTap: () => setState(() {
+          onPressed: () => setState(() {
             _displayMode = .edit;
             _focusNode.requestFocus();
           }),
         ),
-        GlassBarItem.icon(
+        AdaptiveAppBarItem(
           id: 'right_item',
           icon: Icon(PlatformIcons(context).playArrowSolid),
-          onTap: () => widget.onShowBeatdownBrowser?.call(
+          onPressed: () => widget.onShowBeatdownBrowser?.call(
             context,
             _buildWorkoutFromUi(),
           ),
@@ -462,14 +464,13 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     final enabledColor = theme.colorScheme.primary;
     final disabledColor = theme.colorScheme.onSurfaceVariant;
     return [
-      GlassBarItem.icon(
+      AdaptiveAppBarItem(
         id: 'right_item',
         icon: Icon(
           PlatformIcons(context).checkMark,
           color: isEnabled ? enabledColor : disabledColor,
         ),
-        enabled: isEnabled,
-        onTap: isEnabled
+        onPressed: isEnabled
             ? () async {
                 final savedWorkout = await _saveWorkout();
                 if (!mounted) return;
@@ -478,7 +479,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                   _displayMode = .display;
                 });
               }
-            : () {},
+            : null,
       ),
     ];
   }
@@ -663,40 +664,41 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   );
 
   @override
-  Widget build(BuildContext context) => GlassScaffold(
-    appBar: ListenableBuilder(
-      listenable: _nameTextController,
-      builder: (_, _) => GlassAppBar.pinned(
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: _nameTextController,
+    builder: (_, _) => AdaptiveScaffold(
+      appBar: AdaptiveAppBar(
         backgroundColor: Colors.transparent,
         leading: [
-          GlassBarItem.icon(
+          AdaptiveAppBarItem(
             id: 'left-item',
             icon: Icon(
               _displayMode == .display
                   ? PlatformIcons(context).back
                   : AdaptiveIcons.close,
             ),
-            onTap: _handleCancel,
+            onPressed: _handleCancel,
           ),
         ],
         title: _titleForAppBar(context),
         actions: _rightAppBarButtonItems(context),
       ),
-    ),
-    body: SafeArea(
-      child: CustomScrollView(
-        primary: true,
-        slivers: [
-          SliverPadding(padding: const EdgeInsets.only(top: kToolbarHeight)),
-          ...content(context),
-          if (_displayMode == .display) _displayFooter(context),
-          // Add padding when the picker is up, so we can scroll the content
-          // above the keyboard and picker without it being obscured
-          SliverPadding(
-            padding: const EdgeInsets.only(bottom: kTextTabBarHeight),
-          ),
-          if (_pickerIsShown) SliverFillRemaining(child: SizedBox(height: 800)),
-        ],
+      body: SafeArea(
+        child: CustomScrollView(
+          primary: true,
+          slivers: [
+            SliverPadding(padding: const EdgeInsets.only(top: kToolbarHeight)),
+            ...content(context),
+            if (_displayMode == .display) _displayFooter(context),
+            // Add padding when the picker is up, so we can scroll the content
+            // above the keyboard and picker without it being obscured
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: kTextTabBarHeight),
+            ),
+            if (_pickerIsShown)
+              SliverFillRemaining(child: SizedBox(height: 800)),
+          ],
+        ),
       ),
     ),
   );

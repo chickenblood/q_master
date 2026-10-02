@@ -13,9 +13,11 @@ import '../model/workout.dart';
 import '../model/workout_list.dart';
 import '../settings/settings_sheet.dart';
 import '../slack/slackblast_picker_sheet.dart';
+import '../ui/adaptive_app_bar.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_menu.dart';
 import '../ui/adaptive_modal_sheet.dart';
+import '../ui/adaptive_scaffold.dart';
 import '../ui/dismissible_row.dart';
 import '../ui/menu_icons.dart';
 import '../utils/datetime_utils.dart';
@@ -183,8 +185,8 @@ class WorkoutsTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final workouts = ref.watch(workoutListProvider);
     final listNotifier = ref.read(workoutListProvider.notifier);
-    return GlassScaffold(
-      appBar: GlassAppBar.pinned(
+    return AdaptiveScaffold(
+      appBar: AdaptiveAppBar(
         leading: [settingsGlassBarItem(id: 'left-item', context: context)],
         title: Text(
           L10n.of(context)!.workoutsTabTitle,

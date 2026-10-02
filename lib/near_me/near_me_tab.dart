@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 import '../l10n/l10n.dart';
 import '../settings/settings_sheet.dart';
+import '../ui/adaptive_app_bar.dart';
+import '../ui/adaptive_scaffold.dart';
 
 class NearMeTab extends StatelessWidget {
   final controller = WebViewController()
@@ -46,8 +47,8 @@ class NearMeTab extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => GlassScaffold(
-    appBar: GlassAppBar.pinned(
+  Widget build(BuildContext context) => AdaptiveScaffold(
+    appBar: AdaptiveAppBar(
       leading: [settingsGlassBarItem(id: 'left-item', context: context)],
       title: Text(
         L10n.of(context)!.nearMeTabTitle,
@@ -57,9 +58,9 @@ class NearMeTab extends StatelessWidget {
         textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.6),
       ),
       actions: [
-        GlassBarItem.icon(
+        AdaptiveAppBarItem(
           icon: Icon(PlatformIcons(context).refresh),
-          onTap: () => controller.reload(),
+          onPressed: () => controller.reload(),
         ),
       ],
     ),
