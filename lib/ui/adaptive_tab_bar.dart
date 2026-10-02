@@ -58,9 +58,15 @@ final class AdaptiveTabBar extends StatelessWidget {
         unselectedItemColor: unselectedIconColor,
       ),
       cupertino: (_, _) => GlassMorphTrigger(
-        builder: (_, anchor) => GlassTabBar.minimizable(
+        builder: (innerContext, anchor) => GlassTabBar.minimizable(
           tabs: items
-              .map((item) => GlassTab(icon: item.icon, label: item.label))
+              .map(
+                (item) => GlassTab(
+                  icon: item.icon,
+                  label: item.label,
+                  glowColor: Theme.of(innerContext).colorScheme.primary,
+                ),
+              )
               .toList(),
           selectedIndex: selectedIndex,
           onTabSelected: onTabSelected,

@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:q_master/settings/settings_sheet.dart';
 import 'package:q_master/utils/shared_app_prefs.dart';
 
@@ -12,8 +11,7 @@ import '../l10n/l10n.dart';
 import '../model/timer.dart';
 import '../theme/theme.dart';
 import '../ui/action_button.dart';
-import '../ui/adaptive_app_bar.dart';
-import '../ui/adaptive_scaffold.dart';
+import '../ui/adaptive_widgets.dart';
 import '../ui/media_query.dart';
 import '../utils/datetime_utils.dart';
 import 'timer_tab.dart';
@@ -158,15 +156,15 @@ class TimerSetupTab extends ConsumerWidget {
                               const SizedBox(height: 10),
                               SizedBox(
                                 width: double.infinity,
-                                child: GlassSegmentedControl(
+                                child: AdaptiveSegmentedControl(
                                   segments: [
-                                    GlassSegment(
+                                    AdaptiveSegment(
                                       label: l10n.timerTypeStopwatchLabel,
                                     ),
-                                    GlassSegment(
+                                    AdaptiveSegment(
                                       label: l10n.timerTypeTabataLabel,
                                     ),
-                                    GlassSegment(
+                                    AdaptiveSegment(
                                       label: l10n.timerTypeCountdownLabel,
                                     ),
                                   ],
@@ -175,9 +173,6 @@ class TimerSetupTab extends ConsumerWidget {
                                     prefs.timerType.value = index;
                                     timer.reset();
                                   },
-                                  indicatorColor: Theme.of(
-                                    context,
-                                  ).colorScheme.primary,
                                 ),
                               ),
                             ],

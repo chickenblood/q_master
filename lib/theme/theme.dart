@@ -343,7 +343,7 @@ ThemeData darkTheme() {
           TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
         ),
         padding: const WidgetStatePropertyAll(
-          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         ),
         visualDensity: VisualDensity.compact,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -519,6 +519,11 @@ ThemeData lightTheme() {
         textStyle: const WidgetStatePropertyAll(
           TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
         ),
+        padding: const WidgetStatePropertyAll(
+          EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        ),
+        visualDensity: VisualDensity.compact,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     ),
     chipTheme: ChipThemeData(

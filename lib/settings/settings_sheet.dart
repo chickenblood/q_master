@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../l10n/l10n.dart';
@@ -120,16 +119,15 @@ class _SettingsSheet extends ConsumerWidget {
                     labelStyle: rowLabelStyle,
                     trailing: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 250),
-                      child: GlassSegmentedControl(
+                      child: AdaptiveSegmentedControl(
                         segments: [
-                          GlassSegment(label: l10n.themeSettingsSystemLabel),
-                          GlassSegment(label: l10n.themeSettingsLightLabel),
-                          GlassSegment(label: l10n.themeSettingsDarkLabel),
+                          AdaptiveSegment(label: l10n.themeSettingsSystemLabel),
+                          AdaptiveSegment(label: l10n.themeSettingsLightLabel),
+                          AdaptiveSegment(label: l10n.themeSettingsDarkLabel),
                         ],
                         selectedIndex:
                             ThemeMode.values[prefs.theme.value].index,
                         onSegmentSelected: (index) => prefs.theme.value = index,
-                        indicatorColor: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),

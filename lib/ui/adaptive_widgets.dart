@@ -4,6 +4,7 @@ export './adaptive_icons.dart';
 export './adaptive_menu.dart';
 export './adaptive_modal_sheet.dart';
 export './adaptive_scaffold.dart';
+export './adaptive_segmented_control.dart';
 export './adaptive_slider.dart';
 export './adaptive_switch.dart';
 export './adaptive_tab_bar.dart';
