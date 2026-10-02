@@ -18,6 +18,7 @@ import 'model/workout_list.dart';
 import 'near_me/near_me_tab.dart';
 import 'theme/theme.dart';
 import 'timer/timer_setup_tab.dart';
+import 'ui/adaptive_accessory_action_item.dart';
 import 'ui/adaptive_icons.dart';
 import 'ui/adaptive_scaffold.dart';
 import 'ui/adaptive_tab_bar.dart';
@@ -226,12 +227,17 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                                 label: L10n.of(context)!.nearMeTabTitle,
                               ),
                             ],
-                            accessoryActionButton:
-                                selectedIndex == Tab.workouts.index
+                            // iOS only
+                            trailingButton: selectedIndex == Tab.workouts.index
                                 ? _addWorkoutButton(context: context, ref: ref)
                                 : null,
                             scrollController: _workoutsScrollController,
                           ),
+                          // Android only
+                          floatingActionButton:
+                              selectedIndex == Tab.workouts.index
+                              ? _addWorkoutButton(context: context, ref: ref)
+                              : null,
                         );
                       },
                     ),
@@ -247,11 +253,11 @@ final class _MainAppState extends ConsumerState<_MainApp> {
 }
 
 /// A trailing button next to the tab bar for creating a new workout.
-AdaptiveAccessoryActionButton? _addWorkoutButton({
+AdaptiveAccessoryActionItem? _addWorkoutButton({
   required BuildContext context,
   required WidgetRef ref,
 }) {
-  return AdaptiveAccessoryActionButton(
+  return AdaptiveAccessoryActionItem(
     icon: Icon(PlatformIcons(context).add),
     onTap: (anchor) => WorkoutsTab.showWorkoutCreationPicker(
       context: context,

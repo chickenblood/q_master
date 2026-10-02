@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/l10n.dart';
 import '../model/timer.dart';
 import '../theme/theme.dart';
+import '../ui/adaptive_accessory_action_item.dart';
 import '../ui/adaptive_app_bar.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_scaffold.dart';
@@ -19,6 +20,21 @@ final class TimerScreen extends ConsumerWidget {
   Future<void> _resetTimer(WidgetRef ref) async {
     final notifier = ref.read(timerProvider.notifier);
     await notifier.reset();
+  }
+
+  // The FAB is only for Android. We use an app bar action on iOS.
+  AdaptiveAccessoryActionItem? _androidResetFAB(
+    BuildContext context, {
+    required WidgetRef ref,
+  }) {
+    return AdaptiveAccessoryActionItem(
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      onTap: (_) => _resetTimer(ref),
+      icon: Icon(
+        PlatformIcons(context).refreshBold,
+        color: Theme.of(context).colorScheme.onPrimary, // White from theme
+      ),
+    );
   }
 
   Widget _layoutTiles(
@@ -125,16 +141,18 @@ final class TimerScreen extends ConsumerWidget {
                 ).clamp(maxScaleFactor: 1.6),
               ),
               actions: [
-                // Action buttons – iOS only
-                AdaptiveAppBarItem(
-                  icon: Icon(
-                    PlatformIcons(context).refresh,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.secondary, // Red from theme
+                // Action button for resetting the timer – iOS only
+                // A FAB is used on Android.
+                if (Theme.of(context).platform == TargetPlatform.iOS)
+                  AdaptiveAppBarItem(
+                    icon: Icon(
+                      PlatformIcons(context).refresh,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.secondary, // Red from theme
+                    ),
+                    onPressed: () => _resetTimer(ref),
                   ),
-                  onPressed: () => _resetTimer(ref),
-                ),
               ],
             )
           : null,
@@ -207,9 +225,7 @@ final class TimerScreen extends ConsumerWidget {
           ),
         },
       ),
-      // material: (innerContext, _) => MaterialScaffoldData(
-      //   floatingActionButton: _androidResetFAB(innerContext, ref: ref),
-      // ),
+      floatingActionButton: _androidResetFAB(context, ref: ref),
     );
   }
 }

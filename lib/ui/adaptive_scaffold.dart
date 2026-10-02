@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
+import './adaptive_accessory_action_item.dart';
 import './adaptive_app_bar.dart';
-import './adaptive_tab_bar.dart';
 
 /// A class representing an adaptive scaffold that works on both Material and
 /// Cupertino platforms.
@@ -13,8 +13,9 @@ import './adaptive_tab_bar.dart';
 final class AdaptiveScaffold extends StatelessWidget {
   final AdaptiveAppBar? appBar;
   final Widget body;
-  final AdaptiveTabBar? bottomBar;
+  final Widget? bottomBar;
   final Color backgroundColor;
+  final AdaptiveAccessoryActionItem? floatingActionButton;
 
   const AdaptiveScaffold({
     super.key,
@@ -22,25 +23,23 @@ final class AdaptiveScaffold extends StatelessWidget {
     this.appBar,
     this.bottomBar,
     this.backgroundColor = Colors.transparent,
+    this.floatingActionButton,
   });
 
   @override
   Widget build(BuildContext context) => PlatformWidget(
     material: (_, _) {
-      final accessoryActionButton = (bottomBar is AdaptiveTabBar)
-          ? (bottomBar as AdaptiveTabBar).accessoryActionButton
-          : null;
       return Scaffold(
         appBar: appBar,
         backgroundColor: backgroundColor,
         body: body,
         bottomNavigationBar: bottomBar,
-        floatingActionButton: accessoryActionButton != null
+        floatingActionButton: floatingActionButton != null
             ? FloatingActionButton(
-                onPressed: () => accessoryActionButton.onTap(null),
-                foregroundColor: accessoryActionButton.foregroundColor,
-                backgroundColor: accessoryActionButton.backgroundColor,
-                child: accessoryActionButton.icon,
+                onPressed: () => floatingActionButton!.onTap(null),
+                foregroundColor: floatingActionButton!.foregroundColor,
+                backgroundColor: floatingActionButton!.backgroundColor,
+                child: floatingActionButton!.icon,
               )
             : null,
       );

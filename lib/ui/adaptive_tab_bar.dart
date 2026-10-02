@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
+import './adaptive_accessory_action_item.dart';
+
 /// A class representing an item in the adaptive tab bar.
 ///
 /// Each item has an optional [label], a required [icon], an optional [id],
@@ -11,28 +13,6 @@ final class AdaptiveTabItem {
   final Widget icon;
   final Object? id;
   const AdaptiveTabItem({this.label, required this.icon, this.id});
-}
-
-/// A class representing an action button with an icon and a callback.
-///
-/// Creates a GlassTabBarTrailingButton on iOS and a FloatingActionButton on
-/// Android.
-/// The colors will be ignored on iOS as the trailing button will use the style
-/// of the tab bar.
-final class AdaptiveAccessoryActionButton {
-  final Widget icon;
-  // GlassMorphAnchor is used for the iOS trailing button tap callback.
-  final Function(GlassMorphAnchor? glassAnchor) onTap;
-  final Object? id;
-  final Color? foregroundColor;
-  final Color? backgroundColor;
-  const AdaptiveAccessoryActionButton({
-    required this.icon,
-    this.id,
-    this.foregroundColor,
-    this.backgroundColor,
-    required this.onTap,
-  });
 }
 
 /// A tab bar that adapts to the platform (Material or Cupertino).
@@ -45,7 +25,7 @@ final class AdaptiveTabBar extends StatelessWidget {
   final bool visible;
   final Color? selectedIconColor;
   final Color? unselectedIconColor;
-  final AdaptiveAccessoryActionButton? accessoryActionButton;
+  final AdaptiveAccessoryActionItem? trailingButton;
   final minimizeController = GlassTabBarMinimizeController();
   final ScrollController? scrollController;
 
@@ -58,7 +38,7 @@ final class AdaptiveTabBar extends StatelessWidget {
     this.selectedIconColor,
     this.unselectedIconColor,
     this.scrollController,
-    this.accessoryActionButton,
+    this.trailingButton,
   });
 
   @override
@@ -87,10 +67,10 @@ final class AdaptiveTabBar extends StatelessWidget {
           minimizeController: minimizeController,
           scrollController: scrollController,
           onMinimizedTabTap: minimizeController.expand,
-          trailingButton: accessoryActionButton != null
+          trailingButton: trailingButton != null
               ? GlassTabBarTrailingButton(
-                  icon: accessoryActionButton!.icon,
-                  onTap: () => accessoryActionButton!.onTap(anchor),
+                  icon: trailingButton!.icon,
+                  onTap: () => trailingButton!.onTap(anchor),
                 )
               : null,
         ),
