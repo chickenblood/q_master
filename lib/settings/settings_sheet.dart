@@ -136,7 +136,7 @@ class _SettingsSheet extends ConsumerWidget {
                   _SettingsRow(
                     label: l10n.motorboatSoundSettingsLabel,
                     labelStyle: rowLabelStyle,
-                    trailing: GlassSwitch(
+                    trailing: AdaptiveSwitch(
                       value: prefs.motorboatSoundEnabled.value,
                       activeColor: Theme.of(context).colorScheme.primary,
                       onChanged: (value) =>

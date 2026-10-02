@@ -5,4 +5,5 @@ export './adaptive_menu.dart';
 export './adaptive_modal_sheet.dart';
 export './adaptive_scaffold.dart';
 export './adaptive_slider.dart';
+export './adaptive_switch.dart';
 export './adaptive_tab_bar.dart';

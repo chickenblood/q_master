@@ -1,7 +1,7 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 3.4.1+587
+version: 3.4.1+588
 
 environment:
   sdk: ^3.10.0
