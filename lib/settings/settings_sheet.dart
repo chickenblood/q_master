@@ -5,10 +5,7 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../l10n/l10n.dart';
-import '../ui/adaptive_app_bar.dart';
-import '../ui/adaptive_icons.dart';
-import '../ui/adaptive_modal_sheet.dart';
-import '../ui/adaptive_scaffold.dart';
+import '../ui/adaptive_widgets.dart';
 import '../ui/cupertino_sheet_fork.dart';
 import '../utils/shared_app_prefs.dart';
 
@@ -88,7 +85,7 @@ class _SettingsSheet extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Expanded(
-                          child: GlassSlider(
+                          child: AdaptiveSlider(
                             value: prefs.exercisesPerPage.value.toDouble(),
                             min: 1,
                             max: SharedAppPrefs.maxExercisesPerPage.toDouble(),
