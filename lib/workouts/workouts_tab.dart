@@ -36,7 +36,7 @@ class WorkoutsTab extends ConsumerWidget {
   static Future<void> showWorkoutCreationPicker({
     required BuildContext context,
     required WidgetRef ref,
-    required GlassMorphAnchor anchor,
+    required GlassMorphAnchor? anchor,
   }) async {
     final navigator = Navigator.of(context, rootNavigator: true);
 

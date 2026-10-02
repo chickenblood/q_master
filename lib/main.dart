@@ -202,47 +202,35 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                               children: _tabPages,
                             ),
                           ),
-                          bottomBar: Visibility(
+                          bottomBar: AdaptiveTabBar(
                             visible: _shouldShowTabBar(context),
-                            child: SafeArea(
-                              bottom: false,
-                              child: GlassMorphTrigger(
-                                builder: (_, anchor) => AdaptiveTabBar(
-                                  selectedIconColor: colorScheme.primary,
-                                  selectedIndex: selectedIndex,
-                                  onTabSelected: (index) => widget
-                                      ._tabController
-                                      .setIndex(context, index),
-                                  items: [
-                                    AdaptiveTabItem(
-                                      icon: Icon(AdaptiveIcons.history),
-                                      label: L10n.of(context)!.workoutsTabTitle,
-                                    ),
-                                    AdaptiveTabItem(
-                                      icon: Icon(AdaptiveIcons.sports),
-                                      label: L10n.of(context)!.gamesTabTitle,
-                                    ),
-                                    AdaptiveTabItem(
-                                      icon: Icon(AdaptiveIcons.timer),
-                                      label: L10n.of(context)!.timerPageTitle,
-                                    ),
-                                    AdaptiveTabItem(
-                                      icon: Icon(AdaptiveIcons.location),
-                                      label: L10n.of(context)!.nearMeTabTitle,
-                                    ),
-                                  ],
-                                  accessoryActionButton:
-                                      selectedIndex == Tab.workouts.index
-                                      ? _addWorkoutButton(
-                                          context: context,
-                                          ref: ref,
-                                          anchor: anchor,
-                                        )
-                                      : null,
-                                  scrollController: _workoutsScrollController,
-                                ),
+                            selectedIconColor: colorScheme.primary,
+                            selectedIndex: selectedIndex,
+                            onTabSelected: (index) =>
+                                widget._tabController.setIndex(context, index),
+                            items: [
+                              AdaptiveTabItem(
+                                icon: Icon(AdaptiveIcons.history),
+                                label: L10n.of(context)!.workoutsTabTitle,
                               ),
-                            ),
+                              AdaptiveTabItem(
+                                icon: Icon(AdaptiveIcons.sports),
+                                label: L10n.of(context)!.gamesTabTitle,
+                              ),
+                              AdaptiveTabItem(
+                                icon: Icon(AdaptiveIcons.timer),
+                                label: L10n.of(context)!.timerPageTitle,
+                              ),
+                              AdaptiveTabItem(
+                                icon: Icon(AdaptiveIcons.location),
+                                label: L10n.of(context)!.nearMeTabTitle,
+                              ),
+                            ],
+                            accessoryActionButton:
+                                selectedIndex == Tab.workouts.index
+                                ? _addWorkoutButton(context: context, ref: ref)
+                                : null,
+                            scrollController: _workoutsScrollController,
                           ),
                         );
                       },
@@ -262,11 +250,10 @@ final class _MainAppState extends ConsumerState<_MainApp> {
 AdaptiveAccessoryActionButton? _addWorkoutButton({
   required BuildContext context,
   required WidgetRef ref,
-  required GlassMorphAnchor anchor,
 }) {
   return AdaptiveAccessoryActionButton(
     icon: Icon(PlatformIcons(context).add),
-    onTap: () => WorkoutsTab.showWorkoutCreationPicker(
+    onTap: (anchor) => WorkoutsTab.showWorkoutCreationPicker(
       context: context,
       ref: ref,
       anchor: anchor,

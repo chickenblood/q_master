@@ -13,7 +13,7 @@ import './adaptive_tab_bar.dart';
 final class AdaptiveScaffold extends StatelessWidget {
   final AdaptiveAppBar? appBar;
   final Widget body;
-  final Widget? bottomBar;
+  final AdaptiveTabBar? bottomBar;
 
   const AdaptiveScaffold({
     super.key,
@@ -34,7 +34,7 @@ final class AdaptiveScaffold extends StatelessWidget {
         bottomNavigationBar: bottomBar,
         floatingActionButton: accessoryActionButton != null
             ? FloatingActionButton(
-                onPressed: accessoryActionButton.onTap,
+                onPressed: () => accessoryActionButton.onTap(null),
                 foregroundColor: accessoryActionButton.foregroundColor,
                 backgroundColor: accessoryActionButton.backgroundColor,
                 child: accessoryActionButton.icon,

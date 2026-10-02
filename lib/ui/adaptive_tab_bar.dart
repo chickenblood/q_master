@@ -21,7 +21,8 @@ final class AdaptiveTabItem {
 /// of the tab bar.
 final class AdaptiveAccessoryActionButton {
   final Widget icon;
-  final VoidCallback onTap;
+  // GlassMorphAnchor is used for the iOS trailing button tap callback.
+  final Function(GlassMorphAnchor? glassAnchor) onTap;
   final Object? id;
   final Color? foregroundColor;
   final Color? backgroundColor;
@@ -41,6 +42,7 @@ final class AdaptiveTabBar extends StatelessWidget {
   final List<AdaptiveTabItem> items;
   final int selectedIndex;
   final ValueChanged<int> onTabSelected;
+  final bool visible;
   final Color? selectedIconColor;
   final Color? unselectedIconColor;
   final AdaptiveAccessoryActionButton? accessoryActionButton;
@@ -52,6 +54,7 @@ final class AdaptiveTabBar extends StatelessWidget {
     required this.items,
     this.selectedIndex = 0,
     required this.onTabSelected,
+    this.visible = true,
     this.selectedIconColor,
     this.unselectedIconColor,
     this.scrollController,
@@ -59,34 +62,39 @@ final class AdaptiveTabBar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => PlatformWidget(
-    material: (_, _) => BottomNavigationBar(
-      items: items
-          .map(
-            (item) =>
-                BottomNavigationBarItem(icon: item.icon, label: item.label),
-          )
-          .toList(),
-      currentIndex: selectedIndex,
-      onTap: onTabSelected,
-      selectedItemColor: selectedIconColor,
-      unselectedItemColor: unselectedIconColor,
-    ),
-    cupertino: (_, _) => GlassTabBar.minimizable(
-      tabs: items
-          .map((item) => GlassTab(icon: item.icon, label: item.label))
-          .toList(),
-      selectedIndex: selectedIndex,
-      onTabSelected: onTabSelected,
-      minimizeController: minimizeController,
-      scrollController: scrollController,
-      onMinimizedTabTap: minimizeController.expand,
-      trailingButton: accessoryActionButton != null
-          ? GlassTabBarTrailingButton(
-              icon: accessoryActionButton!.icon,
-              onTap: accessoryActionButton!.onTap,
+  Widget build(BuildContext context) => Visibility(
+    visible: visible,
+    child: PlatformWidget(
+      material: (_, _) => BottomNavigationBar(
+        items: items
+            .map(
+              (item) =>
+                  BottomNavigationBarItem(icon: item.icon, label: item.label),
             )
-          : null,
+            .toList(),
+        currentIndex: selectedIndex,
+        onTap: onTabSelected,
+        selectedItemColor: selectedIconColor,
+        unselectedItemColor: unselectedIconColor,
+      ),
+      cupertino: (_, _) => GlassMorphTrigger(
+        builder: (_, anchor) => GlassTabBar.minimizable(
+          tabs: items
+              .map((item) => GlassTab(icon: item.icon, label: item.label))
+              .toList(),
+          selectedIndex: selectedIndex,
+          onTabSelected: onTabSelected,
+          minimizeController: minimizeController,
+          scrollController: scrollController,
+          onMinimizedTabTap: minimizeController.expand,
+          trailingButton: accessoryActionButton != null
+              ? GlassTabBarTrailingButton(
+                  icon: accessoryActionButton!.icon,
+                  onTap: () => accessoryActionButton!.onTap(anchor),
+                )
+              : null,
+        ),
+      ),
     ),
   );
 }
