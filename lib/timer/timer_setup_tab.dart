@@ -112,7 +112,8 @@ class TimerSetupTab extends ConsumerWidget {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(12, 56, 12, 12),
+                padding:
+                    adaptivePadding + const EdgeInsets.fromLTRB(12, 12, 12, 12),
                 child: ListenableBuilder(
                   listenable: Listenable.merge([
                     prefs.timerType,

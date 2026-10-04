@@ -8,8 +8,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../l10n/l10n.dart';
 import '../settings/settings_sheet.dart';
-import '../ui/adaptive_app_bar.dart';
-import '../ui/adaptive_scaffold.dart';
+import '../ui/adaptive_widgets.dart';
 import '../ui/media_query.dart';
 import 'deck_of_pain_game_view.dart';
 import 'dod_game_view.dart';
@@ -92,9 +91,9 @@ class GamesTab extends StatelessWidget {
                     80.0,
                     kTextTabBarHeight + 24.0,
                   )
-                : const EdgeInsets.fromLTRB(
+                : EdgeInsets.fromLTRB(
                     80.0,
-                    16.0,
+                    adaptivePadding.top,
                     80.0,
                     kTextTabBarHeight,
                   ),

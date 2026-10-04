@@ -403,7 +403,7 @@ class _SlackblastPickerSheetState
                 physics: BottomSheetScrollPhysics(),
                 slivers: [
                   SliverPadding(
-                    padding: const EdgeInsets.only(top: kToolbarHeight),
+                    padding: EdgeInsets.only(top: adaptivePadding.top),
                   ),
                   SliverToBoxAdapter(
                     child: SlackblastPickerSection<F3Region>(

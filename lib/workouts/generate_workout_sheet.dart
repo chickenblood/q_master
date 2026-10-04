@@ -125,7 +125,8 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, kToolbarHeight + 16, 16, 16),
+            padding:
+                adaptivePadding + const EdgeInsets.fromLTRB(16, 16, 16, 16),
             child: Column(
               children: [
                 GlassTextField(

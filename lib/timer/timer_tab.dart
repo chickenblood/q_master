@@ -48,7 +48,6 @@ final class TimerScreen extends ConsumerWidget {
           crossAxisAlignment: .stretch,
           mainAxisSize: .max,
           children: [
-            SizedBox(height: kToolbarHeight),
             Expanded(
               flex: 2,
               child: Column(
@@ -157,73 +156,76 @@ final class TimerScreen extends ConsumerWidget {
             )
           : null,
       body: SafeArea(
-        child: switch (notifier.timerState) {
-          .preparing => _layoutTiles(
-            l10n,
-            isPortrait: isPortrait,
-            timerNotifier: notifier,
-            firstTile: _TileSpec(
-              label: l10n.timerPrepareLabel,
-              timeLabel: formatter(notifier.remainingPrepareTime),
-              labelColor: TimerColors.prepareLabel(context),
-              fgColor: TimerColors.prepareFg(context),
-              bgColor: TimerColors.prepareBg(context),
+        child: Padding(
+          padding: isPortrait || isTablet ? adaptivePadding : EdgeInsets.zero,
+          child: switch (notifier.timerState) {
+            .preparing => _layoutTiles(
+              l10n,
+              isPortrait: isPortrait,
+              timerNotifier: notifier,
+              firstTile: _TileSpec(
+                label: l10n.timerPrepareLabel,
+                timeLabel: formatter(notifier.remainingPrepareTime),
+                labelColor: TimerColors.prepareLabel(context),
+                fgColor: TimerColors.prepareFg(context),
+                bgColor: TimerColors.prepareBg(context),
+              ),
+              secondTile: timerType == .tabata
+                  ? _TileSpec(
+                      label: l10n.timerWorkLabel,
+                      timeLabel: formatter(workTime),
+                      labelColor: TimerColors.workLabel(context),
+                      fgColor: TimerColors.workFg(context),
+                      bgColor: TimerColors.workBg(context),
+                    )
+                  : null,
             ),
-            secondTile: timerType == .tabata
-                ? _TileSpec(
-                    label: l10n.timerWorkLabel,
-                    timeLabel: formatter(workTime),
-                    labelColor: TimerColors.workLabel(context),
-                    fgColor: TimerColors.workFg(context),
-                    bgColor: TimerColors.workBg(context),
-                  )
-                : null,
-          ),
-          .working => _layoutTiles(
-            l10n,
-            isPortrait: isPortrait,
-            timerNotifier: notifier,
-            firstTile: _TileSpec(
-              label: l10n.timerWorkLabel,
-              timeLabel: formatter(workTime),
-              labelColor: TimerColors.workLabel(context),
-              fgColor: TimerColors.workFg(context),
-              bgColor: TimerColors.workBg(context),
+            .working => _layoutTiles(
+              l10n,
+              isPortrait: isPortrait,
+              timerNotifier: notifier,
+              firstTile: _TileSpec(
+                label: l10n.timerWorkLabel,
+                timeLabel: formatter(workTime),
+                labelColor: TimerColors.workLabel(context),
+                fgColor: TimerColors.workFg(context),
+                bgColor: TimerColors.workBg(context),
+              ),
+              secondTile: timerType == .tabata
+                  ? _TileSpec(
+                      label: l10n.timerRestLabel,
+                      timeLabel: formatter(notifier.remainingRestTime),
+                      labelColor: TimerColors.restLabel(context),
+                      fgColor: TimerColors.restFg(context),
+                      bgColor: TimerColors.restBg(context),
+                    )
+                  : null,
             ),
-            secondTile: timerType == .tabata
-                ? _TileSpec(
-                    label: l10n.timerRestLabel,
-                    timeLabel: formatter(notifier.remainingRestTime),
-                    labelColor: TimerColors.restLabel(context),
-                    fgColor: TimerColors.restFg(context),
-                    bgColor: TimerColors.restBg(context),
-                  )
-                : null,
-          ),
-          .resting => _layoutTiles(
-            l10n,
-            isPortrait: isPortrait,
-            timerNotifier: notifier,
-            firstTile: _TileSpec(
-              label: l10n.timerRestLabel,
-              timeLabel: formatter(notifier.remainingRestTime),
-              labelColor: TimerColors.restLabel(context),
-              fgColor: TimerColors.restFg(context),
-              bgColor: TimerColors.restBg(context),
+            .resting => _layoutTiles(
+              l10n,
+              isPortrait: isPortrait,
+              timerNotifier: notifier,
+              firstTile: _TileSpec(
+                label: l10n.timerRestLabel,
+                timeLabel: formatter(notifier.remainingRestTime),
+                labelColor: TimerColors.restLabel(context),
+                fgColor: TimerColors.restFg(context),
+                bgColor: TimerColors.restBg(context),
+              ),
+              secondTile: timerType == .tabata
+                  ? _TileSpec(
+                      label: l10n.timerWorkLabel,
+                      // Upcoming work is for the next round (not the current one),
+                      // so show the full interval.
+                      timeLabel: formatter(notifier.workInterval),
+                      labelColor: TimerColors.workLabel(context),
+                      fgColor: TimerColors.workFg(context),
+                      bgColor: TimerColors.workBg(context),
+                    )
+                  : null,
             ),
-            secondTile: timerType == .tabata
-                ? _TileSpec(
-                    label: l10n.timerWorkLabel,
-                    // Upcoming work is for the next round (not the current one),
-                    // so show the full interval.
-                    timeLabel: formatter(notifier.workInterval),
-                    labelColor: TimerColors.workLabel(context),
-                    fgColor: TimerColors.workFg(context),
-                    bgColor: TimerColors.workBg(context),
-                  )
-                : null,
-          ),
-        },
+          },
+        ),
       ),
       floatingActionButton: _androidResetFAB(context, ref: ref),
     );

@@ -183,64 +183,51 @@ final class _MainAppState extends ConsumerState<_MainApp> {
               supportedLocales: L10n.supportedLocales,
               navigatorKey: widget._navigatorKey,
               debugShowCheckedModeBanner: false,
-              home: Builder(
-                builder: (context) {
-                  final theme = Theme.of(context);
-                  final colorScheme = theme.colorScheme;
-
-                  return Material(
-                    child: ListenableBuilder(
-                      listenable: widget._tabController,
-                      builder: (context, _) {
-                        final selectedIndex = widget._tabController.index(
-                          context,
-                        );
-                        return AdaptiveScaffold(
-                          body: SafeArea(
-                            top: false,
-                            child: _TabsContainer(
-                              selectedIndex: selectedIndex,
-                              children: _tabPages,
-                            ),
-                          ),
-                          bottomBar: AdaptiveTabBar(
-                            visible: _shouldShowTabBar(context),
-                            selectedIconColor: colorScheme.primary,
-                            selectedIndex: selectedIndex,
-                            onTabSelected: (index) =>
-                                widget._tabController.setIndex(context, index),
-                            items: [
-                              AdaptiveTabItem(
-                                icon: Icon(AdaptiveIcons.history),
-                                label: L10n.of(context)!.workoutsTabTitle,
-                              ),
-                              AdaptiveTabItem(
-                                icon: Icon(AdaptiveIcons.sports),
-                                label: L10n.of(context)!.gamesTabTitle,
-                              ),
-                              AdaptiveTabItem(
-                                icon: Icon(AdaptiveIcons.timer),
-                                label: L10n.of(context)!.timerPageTitle,
-                              ),
-                              AdaptiveTabItem(
-                                icon: Icon(AdaptiveIcons.location),
-                                label: L10n.of(context)!.nearMeTabTitle,
-                              ),
-                            ],
-                            // iOS only
-                            trailingButton: selectedIndex == Tab.workouts.index
-                                ? _addWorkoutButton(context: context, ref: ref)
-                                : null,
-                            scrollController: _workoutsScrollController,
-                          ),
-                          // Android only
-                          floatingActionButton:
-                              selectedIndex == Tab.workouts.index
-                              ? _addWorkoutButton(context: context, ref: ref)
-                              : null,
-                        );
-                      },
+              home: ListenableBuilder(
+                listenable: widget._tabController,
+                builder: (context, _) {
+                  final selectedIndex = widget._tabController.index(context);
+                  return AdaptiveScaffold(
+                    body: SafeArea(
+                      child: _TabsContainer(
+                        selectedIndex: selectedIndex,
+                        children: _tabPages,
+                      ),
                     ),
+                    bottomBar: AdaptiveTabBar(
+                      visible: _shouldShowTabBar(context),
+                      selectedIconColor: Theme.of(context).colorScheme.primary,
+                      selectedIndex: selectedIndex,
+                      onTabSelected: (index) =>
+                          widget._tabController.setIndex(context, index),
+                      items: [
+                        AdaptiveTabItem(
+                          icon: Icon(AdaptiveIcons.history),
+                          label: L10n.of(context)!.workoutsTabTitle,
+                        ),
+                        AdaptiveTabItem(
+                          icon: Icon(AdaptiveIcons.sports),
+                          label: L10n.of(context)!.gamesTabTitle,
+                        ),
+                        AdaptiveTabItem(
+                          icon: Icon(AdaptiveIcons.timer),
+                          label: L10n.of(context)!.timerPageTitle,
+                        ),
+                        AdaptiveTabItem(
+                          icon: Icon(AdaptiveIcons.location),
+                          label: L10n.of(context)!.nearMeTabTitle,
+                        ),
+                      ],
+                      // iOS only
+                      trailingButton: selectedIndex == Tab.workouts.index
+                          ? _addWorkoutButton(context: context, ref: ref)
+                          : null,
+                      scrollController: _workoutsScrollController,
+                    ),
+                    // Android only
+                    floatingActionButton: selectedIndex == Tab.workouts.index
+                        ? _addWorkoutButton(context: context, ref: ref)
+                        : null,
                   );
                 },
               ),

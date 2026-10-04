@@ -9,9 +9,7 @@ import '../model/workout.dart';
 import '../model/workout_list.dart';
 import '../theme/theme.dart';
 import '../ui/action_button.dart';
-import '../ui/adaptive_app_bar.dart';
-import '../ui/adaptive_icons.dart';
-import '../ui/adaptive_scaffold.dart';
+import '../ui/adaptive_widgets.dart';
 import '../ui/dismissible_row.dart';
 import '../utils/datetime_utils.dart';
 import 'exercise_picker_sheet.dart';
@@ -687,14 +685,14 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
         child: CustomScrollView(
           primary: true,
           slivers: [
-            SliverPadding(padding: const EdgeInsets.only(top: kToolbarHeight)),
+            SliverPadding(padding: EdgeInsets.only(top: adaptivePadding.top)),
             ...content(context),
             if (_displayMode == .display) _displayFooter(context),
+            SliverPadding(
+              padding: EdgeInsets.only(bottom: adaptivePadding.bottom),
+            ),
             // Add padding when the picker is up, so we can scroll the content
             // above the keyboard and picker without it being obscured
-            SliverPadding(
-              padding: const EdgeInsets.only(bottom: kTextTabBarHeight),
-            ),
             if (_pickerIsShown)
               SliverFillRemaining(child: SizedBox(height: 800)),
           ],

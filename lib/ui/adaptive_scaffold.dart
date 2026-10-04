@@ -1,9 +1,19 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import './adaptive_accessory_action_item.dart';
 import './adaptive_app_bar.dart';
+
+/// Returns the padding that should be applied to bodies in an adaptive
+/// scaffold.
+///
+/// This may be used as padding for simple widget bodies, but should be used
+/// as headers and footers for scrollable content.
+final adaptivePadding = defaultTargetPlatform == .iOS
+    ? EdgeInsets.only(top: kToolbarHeight, bottom: kTextTabBarHeight)
+    : EdgeInsets.zero;
 
 /// A class representing an adaptive scaffold that works on both Material and
 /// Cupertino platforms.
@@ -27,10 +37,13 @@ final class AdaptiveScaffold extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => PlatformWidget(
-    material: (_, _) {
-      return Scaffold(
+  Widget build(BuildContext context) {
+    return PlatformWidget(
+      material: (_, _) => Scaffold(
         appBar: appBar,
+        // match the default for [GlassScaffold]
+        extendBodyBehindAppBar: true,
+        extendBody: true,
         backgroundColor: backgroundColor,
         body: body,
         bottomNavigationBar: bottomBar,
@@ -42,13 +55,13 @@ final class AdaptiveScaffold extends StatelessWidget {
                 child: floatingActionButton!.icon,
               )
             : null,
-      );
-    },
-    cupertino: (_, _) => GlassScaffold(
-      appBar: appBar,
-      backgroundColor: backgroundColor,
-      body: body,
-      bottomBar: bottomBar,
-    ),
-  );
+      ),
+      cupertino: (_, _) => GlassScaffold(
+        backgroundColor: backgroundColor,
+        appBar: appBar,
+        body: body,
+        bottomBar: bottomBar,
+      ),
+    );
+  }
 }

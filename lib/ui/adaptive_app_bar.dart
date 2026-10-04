@@ -58,6 +58,7 @@ final class AdaptiveAppBar extends StatelessWidget
         leading: leadingItems.isNotEmpty ? Row(children: leadingItems) : null,
         actions: actionsItems,
         backgroundColor: backgroundColor,
+        elevation: 0,
       );
     },
     cupertino: (_, _) {

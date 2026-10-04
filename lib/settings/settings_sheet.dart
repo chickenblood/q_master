@@ -187,10 +187,11 @@ class _SettingsSheet extends ConsumerWidget {
           child: CustomScrollView(
             physics: BottomSheetScrollPhysics(),
             slivers: [
-              SliverPadding(
-                padding: const EdgeInsets.only(top: kToolbarHeight),
-              ),
+              SliverPadding(padding: EdgeInsets.only(top: adaptivePadding.top)),
               _content(context, prefs: prefs, ref: ref),
+              SliverPadding(
+                padding: EdgeInsets.only(top: adaptivePadding.bottom),
+              ),
             ],
           ),
         ),

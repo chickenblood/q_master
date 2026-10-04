@@ -203,10 +203,10 @@ class WorkoutsTab extends ConsumerWidget {
               child: ReorderableListView.builder(
                 scrollController: _scrollController,
                 header: SizedBox.fromSize(
-                  size: const Size.fromHeight(kToolbarHeight),
+                  size: Size.fromHeight(adaptivePadding.top),
                 ),
                 footer: SizedBox.fromSize(
-                  size: const Size.fromHeight(kTextTabBarHeight),
+                  size: Size.fromHeight(adaptivePadding.bottom),
                 ),
                 itemCount: workouts.length,
                 itemBuilder: (context, index) => _WorkoutTile(

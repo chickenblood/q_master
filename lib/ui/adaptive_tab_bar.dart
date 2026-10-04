@@ -57,23 +57,26 @@ final class AdaptiveTabBar extends StatelessWidget {
         selectedItemColor: selectedIconColor,
         unselectedItemColor: unselectedIconColor,
       ),
-      cupertino: (_, _) => GlassMorphTrigger(
-        builder: (innerContext, anchor) => GlassTabBar.minimizable(
-          tabs: items
-              .map((item) => GlassTab(icon: item.icon, label: item.label))
-              .toList(),
-          selectedIndex: selectedIndex,
-          onTabSelected: onTabSelected,
-          selectedIconColor: selectedIconColor,
-          minimizeController: minimizeController,
-          scrollController: scrollController,
-          onMinimizedTabTap: minimizeController.expand,
-          trailingButton: trailingButton != null
-              ? GlassTabBarTrailingButton(
-                  icon: trailingButton!.icon,
-                  onTap: () => trailingButton!.onTap(anchor),
-                )
-              : null,
+      cupertino: (_, _) => SafeArea(
+        bottom: false,
+        child: GlassMorphTrigger(
+          builder: (innerContext, anchor) => GlassTabBar.minimizable(
+            tabs: items
+                .map((item) => GlassTab(icon: item.icon, label: item.label))
+                .toList(),
+            selectedIndex: selectedIndex,
+            onTabSelected: onTabSelected,
+            selectedIconColor: selectedIconColor,
+            minimizeController: minimizeController,
+            scrollController: scrollController,
+            onMinimizedTabTap: minimizeController.expand,
+            trailingButton: trailingButton != null
+                ? GlassTabBarTrailingButton(
+                    icon: trailingButton!.icon,
+                    onTap: () => trailingButton!.onTap(anchor),
+                  )
+                : null,
+          ),
         ),
       ),
     ),
