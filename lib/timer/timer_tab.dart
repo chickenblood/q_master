@@ -28,6 +28,7 @@ final class TimerScreen extends ConsumerWidget {
     required WidgetRef ref,
   }) {
     return AdaptiveAccessoryActionItem(
+      id: 'reset-timer',
       backgroundColor: Theme.of(context).colorScheme.primary,
       onTap: (_) => _resetTimer(ref),
       icon: Icon(

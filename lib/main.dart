@@ -246,6 +246,7 @@ AdaptiveAccessoryActionItem? _addWorkoutButton({
 }) {
   return AdaptiveAccessoryActionItem(
     icon: Icon(PlatformIcons(context).add),
+    id: 'add-workout',
     onTap: (anchor) => WorkoutsTab.showWorkoutCreationPicker(
       context: context,
       ref: ref,

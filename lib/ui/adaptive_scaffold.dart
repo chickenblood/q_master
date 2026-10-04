@@ -52,6 +52,7 @@ final class AdaptiveScaffold extends StatelessWidget {
                 onPressed: () => floatingActionButton!.onTap(null),
                 foregroundColor: floatingActionButton!.foregroundColor,
                 backgroundColor: floatingActionButton!.backgroundColor,
+                heroTag: floatingActionButton!.id,
                 child: floatingActionButton!.icon,
               )
             : null,
