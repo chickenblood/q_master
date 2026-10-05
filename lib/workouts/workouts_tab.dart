@@ -49,9 +49,9 @@ class WorkoutsTab extends ConsumerWidget {
     if (!context.mounted) return;
 
     if (result == .manual) {
-      await _invokeWorkoutEditor(context, displayMode: DisplayMode.edit);
+      await invokeWorkoutEditor(context, displayMode: DisplayMode.edit);
     } else if (result == .generate) {
-      await _showGenerateWorkoutModal(context, ref);
+      await showGenerateWorkoutModal(context, ref: ref);
     }
   }
 
@@ -91,10 +91,10 @@ class WorkoutsTab extends ConsumerWidget {
     ),
   );
 
-  static Future<void> _showGenerateWorkoutModal(
-    BuildContext context,
-    WidgetRef ref,
-  ) async {
+  static Future<void> showGenerateWorkoutModal(
+    BuildContext context, {
+    required WidgetRef ref,
+  }) async {
     final navigator = Navigator.of(context, rootNavigator: true);
 
     final workout = await showAdaptiveModalSheet(
@@ -109,7 +109,7 @@ class WorkoutsTab extends ConsumerWidget {
       await listNotifier.add(workout);
       if (!context.mounted) return;
 
-      await _invokeWorkoutEditor(
+      await invokeWorkoutEditor(
         context,
         workout: workout,
         displayMode: DisplayMode.edit,
@@ -148,7 +148,7 @@ class WorkoutsTab extends ConsumerWidget {
   Future<void> _showSlackblastPicker(BuildContext context, Workout workout) =>
       showSlackblastPicker(context, workout: workout);
 
-  static Future<Workout?> _invokeWorkoutEditor(
+  static Future<Workout?> invokeWorkoutEditor(
     BuildContext context, {
     Workout? workout,
     required DisplayMode displayMode,
@@ -213,7 +213,7 @@ class WorkoutsTab extends ConsumerWidget {
                   key: ValueKey(workouts[index]),
                   listNotifier: listNotifier,
                   workout: workouts[index],
-                  onInvokeWorkoutEditor: _invokeWorkoutEditor,
+                  onInvokeWorkoutEditor: invokeWorkoutEditor,
                   onShareWorkout: _shareWorkout,
                   onShareToBackblast: _showSlackblastPicker,
                 ),
@@ -414,23 +414,23 @@ final class _OverflowMenu extends StatelessWidget {
         menuChildren: [
           AdaptiveMenuItem(
             onPressed: () => onShareToBackblast(menuContext),
-            icon: Menu.slack,
-            text: L10n.of(context)!.postToBackblastText,
+            icon: Icon(Menu.slack),
+            title: L10n.of(context)!.postToBackblastText,
           ),
           AdaptiveMenuItem(
             onPressed: () => onDuplicate(),
-            icon: Icons.copy,
-            text: L10n.of(context)!.duplicateWorkoutText,
+            icon: Icon(Icons.copy),
+            title: L10n.of(context)!.duplicateWorkoutText,
           ),
           AdaptiveMenuItem(
             onPressed: () => onShare(menuContext),
-            icon: context.platformIcons.share,
-            text: L10n.of(context)!.shareWorkoutText,
+            icon: Icon(context.platformIcons.share),
+            title: L10n.of(context)!.shareWorkoutText,
           ),
           AdaptiveMenuItem(
             onPressed: onDelete,
-            icon: context.platformIcons.delete,
-            text: L10n.of(context)!.deleteWorkoutText,
+            icon: Icon(context.platformIcons.delete),
+            title: L10n.of(context)!.deleteWorkoutText,
             isDestructive: true,
           ),
         ],

@@ -58,13 +58,21 @@
     "@workoutCreationPickerTitle": {
       "description": "Title for the unified beatdown creation picker modal sheet."
     },
-    "workoutCreationPickerManual": "Create manually",
+    "workoutCreationPickerManual": "Build Manually",
     "@workoutCreationPickerManual": {
       "description": "Button label for manual beatdown creation in the picker."
+    },
+    "workoutCreationPickerManualSubtitle": "Add sections & exercises",
+    "@workoutCreationPickerManualSubtitle": {
+      "description": "Subtitle for the manual beatdown creation button in the picker."
     },
     "workoutCreationPickerGenerate": "Generate with AI",
     "@workoutCreationPickerGenerate": {
       "description": "Button label for AI-generated beatdown creation in the picker."
+    },
+    "workoutCreationPickerGenerateSubtitle": "Describe your beatdown",
+    "@workoutCreationPickerGenerateSubtitle": {
+      "description": "Subtitle for the AI-generated beatdown creation button in the picker."
     },
     "workoutCreationPickerFromTemplate": "From template",
     "@workoutCreationPickerFromTemplate": {

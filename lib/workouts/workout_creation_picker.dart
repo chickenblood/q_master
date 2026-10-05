@@ -54,8 +54,8 @@ class _WorkoutCreationPicker extends StatelessWidget {
               icon: AdaptiveIcons.create,
               iconBg: Theme.of(context).colorScheme.surfaceContainerHighest,
               iconColor: Theme.of(context).colorScheme.primary,
-              title: 'Build Manually',
-              subtitle: 'Add sections & exercises',
+              title: L10n.of(context)!.workoutCreationPickerManual,
+              subtitle: L10n.of(context)!.workoutCreationPickerManualSubtitle,
               onTap: () =>
                   Navigator.of(context).pop(WorkoutCreationType.manual),
             ),
@@ -64,8 +64,8 @@ class _WorkoutCreationPicker extends StatelessWidget {
               icon: AdaptiveIcons.sparkles,
               iconBg: Theme.of(context).colorScheme.surfaceContainerHighest,
               iconColor: Theme.of(context).colorScheme.primary,
-              title: 'Generate with AI',
-              subtitle: 'Describe your beatdown',
+              title: L10n.of(context)!.workoutCreationPickerGenerate,
+              subtitle: L10n.of(context)!.workoutCreationPickerGenerateSubtitle,
               onTap: () =>
                   Navigator.of(context).pop(WorkoutCreationType.generate),
             ),

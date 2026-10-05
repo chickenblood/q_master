@@ -2,15 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
+/// A class representing a menu item with an icon, an optional label, and a
+/// callback.
+///
+/// Used within an [AdaptiveMenu] or [AdaptiveAccessoryActionItem] to define
+/// individual menu options.
 final class AdaptiveMenuItem {
-  final String text;
-  final IconData icon;
+  final Widget icon;
+  final String title;
   final bool isDestructive;
   final void Function() onPressed;
 
   const AdaptiveMenuItem({
-    required this.text,
     required this.icon,
+    required this.title,
     this.isDestructive = false,
     required this.onPressed,
   });
@@ -35,8 +40,8 @@ final class AdaptiveMenu extends StatelessWidget {
       items: [
         ...menuChildren.map(
           (item) => GlassMenuItem(
-            title: item.text,
-            icon: Icon(item.icon),
+            title: item.title,
+            icon: item.icon,
             isDestructive: item.isDestructive,
             onTap: item.onPressed,
           ),
@@ -54,11 +59,9 @@ final class AdaptiveMenu extends StatelessWidget {
           .map(
             (item) => MenuItemButton(
               onPressed: item.onPressed,
-              trailingIcon: Row(
-                children: [SizedBox(width: 20), Icon(item.icon)],
-              ),
+              trailingIcon: Row(children: [SizedBox(width: 20), item.icon]),
               child: PlatformText(
-                item.text,
+                item.title,
                 style: TextTheme.of(context).titleLarge!,
               ),
             ),

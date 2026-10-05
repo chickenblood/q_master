@@ -41,6 +41,35 @@ final class AdaptiveTabBar extends StatelessWidget {
     this.trailingButton,
   });
 
+  GlassTabBarTrailingButton? _buildTrailingButton(
+    AdaptiveAccessoryActionItem? trailingItem, {
+    GlassMorphAnchor? anchor,
+  }) {
+    if (trailingItem == null) return null;
+
+    if (trailingItem.menuItems.isEmpty) {
+      return GlassTabBarTrailingButton(
+        icon: trailingItem.icon,
+        onTap: () => trailingItem.onPressed(anchor),
+      );
+    } else {
+      return GlassTabBarTrailingButton.menu(
+        icon: trailingItem.icon,
+        menuWidth: 250,
+        menuItems: trailingItem.menuItems
+            .map(
+              (e) => GlassMenuItem(
+                icon: e.icon,
+                title: e.title,
+                onTap: e.onPressed,
+                isDestructive: e.isDestructive,
+              ),
+            )
+            .toList(),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) => Visibility(
     visible: visible,
@@ -70,12 +99,10 @@ final class AdaptiveTabBar extends StatelessWidget {
             minimizeController: minimizeController,
             scrollController: scrollController,
             onMinimizedTabTap: minimizeController.expand,
-            trailingButton: trailingButton != null
-                ? GlassTabBarTrailingButton(
-                    icon: trailingButton!.icon,
-                    onTap: () => trailingButton!.onTap(anchor),
-                  )
-                : null,
+            trailingButton: _buildTrailingButton(
+              trailingButton,
+              anchor: anchor,
+            ),
           ),
         ),
       ),

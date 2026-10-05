@@ -18,10 +18,7 @@ import 'model/workout_list.dart';
 import 'near_me/near_me_tab.dart';
 import 'theme/theme.dart';
 import 'timer/timer_setup_tab.dart';
-import 'ui/adaptive_accessory_action_item.dart';
-import 'ui/adaptive_icons.dart';
-import 'ui/adaptive_scaffold.dart';
-import 'ui/adaptive_tab_bar.dart';
+import 'ui/adaptive_widgets.dart';
 import 'ui/media_query.dart';
 import 'ui/simple_alert.dart';
 import 'utils/shared_app_prefs.dart';
@@ -220,7 +217,11 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                       ],
                       // iOS only
                       trailingButton: selectedIndex == Tab.workouts.index
-                          ? _addWorkoutButton(context: context, ref: ref)
+                          ? _addWorkoutButton(
+                              context: context,
+                              ref: ref,
+                              isMenuButton: false,
+                            )
                           : null,
                       scrollController: _workoutsScrollController,
                     ),
@@ -243,16 +244,37 @@ final class _MainAppState extends ConsumerState<_MainApp> {
 AdaptiveAccessoryActionItem? _addWorkoutButton({
   required BuildContext context,
   required WidgetRef ref,
+  bool isMenuButton = false,
+  List<AdaptiveMenuItem> menuItems = const [],
 }) {
-  return AdaptiveAccessoryActionItem(
-    icon: Icon(PlatformIcons(context).add),
-    id: 'add-workout',
-    onTap: (anchor) => WorkoutsTab.showWorkoutCreationPicker(
-      context: context,
-      ref: ref,
-      anchor: anchor,
-    ),
-  );
+  return isMenuButton
+      ? AdaptiveAccessoryActionItem.menu(
+          icon: Icon(PlatformIcons(context).add),
+          id: 'add-workout',
+          menuItems: [
+            AdaptiveMenuItem(
+              icon: Icon(AdaptiveIcons.create),
+              title: L10n.of(context)!.workoutCreationPickerManual,
+              onPressed: () =>
+                  WorkoutsTab.invokeWorkoutEditor(context, displayMode: .edit),
+            ),
+            AdaptiveMenuItem(
+              icon: Icon(AdaptiveIcons.sparkles),
+              title: L10n.of(context)!.workoutCreationPickerGenerate,
+              onPressed: () =>
+                  WorkoutsTab.showGenerateWorkoutModal(context, ref: ref),
+            ),
+          ],
+        )
+      : AdaptiveAccessoryActionItem(
+          icon: Icon(PlatformIcons(context).add),
+          id: 'add-workout',
+          onPressed: (anchor) => WorkoutsTab.showWorkoutCreationPicker(
+            context: context,
+            ref: ref,
+            anchor: anchor,
+          ),
+        );
 }
 
 // Configure the audio session to not interrupt other audio apps.
