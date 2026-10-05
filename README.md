@@ -11,27 +11,37 @@ Flutter uses "Material Design" by default which is the standard design language 
 
 Flutter also has a set of "Cupertino" [widgets](https://docs.flutter.dev/ui/widgets/cupertino) in the flutter/cupertino library which mimic Apple's iOS look and feel.
 
-Since I'm a UX purist, I prefer to have the UI look native to the platform where it is used and have iOS users feel at home, so this codebase makes liberal use of:
+Since I'm a UX purist, I prefer to have the UI look native to the platform where it is used and have iOS users feel at home (i.e. use both Material and Cupertino where it makes sense), so this codebase makes liberal use of:
 
-* Adaptive widgets in the Flutter framework: Switch.adaptive, Slider.adaptive, etc. which wrap the Flutter Material and Cupertino widgets. More examples [here](https://docs.flutter.dev/ui/adaptive-responsive/platform-adaptations#widgets-with-adaptive-constructors)
+* In the Flutter framework:
 
-* Adaptive icons, i.e. Icons.adaptive.more, Icons.adaptive.settings, etc.
+** Adaptive widgets in the Flutter framework: Switch.adaptive, Slider.adaptive, etc. which wrap the Flutter Material and Cupertino widgets. More examples [here](https://docs.flutter.dev/ui/adaptive-responsive/platform-adaptations#widgets-with-adaptive-constructors)
 
-* The [flutter_platform_widgets](https://pub.dev/packages/flutter_platform_widgets) package, which wraps equivalent higher-level widgets for both platforms and gives you a simple API to target both.
+ * Adaptive icons, i.e. Icons.adaptive.more, Icons.adaptive.settings, etc.
+
+* Additional frameworks:
+
+ * The [liquid_glass_widgets](https://pub.dev/packages/liquid_glass_widgets) package provides a good emulation of Apple's liquid glass, with morphing effects and blurs.
+
+Some helper classes have been added to handle the heavy lifting for UI masonry and common controls. See the following in the ui/ directory:
+
+ * AdaptiveAppBar
+ * AdaptiveScaffold
+ * AdaptiveTabBar
+ * AdaptiveModalSheet
+ * AdaptiveSlider
+ * AdaptiveSwitch
+ * AdaptiveIcons (for those not covered by Flutter Icons.adaptive and PlatformIcon).
+ * AdaptiveMenu
+ * showAdaptiveDraggableSheet
+ * showAdaptiveModalSheet (adapts the content into a dialog for tablets)
+
+* (Legacy) The [flutter_platform_widgets](https://pub.dev/packages/flutter_platform_widgets) package, which wraps equivalent higher-level widgets for both platforms and gives you a simple API to target both. Prefer the Adaptive* variant above where one exists or where you desire a glass layer on iOS. Use these for everything else.
+
   * Use PlatformText rather than Text
-  * Use PlatformScaffold rather than Scaffold
-  * Use PlatformAppBar rather than AppBar
   * Use PlatformIconButton rather than IconButton
   * Use PlatformTextButton rather than TextButton
   * Use PlatformListTile rather than ListTile
-
-In addition, I've added some helper classes that fills any gaps that the utilities above don't fill. See the following in the ui/ directory:
-
-* AdaptiveIcons for those not covered by Flutter Icons.adaptive and PlatformIcon.
-* AdaptiveMenu (uses the [pull_down_button](https://pub.dev/packages/pull_down_button) package) for a better iOS-styled popup menu.
-* showAdaptiveModalSheet that presents full-screen modals in the iOS modal sheet style (with a perspective transform, revealing the content below).
-
-Despite all this, iOS 26 brings [Liquid Glass](https://developer.apple.com/documentation/technologyoverviews/adopting-liquid-glass) which is a complete overhaul of the iOS design system, and which will unfortunately make things look a little dated, *for now* :/
 
 ## Workout JSON Format
 
