@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/l10n.dart';
 import '../model/exicon_fetcher.dart';
+import '../ui/adaptive_draggable_sheet.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/simple_alert.dart';
 import '../utils/shared_app_prefs.dart';
@@ -24,12 +25,8 @@ Future<String?> showExercisePicker(
   final controller = TextEditingController(text: text)
     ..selection = TextSelection(baseOffset: 0, extentOffset: text?.length ?? 0);
 
-  return GlassModalSheet.show(
+  return showAdaptiveDraggableSheet(
     context: context,
-    useRootNavigator: true,
-    dragIndicatorWidth: 64,
-    halfSize: 0.6,
-    fullSize: 0.9,
     builder: (context) => _ExercisePickerSheet(
       controller: controller,
       onExerciseAdded: onExerciseAdded,
