@@ -379,6 +379,7 @@ class _SlackblastPickerSheetState
     final l10n = L10n.of(context)!;
     return Material(
       child: AdaptiveScaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AdaptiveAppBar(
           leading: [
             AdaptiveAppBarItem(

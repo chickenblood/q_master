@@ -186,6 +186,7 @@ class WorkoutsTab extends ConsumerWidget {
     final workouts = ref.watch(workoutListProvider);
     final listNotifier = ref.read(workoutListProvider.notifier);
     return AdaptiveScaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AdaptiveAppBar(
         leading: [settingsGlassBarItem(id: 'left-item', context: context)],
         title: Text(

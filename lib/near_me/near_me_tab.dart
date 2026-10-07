@@ -48,6 +48,7 @@ class NearMeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AdaptiveScaffold(
+    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     appBar: AdaptiveAppBar(
       leading: [settingsGlassBarItem(id: 'left-item', context: context)],
       title: Text(

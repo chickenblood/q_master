@@ -27,6 +27,7 @@ final class DeckOfPainGameView extends StatelessWidget {
     return Hero(
       tag: heroTag,
       child: AdaptiveScaffold(
+        backgroundColor: Colors.black,
         appBar: AdaptiveAppBar(
           backgroundColor: Colors.transparent,
           leading: [

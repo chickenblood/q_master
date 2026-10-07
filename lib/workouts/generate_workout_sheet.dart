@@ -105,6 +105,7 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
   @override
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AdaptiveAppBar(
         leading: [
           AdaptiveAppBarItem(

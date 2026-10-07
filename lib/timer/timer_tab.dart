@@ -129,6 +129,7 @@ final class TimerScreen extends ConsumerWidget {
         ? formatDuration
         : formatPreciseDuration;
     return AdaptiveScaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: isPortrait || isTablet
           ? AdaptiveAppBar(
               title: Text(

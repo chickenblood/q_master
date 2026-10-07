@@ -665,6 +665,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: _nameTextController,
     builder: (_, _) => AdaptiveScaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AdaptiveAppBar(
         backgroundColor: Colors.transparent,
         leading: [

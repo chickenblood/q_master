@@ -93,6 +93,7 @@ class TimerSetupTab extends ConsumerWidget {
     final timer = ref.read(timerProvider.notifier);
     final prefs = SharedAppPrefs.instance;
     return AdaptiveScaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AdaptiveAppBar(
         title: Text(
           l10n.timerSetupTabTitle,

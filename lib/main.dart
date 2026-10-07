@@ -185,6 +185,7 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                 builder: (context, _) {
                   final selectedIndex = widget._tabController.index(context);
                   return AdaptiveScaffold(
+                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                     body: SafeArea(
                       top: false,
                       child: _TabsContainer(
