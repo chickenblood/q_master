@@ -18,7 +18,7 @@ final class AdaptiveTabItem {
 /// A tab bar that adapts to the platform (Material or Cupertino).
 ///
 /// Supports auto-minimizing on iOS if a ScrollController is provided.
-final class AdaptiveTabBar extends StatelessWidget {
+final class AdaptiveTabBar extends StatefulWidget {
   final List<AdaptiveTabItem> items;
   final int selectedIndex;
   final ValueChanged<int> onTabSelected;
@@ -26,7 +26,6 @@ final class AdaptiveTabBar extends StatelessWidget {
   final Color? selectedIconColor;
   final Color? unselectedIconColor;
   final AdaptiveAccessoryActionItem? trailingButton;
-  final GlassTabBarMinimizeController minimizeController;
   final ScrollController? scrollController;
 
   AdaptiveTabBar({
@@ -38,9 +37,24 @@ final class AdaptiveTabBar extends StatelessWidget {
     this.selectedIconColor,
     this.unselectedIconColor,
     this.scrollController,
-    GlassTabBarMinimizeController? minimizeController,
     this.trailingButton,
-  }) : minimizeController = minimizeController ?? GlassTabBarMinimizeController();
+  });
+
+  @override
+  State<AdaptiveTabBar> createState() => _AdaptiveTabBarState();
+}
+
+final class _AdaptiveTabBarState extends State<AdaptiveTabBar> {
+  // Handle minimizing the tab bar when scrolling down.
+  final _minimizeController = GlassTabBarMinimizeController(
+    behavior: .onScrollDown,
+  );
+
+  @override
+  void dispose() {
+    _minimizeController.dispose();
+    super.dispose();
+  }
 
   GlassTabBarTrailingButton? _buildTrailingButton(
     AdaptiveAccessoryActionItem? trailingItem, {
@@ -73,35 +87,35 @@ final class AdaptiveTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Visibility(
-    visible: visible,
+    visible: widget.visible,
     child: PlatformWidget(
       material: (_, _) => BottomNavigationBar(
-        items: items
+        items: widget.items
             .map(
               (item) =>
                   BottomNavigationBarItem(icon: item.icon, label: item.label),
             )
             .toList(),
-        currentIndex: selectedIndex,
-        onTap: onTabSelected,
-        selectedItemColor: selectedIconColor,
-        unselectedItemColor: unselectedIconColor,
+        currentIndex: widget.selectedIndex,
+        onTap: widget.onTabSelected,
+        selectedItemColor: widget.selectedIconColor,
+        unselectedItemColor: widget.unselectedIconColor,
       ),
       cupertino: (_, _) => SafeArea(
         bottom: false,
         child: GlassMorphTrigger(
           builder: (innerContext, anchor) => GlassTabBar.minimizable(
-            tabs: items
+            tabs: widget.items
                 .map((item) => GlassTab(icon: item.icon, label: item.label))
                 .toList(),
-            selectedIndex: selectedIndex,
-            onTabSelected: onTabSelected,
-            selectedIconColor: selectedIconColor,
-            minimizeController: minimizeController,
-            scrollController: scrollController,
-            onMinimizedTabTap: minimizeController.expand,
+            selectedIndex: widget.selectedIndex,
+            onTabSelected: widget.onTabSelected,
+            selectedIconColor: widget.selectedIconColor,
+            minimizeController: _minimizeController,
+            scrollController: widget.scrollController,
+            onMinimizedTabTap: _minimizeController.expand,
             trailingButton: _buildTrailingButton(
-              trailingButton,
+              widget.trailingButton,
               anchor: anchor,
             ),
           ),
