@@ -75,10 +75,6 @@ class _MainApp extends ConsumerStatefulWidget with WidgetsBindingObserver {
 
 final class _MainAppState extends ConsumerState<_MainApp> {
   final _tabPages = <Widget>[];
-  // Handle minimizing the tab bar when scrolling down.
-  final _minimizeController = GlassTabBarMinimizeController(
-    behavior: .onScrollDown,
-  );
   final _workoutsScrollController = ScrollController();
   late final StreamSubscription<SharedMedia> _sharedMediaSubscription;
 
