@@ -26,7 +26,7 @@ final class AdaptiveTabBar extends StatelessWidget {
   final Color? selectedIconColor;
   final Color? unselectedIconColor;
   final AdaptiveAccessoryActionItem? trailingButton;
-  final minimizeController = GlassTabBarMinimizeController();
+  final GlassTabBarMinimizeController minimizeController;
   final ScrollController? scrollController;
 
   AdaptiveTabBar({
@@ -38,8 +38,9 @@ final class AdaptiveTabBar extends StatelessWidget {
     this.selectedIconColor,
     this.unselectedIconColor,
     this.scrollController,
+    GlassTabBarMinimizeController? minimizeController,
     this.trailingButton,
-  });
+  }) : minimizeController = minimizeController ?? GlassTabBarMinimizeController();
 
   GlassTabBarTrailingButton? _buildTrailingButton(
     AdaptiveAccessoryActionItem? trailingItem, {

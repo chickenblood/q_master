@@ -194,6 +194,7 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                       ),
                     ),
                     bottomBar: AdaptiveTabBar(
+                      minimizeController: _minimizeController,
                       visible: _shouldShowTabBar(context),
                       selectedIconColor: Theme.of(context).colorScheme.primary,
                       selectedIndex: selectedIndex,
