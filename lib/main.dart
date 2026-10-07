@@ -227,6 +227,9 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                           : null,
                       scrollController: _workoutsScrollController,
                     ),
+                    // Stops the body from resizing when the keyboard appears.
+                    // so the tab bar doesn't end up atop the keyboard.
+                    resizeToAvoidBottomInset: false,
                     // Android only
                     floatingActionButton: selectedIndex == Tab.workouts.index
                         ? _addWorkoutButton(context: context, ref: ref)
