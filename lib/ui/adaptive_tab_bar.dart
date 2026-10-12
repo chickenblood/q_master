@@ -28,7 +28,7 @@ final class AdaptiveTabBar extends StatefulWidget {
   final AdaptiveAccessoryActionItem? trailingButton;
   final ScrollController? scrollController;
 
-  AdaptiveTabBar({
+  const AdaptiveTabBar({
     super.key,
     required this.items,
     this.selectedIndex = 0,

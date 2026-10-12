@@ -4,8 +4,9 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 final class AdaptiveSegment {
   final String label;
+  final Widget? icon;
 
-  const AdaptiveSegment({required this.label});
+  const AdaptiveSegment({required this.label, this.icon});
 }
 
 final class AdaptiveSegmentedControl extends StatelessWidget {
@@ -23,7 +24,9 @@ final class AdaptiveSegmentedControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) => PlatformWidget(
     cupertino: (innerContext, _) => GlassSegmentedControl(
-      segments: segments.map((e) => GlassSegment(label: e.label)).toList(),
+      segments: segments
+          .map((e) => GlassSegment(label: e.label, icon: e.icon))
+          .toList(),
       selectedIndex: selectedIndex,
       onSegmentSelected: onSegmentSelected,
       indicatorColor: Theme.of(innerContext).colorScheme.primary,
@@ -36,6 +39,7 @@ final class AdaptiveSegmentedControl extends StatelessWidget {
           .map(
             (entry) => ButtonSegment<int>(
               value: entry.key,
+              icon: entry.value.icon,
               label: Text(entry.value.label),
             ),
           )
