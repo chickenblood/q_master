@@ -445,14 +445,6 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
             _focusNode.requestFocus();
           }),
         ),
-        AdaptiveAppBarItem(
-          id: 'right_item',
-          icon: Icon(PlatformIcons(context).playArrowSolid),
-          onPressed: () => widget.onShowBeatdownBrowser?.call(
-            context,
-            _buildWorkoutFromUi(),
-          ),
-        ),
       ];
     }
     final theme = Theme.of(context);
@@ -699,6 +691,27 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           ],
         ),
       ),
+      bottomBar: _displayMode == .display
+          ? AdaptiveButtonBar(
+              mainAxisAlignment: .end,
+              items: [
+                AdaptiveButtonBarItem(
+                  icon: Icon(Icons.adaptive.share),
+                  onPressed: () =>
+                      widget.onShare?.call(context, _buildWorkoutFromUi()),
+                ),
+                AdaptiveButtonBarItem(
+                  icon: Icon(PlatformIcons(context).playArrowSolid),
+                  onPressed: () {
+                    widget.onShowBeatdownBrowser?.call(
+                      context,
+                      _buildWorkoutFromUi(),
+                    );
+                  },
+                ),
+              ],
+            )
+          : null,
     ),
   );
 
