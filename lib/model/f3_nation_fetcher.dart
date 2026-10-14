@@ -159,7 +159,7 @@ final class F3NationFetcher extends _$F3NationFetcher {
         'parentOrgIds': [regionId],
         if (searchTerm != null && searchTerm.isNotEmpty)
           'searchTerm': searchTerm,
-        'pageSize': 200,
+        'pageSize': 20,
       },
     );
     final aos = _readList(json, 'orgs').map(F3Ao.fromApiJson).toList()
@@ -189,7 +189,12 @@ final class F3NationFetcher extends _$F3NationFetcher {
     final end = _dateOnly(to ?? today);
     final json = await _get(
       '/event-instance',
-      queryParameters: {'aoOrgId': aoOrgId, 'pageSize': 500},
+      queryParameters: {
+        'aoOrgId': aoOrgId,
+        'pageSize': 20,
+        'startDate': start,
+        'endDate': end,
+      },
     );
     final instances =
         _readList(json, 'eventInstances')
