@@ -123,6 +123,7 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
           exercisesPerPage: exercisesPerPage,
         );
         return AdaptiveScaffold(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           body: SafeArea(
             child: GestureDetector(
               onScaleStart: _handleScaleStart,
