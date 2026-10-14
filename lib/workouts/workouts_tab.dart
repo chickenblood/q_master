@@ -26,6 +26,22 @@ import 'create_workout_sheet.dart';
 import 'generate_workout_sheet.dart';
 import 'workout_creation_picker.dart' as creation_picker;
 
+enum WorkoutRoute { editor, beatdownBrowser }
+
+final activeWorkoutRoutesProvider =
+    NotifierProvider<ActiveWorkoutRoutes, Set<WorkoutRoute>>(
+      ActiveWorkoutRoutes.new,
+    );
+
+final class ActiveWorkoutRoutes extends Notifier<Set<WorkoutRoute>> {
+  @override
+  Set<WorkoutRoute> build() => {};
+
+  void push(WorkoutRoute route) => state = {...state, route};
+
+  void pop(WorkoutRoute route) => state = {...state}..remove(route);
+}
+
 class WorkoutsTab extends ConsumerWidget {
   final ScrollController? _scrollController;
   const WorkoutsTab({super.key, ScrollController? scrollController})
@@ -152,33 +168,55 @@ class WorkoutsTab extends ConsumerWidget {
     BuildContext context, {
     Workout? workout,
     required DisplayMode displayMode,
-  }) => Navigator.of(context, rootNavigator: false).push(
-    platformPageRoute(
-      //fullscreenDialog: true,
-      context: context,
-      builder: (_) => CreateWorkoutSheet(
-        originalWorkout: workout,
-        initialDisplayMode: displayMode,
-        onShare: _shareWorkout,
-        onShowBeatdownBrowser: _showBeatdownBrowser,
-      ),
-    ),
-  );
+  }) async {
+    final activeRoutes = ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(activeWorkoutRoutesProvider.notifier);
+    activeRoutes.push(WorkoutRoute.editor);
+    try {
+      return await Navigator.of(context, rootNavigator: false).push(
+        platformPageRoute(
+          settings: RouteSettings(name: WorkoutRoute.editor.name),
+          //fullscreenDialog: true,
+          context: context,
+          builder: (_) => CreateWorkoutSheet(
+            originalWorkout: workout,
+            initialDisplayMode: displayMode,
+            onShare: _shareWorkout,
+            onShowBeatdownBrowser: _showBeatdownBrowser,
+          ),
+        ),
+      );
+    } finally {
+      activeRoutes.pop(WorkoutRoute.editor);
+    }
+  }
+
   static Future<void> _showBeatdownBrowser(
     BuildContext context,
     Workout workout,
   ) async {
+    final activeRoutes = ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(activeWorkoutRoutesProvider.notifier);
+    activeRoutes.push(WorkoutRoute.beatdownBrowser);
     // Stop the screen from sleeping while the beatdown browser is shown.
     WakelockPlus.enable();
 
-    await Navigator.of(context).pushReplacement(
-      platformPageRoute(
-        context: context,
-        builder: (context) => BeatdownBrowser(workout: workout),
-      ),
-    );
-
-    WakelockPlus.disable();
+    try {
+      await Navigator.of(context).pushReplacement(
+        platformPageRoute(
+          settings: RouteSettings(name: WorkoutRoute.beatdownBrowser.name),
+          context: context,
+          builder: (context) => BeatdownBrowser(workout: workout),
+        ),
+      );
+    } finally {
+      WakelockPlus.disable();
+      activeRoutes.pop(WorkoutRoute.beatdownBrowser);
+    }
   }
 
   @override
@@ -214,7 +252,13 @@ class WorkoutsTab extends ConsumerWidget {
                   key: ValueKey(workouts[index]),
                   listNotifier: listNotifier,
                   workout: workouts[index],
-                  onInvokeWorkoutEditor: invokeWorkoutEditor,
+                  onInvokeWorkoutEditor:
+                      (context, {workout, required displayMode}) =>
+                          invokeWorkoutEditor(
+                            context,
+                            workout: workout,
+                            displayMode: displayMode,
+                          ),
                   onShareWorkout: _shareWorkout,
                   onShareToBackblast: _showSlackblastPicker,
                 ),

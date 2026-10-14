@@ -141,6 +141,10 @@ final class _MainAppState extends ConsumerState<_MainApp> {
   // Determine whether to show the tab bar based on the selected tab, device
   // and orientation.
   bool _shouldShowTabBar(BuildContext context) {
+    if (ref.watch(activeWorkoutRoutesProvider).contains(WorkoutRoute.editor)) {
+      return false;
+    }
+
     final isTablet = MediaUtils.isTablet(context);
     final selectedIndex = widget._tabController.index(context);
     // We want a full screen timer on phones in landscape mode.
@@ -149,6 +153,8 @@ final class _MainAppState extends ConsumerState<_MainApp> {
 
     return isTablet || !(isTimerTab && isLandscape);
   }
+
+  bool get _shouldShowFab => ref.watch(activeWorkoutRoutesProvider).isEmpty;
 
   @override
   Widget build(BuildContext context) {
@@ -214,7 +220,8 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                         ),
                       ],
                       // iOS only
-                      trailingButton: selectedIndex == Tab.workouts.index
+                      trailingButton:
+                          selectedIndex == Tab.workouts.index && _shouldShowFab
                           ? _addWorkoutButton(
                               context: context,
                               ref: ref,
@@ -227,7 +234,8 @@ final class _MainAppState extends ConsumerState<_MainApp> {
                     // so the tab bar doesn't end up atop the keyboard.
                     resizeToAvoidBottomInset: false,
                     // Android only
-                    floatingActionButton: selectedIndex == Tab.workouts.index
+                    floatingActionButton:
+                        selectedIndex == Tab.workouts.index && _shouldShowFab
                         ? _addWorkoutButton(context: context, ref: ref)
                         : null,
                   );
