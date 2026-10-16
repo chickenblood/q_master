@@ -39,4 +39,7 @@ final class AdaptiveIcons {
 
   static IconData get notes =>
       Platform.isIOS ? CupertinoIcons.doc_text : Icons.description_outlined;
+
+  static IconData get file =>
+      Platform.isIOS ? CupertinoIcons.doc : Icons.attach_file;
 }

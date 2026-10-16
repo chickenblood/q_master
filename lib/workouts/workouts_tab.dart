@@ -25,6 +25,7 @@ import 'beatdown_browser_screen.dart';
 import 'create_workout_sheet.dart';
 import 'generate_workout_sheet.dart';
 import 'workout_creation_picker.dart' as creation_picker;
+  import 'workout_share_picker.dart';
 
 enum WorkoutRoute { editor, beatdownBrowser }
 
@@ -141,24 +142,27 @@ class WorkoutsTab extends ConsumerWidget {
     final box = context.findRenderObject() as RenderBox;
     final sharePositionRect = box.localToGlobal(Offset.zero) & box.size;
 
-    // Share as plain text (for Slack) and json (for another Q Master user on
-    // Airdrop)
-    final plainText = workout.formattedText;
-    //final text = XFile.fromData(utf8.encode(plainText), mimeType: 'text/plain');
+    final shareType = await showWorkoutSharePicker(context: context);
+    if (shareType == null) return;
 
-    final jsonText = workout.formattedJson;
-    final json = XFile.fromData(
-      utf8.encode(jsonText),
-      mimeType: 'application/json',
-    );
-    await SharePlus.instance.share(
-      ShareParams(
-        text: plainText,
-        files: [json],
+    // Plain text suits Slack; the json file suits another Q Master user.
+    final ShareParams params = switch (shareType) {
+      WorkoutShareType.plainText => ShareParams(
+        text: workout.formattedText,
+        sharePositionOrigin: sharePositionRect,
+      ),
+      WorkoutShareType.beatdownFile => ShareParams(
+        files: [
+          XFile.fromData(
+            utf8.encode(workout.formattedJson),
+            mimeType: 'application/json',
+          ),
+        ],
         fileNameOverrides: ['workout.qmw'],
         sharePositionOrigin: sharePositionRect,
       ),
-    );
+    };
+    await SharePlus.instance.share(params);
   }
 
   Future<void> _showSlackblastPicker(BuildContext context, Workout workout) =>

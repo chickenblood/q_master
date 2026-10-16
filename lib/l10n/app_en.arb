@@ -82,6 +82,26 @@
     "@createWorkoutPickerTitle": {
       "description": "Title of the bottom sheet for deciding how to create a new beatdown."
     },
+    "sharePickerTitle": "Share Beatdown",
+    "@sharePickerTitle": {
+      "description": "Title of the bottom sheet for choosing how to share a beatdown."
+    },
+    "sharePickerPlainText": "Share as plain text",
+    "@sharePickerPlainText": {
+      "description": "Share picker option label for sharing a beatdown as plain text."
+    },
+    "sharePickerPlainTextSubtitle": "Paste into Slack or a message",
+    "@sharePickerPlainTextSubtitle": {
+      "description": "Subtitle for the plain text share option."
+    },
+    "sharePickerFile": "Share beatdown file",
+    "@sharePickerFile": {
+      "description": "Share picker option label for sharing a beatdown as a Q Master file."
+    },
+    "sharePickerFileSubtitle": "Open in another Q Master",
+    "@sharePickerFileSubtitle": {
+      "description": "Subtitle for the beatdown file share option."
+    },
     "createWorkoutDialogTitle": "Create Beatdown",
     "@createWorkoutDialogTitle": {
       "description": "Title of the bottom sheet for creating a new beatdown."
