@@ -29,6 +29,10 @@ Future<T?> showOptionPicker<T>({
   if (anchor != null) {
     return GlassModalSheet.show(
       morphFrom: anchor,
+      initialState: .full,
+      detents: {
+        MediaQuery.orientationOf(context) == .portrait ? .medium : .large,
+      },
       context: context,
       useRootNavigator: true,
       builder: (_) => _OptionPicker<T>(title: title, options: options),
