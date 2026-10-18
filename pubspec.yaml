@@ -1,7 +1,7 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 3.4.1+615
+version: 3.4.1+616
 
 environment:
   sdk: ^3.10.0
@@ -24,6 +24,7 @@ dependencies: # keep sorted alphabetically
   flutter_riverpod: ^3.0.3
   flutter_widget_from_html_core: ^0.17.2
   freezed_annotation: ^3.1.0
+  go_router: ^18.1.0
   intl: any
   json_annotation: ^4.9.0
   just_audio: ^0.10.5

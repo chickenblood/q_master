@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart' show CupertinoPage;
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -25,25 +27,82 @@ import 'beatdown_browser_screen.dart';
 import 'create_workout_sheet.dart';
 import 'generate_workout_sheet.dart';
 import 'workout_creation_picker.dart' as creation_picker;
-  import 'workout_share_picker.dart';
+import 'workout_share_picker.dart';
 
-enum WorkoutRoute { editor, beatdownBrowser }
+final class WorkoutEditorRouteArguments {
+  final Workout? workout;
+  final DisplayMode displayMode;
 
-final activeWorkoutRoutesProvider =
-    NotifierProvider<ActiveWorkoutRoutes, Set<WorkoutRoute>>(
-      ActiveWorkoutRoutes.new,
-    );
-
-final class ActiveWorkoutRoutes extends Notifier<Set<WorkoutRoute>> {
-  @override
-  Set<WorkoutRoute> build() => {};
-
-  void push(WorkoutRoute route) => state = {...state, route};
-
-  void pop(WorkoutRoute route) => state = {...state}..remove(route);
+  const WorkoutEditorRouteArguments({
+    required this.workout,
+    required this.displayMode,
+  });
 }
 
 class WorkoutsTab extends ConsumerWidget {
+  static const editorRouteName = 'workout-editor';
+  static const beatdownBrowserRouteName = 'beatdown-browser';
+
+  static List<RouteBase> get routes => [
+    GoRoute(
+      path: 'editor',
+      name: editorRouteName,
+      pageBuilder: (context, state) {
+        final arguments = state.extra;
+        if (arguments is! WorkoutEditorRouteArguments) {
+          throw StateError('Workout editor route requires editor arguments.');
+        }
+        return _routePage(
+          context,
+          state,
+          CreateWorkoutSheet(
+            originalWorkout: arguments.workout,
+            initialDisplayMode: arguments.displayMode,
+            onShare: _shareWorkout,
+            onShowBeatdownBrowser: _showBeatdownBrowser,
+          ),
+        );
+      },
+    ),
+    GoRoute(
+      path: 'beatdown-browser',
+      name: beatdownBrowserRouteName,
+      pageBuilder: (context, state) {
+        final workout = state.extra;
+        if (workout is! Workout) {
+          throw StateError('Beatdown browser route requires a workout.');
+        }
+        return _routePage(
+          context,
+          state,
+          _BeatdownBrowserRoute(workout: workout),
+        );
+      },
+    ),
+  ];
+
+  static Page<Object?> _routePage(
+    BuildContext context,
+    GoRouterState state,
+    Widget child,
+  ) {
+    final pageArguments = state.extra;
+    final pageName = state.name ?? state.path;
+    return isMaterial(context)
+        ? MaterialPage<Object?>(
+            key: state.pageKey,
+            name: pageName,
+            arguments: pageArguments,
+            child: child,
+          )
+        : CupertinoPage<Object?>(
+            key: state.pageKey,
+            name: pageName,
+            arguments: pageArguments,
+            child: child,
+          );
+  }
+
   final ScrollController? _scrollController;
   const WorkoutsTab({super.key, ScrollController? scrollController})
     : _scrollController = scrollController;
@@ -172,56 +231,16 @@ class WorkoutsTab extends ConsumerWidget {
     BuildContext context, {
     Workout? workout,
     required DisplayMode displayMode,
-  }) async {
-    final activeRoutes = ProviderScope.containerOf(
-      context,
-      listen: false,
-    ).read(activeWorkoutRoutesProvider.notifier);
-    activeRoutes.push(WorkoutRoute.editor);
-    try {
-      return await Navigator.of(context, rootNavigator: false).push(
-        platformPageRoute(
-          settings: RouteSettings(name: WorkoutRoute.editor.name),
-          //fullscreenDialog: true,
-          context: context,
-          builder: (_) => CreateWorkoutSheet(
-            originalWorkout: workout,
-            initialDisplayMode: displayMode,
-            onShare: _shareWorkout,
-            onShowBeatdownBrowser: _showBeatdownBrowser,
-          ),
-        ),
-      );
-    } finally {
-      activeRoutes.pop(WorkoutRoute.editor);
-    }
-  }
+  }) => context.pushNamed<Workout>(
+    editorRouteName,
+    extra: WorkoutEditorRouteArguments(
+      workout: workout,
+      displayMode: displayMode,
+    ),
+  );
 
-  static Future<void> _showBeatdownBrowser(
-    BuildContext context,
-    Workout workout,
-  ) async {
-    final activeRoutes = ProviderScope.containerOf(
-      context,
-      listen: false,
-    ).read(activeWorkoutRoutesProvider.notifier);
-    activeRoutes.push(WorkoutRoute.beatdownBrowser);
-    // Stop the screen from sleeping while the beatdown browser is shown.
-    WakelockPlus.enable();
-
-    try {
-      await Navigator.of(context).pushReplacement(
-        platformPageRoute(
-          settings: RouteSettings(name: WorkoutRoute.beatdownBrowser.name),
-          context: context,
-          builder: (context) => BeatdownBrowser(workout: workout),
-        ),
-      );
-    } finally {
-      WakelockPlus.disable();
-      activeRoutes.pop(WorkoutRoute.beatdownBrowser);
-    }
-  }
+  static void _showBeatdownBrowser(BuildContext context, Workout workout) =>
+      context.pushReplacementNamed(beatdownBrowserRouteName, extra: workout);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -272,6 +291,33 @@ class WorkoutsTab extends ConsumerWidget {
           : _emptyContentPlaceholder(context),
     );
   }
+}
+
+final class _BeatdownBrowserRoute extends StatefulWidget {
+  final Workout workout;
+
+  const _BeatdownBrowserRoute({required this.workout});
+
+  @override
+  State<_BeatdownBrowserRoute> createState() => _BeatdownBrowserRouteState();
+}
+
+final class _BeatdownBrowserRouteState extends State<_BeatdownBrowserRoute> {
+  @override
+  void initState() {
+    super.initState();
+    WakelockPlus.enable();
+  }
+
+  @override
+  void dispose() {
+    WakelockPlus.disable();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      BeatdownBrowser(workout: widget.workout);
 }
 
 final class _WorkoutTile extends StatelessWidget {

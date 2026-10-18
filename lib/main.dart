@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:audio_session/audio_session.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:shake/shake.dart';
@@ -37,9 +37,6 @@ Future<void> main() async {
 class _MainApp extends ConsumerStatefulWidget with WidgetsBindingObserver {
   late final ShakeDetector _shakeDetector;
   final _navigatorKey = GlobalKey<NavigatorState>();
-  final _tabController = PlatformTabController(
-    initialIndex: Tab.workouts.index,
-  );
 
   _MainApp() {
     _configureAudioSession();
@@ -48,8 +45,10 @@ class _MainApp extends ConsumerStatefulWidget with WidgetsBindingObserver {
     // Easter egg sound effect on game action or shake.
     _shakeDetector = ShakeDetector.autoStart(
       onPhoneShake: (_) {
-        final selectedTab = _tabController.index(_navigatorKey.currentContext!);
-        if (selectedTab != Tab.games.index &&
+        final location = GoRouter.of(
+          _navigatorKey.currentContext!,
+        ).state.uri.path;
+        if (!location.startsWith('/games') &&
             SharedAppPrefs.instance.motorboatSoundEnabled.value) {
           AudioPlayer()
             ..setAsset('assets/sounds/easter_egg.m4a')
@@ -74,25 +73,75 @@ class _MainApp extends ConsumerStatefulWidget with WidgetsBindingObserver {
 }
 
 final class _MainAppState extends ConsumerState<_MainApp> {
-  final _tabPages = <Widget>[];
   final _workoutsScrollController = ScrollController();
   late final StreamSubscription<SharedMedia> _sharedMediaSubscription;
+  late final GoRouter _router;
 
   @override
   void initState() {
     super.initState();
-    _tabPages.addAll([
-      WorkoutsTab(scrollController: _workoutsScrollController),
-      GamesTab(),
-      TimerSetupTab(),
-      NearMeTab(),
-    ]);
+    _router = GoRouter(
+      navigatorKey: widget._navigatorKey,
+      initialLocation: '/workouts',
+      routes: [
+        StatefulShellRoute(
+          branches: [
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/workouts',
+                  routes: WorkoutsTab.routes,
+                  builder: (context, state) =>
+                      WorkoutsTab(scrollController: _workoutsScrollController),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/games',
+                  builder: (context, state) => GamesTab(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/timer',
+                  builder: (context, state) => TimerSetupTab(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/location',
+                  builder: (context, state) => NearMeTab(),
+                ),
+              ],
+            ),
+          ],
+          navigatorContainerBuilder: (context, navigationShell, children) =>
+              IndexedStack(
+                index: navigationShell.currentIndex,
+                children: [
+                  for (final child in children)
+                    GlassNavigationShell(child: child),
+                ],
+              ),
+          builder: (context, state, navigationShell) =>
+              _buildShell(context, state, navigationShell),
+        ),
+      ],
+    );
     configureReceivingShares();
   }
 
   @override
   void dispose() {
     _sharedMediaSubscription.cancel();
+    _router.dispose();
+    _workoutsScrollController.dispose();
     super.dispose();
   }
 
@@ -140,13 +189,16 @@ final class _MainAppState extends ConsumerState<_MainApp> {
 
   // Determine whether to show the tab bar based on the selected tab, device
   // and orientation.
-  bool _shouldShowTabBar(BuildContext context) {
-    if (ref.watch(activeWorkoutRoutesProvider).contains(WorkoutRoute.editor)) {
+  bool _shouldShowTabBar(
+    BuildContext context, {
+    required String location,
+    required int selectedIndex,
+  }) {
+    if (location == '/workouts/editor') {
       return false;
     }
 
     final isTablet = MediaUtils.isTablet(context);
-    final selectedIndex = widget._tabController.index(context);
     // We want a full screen timer on phones in landscape mode.
     final isTimerTab = Tab.values[selectedIndex] == .timer;
     final isLandscape = MediaQuery.orientationOf(context) == .landscape;
@@ -154,7 +206,55 @@ final class _MainAppState extends ConsumerState<_MainApp> {
     return isTablet || !(isTimerTab && isLandscape);
   }
 
-  bool get _shouldShowFab => ref.watch(activeWorkoutRoutesProvider).isEmpty;
+  Widget _buildShell(
+    BuildContext context,
+    GoRouterState state,
+    StatefulNavigationShell navigationShell,
+  ) {
+    final selectedIndex = navigationShell.currentIndex;
+    final location = state.uri.path;
+    final shouldShowFab = location == '/workouts';
+    return AdaptiveScaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: SafeArea(top: false, child: navigationShell),
+      bottomBar: AdaptiveTabBar(
+        visible: _shouldShowTabBar(
+          context,
+          location: location,
+          selectedIndex: selectedIndex,
+        ),
+        selectedIconColor: Theme.of(context).colorScheme.primary,
+        selectedIndex: selectedIndex,
+        onTabSelected: (index) => navigationShell.goBranch(index),
+        items: [
+          AdaptiveTabItem(
+            icon: Icon(AdaptiveIcons.history),
+            label: L10n.of(context)!.workoutsTabTitle,
+          ),
+          AdaptiveTabItem(
+            icon: Icon(AdaptiveIcons.sports),
+            label: L10n.of(context)!.gamesTabTitle,
+          ),
+          AdaptiveTabItem(
+            icon: Icon(AdaptiveIcons.timer),
+            label: L10n.of(context)!.timerPageTitle,
+          ),
+          AdaptiveTabItem(
+            icon: Icon(AdaptiveIcons.location),
+            label: L10n.of(context)!.nearMeTabTitle,
+          ),
+        ],
+        trailingButton: selectedIndex == Tab.workouts.index && shouldShowFab
+            ? _addWorkoutButton(context: context, ref: ref)
+            : null,
+        scrollController: _workoutsScrollController,
+      ),
+      resizeToAvoidBottomInset: false,
+      floatingActionButton: selectedIndex == Tab.workouts.index && shouldShowFab
+          ? _addWorkoutButton(context: context, ref: ref)
+          : null,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -176,71 +276,12 @@ final class _MainAppState extends ConsumerState<_MainApp> {
           ),
           themeMode: ThemeMode.values[SharedAppPrefs.instance.theme.value],
           builder: (context) => ScaffoldMessenger(
-            child: PlatformApp(
+            child: PlatformApp.router(
               title: 'Q Master',
               localizationsDelegates: L10n.localizationsDelegates,
               supportedLocales: L10n.supportedLocales,
-              navigatorKey: widget._navigatorKey,
+              routerConfig: _router,
               debugShowCheckedModeBanner: false,
-              home: ListenableBuilder(
-                listenable: widget._tabController,
-                builder: (context, _) {
-                  final selectedIndex = widget._tabController.index(context);
-                  return AdaptiveScaffold(
-                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    body: SafeArea(
-                      top: false,
-                      child: _TabsContainer(
-                        selectedIndex: selectedIndex,
-                        children: _tabPages,
-                      ),
-                    ),
-                    bottomBar: AdaptiveTabBar(
-                      visible: _shouldShowTabBar(context),
-                      selectedIconColor: Theme.of(context).colorScheme.primary,
-                      selectedIndex: selectedIndex,
-                      onTabSelected: (index) =>
-                          widget._tabController.setIndex(context, index),
-                      items: [
-                        AdaptiveTabItem(
-                          icon: Icon(AdaptiveIcons.history),
-                          label: L10n.of(context)!.workoutsTabTitle,
-                        ),
-                        AdaptiveTabItem(
-                          icon: Icon(AdaptiveIcons.sports),
-                          label: L10n.of(context)!.gamesTabTitle,
-                        ),
-                        AdaptiveTabItem(
-                          icon: Icon(AdaptiveIcons.timer),
-                          label: L10n.of(context)!.timerPageTitle,
-                        ),
-                        AdaptiveTabItem(
-                          icon: Icon(AdaptiveIcons.location),
-                          label: L10n.of(context)!.nearMeTabTitle,
-                        ),
-                      ],
-                      // iOS only
-                      trailingButton:
-                          selectedIndex == Tab.workouts.index && _shouldShowFab
-                          ? _addWorkoutButton(
-                              context: context,
-                              ref: ref,
-                              isMenuButton: false,
-                            )
-                          : null,
-                      scrollController: _workoutsScrollController,
-                    ),
-                    // Stops the body from resizing when the keyboard appears.
-                    // so the tab bar doesn't end up atop the keyboard.
-                    resizeToAvoidBottomInset: false,
-                    // Android only
-                    floatingActionButton:
-                        selectedIndex == Tab.workouts.index && _shouldShowFab
-                        ? _addWorkoutButton(context: context, ref: ref)
-                        : null,
-                  );
-                },
-              ),
             ),
           ),
         ),
@@ -253,37 +294,16 @@ final class _MainAppState extends ConsumerState<_MainApp> {
 AdaptiveAccessoryActionItem? _addWorkoutButton({
   required BuildContext context,
   required WidgetRef ref,
-  bool isMenuButton = false,
-  List<AdaptiveMenuItem> menuItems = const [],
 }) {
-  return isMenuButton
-      ? AdaptiveAccessoryActionItem.menu(
-          icon: Icon(PlatformIcons(context).add),
-          id: 'add-workout',
-          menuItems: [
-            AdaptiveMenuItem(
-              icon: Icon(AdaptiveIcons.create),
-              title: L10n.of(context)!.workoutCreationPickerManual,
-              onPressed: () =>
-                  WorkoutsTab.invokeWorkoutEditor(context, displayMode: .edit),
-            ),
-            AdaptiveMenuItem(
-              icon: Icon(AdaptiveIcons.sparkles),
-              title: L10n.of(context)!.workoutCreationPickerGenerate,
-              onPressed: () =>
-                  WorkoutsTab.showGenerateWorkoutModal(context, ref: ref),
-            ),
-          ],
-        )
-      : AdaptiveAccessoryActionItem(
-          icon: Icon(PlatformIcons(context).add),
-          id: 'add-workout',
-          onPressed: (anchor) => WorkoutsTab.showWorkoutCreationPicker(
-            context: context,
-            ref: ref,
-            anchor: anchor,
-          ),
-        );
+  return AdaptiveAccessoryActionItem(
+    icon: Icon(PlatformIcons(context).add),
+    id: 'add-workout',
+    onPressed: (anchor) => WorkoutsTab.showWorkoutCreationPicker(
+      context: context,
+      ref: ref,
+      anchor: anchor,
+    ),
+  );
 }
 
 // Configure the audio session to not interrupt other audio apps.
@@ -305,34 +325,4 @@ Future<void> _configureAudioSession() async {
       androidWillPauseWhenDucked: false,
     ),
   );
-}
-
-/// Wraps tabs so that it supports nested navigation and remembers
-/// the navigation stack when switching tabs.
-final class _TabsContainer extends StatelessWidget {
-  final List<Widget> children;
-  final int selectedIndex;
-
-  _TabsContainer({required List<Widget> children, required this.selectedIndex})
-    : children = children.map((child) => _TabWrapper(child: child)).toList();
-
-  @override
-  Widget build(BuildContext context) {
-    return IndexedStack(index: selectedIndex, children: children);
-  }
-}
-
-final class _TabWrapper extends StatelessWidget {
-  final Widget child;
-
-  const _TabWrapper({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return GlassNavigationShell(
-      child: CupertinoTabView(
-        onGenerateRoute: (_) => MaterialPageRoute(builder: (_) => child),
-      ),
-    );
-  }
 }
