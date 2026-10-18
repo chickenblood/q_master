@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:q_master/ui/adaptive_scaffold.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,12 +11,37 @@ import '../l10n/l10n.dart';
 import '../model/exicon_fetcher.dart';
 import '../ui/adaptive_draggable_sheet.dart';
 import '../ui/adaptive_icons.dart';
+import '../ui/adaptive_route_page.dart';
 import '../ui/simple_alert.dart';
 import '../utils/shared_app_prefs.dart';
 import 'exicon_catalog.dart';
 import 'workout_auto_completions.dart';
 import 'workout_constants.dart';
 import 'youtube_video_screen.dart';
+
+/// Route name for full-screen YouTube playback opened from the exercise picker.
+const youtubeVideoRouteName = 'youtube-video';
+
+/// Builds the video route on the root navigator so it covers the tab shell.
+GoRoute youtubeVideoRoute({
+  required GlobalKey<NavigatorState> rootNavigatorKey,
+}) => GoRoute(
+  path: 'youtube-video',
+  name: youtubeVideoRouteName,
+  parentNavigatorKey: rootNavigatorKey,
+  pageBuilder: (context, state) {
+    final videoId = state.extra;
+    if (videoId is! String || videoId.isEmpty) {
+      throw StateError('YouTube video route requires a video ID.');
+    }
+    return adaptiveRoutePage(
+      context,
+      state,
+      YoutubeVideoScreen(videoId: videoId),
+      fullscreenDialog: true,
+    );
+  },
+);
 
 Future<String?> showExercisePicker(
   BuildContext context, {
@@ -159,12 +185,7 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
         await launchUrl(videoUrl, mode: .externalApplication);
         return;
       }
-      await Navigator.of(context, rootNavigator: true).push<void>(
-        MaterialPageRoute(
-          fullscreenDialog: true,
-          builder: (_) => YoutubeVideoScreen(videoId: videoId),
-        ),
-      );
+      await context.pushNamed<void>(youtubeVideoRouteName, extra: videoId);
     } else {
       await launchUrl(videoUrl, mode: .externalApplication);
     }

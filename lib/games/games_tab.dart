@@ -3,31 +3,88 @@ import 'dart:math';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:go_router/go_router.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../l10n/l10n.dart';
 import '../settings/settings_sheet.dart';
 import '../ui/adaptive_widgets.dart';
 import '../ui/media_query.dart';
+import '../ui/adaptive_route_page.dart';
 import 'deck_of_pain_game_view.dart';
 import 'dod_game_view.dart';
 
+/// Carries the source tile's Hero tag into a full-screen game route.
+final class GameRouteArguments {
+  final String heroTag;
+
+  const GameRouteArguments({required this.heroTag});
+}
+
 class GamesTab extends StatelessWidget {
+  /// Route name for the Dodecahedron of Doom game.
+  static const dodGameRouteName = 'dod-game';
+
+  /// Route name for the Deck of Pain game.
+  static const deckOfPainGameRouteName = 'deck-of-pain-game';
+
+  /// Builds game routes on the root navigator so they cover the tab shell.
+  static List<RouteBase> routes({
+    required GlobalKey<NavigatorState> rootNavigatorKey,
+  }) => [
+    GoRoute(
+      path: 'dod-game',
+      name: dodGameRouteName,
+      parentNavigatorKey: rootNavigatorKey,
+      pageBuilder: (context, state) {
+        final arguments = state.extra;
+        if (arguments is! GameRouteArguments) {
+          throw StateError('DoD route requires game route arguments.');
+        }
+        return adaptiveRoutePage(
+          context,
+          state,
+          DodGameView(heroTag: arguments.heroTag),
+          fullscreenDialog: true,
+        );
+      },
+    ),
+    GoRoute(
+      path: 'deck-of-pain',
+      name: deckOfPainGameRouteName,
+      parentNavigatorKey: rootNavigatorKey,
+      pageBuilder: (context, state) {
+        final arguments = state.extra;
+        if (arguments is! GameRouteArguments) {
+          throw StateError('Deck of Pain route requires game route arguments.');
+        }
+        return adaptiveRoutePage(
+          context,
+          state,
+          DeckOfPainGameView(heroTag: arguments.heroTag),
+          fullscreenDialog: true,
+        );
+      },
+    ),
+  ];
+
   const GamesTab({super.key});
 
-  Future<void> _showDodGame(BuildContext context, String tag) =>
-      _withPortraitLock(
-        context: context,
-        action: () => _presentModalSheet(context, DodGameView(heroTag: tag)),
-      );
+  Future<void> _showDodGame(BuildContext context, String tag) {
+    final router = GoRouter.of(context);
+    return _withPortraitLock(
+      context: context,
+      action: () => _presentGame(router, dodGameRouteName, tag),
+    );
+  }
 
-  Future<void> _showDeckOfPainGame(BuildContext context, String tag) =>
-      _withPortraitLock(
-        context: context,
-        action: () =>
-            _presentModalSheet(context, DeckOfPainGameView(heroTag: tag)),
-      );
+  Future<void> _showDeckOfPainGame(BuildContext context, String tag) {
+    final router = GoRouter.of(context);
+    return _withPortraitLock(
+      context: context,
+      action: () => _presentGame(router, deckOfPainGameRouteName, tag),
+    );
+  }
 
   Future<void> _withPortraitLock({
     required BuildContext context,
@@ -42,6 +99,7 @@ class GamesTab extends StatelessWidget {
     }
 
     try {
+      if (!context.mounted) return;
       await action();
     } finally {
       if (shouldLockPortrait) {
@@ -50,19 +108,20 @@ class GamesTab extends StatelessWidget {
     }
   }
 
-  Future<void> _presentModalSheet(BuildContext context, Widget child) async {
-    // Stop the screen from sleeping while the beatdown browser is shown.
-    WakelockPlus.enable();
-
-    await Navigator.of(context, rootNavigator: true).push(
-      platformPageRoute(
-        context: context,
-        fullscreenDialog: true,
-        builder: (context) => child,
-      ),
-    );
-
-    WakelockPlus.disable();
+  Future<void> _presentGame(
+    GoRouter router,
+    String routeName,
+    String heroTag,
+  ) async {
+    await WakelockPlus.enable();
+    try {
+      await router.pushNamed<void>(
+        routeName,
+        extra: GameRouteArguments(heroTag: heroTag),
+      );
+    } finally {
+      await WakelockPlus.disable();
+    }
   }
 
   @override

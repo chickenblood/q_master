@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart' show CupertinoPage;
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +18,7 @@ import '../ui/adaptive_app_bar.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_menu.dart';
 import '../ui/adaptive_modal_sheet.dart';
+import '../ui/adaptive_route_page.dart';
 import '../ui/adaptive_scaffold.dart';
 import '../ui/dismissible_row.dart';
 import '../ui/menu_icons.dart';
@@ -40,9 +40,13 @@ final class WorkoutEditorRouteArguments {
 }
 
 class WorkoutsTab extends ConsumerWidget {
+  /// Route name for the workout editor.
   static const editorRouteName = 'workout-editor';
+
+  /// Route name for the beatdown exercise browser.
   static const beatdownBrowserRouteName = 'beatdown-browser';
 
+  /// Routes pushed above the workouts list while remaining in its tab branch.
   static List<RouteBase> get routes => [
     GoRoute(
       path: 'editor',
@@ -52,7 +56,7 @@ class WorkoutsTab extends ConsumerWidget {
         if (arguments is! WorkoutEditorRouteArguments) {
           throw StateError('Workout editor route requires editor arguments.');
         }
-        return _routePage(
+        return adaptiveRoutePage(
           context,
           state,
           CreateWorkoutSheet(
@@ -72,7 +76,7 @@ class WorkoutsTab extends ConsumerWidget {
         if (workout is! Workout) {
           throw StateError('Beatdown browser route requires a workout.');
         }
-        return _routePage(
+        return adaptiveRoutePage(
           context,
           state,
           _BeatdownBrowserRoute(workout: workout),
@@ -80,28 +84,6 @@ class WorkoutsTab extends ConsumerWidget {
       },
     ),
   ];
-
-  static Page<Object?> _routePage(
-    BuildContext context,
-    GoRouterState state,
-    Widget child,
-  ) {
-    final pageArguments = state.extra;
-    final pageName = state.name ?? state.path;
-    return isMaterial(context)
-        ? MaterialPage<Object?>(
-            key: state.pageKey,
-            name: pageName,
-            arguments: pageArguments,
-            child: child,
-          )
-        : CupertinoPage<Object?>(
-            key: state.pageKey,
-            name: pageName,
-            arguments: pageArguments,
-            child: child,
-          );
-  }
 
   final ScrollController? _scrollController;
   const WorkoutsTab({super.key, ScrollController? scrollController})

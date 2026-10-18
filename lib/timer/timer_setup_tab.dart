@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:q_master/settings/settings_sheet.dart';
 import 'package:q_master/utils/shared_app_prefs.dart';
@@ -12,12 +13,26 @@ import '../model/timer.dart';
 import '../theme/theme.dart';
 import '../ui/action_button.dart';
 import '../ui/adaptive_widgets.dart';
+import '../ui/adaptive_route_page.dart';
 import '../ui/media_query.dart';
 import '../utils/datetime_utils.dart';
 import 'timer_tab.dart';
 
 /// TimerSetupTab — matches Option 3 "Timer Tab (Setup-First)" mock
 class TimerSetupTab extends ConsumerWidget {
+  /// Route name for the full-screen timer launched from the setup tab.
+  static const timerScreenRouteName = 'timer-screen';
+
+  /// Routes owned by the timer tab, with the active timer as a pushed page.
+  static List<RouteBase> get routes => [
+    GoRoute(
+      path: 'screen',
+      name: timerScreenRouteName,
+      pageBuilder: (context, state) =>
+          adaptiveRoutePage(context, state, const TimerScreen()),
+    ),
+  ];
+
   const TimerSetupTab({super.key});
 
   void _showTimeIntervalPicker(
@@ -322,14 +337,8 @@ class TimerSetupTab extends ConsumerWidget {
               child: SizedBox(
                 height: 62,
                 child: ActionButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      platformPageRoute(
-                        context: context,
-                        builder: (_) => const TimerScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: () =>
+                      context.pushNamed<void>(timerScreenRouteName),
                   label: l10n.timerStartButtonLabel,
                   icon: context.platformIcons.playArrowSolid,
                 ),

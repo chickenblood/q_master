@@ -5,6 +5,7 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'games/games_tab.dart';
 import 'near_me/near_me_tab.dart';
 import 'timer/timer_setup_tab.dart';
+import 'workouts/exercise_picker_sheet.dart';
 import 'ui/app_shell.dart';
 import 'workouts/received_workout_share_listener.dart';
 import 'workouts/workouts_tab.dart';
@@ -27,7 +28,10 @@ GoRouter createAppRouter({
           routes: [
             GoRoute(
               path: '/workouts',
-              routes: WorkoutsTab.routes,
+              routes: [
+                ...WorkoutsTab.routes,
+                youtubeVideoRoute(rootNavigatorKey: navigatorKey),
+              ],
               builder: (context, state) =>
                   WorkoutsTab(scrollController: workoutsScrollController),
             ),
@@ -35,13 +39,18 @@ GoRouter createAppRouter({
         ),
         StatefulShellBranch(
           routes: [
-            GoRoute(path: '/games', builder: (context, state) => GamesTab()),
+            GoRoute(
+              path: '/games',
+              routes: GamesTab.routes(rootNavigatorKey: navigatorKey),
+              builder: (context, state) => GamesTab(),
+            ),
           ],
         ),
         StatefulShellBranch(
           routes: [
             GoRoute(
               path: '/timer',
+              routes: TimerSetupTab.routes,
               builder: (context, state) => TimerSetupTab(),
             ),
           ],
