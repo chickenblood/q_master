@@ -6,6 +6,7 @@ import 'games/games_tab.dart';
 import 'near_me/near_me_tab.dart';
 import 'timer/timer_setup_tab.dart';
 import 'ui/app_shell.dart';
+import 'workouts/received_workout_share_listener.dart';
 import 'workouts/workouts_tab.dart';
 
 /// Creates the app router with an independent navigation stack for each tab.
@@ -61,11 +62,14 @@ GoRouter createAppRouter({
               for (final child in children) GlassNavigationShell(child: child),
             ],
           ),
-      builder: (context, state, navigationShell) => AppShell(
-        navigationShell: navigationShell,
-        routerState: state,
-        workoutsScrollController: workoutsScrollController,
-      ),
+      builder: (context, state, navigationShell) =>
+          ReceivedWorkoutShareListener(
+            child: AppShell(
+              navigationShell: navigationShell,
+              routerState: state,
+              workoutsScrollController: workoutsScrollController,
+            ),
+          ),
     ),
   ],
 );
