@@ -11,20 +11,13 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:shake/shake.dart';
 import 'package:zikzak_share_handler/zikzak_share_handler.dart';
 
+import 'app_router.dart';
 import 'firebase_options.dart';
-import 'games/games_tab.dart';
 import 'l10n/l10n.dart';
 import 'model/workout_list.dart';
-import 'near_me/near_me_tab.dart';
 import 'theme/theme.dart';
-import 'timer/timer_setup_tab.dart';
-import 'ui/adaptive_widgets.dart';
-import 'ui/media_query.dart';
 import 'ui/simple_alert.dart';
 import 'utils/shared_app_prefs.dart';
-import 'workouts/workouts_tab.dart';
-
-enum Tab { workouts, games, timer, location }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -80,59 +73,9 @@ final class _MainAppState extends ConsumerState<_MainApp> {
   @override
   void initState() {
     super.initState();
-    _router = GoRouter(
+    _router = createAppRouter(
       navigatorKey: widget._navigatorKey,
-      initialLocation: '/workouts',
-      routes: [
-        StatefulShellRoute(
-          branches: [
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: '/workouts',
-                  routes: WorkoutsTab.routes,
-                  builder: (context, state) =>
-                      WorkoutsTab(scrollController: _workoutsScrollController),
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: '/games',
-                  builder: (context, state) => GamesTab(),
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: '/timer',
-                  builder: (context, state) => TimerSetupTab(),
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: '/location',
-                  builder: (context, state) => NearMeTab(),
-                ),
-              ],
-            ),
-          ],
-          navigatorContainerBuilder: (context, navigationShell, children) =>
-              IndexedStack(
-                index: navigationShell.currentIndex,
-                children: [
-                  for (final child in children)
-                    GlassNavigationShell(child: child),
-                ],
-              ),
-          builder: (context, state, navigationShell) =>
-              _buildShell(context, state, navigationShell),
-        ),
-      ],
+      workoutsScrollController: _workoutsScrollController,
     );
     configureReceivingShares();
   }
@@ -187,75 +130,6 @@ final class _MainAppState extends ConsumerState<_MainApp> {
         );
   }
 
-  // Determine whether to show the tab bar based on the selected tab, device
-  // and orientation.
-  bool _shouldShowTabBar(
-    BuildContext context, {
-    required String location,
-    required int selectedIndex,
-  }) {
-    if (location == '/workouts/editor') {
-      return false;
-    }
-
-    final isTablet = MediaUtils.isTablet(context);
-    // We want a full screen timer on phones in landscape mode.
-    final isTimerTab = Tab.values[selectedIndex] == .timer;
-    final isLandscape = MediaQuery.orientationOf(context) == .landscape;
-
-    return isTablet || !(isTimerTab && isLandscape);
-  }
-
-  Widget _buildShell(
-    BuildContext context,
-    GoRouterState state,
-    StatefulNavigationShell navigationShell,
-  ) {
-    final selectedIndex = navigationShell.currentIndex;
-    final location = state.uri.path;
-    final shouldShowFab = location == '/workouts';
-    return AdaptiveScaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SafeArea(top: false, child: navigationShell),
-      bottomBar: AdaptiveTabBar(
-        visible: _shouldShowTabBar(
-          context,
-          location: location,
-          selectedIndex: selectedIndex,
-        ),
-        selectedIconColor: Theme.of(context).colorScheme.primary,
-        selectedIndex: selectedIndex,
-        onTabSelected: (index) => navigationShell.goBranch(index),
-        items: [
-          AdaptiveTabItem(
-            icon: Icon(AdaptiveIcons.history),
-            label: L10n.of(context)!.workoutsTabTitle,
-          ),
-          AdaptiveTabItem(
-            icon: Icon(AdaptiveIcons.sports),
-            label: L10n.of(context)!.gamesTabTitle,
-          ),
-          AdaptiveTabItem(
-            icon: Icon(AdaptiveIcons.timer),
-            label: L10n.of(context)!.timerPageTitle,
-          ),
-          AdaptiveTabItem(
-            icon: Icon(AdaptiveIcons.location),
-            label: L10n.of(context)!.nearMeTabTitle,
-          ),
-        ],
-        trailingButton: selectedIndex == Tab.workouts.index && shouldShowFab
-            ? _addWorkoutButton(context: context, ref: ref)
-            : null,
-        scrollController: _workoutsScrollController,
-      ),
-      resizeToAvoidBottomInset: false,
-      floatingActionButton: selectedIndex == Tab.workouts.index && shouldShowFab
-          ? _addWorkoutButton(context: context, ref: ref)
-          : null,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return PlatformProvider(
@@ -288,22 +162,6 @@ final class _MainAppState extends ConsumerState<_MainApp> {
       ),
     );
   }
-}
-
-/// A trailing button next to the tab bar for creating a new workout.
-AdaptiveAccessoryActionItem? _addWorkoutButton({
-  required BuildContext context,
-  required WidgetRef ref,
-}) {
-  return AdaptiveAccessoryActionItem(
-    icon: Icon(PlatformIcons(context).add),
-    id: 'add-workout',
-    onPressed: (anchor) => WorkoutsTab.showWorkoutCreationPicker(
-      context: context,
-      ref: ref,
-      anchor: anchor,
-    ),
-  );
 }
 
 // Configure the audio session to not interrupt other audio apps.
