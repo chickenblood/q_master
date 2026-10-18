@@ -40,6 +40,7 @@ class _YoutubeVideoScreenState extends State<YoutubeVideoScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: AdaptiveScaffold(
+        backgroundColor: Colors.black,
         appBar: AdaptiveAppBar(
           backgroundColor: Colors.transparent,
           leading: [
