@@ -58,8 +58,8 @@ final class AdaptiveMenu extends StatelessWidget {
       menuChildren: menuChildren
           .map(
             (item) => MenuItemButton(
+              leadingIcon: item.icon,
               onPressed: item.onPressed,
-              trailingIcon: Row(children: [SizedBox(width: 20), item.icon]),
               child: PlatformText(
                 item.title,
                 style: TextTheme.of(context).titleLarge!,
