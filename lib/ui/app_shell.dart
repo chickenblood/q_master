@@ -77,7 +77,7 @@ class AppShell extends ConsumerWidget {
         items: [
           AdaptiveTabItem(
             icon: Icon(AdaptiveIcons.history),
-            label: L10n.of(context)!.workoutsTabTitle,
+            label: L10n.of(context)!.workoutsTabShortTitle,
           ),
           AdaptiveTabItem(
             icon: Icon(AdaptiveIcons.sports),
