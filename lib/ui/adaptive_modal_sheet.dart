@@ -15,18 +15,18 @@ Future<T?> showAdaptiveModalSheet<T>({
   return isTablet
       ? showAdaptiveDialog(
           context: context,
-          builder: (_) => BackdropFilter(
-            filter: .blur(sigmaX: 5, sigmaY: 5),
-            child: Dialog(
-              insetPadding: const EdgeInsets.all(150),
-              clipBehavior: .hardEdge,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              // Remove status bar padding at the top. There will be no status bar
-              // in the form sheet.
-              child: MediaQuery(
-                data: MediaQuery.of(context).removePadding(removeTop: true),
+          builder: (_) => MediaQuery(
+            data: MediaQuery.of(context).removePadding(removeTop: true),
+            child: BackdropFilter(
+              filter: .blur(sigmaX: 5, sigmaY: 5),
+              child: Dialog(
+                insetPadding: const EdgeInsets.all(150),
+                clipBehavior: .hardEdge,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                // Remove status bar padding at the top. There will be no status bar
+                // in the form sheet.
                 child: child,
               ),
             ),
