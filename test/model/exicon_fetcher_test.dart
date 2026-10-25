@@ -24,21 +24,18 @@ void main() {
       expect(entry.description, 'A full-body movement');
       expect(entry.type, 'exicon');
       expect(entry.aliases, ['8-count bodybuilder', 'squat thrust']);
-      expect(
-        entry.tags,
-        [
-          const ExiconTag(
-            id: 't5',
-            name: 'Full Body',
-            data: {'id': 't5', 'name': 'Full Body'},
-          ),
-          const ExiconTag(
-            id: 't6',
-            name: 'Partner',
-            data: {'id': 't6', 'name': 'Partner'},
-          ),
-        ],
-      );
+      expect(entry.tags, [
+        const ExiconTag(
+          id: 't5',
+          name: 'Full Body',
+          data: {'id': 't5', 'name': 'Full Body'},
+        ),
+        const ExiconTag(
+          id: 't6',
+          name: 'Partner',
+          data: {'id': 't6', 'name': 'Partner'},
+        ),
+      ]);
       expect(entry.videoUrl, Uri.parse('https://example.com/burpee'));
       expect(entry.mentionedEntries, ['Merkin']);
       expect(entry.referencedBy, ['Beatdown-1']);
@@ -74,16 +71,13 @@ void main() {
         ],
       });
 
-      expect(
-        entry.tags,
-        const [
-          ExiconTag(
-            id: 't1',
-            name: 'Upper Body',
-            data: {'id': 't1', 'name': 'Upper Body'},
-          ),
-        ],
-      );
+      expect(entry.tags, const [
+        ExiconTag(
+          id: 't1',
+          name: 'Upper Body',
+          data: {'id': 't1', 'name': 'Upper Body'},
+        ),
+      ]);
     });
 
     test('id remains optional', () {

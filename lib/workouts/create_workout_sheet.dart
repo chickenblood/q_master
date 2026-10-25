@@ -74,9 +74,10 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   var _displayMode = DisplayMode.display;
   var _pickerIsShown = false;
 
-  // Track the group of the most recently added exercise for scrolling
-  _SectionDraft? _lastAddedSection;
+  // The exercise row to scroll into view after the next build.
+  ({_SectionDraft section, int index})? _scrollTarget;
   EdgeDraggingAutoScroller? _exerciseAutoScroller;
+  Offset? _lastDragPosition;
   late final AppLifecycleListener _appLifecycleListener;
 
   // --- Lifecycle & State ---
@@ -177,11 +178,12 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
 
     setState(() {
       final exercise = sourceSection.exercises.removeAt(sourceIndex);
-      targetSection.exercises.insert(
-        adjustedTargetIndex.clamp(0, targetSection.exercises.length),
-        exercise,
+      final insertIndex = adjustedTargetIndex.clamp(
+        0,
+        targetSection.exercises.length,
       );
-      _lastAddedSection = targetSection;
+      targetSection.exercises.insert(insertIndex, exercise);
+      _scrollTarget = (section: targetSection, index: insertIndex);
     });
   }
 
@@ -190,7 +192,20 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     _sections.insert(toIndex, section);
   }
 
+  /// Whether [itemContext]'s box lies entirely within its scrollable viewport.
+  bool _isFullyVisible(BuildContext itemContext) {
+    final box = itemContext.findRenderObject();
+    final scrollContext = Scrollable.maybeOf(itemContext)?.context;
+    final viewport = scrollContext?.findRenderObject();
+    if (box is! RenderBox || viewport is! RenderBox) return false;
+    final itemRect = box.localToGlobal(Offset.zero) & box.size;
+    final viewportRect = viewport.localToGlobal(Offset.zero) & viewport.size;
+    return viewportRect.contains(itemRect.topLeft) &&
+        viewportRect.contains(itemRect.bottomRight);
+  }
+
   void _updateExerciseAutoScroll(Offset globalPosition) {
+    _lastDragPosition = globalPosition;
     final autoScroller = _exerciseAutoScroller;
     if (autoScroller == null) return;
 
@@ -295,7 +310,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     if (lines.isEmpty) return;
     setState(() {
       section.exercises.addAll(lines);
-      _lastAddedSection = section;
+      _scrollTarget = (section: section, index: section.exercises.length - 1);
     });
   }
 
@@ -334,7 +349,10 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
         onExerciseAdded: (exercise) {
           setState(() {
             section.exercises.add(exercise);
-            _lastAddedSection = section;
+            _scrollTarget = (
+              section: section,
+              index: section.exercises.length - 1,
+            );
           });
         },
       ).then((_) => setState(() => _pickerIsShown = false));
@@ -357,7 +375,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     if (updatedExercise?.trim().isNotEmpty ?? false) {
       setState(() {
         exercises[index] = updatedExercise!;
-        _lastAddedSection = section;
+        _scrollTarget = (section: section, index: index);
       });
     }
   }
@@ -385,15 +403,19 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       child: Builder(
         builder: (itemContext) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (exerciseIndex == exercises.length - 1 &&
-                identical(_lastAddedSection, section)) {
-              Scrollable.ensureVisible(
-                itemContext,
-                duration: const Duration(milliseconds: 300),
-                alignment: 0.0,
-                alignmentPolicy: .explicit,
-              );
-              _lastAddedSection = null;
+            final target = _scrollTarget;
+            if (target != null &&
+                identical(target.section, section) &&
+                target.index == exerciseIndex) {
+              _scrollTarget = null;
+              if (itemContext.mounted && !_isFullyVisible(itemContext)) {
+                Scrollable.ensureVisible(
+                  itemContext,
+                  duration: const Duration(milliseconds: 300),
+                  alignment: 0.5,
+                  alignmentPolicy: ScrollPositionAlignmentPolicy.explicit,
+                );
+              }
             }
           });
           return GestureDetector(
@@ -475,6 +497,12 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           _exerciseAutoScroller = EdgeDraggingAutoScroller(
             Scrollable.of(context),
             velocityScalar: 10,
+            // The scroller keeps its target fixed in scroll space, so refresh
+            // it after each step to keep scrolling while the pointer is still.
+            onScrollViewScrolled: () {
+              final position = _lastDragPosition;
+              if (position != null) _updateExerciseAutoScroll(position);
+            },
           );
         },
         onDragUpdate: (details) {
@@ -483,6 +511,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
         onDragEnd: (_) {
           _exerciseAutoScroller?.stopAutoScroll();
           _exerciseAutoScroller = null;
+          _lastDragPosition = null;
         },
         feedback: Material(
           color: Theme.of(context).colorScheme.surface,

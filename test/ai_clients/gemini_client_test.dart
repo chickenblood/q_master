@@ -14,18 +14,14 @@ void main() {
       client = GeminiClient();
     });
 
-    test(
-      'requestWorkout returns a non-empty JSON response',
-      () async {
-        final result = await client.requestWorkout(
-          'Outdoor 60mins, all PAX levels, focus on legs',
-        );
+    test('requestWorkout returns a non-empty JSON response', () async {
+      final result = await client.requestWorkout(
+        'Outdoor 60mins, all PAX levels, focus on legs',
+      );
 
-        expect(result, isNotEmpty);
-        // The prompt asks for JSON — verify it at least contains a brace.
-        expect(result, contains('{'));
-      },
-      timeout: const Timeout(Duration(seconds: 30)),
-    );
+      expect(result, isNotEmpty);
+      // The prompt asks for JSON — verify it at least contains a brace.
+      expect(result, contains('{'));
+    }, timeout: const Timeout(Duration(seconds: 30)));
   });
 }

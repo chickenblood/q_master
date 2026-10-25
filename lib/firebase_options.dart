@@ -83,5 +83,4 @@ class DefaultFirebaseOptions {
     projectId: 'q-master-7346a',
     storageBucket: 'q-master-7346a.firebasestorage.app',
   );
-
 }

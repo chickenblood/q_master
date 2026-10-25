@@ -224,4 +224,74 @@ void main() {
     await gesture.up();
     await tester.pumpAndSettle();
   });
+
+  testWidgets('dropping an exercise scrolls the moved row into view', (
+    tester,
+  ) async {
+    final workout = Workout(
+      name: 'Scroll to drop',
+      date: DateTime(2025),
+      sections: [
+        for (var index = 0; index < 20; index++)
+          WorkoutSection(
+            name: 'Section $index',
+            exercises: ['Exercise $index'],
+          ),
+      ],
+    );
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          theme: ThemeData(platform: TargetPlatform.android),
+          localizationsDelegates: L10n.localizationsDelegates,
+          supportedLocales: L10n.supportedLocales,
+          home: CreateWorkoutSheet(
+            originalWorkout: workout,
+            initialDisplayMode: DisplayMode.edit,
+          ),
+        ),
+      ),
+    );
+    await _pumpEditor(tester);
+
+    final viewport = tester.getRect(find.byType(CustomScrollView));
+    final scrollable = tester.state<ScrollableState>(
+      find
+          .descendant(
+            of: find.byType(CustomScrollView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('Exercise 0')),
+    );
+    await tester.pump(kLongPressTimeout);
+    await tester.pump();
+    await gesture.moveTo(Offset(viewport.center.dx, viewport.bottom - 8));
+    for (var frame = 0; frame < 20; frame++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(scrollable.position.pixels, greaterThan(0));
+
+    // Move away from the edge and let the auto-scroll settle, since the
+    // scrollable ignores pointers while it animates.
+    await gesture.moveTo(tester.getCenter(find.text('Exercise 3')));
+    await tester.pump(const Duration(milliseconds: 300));
+    await gesture.moveBy(const Offset(0, 1));
+    await tester.pump();
+    final offsetBeforeDrop = scrollable.position.pixels;
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(scrollable.position.pixels, isNot(offsetBeforeDrop));
+    expect(
+      tester.getCenter(find.text('Exercise 0')).dy,
+      closeTo(viewport.center.dy, 80),
+    );
+  });
 }
