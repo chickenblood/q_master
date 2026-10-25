@@ -773,46 +773,18 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     sliver: SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-        child: Column(
-          spacing: 12,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Row(
-              spacing: 8,
-              children: [
-                Expanded(
-                  child: ActionButton(
-                    label: L10n.of(context)!.editWorkoutButtonText,
-                    icon: PlatformIcons(context).edit,
-                    outlined: true,
-                    onPressed: () => setState(() => _displayMode = .edit),
-                  ),
-                ),
-                Expanded(
-                  child: ActionButton(
-                    label: L10n.of(context)!.shareWorkoutButtonText,
-                    icon: PlatformIcons(context).share,
-                    outlined: true,
-                    onPressed: () =>
-                        widget.onShare?.call(context, _buildWorkoutFromUi()),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 62,
-              child: ActionButton(
-                label: L10n.of(context)!.startBeatdownButtonText,
-                icon: PlatformIcons(context).playArrowSolid,
-                onPressed: () {
-                  widget.onShowBeatdownBrowser?.call(
-                    context,
-                    _buildWorkoutFromUi(),
-                  );
-                },
-              ),
-            ),
-          ],
+        child: SizedBox(
+          height: 62,
+          child: ActionButton(
+            label: L10n.of(context)!.startBeatdownButtonText,
+            icon: PlatformIcons(context).playArrowSolid,
+            onPressed: () {
+              widget.onShowBeatdownBrowser?.call(
+                context,
+                _buildWorkoutFromUi(),
+              );
+            },
+          ),
         ),
       ),
     ),
