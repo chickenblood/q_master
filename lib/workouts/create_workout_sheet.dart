@@ -22,6 +22,14 @@ import 'exercise_picker_sheet.dart';
 /// 3) Start the beatdown.
 enum DisplayMode { display, edit }
 
+final class _SectionDraft {
+  _SectionDraft({required this.name, List<String>? exercises})
+    : exercises = exercises ?? [];
+
+  String name;
+  final List<String> exercises;
+}
+
 final class CreateWorkoutSheet extends ConsumerStatefulWidget {
   final Workout? originalWorkout;
   final DisplayMode initialDisplayMode;
@@ -46,7 +54,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   final _focusNode = FocusNode();
   final _nameTextController = TextEditingController();
 
-  final _sections = <String, List<String>>{};
+  final _sections = <_SectionDraft>[];
 
   // For storing the original workout when in edit mode, so we can revert to it
   // if the user cancels out of editing.
@@ -56,7 +64,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   var _pickerIsShown = false;
 
   // Track the group of the most recently added exercise for scrolling
-  String? _lastAddedItemGroup;
+  _SectionDraft? _lastAddedSection;
   late final AppLifecycleListener _appLifecycleListener;
 
   // --- Lifecycle & State ---
@@ -80,7 +88,9 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (workout == null) {
         setState(() {
-          _sections[L10n.of(context)!.warmupSectionTitle] = [];
+          _sections.add(
+            _SectionDraft(name: L10n.of(context)!.warmupSectionTitle),
+          );
         });
         _nameTextController.text = L10n.of(context)!.defaultWorkoutName;
         _selectNameText();
@@ -130,12 +140,8 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   }
 
   void _moveSection({required int fromIndex, required int toIndex}) {
-    final sectionEntries = _sections.entries.toList(growable: true);
-    final section = sectionEntries.removeAt(fromIndex);
-    sectionEntries.insert(toIndex, section);
-    _sections
-      ..clear()
-      ..addEntries(sectionEntries);
+    final section = _sections.removeAt(fromIndex);
+    _sections.insert(toIndex, section);
   }
 
   Future<String?> _showNameChangeDialog(
@@ -188,16 +194,12 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     );
     final trimmedName = sectionName?.trim();
     if (trimmedName == null || trimmedName.isEmpty) return;
-    final alreadyExists = _sections.keys.any(
-      (name) => name.toLowerCase() == trimmedName.toLowerCase(),
-    );
-    if (alreadyExists) return;
     setState(() {
-      _sections[trimmedName] = [];
+      _sections.add(_SectionDraft(name: trimmedName));
     });
   }
 
-  Future<void> _pasteExercises({required String sectionGroup}) async {
+  Future<void> _pasteExercises({required _SectionDraft section}) async {
     final data = await Clipboard.getData('text/plain');
     final text = data?.text;
     if (text == null || text.trim().isEmpty) return;
@@ -207,43 +209,32 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
         .where((line) => line.isNotEmpty)
         .toList();
     if (lines.isEmpty) return;
-    final exercises = _sections[sectionGroup]!;
     setState(() {
-      exercises.addAll(lines);
-      _lastAddedItemGroup = sectionGroup;
+      section.exercises.addAll(lines);
+      _lastAddedSection = section;
     });
   }
 
   void _editSectionTitle(
     BuildContext context, {
-    required String sectionTitle,
+    required _SectionDraft section,
   }) async {
     final updatedTitle = await _showNameChangeDialog(
       context,
       title: L10n.of(context)!.updateSectionDialogTitle,
       buttonTitle: L10n.of(context)!.updateSectionDialogButtonText,
-      initialText: sectionTitle,
+      initialText: section.name,
     );
     final trimmedName = updatedTitle?.trim();
     if (trimmedName == null || trimmedName.isEmpty) return;
-    final updatedSections = <String, List<String>>{};
-    for (final name in _sections.keys) {
-      if (name == sectionTitle) {
-        updatedSections[trimmedName] = _sections[name] ?? [];
-      } else {
-        updatedSections[name] = _sections[name] ?? [];
-      }
-    }
     setState(() {
-      _sections.clear();
-      _sections.addAll(updatedSections);
+      section.name = trimmedName;
     });
   }
 
   Widget _addExerciseButton(
     BuildContext context, {
-    required List<String> exercises,
-    required String sectionTitle,
+    required _SectionDraft section,
   }) => PlatformIconButton(
     icon: Icon(
       PlatformIcons(context).add,
@@ -258,8 +249,8 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
         context,
         onExerciseAdded: (exercise) {
           setState(() {
-            exercises.add(exercise);
-            _lastAddedItemGroup = sectionTitle;
+            section.exercises.add(exercise);
+            _lastAddedSection = section;
           });
         },
       ).then((_) => setState(() => _pickerIsShown = false));
@@ -270,7 +261,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     BuildContext context, {
     required List<String> exercises,
     required int index,
-    required String sectionGroup,
+    required _SectionDraft section,
   }) async {
     final existingExercise = exercises[index];
     final updatedExercise = await _showNameChangeDialog(
@@ -282,30 +273,28 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     if (updatedExercise?.trim().isNotEmpty ?? false) {
       setState(() {
         exercises[index] = updatedExercise!;
-        _lastAddedItemGroup = sectionGroup;
+        _lastAddedSection = section;
       });
     }
   }
 
   List<Widget> content(BuildContext context) {
-    final sectionOrder = _sections.keys.toList(growable: false);
     return [
       SliverSafeArea(
         top: false,
         bottom: false,
         sliver: SliverReorderableList(
-          itemCount: sectionOrder.length,
+          itemCount: _sections.length,
           itemBuilder: (context, sectionIndex) {
-            final sectionGroup = sectionOrder[sectionIndex];
-            final exercises = _sections[sectionGroup]!;
+            final section = _sections[sectionIndex];
+            final exercises = section.exercises;
             return Column(
-              key: ValueKey('section_$sectionGroup'),
+              key: ValueKey(section),
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _sectionHeader(
                   context,
-                  sectionTitle: sectionGroup,
-                  exercises: exercises,
+                  section: section,
                   sectionIndex: sectionIndex,
                 ),
                 ReorderableListView.builder(
@@ -328,14 +317,14 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                         builder: (itemContext) {
                           WidgetsBinding.instance.addPostFrameCallback((_) {
                             if (isLastItem &&
-                                _lastAddedItemGroup == sectionGroup) {
+                                identical(_lastAddedSection, section)) {
                               Scrollable.ensureVisible(
                                 itemContext,
                                 duration: const Duration(milliseconds: 300),
                                 alignment: 0.0,
                                 alignmentPolicy: .explicit,
                               );
-                              _lastAddedItemGroup = null;
+                              _lastAddedSection = null;
                             }
                           });
                           return GestureDetector(
@@ -344,7 +333,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                                     context,
                                     exercises: exercises,
                                     index: exerciseIndex,
-                                    sectionGroup: sectionGroup,
+                                    section: section,
                                   )
                                 : null,
                             child: ReorderableDelayedDragStartListener(
@@ -498,9 +487,11 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                     buttonTitle: L10n.of(context)!.pasteExercisesButtonLabel,
                     initialText: L10n.of(context)!.pasteSectionInitialText,
                   );
-                  if (newSectionName == null) return;
-                  setState(() => _sections[newSectionName] = []);
-                  _pasteExercises(sectionGroup: newSectionName);
+                  final trimmedName = newSectionName?.trim();
+                  if (trimmedName == null || trimmedName.isEmpty) return;
+                  final section = _SectionDraft(name: trimmedName);
+                  setState(() => _sections.add(section));
+                  _pasteExercises(section: section);
                 }
               : null,
         ),
@@ -510,17 +501,16 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
 
   Widget _sectionHeader(
     BuildContext context, {
-    required String sectionTitle,
-    required List<String> exercises,
+    required _SectionDraft section,
     required int sectionIndex,
   }) {
     final isEditingMode = _displayMode == .edit;
     return DismissibleRow(
-      key: ValueKey('dismissible_$sectionTitle'),
+      key: ValueKey(section),
       enabled: isEditingMode,
       onDismissed: (_) {
         setState(() {
-          _sections.remove(sectionTitle);
+          _sections.remove(section);
         });
       },
       child: ReorderableDelayedDragStartListener(
@@ -531,7 +521,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           color: Theme.of(context).colorScheme.surface,
           child: GestureDetector(
             onDoubleTap: () => isEditingMode
-                ? _editSectionTitle(context, sectionTitle: sectionTitle)
+                ? _editSectionTitle(context, section: section)
                 : null,
             child: Row(
               mainAxisAlignment: .spaceBetween,
@@ -541,7 +531,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      sectionTitle.toUpperCase(),
+                      section.name.toUpperCase(),
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: Theme.of(context).colorScheme.primary,
                         letterSpacing: .1,
@@ -562,16 +552,10 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                           size: 20,
                         ),
                         tooltip: L10n.of(context)!.editSectionTooltip,
-                        onPressed: () => _editSectionTitle(
-                          context,
-                          sectionTitle: sectionTitle,
-                        ),
+                        onPressed: () =>
+                            _editSectionTitle(context, section: section),
                       ),
-                      _addExerciseButton(
-                        context,
-                        exercises: exercises,
-                        sectionTitle: sectionTitle,
-                      ),
+                      _addExerciseButton(context, section: section),
                     ],
                   ),
               ],
@@ -834,8 +818,11 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     date:
         _storedWorkout?.date ?? widget.originalWorkout?.date ?? DateTime.now(),
     sections: [
-      for (final entry in _sections.entries)
-        WorkoutSection(name: entry.key, exercises: List.of(entry.value)),
+      for (final section in _sections)
+        WorkoutSection(
+          name: section.name,
+          exercises: List.of(section.exercises),
+        ),
     ],
   );
 
@@ -843,8 +830,13 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     _nameTextController.text = workout.name;
     _sections
       ..clear()
-      ..addEntries(
-        workout.sections.map((s) => MapEntry(s.name, List.of(s.exercises))),
+      ..addAll(
+        workout.sections.map(
+          (section) => _SectionDraft(
+            name: section.name,
+            exercises: List.of(section.exercises),
+          ),
+        ),
       );
   }
 }
