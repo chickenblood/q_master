@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,56 +14,8 @@ Future<void> _pumpEditor(WidgetTester tester) async {
   await tester.pump(const Duration(milliseconds: 500));
 }
 
-Future<void> _pumpEditorForWorkout(WidgetTester tester, Workout workout) async {
-  await tester.pumpWidget(
-    ProviderScope(
-      child: MaterialApp(
-        theme: ThemeData(platform: TargetPlatform.android),
-        localizationsDelegates: L10n.localizationsDelegates,
-        supportedLocales: L10n.supportedLocales,
-        home: CreateWorkoutSheet(
-          originalWorkout: workout,
-          initialDisplayMode: DisplayMode.edit,
-        ),
-      ),
-    ),
-  );
-  await _pumpEditor(tester);
-}
-
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-
-  testWidgets('dragging an exercise moves it into an empty section', (
-    tester,
-  ) async {
-    final workout = Workout(
-      name: 'Workout',
-      date: DateTime(2026),
-      sections: [
-        WorkoutSection(name: 'Warm up', exercises: ['Jumping Jacks']),
-        WorkoutSection(name: 'Thang', exercises: []),
-      ],
-    );
-    await _pumpEditorForWorkout(tester, workout);
-
-    final gesture = await tester.startGesture(
-      tester.getCenter(find.text('Jumping Jacks')),
-    );
-    await tester.pump(const Duration(milliseconds: 500));
-    await gesture.moveTo(
-      tester.getCenter(find.byKey(const ValueKey('exercise_drop_target_1'))),
-    );
-    await tester.pump();
-    await gesture.up();
-    await _pumpEditor(tester);
-
-    expect(find.text('Jumping Jacks'), findsOneWidget);
-    expect(
-      tester.getTopLeft(find.text('Jumping Jacks')).dy,
-      greaterThan(tester.getTopLeft(find.text('THANG')).dy),
-    );
-  });
 
   testWidgets('saving an edited new workout replaces it instead of adding it', (
     tester,
@@ -166,5 +119,51 @@ void main() {
     final sections = container.read(workoutListProvider).single.sections;
     expect(sections, hasLength(2));
     expect(sections.map((section) => section.name), ['Warm up', 'Warm up']);
+  });
+
+  testWidgets('dragging an exercise moves it to another section', (
+    tester,
+  ) async {
+    final workout = Workout(
+      name: 'Cross-section move',
+      date: DateTime(2025),
+      sections: [
+        WorkoutSection(name: 'Warm up', exercises: ['Push-ups']),
+        WorkoutSection(name: 'Thang', exercises: ['Burpees']),
+      ],
+    );
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          theme: ThemeData(platform: TargetPlatform.android),
+          localizationsDelegates: L10n.localizationsDelegates,
+          supportedLocales: L10n.supportedLocales,
+          home: CreateWorkoutSheet(
+            originalWorkout: workout,
+            initialDisplayMode: DisplayMode.edit,
+          ),
+        ),
+      ),
+    );
+    await _pumpEditor(tester);
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('Push-ups')),
+    );
+    await tester.pump(kLongPressTimeout);
+    await tester.pump();
+    await gesture.moveTo(tester.getCenter(find.text('Burpees')));
+    await tester.pump();
+    await gesture.up();
+    await _pumpEditor(tester);
+
+    expect(
+      tester.getTopLeft(find.text('Push-ups')).dy,
+      greaterThan(tester.getTopLeft(find.text('THANG')).dy),
+    );
   });
 }

@@ -142,25 +142,45 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   }
 
   // --- Section & Exercise Manipulation ---
+  bool _canAcceptDraggedExercise(_DraggedExercise draggedExercise) {
+    final sourceExercises = draggedExercise.section.exercises;
+    return _displayMode == DisplayMode.edit &&
+        _sections.any(
+          (section) => identical(section, draggedExercise.section),
+        ) &&
+        draggedExercise.index >= 0 &&
+        draggedExercise.index < sourceExercises.length &&
+        sourceExercises[draggedExercise.index] == draggedExercise.name;
+  }
+
   void _moveExerciseToSection({
     required _DraggedExercise draggedExercise,
     required _SectionDraft targetSection,
     required int targetIndex,
   }) {
+    if (!_canAcceptDraggedExercise(draggedExercise) ||
+        !_sections.any((section) => identical(section, targetSection))) {
+      return;
+    }
+
     final sourceSection = draggedExercise.section;
-    if (draggedExercise.index >= sourceSection.exercises.length) return;
+    final sourceIndex = draggedExercise.index;
+    final adjustedTargetIndex =
+        identical(sourceSection, targetSection) && sourceIndex < targetIndex
+        ? targetIndex - 1
+        : targetIndex;
+    if (identical(sourceSection, targetSection) &&
+        sourceIndex == adjustedTargetIndex) {
+      return;
+    }
 
     setState(() {
-      final exercise = sourceSection.exercises.removeAt(draggedExercise.index);
-      final adjustedTargetIndex =
-          identical(sourceSection, targetSection) &&
-              draggedExercise.index < targetIndex
-          ? targetIndex - 1
-          : targetIndex;
+      final exercise = sourceSection.exercises.removeAt(sourceIndex);
       targetSection.exercises.insert(
         adjustedTargetIndex.clamp(0, targetSection.exercises.length),
         exercise,
       );
+      _lastAddedSection = targetSection;
     });
   }
 
@@ -310,16 +330,12 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   }) {
     final exercise = section.exercises[exerciseIndex];
     final exercises = section.exercises;
-    final itemKey = ValueKey(
-      'exercise_${identityHashCode(section)}_$exerciseIndex',
-    );
     final draggedExercise = _DraggedExercise(
       section: section,
       index: exerciseIndex,
       name: exercise,
     );
-
-    return DismissibleRow(
+    final row = DismissibleRow(
       key: ValueKey('dismissible_${identityHashCode(section)}_$exerciseIndex'),
       enabled: _displayMode == DisplayMode.edit,
       onDismissed: (direction) {
@@ -341,8 +357,8 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
               _lastAddedSection = null;
             }
           });
-          final row = GestureDetector(
-            onDoubleTap: () => _displayMode == DisplayMode.edit
+          return GestureDetector(
+            onDoubleTap: () => _displayMode == .edit
                 ? _editExercise(
                     context,
                     exercises: exercises,
@@ -357,7 +373,9 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                 children: [
                   Expanded(
                     child: PlatformListTile(
-                      key: itemKey,
+                      key: ValueKey(
+                        'exercise_${identityHashCode(section)}_$exerciseIndex',
+                      ),
                       title: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
@@ -390,46 +408,75 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
               ),
             ),
           );
-
-          if (_displayMode != DisplayMode.edit) return row;
-          return DragTarget<_DraggedExercise>(
-            onWillAcceptWithDetails: (details) => true,
-            onAcceptWithDetails: (details) => _moveExerciseToSection(
-              draggedExercise: details.data,
-              targetSection: section,
-              targetIndex: exerciseIndex,
-            ),
-            builder: (context, candidates, rejected) => LongPressDraggable(
-              data: draggedExercise,
-              feedback: Material(
-                color: Theme.of(context).colorScheme.surface,
-                elevation: 6,
-                borderRadius: BorderRadius.circular(8),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Text(
-                    draggedExercise.name,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ),
-              ),
-              childWhenDragging: Opacity(opacity: 0.3, child: row),
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: candidates.isNotEmpty
-                      ? Theme.of(
-                          context,
-                        ).colorScheme.primary.withValues(alpha: 0.12)
-                      : null,
-                ),
-                child: row,
-              ),
-            ),
-          );
         },
       ),
     );
+
+    if (_displayMode != DisplayMode.edit) return row;
+    final dropTargetKey = GlobalKey();
+    return DragTarget<_DraggedExercise>(
+      onWillAcceptWithDetails: (details) =>
+          _canAcceptDraggedExercise(details.data),
+      onAcceptWithDetails: (details) {
+        final box =
+            dropTargetKey.currentContext!.findRenderObject()! as RenderBox;
+        final localPosition = box.globalToLocal(details.offset);
+        final targetIndex =
+            exerciseIndex + (localPosition.dy >= box.size.height / 2 ? 1 : 0);
+        _moveExerciseToSection(
+          draggedExercise: details.data,
+          targetSection: section,
+          targetIndex: targetIndex,
+        );
+      },
+      builder: (context, candidates, rejected) => LongPressDraggable(
+        data: draggedExercise,
+        feedback: Material(
+          color: Theme.of(context).colorScheme.surface,
+          elevation: 6,
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Text(exercise, style: Theme.of(context).textTheme.bodyLarge),
+          ),
+        ),
+        childWhenDragging: Opacity(opacity: 0.3, child: row),
+        child: DecoratedBox(
+          key: dropTargetKey,
+          decoration: BoxDecoration(
+            color: candidates.isNotEmpty
+                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.12)
+                : null,
+          ),
+          child: row,
+        ),
+      ),
+    );
   }
+
+  Widget _exerciseDropTarget({
+    required _SectionDraft section,
+    required int targetIndex,
+  }) => DragTarget<_DraggedExercise>(
+    key: ValueKey('exercise_drop_target_${identityHashCode(section)}'),
+    onWillAcceptWithDetails: (details) =>
+        _canAcceptDraggedExercise(details.data),
+    onAcceptWithDetails: (details) => _moveExerciseToSection(
+      draggedExercise: details.data,
+      targetSection: section,
+      targetIndex: targetIndex,
+    ),
+    builder: (context, candidates, rejected) => SizedBox(
+      height: section.exercises.isEmpty ? 44 : 20,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: candidates.isNotEmpty
+              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.12)
+              : null,
+        ),
+      ),
+    ),
+  );
 
   List<Widget> content(BuildContext context) {
     return [
@@ -461,26 +508,9 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                     exerciseIndex: exerciseIndex,
                   ),
                 if (_displayMode == DisplayMode.edit)
-                  DragTarget<_DraggedExercise>(
-                    key: ValueKey('exercise_drop_target_$sectionIndex'),
-                    onWillAcceptWithDetails: (details) => true,
-                    onAcceptWithDetails: (details) => _moveExerciseToSection(
-                      draggedExercise: details.data,
-                      targetSection: section,
-                      targetIndex: section.exercises.length,
-                    ),
-                    builder: (context, candidates, rejected) => SizedBox(
-                      height: section.exercises.isEmpty ? 44 : 20,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: candidates.isNotEmpty
-                              ? Theme.of(
-                                  context,
-                                ).colorScheme.primary.withValues(alpha: 0.12)
-                              : null,
-                        ),
-                      ),
-                    ),
+                  _exerciseDropTarget(
+                    section: section,
+                    targetIndex: exercises.length,
                   ),
               ],
             );
@@ -598,18 +628,15 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
               crossAxisAlignment: .center,
               children: [
                 Expanded(
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      section.name.toUpperCase(),
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        letterSpacing: .1,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.left,
+                  child: PlatformText(
+                    section.name.toUpperCase(),
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                      letterSpacing: .1,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.left,
                   ),
                 ),
                 if (isEditingMode)
