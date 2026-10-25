@@ -30,14 +30,14 @@ final class AdaptiveAppBar extends StatelessWidget
   final Widget? title;
   final List<AdaptiveAppBarItem> leading;
   final List<AdaptiveAppBarItem> actions;
-  final Color backgroundColor;
+  final Color? backgroundColor;
 
   const AdaptiveAppBar({
     super.key,
     this.title,
     this.leading = const [],
     this.actions = const [],
-    this.backgroundColor = Colors.transparent,
+    this.backgroundColor,
   });
 
   // TODO: This could be wrong.
@@ -84,7 +84,8 @@ final class AdaptiveAppBar extends StatelessWidget
         title: title,
         leading: leadingItems,
         actions: actionsItems,
-        backgroundColor: backgroundColor,
+        backgroundColor:
+            backgroundColor ?? Theme.of(context).appBarTheme.backgroundColor!,
       );
     },
   );

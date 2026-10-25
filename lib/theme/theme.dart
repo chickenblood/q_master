@@ -226,7 +226,7 @@ ThemeData darkTheme() {
     cupertinoOverrideTheme: const CupertinoThemeData(primaryColor: textPrimary),
     iconTheme: const IconThemeData(color: textPrimary),
     appBarTheme: AppBarTheme(
-      backgroundColor: bgPage,
+      backgroundColor: bgSurface.withAlpha(179),
       elevation: 0,
       scrolledUnderElevation: 0,
       titleTextStyle: _textTheme(textPrimary, textSecondary).titleLarge,
@@ -403,7 +403,7 @@ ThemeData lightTheme() {
     cupertinoOverrideTheme: const CupertinoThemeData(primaryColor: textPrimary),
     iconTheme: const IconThemeData(color: textPrimary),
     appBarTheme: AppBarTheme(
-      backgroundColor: bgSurface,
+      backgroundColor: bgSurface.withAlpha(179),
       elevation: 0,
       scrolledUnderElevation: 0,
       titleTextStyle: _textTheme(textPrimary, textSecondary).titleLarge,
