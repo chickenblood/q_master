@@ -24,7 +24,7 @@ final class AdaptiveScaffold extends StatelessWidget {
   final AdaptiveAppBar? appBar;
   final Widget body;
   final Widget? bottomBar;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final AdaptiveAccessoryActionItem? floatingActionButton;
   final bool? resizeToAvoidBottomInset;
 
@@ -33,7 +33,7 @@ final class AdaptiveScaffold extends StatelessWidget {
     required this.body,
     this.appBar,
     this.bottomBar,
-    this.backgroundColor = Colors.transparent,
+    this.backgroundColor,
     this.floatingActionButton,
     this.resizeToAvoidBottomInset,
   });

@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:q_master/settings/settings_sheet.dart';
 import 'package:q_master/utils/shared_app_prefs.dart';
 
@@ -12,8 +12,8 @@ import '../l10n/l10n.dart';
 import '../model/timer.dart';
 import '../theme/theme.dart';
 import '../ui/action_button.dart';
-import '../ui/adaptive_widgets.dart';
 import '../ui/adaptive_route_page.dart';
+import '../ui/adaptive_widgets.dart';
 import '../ui/media_query.dart';
 import '../utils/datetime_utils.dart';
 import 'timer_tab.dart';
@@ -108,7 +108,6 @@ class TimerSetupTab extends ConsumerWidget {
     final timer = ref.read(timerProvider.notifier);
     final prefs = SharedAppPrefs.instance;
     return AdaptiveScaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AdaptiveAppBar(
         title: Text(
           l10n.timerSetupTabTitle,

@@ -359,7 +359,6 @@ final class _CaptureVoiceInputDialogState
     final l10n = L10n.of(context)!;
 
     return AdaptiveScaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AdaptiveAppBar(
         title: PlatformText(
           l10n.captureVoiceInputPrompt,

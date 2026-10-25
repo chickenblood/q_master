@@ -8,9 +8,9 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../l10n/l10n.dart';
 import '../settings/settings_sheet.dart';
+import '../ui/adaptive_route_page.dart';
 import '../ui/adaptive_widgets.dart';
 import '../ui/media_query.dart';
-import '../ui/adaptive_route_page.dart';
 import 'deck_of_pain_game_view.dart';
 import 'dod_game_view.dart';
 
@@ -128,7 +128,6 @@ class GamesTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final isLandscape = MediaQuery.orientationOf(context) == .landscape;
     return AdaptiveScaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AdaptiveAppBar(
         leading: [settingsGlassBarItem(id: 'left-item', context: context)],
         title: Text(

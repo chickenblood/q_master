@@ -67,7 +67,6 @@ class AppShell extends ConsumerWidget {
         : null;
 
     return AdaptiveScaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(top: false, child: navigationShell),
       bottomBar: AdaptiveTabBar(
         visible: _shouldShowTabBar(context, location),
