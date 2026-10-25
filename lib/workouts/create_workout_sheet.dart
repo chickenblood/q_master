@@ -704,25 +704,29 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   // Returns the title widget for the app bar based on the current display mode.
   Widget _titleForAppBar(BuildContext context) {
     if (_displayMode == .display) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          PlatformText(
-            _titleTextForAppBar(),
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.3,
-            ),
-            textScaler: MediaQuery.textScalerOf(
-              context,
-            ).clamp(maxScaleFactor: 1.5),
-          ),
-          if (_storedWorkout != null)
+      return AdaptiveContainer(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2),
+        width: 270,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
             PlatformText(
-              _storedWorkout!.date.formattedForDisplay(),
-              style: Theme.of(context).textTheme.bodySmall,
+              _titleTextForAppBar(),
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.3,
+              ),
+              textScaler: MediaQuery.textScalerOf(
+                context,
+              ).clamp(maxScaleFactor: 1.5),
             ),
-        ],
+            if (_storedWorkout != null)
+              PlatformText(
+                _storedWorkout!.date.formattedForDisplay(),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+          ],
+        ),
       );
     } else {
       return Padding(

@@ -1,0 +1,32 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+
+/// Container that adopts iOS Liquid Glass or Material native style.
+final class AdaptiveContainer extends StatelessWidget {
+  final double? width;
+  final double? height;
+  final EdgeInsets? padding;
+  final Widget? child;
+
+  const AdaptiveContainer({
+    super.key,
+    this.width,
+    this.height,
+    this.padding,
+    this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) => PlatformWidget(
+    cupertino: (context, platform) => GlassContainer(
+      shape: LiquidRoundedRectangle(borderRadius: kToolbarHeight / 2),
+      width: width,
+      height: height,
+      padding: padding,
+      child: child,
+    ),
+    material: (context, platform) =>
+        Container(width: width, height: height, padding: padding, child: child),
+  );
+}

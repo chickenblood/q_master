@@ -7,6 +7,11 @@ import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/workout_list.dart';
 import 'package:q_master/workouts/create_workout_sheet.dart';
 
+Future<void> _pumpEditor(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 500));
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -42,23 +47,23 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await _pumpEditor(tester);
 
     final workoutNameField = find.byType(TextField);
     expect(workoutNameField, findsOneWidget);
 
     await tester.enterText(workoutNameField, 'First version');
     await tester.tap(find.byIcon(Icons.check));
-    await tester.pumpAndSettle();
+    await _pumpEditor(tester);
 
     expect(container.read(workoutListProvider), hasLength(1));
     expect(container.read(workoutListProvider).single.name, 'First version');
 
     await tester.tap(find.byIcon(Icons.edit));
-    await tester.pumpAndSettle();
+    await _pumpEditor(tester);
     await tester.enterText(workoutNameField, 'Updated version');
     await tester.tap(find.byIcon(Icons.check));
-    await tester.pumpAndSettle();
+    await _pumpEditor(tester);
 
     final workouts = container.read(workoutListProvider);
     expect(workouts, hasLength(1));
@@ -97,17 +102,17 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await _pumpEditor(tester);
 
     await tester.tap(find.text('Add Section').first);
-    await tester.pumpAndSettle();
+    await _pumpEditor(tester);
     await tester.enterText(find.byType(TextField).last, 'Warm up');
     await tester.tap(find.text('Add Section').last);
-    await tester.pumpAndSettle();
+    await _pumpEditor(tester);
 
     await tester.enterText(find.byType(TextField).first, 'Duplicate sections');
     await tester.tap(find.byIcon(Icons.check));
-    await tester.pumpAndSettle();
+    await _pumpEditor(tester);
 
     final sections = container.read(workoutListProvider).single.sections;
     expect(sections, hasLength(2));
