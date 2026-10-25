@@ -495,7 +495,6 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
                         Expanded(
                           child: WorkoutAutocompleteTextField(
                             textEditingController: widget.controller,
-                            tagFilter: selectedTagKeys,
                             minLines: 1,
                             maxLines: 1,
                             onSubmitted: _addExercise,

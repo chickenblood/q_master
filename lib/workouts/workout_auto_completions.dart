@@ -218,6 +218,7 @@ class _WorkoutAutocompleteTextFieldState
             }
             return Material(
               child: ListView.builder(
+                padding: EdgeInsets.zero,
                 shrinkWrap: true,
                 reverse: widget.optionsViewOpenDirection == .up,
                 itemCount: options.length,
