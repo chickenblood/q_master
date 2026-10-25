@@ -30,6 +30,18 @@ final class _SectionDraft {
   final List<String> exercises;
 }
 
+final class _DraggedExercise {
+  const _DraggedExercise({
+    required this.section,
+    required this.index,
+    required this.name,
+  });
+
+  final _SectionDraft section;
+  final int index;
+  final String name;
+}
+
 final class CreateWorkoutSheet extends ConsumerStatefulWidget {
   final Workout? originalWorkout;
   final DisplayMode initialDisplayMode;
@@ -130,13 +142,26 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   }
 
   // --- Section & Exercise Manipulation ---
-  void _moveExercise(
-    List<String> exercises, {
-    required int fromIndex,
-    required int toIndex,
+  void _moveExerciseToSection({
+    required _DraggedExercise draggedExercise,
+    required _SectionDraft targetSection,
+    required int targetIndex,
   }) {
-    final exercise = exercises.removeAt(fromIndex);
-    exercises.insert(toIndex, exercise);
+    final sourceSection = draggedExercise.section;
+    if (draggedExercise.index >= sourceSection.exercises.length) return;
+
+    setState(() {
+      final exercise = sourceSection.exercises.removeAt(draggedExercise.index);
+      final adjustedTargetIndex =
+          identical(sourceSection, targetSection) &&
+              draggedExercise.index < targetIndex
+          ? targetIndex - 1
+          : targetIndex;
+      targetSection.exercises.insert(
+        adjustedTargetIndex.clamp(0, targetSection.exercises.length),
+        exercise,
+      );
+    });
   }
 
   void _moveSection({required int fromIndex, required int toIndex}) {
@@ -278,6 +303,134 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     }
   }
 
+  Widget _exerciseRow(
+    BuildContext context, {
+    required _SectionDraft section,
+    required int exerciseIndex,
+  }) {
+    final exercise = section.exercises[exerciseIndex];
+    final exercises = section.exercises;
+    final itemKey = ValueKey(
+      'exercise_${identityHashCode(section)}_$exerciseIndex',
+    );
+    final draggedExercise = _DraggedExercise(
+      section: section,
+      index: exerciseIndex,
+      name: exercise,
+    );
+
+    return DismissibleRow(
+      key: ValueKey('dismissible_${identityHashCode(section)}_$exerciseIndex'),
+      enabled: _displayMode == DisplayMode.edit,
+      onDismissed: (direction) {
+        setState(() {
+          exercises.removeAt(exerciseIndex);
+        });
+      },
+      child: Builder(
+        builder: (itemContext) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (exerciseIndex == exercises.length - 1 &&
+                identical(_lastAddedSection, section)) {
+              Scrollable.ensureVisible(
+                itemContext,
+                duration: const Duration(milliseconds: 300),
+                alignment: 0.0,
+                alignmentPolicy: .explicit,
+              );
+              _lastAddedSection = null;
+            }
+          });
+          final row = GestureDetector(
+            onDoubleTap: () => _displayMode == DisplayMode.edit
+                ? _editExercise(
+                    context,
+                    exercises: exercises,
+                    index: exerciseIndex,
+                    section: section,
+                  )
+                : null,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 5, 8, 5),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: PlatformListTile(
+                      key: itemKey,
+                      title: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          exercise,
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                          maxLines: 2,
+                          overflow: .ellipsis,
+                          textAlign: .left,
+                        ),
+                      ),
+                      material: (context, platform) => MaterialListTileData(
+                        contentPadding: EdgeInsets.only(left: 0, right: 8),
+                      ),
+                      cupertino: (context, platform) => CupertinoListTileData(
+                        padding: EdgeInsets.only(left: 0, right: 8),
+                      ),
+                    ),
+                  ),
+                  if (_displayMode == DisplayMode.edit)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 6.0),
+                      child: Icon(
+                        Icons.drag_handle,
+                        color: ThemeColors.dragHandle(context),
+                        size: 24,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+
+          if (_displayMode != DisplayMode.edit) return row;
+          return DragTarget<_DraggedExercise>(
+            onWillAcceptWithDetails: (details) => true,
+            onAcceptWithDetails: (details) => _moveExerciseToSection(
+              draggedExercise: details.data,
+              targetSection: section,
+              targetIndex: exerciseIndex,
+            ),
+            builder: (context, candidates, rejected) => LongPressDraggable(
+              data: draggedExercise,
+              feedback: Material(
+                color: Theme.of(context).colorScheme.surface,
+                elevation: 6,
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Text(
+                    draggedExercise.name,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+              ),
+              childWhenDragging: Opacity(opacity: 0.3, child: row),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: candidates.isNotEmpty
+                      ? Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.12)
+                      : null,
+                ),
+                child: row,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   List<Widget> content(BuildContext context) {
     return [
       SliverSafeArea(
@@ -297,121 +450,38 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                   section: section,
                   sectionIndex: sectionIndex,
                 ),
-                ReorderableListView.builder(
-                  shrinkWrap: true,
-                  buildDefaultDragHandles: false,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: exercises.length,
-                  itemBuilder: (context, exerciseIndex) {
-                    final exercise = exercises[exerciseIndex];
-                    final isLastItem = exerciseIndex == (exercises.length - 1);
-                    return DismissibleRow(
-                      key: ValueKey('dismissible_$exercise$exerciseIndex'),
-                      enabled: _displayMode == DisplayMode.edit,
-                      onDismissed: (direction) {
-                        setState(() {
-                          exercises.removeAt(exerciseIndex);
-                        });
-                      },
-                      child: Builder(
-                        builder: (itemContext) {
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            if (isLastItem &&
-                                identical(_lastAddedSection, section)) {
-                              Scrollable.ensureVisible(
-                                itemContext,
-                                duration: const Duration(milliseconds: 300),
-                                alignment: 0.0,
-                                alignmentPolicy: .explicit,
-                              );
-                              _lastAddedSection = null;
-                            }
-                          });
-                          return GestureDetector(
-                            onDoubleTap: () => _displayMode == .edit
-                                ? _editExercise(
-                                    context,
-                                    exercises: exercises,
-                                    index: exerciseIndex,
-                                    section: section,
-                                  )
-                                : null,
-                            child: ReorderableDelayedDragStartListener(
-                              enabled: _displayMode == .edit,
-                              index: exerciseIndex,
-                              child: Padding(
-                                padding: const EdgeInsets.fromLTRB(16, 5, 8, 5),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                      child: PlatformListTile(
-                                        key: ValueKey(
-                                          'exercise_$exercise$exerciseIndex',
-                                        ),
-                                        title: Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                            exercise,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyLarge
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.w700,
-                                                ),
-                                            maxLines: 2,
-                                            overflow: .ellipsis,
-                                            textAlign: .left,
-                                          ),
-                                        ),
-                                        material: (context, platform) =>
-                                            MaterialListTileData(
-                                              contentPadding: EdgeInsets.only(
-                                                left: 0,
-                                                right: 8,
-                                              ),
-                                            ),
-                                        cupertino: (context, platform) =>
-                                            CupertinoListTileData(
-                                              padding: EdgeInsets.only(
-                                                left: 0,
-                                                right: 8,
-                                              ),
-                                            ),
-                                      ),
-                                    ),
-                                    if (_displayMode == DisplayMode.edit)
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          right: 6.0,
-                                        ),
-                                        child: Icon(
-                                          Icons.drag_handle,
-                                          color: ThemeColors.dragHandle(
-                                            context,
-                                          ),
-                                          size: 24,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
+                for (
+                  var exerciseIndex = 0;
+                  exerciseIndex < exercises.length;
+                  exerciseIndex++
+                )
+                  _exerciseRow(
+                    context,
+                    section: section,
+                    exerciseIndex: exerciseIndex,
+                  ),
+                if (_displayMode == DisplayMode.edit)
+                  DragTarget<_DraggedExercise>(
+                    key: ValueKey('exercise_drop_target_$sectionIndex'),
+                    onWillAcceptWithDetails: (details) => true,
+                    onAcceptWithDetails: (details) => _moveExerciseToSection(
+                      draggedExercise: details.data,
+                      targetSection: section,
+                      targetIndex: section.exercises.length,
+                    ),
+                    builder: (context, candidates, rejected) => SizedBox(
+                      height: section.exercises.isEmpty ? 44 : 20,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: candidates.isNotEmpty
+                              ? Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.12)
+                              : null,
+                        ),
                       ),
-                    );
-                  },
-                  onReorderItem: (startIndex, endIndex) {
-                    setState(() {
-                      _moveExercise(
-                        exercises,
-                        fromIndex: startIndex,
-                        toIndex: endIndex,
-                      );
-                    });
-                  },
-                ),
+                    ),
+                  ),
               ],
             );
           },

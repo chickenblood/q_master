@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:q_master/l10n/l10n.dart';
+import 'package:q_master/model/workout.dart';
 import 'package:q_master/model/workout_list.dart';
 import 'package:q_master/workouts/create_workout_sheet.dart';
 
@@ -12,8 +13,56 @@ Future<void> _pumpEditor(WidgetTester tester) async {
   await tester.pump(const Duration(milliseconds: 500));
 }
 
+Future<void> _pumpEditorForWorkout(WidgetTester tester, Workout workout) async {
+  await tester.pumpWidget(
+    ProviderScope(
+      child: MaterialApp(
+        theme: ThemeData(platform: TargetPlatform.android),
+        localizationsDelegates: L10n.localizationsDelegates,
+        supportedLocales: L10n.supportedLocales,
+        home: CreateWorkoutSheet(
+          originalWorkout: workout,
+          initialDisplayMode: DisplayMode.edit,
+        ),
+      ),
+    ),
+  );
+  await _pumpEditor(tester);
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  testWidgets('dragging an exercise moves it into an empty section', (
+    tester,
+  ) async {
+    final workout = Workout(
+      name: 'Workout',
+      date: DateTime(2026),
+      sections: [
+        WorkoutSection(name: 'Warm up', exercises: ['Jumping Jacks']),
+        WorkoutSection(name: 'Thang', exercises: []),
+      ],
+    );
+    await _pumpEditorForWorkout(tester, workout);
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('Jumping Jacks')),
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+    await gesture.moveTo(
+      tester.getCenter(find.byKey(const ValueKey('exercise_drop_target_1'))),
+    );
+    await tester.pump();
+    await gesture.up();
+    await _pumpEditor(tester);
+
+    expect(find.text('Jumping Jacks'), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.text('Jumping Jacks')).dy,
+      greaterThan(tester.getTopLeft(find.text('THANG')).dy),
+    );
+  });
 
   testWidgets('saving an edited new workout replaces it instead of adding it', (
     tester,
