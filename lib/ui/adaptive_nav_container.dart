@@ -3,13 +3,15 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 /// Container that adopts iOS Liquid Glass or Material native style.
-final class AdaptiveContainer extends StatelessWidget {
+///
+/// For use in app bars and floating chrome.
+final class AdaptiveNavContainer extends StatelessWidget {
   final double? width;
   final double? height;
   final EdgeInsets? padding;
   final Widget? child;
 
-  const AdaptiveContainer({
+  const AdaptiveNavContainer({
     super.key,
     this.width,
     this.height,

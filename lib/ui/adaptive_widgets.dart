@@ -1,10 +1,11 @@
 export './adaptive_accessory_action_item.dart';
 export './adaptive_app_bar.dart';
 export './adaptive_button_bar.dart';
-export './adaptive_container.dart';
 export './adaptive_icons.dart';
 export './adaptive_menu.dart';
 export './adaptive_modal_sheet.dart';
+export './adaptive_nav_container.dart';
+export './adaptive_nav_text_field.dart';
 export './adaptive_scaffold.dart';
 export './adaptive_segmented_control.dart';
 export './adaptive_slider.dart';

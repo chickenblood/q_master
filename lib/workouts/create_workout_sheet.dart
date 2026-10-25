@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
@@ -855,7 +854,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   // Returns the title widget for the app bar based on the current display mode.
   Widget _titleForAppBar(BuildContext context) {
     if (_displayMode == .display) {
-      return AdaptiveContainer(
+      return AdaptiveNavContainer(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2),
         width: 270,
         child: Column(
@@ -882,7 +881,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     } else {
       return Padding(
         padding: _headerInsets,
-        child: GlassTextField(
+        child: AdaptiveNavTextField(
           controller: _nameTextController,
           enabled: _displayMode == .edit,
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6),
