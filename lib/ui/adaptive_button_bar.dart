@@ -45,7 +45,7 @@ final class AdaptiveButtonBar extends StatelessWidget {
       ),
     ),
     cupertino: (_, _) => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.only(bottom: 8, left: 16, right: 16),
       child: Row(
         mainAxisAlignment: mainAxisAlignment,
         children: [

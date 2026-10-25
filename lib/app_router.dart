@@ -5,8 +5,8 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'games/games_tab.dart';
 import 'near_me/near_me_tab.dart';
 import 'timer/timer_setup_tab.dart';
-import 'workouts/exercise_picker_sheet.dart';
 import 'ui/app_shell.dart';
+import 'workouts/exercise_picker_sheet.dart';
 import 'workouts/received_workout_share_listener.dart';
 import 'workouts/workouts_tab.dart';
 
