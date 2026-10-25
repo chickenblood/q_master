@@ -166,4 +166,62 @@ void main() {
       greaterThan(tester.getTopLeft(find.text('THANG')).dy),
     );
   });
+
+  testWidgets('dragging an exercise to the edge auto-scrolls the workout', (
+    tester,
+  ) async {
+    final workout = Workout(
+      name: 'Auto-scroll',
+      date: DateTime(2025),
+      sections: [
+        for (var index = 0; index < 20; index++)
+          WorkoutSection(
+            name: 'Section $index',
+            exercises: ['Exercise $index'],
+          ),
+      ],
+    );
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          theme: ThemeData(platform: TargetPlatform.android),
+          localizationsDelegates: L10n.localizationsDelegates,
+          supportedLocales: L10n.supportedLocales,
+          home: CreateWorkoutSheet(
+            originalWorkout: workout,
+            initialDisplayMode: DisplayMode.edit,
+          ),
+        ),
+      ),
+    );
+    await _pumpEditor(tester);
+
+    final scrollableFinder = find.descendant(
+      of: find.byType(CustomScrollView),
+      matching: find.byType(Scrollable),
+    );
+    final scrollable = tester.state<ScrollableState>(scrollableFinder.first);
+    expect(scrollable.position.pixels, 0);
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('Exercise 0')),
+    );
+    await tester.pump(kLongPressTimeout);
+    await tester.pump();
+
+    final viewport = tester.getRect(find.byType(CustomScrollView));
+    await gesture.moveTo(Offset(viewport.center.dx, viewport.bottom - 8));
+    for (var frame = 0; frame < 10; frame++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    expect(scrollable.position.pixels, greaterThan(0));
+
+    await gesture.up();
+    await tester.pumpAndSettle();
+  });
 }

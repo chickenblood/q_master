@@ -77,6 +77,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
 
   // Track the group of the most recently added exercise for scrolling
   _SectionDraft? _lastAddedSection;
+  EdgeDraggingAutoScroller? _exerciseAutoScroller;
   late final AppLifecycleListener _appLifecycleListener;
 
   // --- Lifecycle & State ---
@@ -114,6 +115,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
 
   @override
   void dispose() {
+    _exerciseAutoScroller?.stopAutoScroll();
     _appLifecycleListener.dispose();
     _nameTextController.dispose();
     _focusNode.dispose();
@@ -187,6 +189,44 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   void _moveSection({required int fromIndex, required int toIndex}) {
     final section = _sections.removeAt(fromIndex);
     _sections.insert(toIndex, section);
+  }
+
+  void _updateExerciseAutoScroll(Offset globalPosition) {
+    final autoScroller = _exerciseAutoScroller;
+    if (autoScroller == null) return;
+
+    final scrollable = autoScroller.scrollable;
+    final viewport = scrollable.context.findRenderObject()! as RenderBox;
+    final viewportRect = viewport.localToGlobal(Offset.zero) & viewport.size;
+    const edgeExtent = 72.0;
+    var dragTarget = Rect.fromCenter(
+      center: globalPosition,
+      width: 1,
+      height: 1,
+    );
+
+    if (globalPosition.dy < viewportRect.top + edgeExtent) {
+      final overscroll = (edgeExtent - (globalPosition.dy - viewportRect.top))
+          .clamp(0.0, edgeExtent);
+      dragTarget = Rect.fromCenter(
+        center: Offset(globalPosition.dx, viewportRect.top - overscroll),
+        width: 1,
+        height: 1,
+      );
+    } else if (globalPosition.dy > viewportRect.bottom - edgeExtent) {
+      final overscroll =
+          (edgeExtent - (viewportRect.bottom - globalPosition.dy)).clamp(
+            0.0,
+            edgeExtent,
+          );
+      dragTarget = Rect.fromCenter(
+        center: Offset(globalPosition.dx, viewportRect.bottom + overscroll),
+        width: 1,
+        height: 1,
+      );
+    }
+
+    autoScroller.startAutoScrollIfNecessary(dragTarget);
   }
 
   Future<String?> _showNameChangeDialog(
@@ -431,6 +471,20 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       },
       builder: (context, candidates, rejected) => LongPressDraggable(
         data: draggedExercise,
+        onDragStarted: () {
+          _exerciseAutoScroller?.stopAutoScroll();
+          _exerciseAutoScroller = EdgeDraggingAutoScroller(
+            Scrollable.of(context),
+            velocityScalar: 10,
+          );
+        },
+        onDragUpdate: (details) {
+          _updateExerciseAutoScroll(details.globalPosition);
+        },
+        onDragEnd: (_) {
+          _exerciseAutoScroller?.stopAutoScroll();
+          _exerciseAutoScroller = null;
+        },
         feedback: Material(
           color: Theme.of(context).colorScheme.surface,
           elevation: 6,
