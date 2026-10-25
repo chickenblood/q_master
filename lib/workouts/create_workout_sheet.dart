@@ -51,6 +51,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   // For storing the original workout when in edit mode, so we can revert to it
   // if the user cancels out of editing.
   Workout? _storedWorkout;
+  Workout? _persistedWorkout;
   var _displayMode = DisplayMode.display;
   var _pickerIsShown = false;
 
@@ -73,6 +74,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     final workout = widget.originalWorkout;
     if (workout != null) {
       _storedWorkout = workout;
+      _persistedWorkout = workout;
       _updateUiFromWorkout(workout);
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -759,12 +761,13 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   Future<Workout> _saveWorkout() async {
     final workoutToSave = _buildWorkoutFromUi().copyWith(date: DateTime.now());
     final listNotifier = ref.read(workoutListProvider.notifier);
-    if (widget.originalWorkout == null) {
+    final persistedWorkout = _persistedWorkout;
+    if (persistedWorkout == null) {
       await listNotifier.add(workoutToSave);
-    } else if (_storedWorkout != null) {
-      await listNotifier.replace(_storedWorkout!, workoutToSave);
+      _persistedWorkout = workoutToSave;
     } else {
-      assert(false, 'Unable to save workout: _storedWorkout is null');
+      await listNotifier.replace(persistedWorkout, workoutToSave);
+      _persistedWorkout = workoutToSave;
     }
     return workoutToSave;
   }
