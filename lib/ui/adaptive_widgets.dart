@@ -1,4 +1,5 @@
 export './adaptive_accessory_action_item.dart';
+export './adaptive_alert_dialog.dart';
 export './adaptive_app_bar.dart';
 export './adaptive_button_bar.dart';
 export './adaptive_icons.dart';
