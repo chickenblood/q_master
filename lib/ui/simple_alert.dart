@@ -6,25 +6,24 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/l10n.dart';
+import '../ui/adaptive_widgets.dart';
 
 /// A simple alert with a message and an OK button.
 /// Supports basic HTML markup in the message for formatting and links.
 Future<void> showSimpleAlert(
   BuildContext context, {
-  String? title,
+  String title = "",
   required String message,
-}) => showAdaptiveDialog(
+}) => showAlertDialog(
   context: context,
-  builder: (BuildContext innerContext) => AlertDialog.adaptive(
-    title: title != null ? PlatformText(title) : null,
-    content: _AlertMessageContent(message: message),
-    actions: [
-      PlatformDialogAction(
-        onPressed: () => Navigator.pop(innerContext),
-        child: PlatformText(L10n.of(innerContext)!.okAction),
-      ),
-    ],
-  ),
+  title: title,
+  content: _AlertMessageContent(message: message),
+  actions: [
+    AdaptiveDialogAction(
+      onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+      title: L10n.of(context)!.okAction,
+    ),
+  ],
 );
 
 final class _AlertMessageContent extends StatelessWidget {

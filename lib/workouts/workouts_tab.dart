@@ -14,12 +14,8 @@ import '../model/workout.dart';
 import '../model/workout_list_controller.dart';
 import '../settings/settings_sheet.dart';
 import '../slack/slackblast_picker_sheet.dart';
-import '../ui/adaptive_app_bar.dart';
-import '../ui/adaptive_icons.dart';
-import '../ui/adaptive_menu.dart';
-import '../ui/adaptive_modal_sheet.dart';
 import '../ui/adaptive_route_page.dart';
-import '../ui/adaptive_scaffold.dart';
+import '../ui/adaptive_widgets.dart';
 import '../ui/dismissible_row.dart';
 import '../ui/menu_icons.dart';
 import '../utils/datetime_utils.dart';
@@ -323,27 +319,22 @@ final class _WorkoutTile extends StatelessWidget {
     required this.onShareToBackblast,
   });
 
-  Future<bool?> _confirmDelete(BuildContext context) => showAdaptiveDialog(
+  Future<bool?> _confirmDelete(BuildContext context) => showAlertDialog(
     context: context,
-    builder: (BuildContext innerContext) => AlertDialog.adaptive(
-      title: PlatformText(L10n.of(context)!.deleteWorkoutAlertTitle),
-      content: PlatformText(L10n.of(context)!.deleteWorkoutAlertDescription),
-      actions: [
-        PlatformDialogAction(
-          cupertino: (_, _) =>
-              CupertinoDialogActionData(isDestructiveAction: true),
-          onPressed: () => Navigator.pop(innerContext, true),
-          child: PlatformText(
-            L10n.of(innerContext)!.deleteWorkoutConfirmAction,
-          ),
-        ),
-        PlatformDialogAction(
-          cupertino: (_, _) => CupertinoDialogActionData(isDefaultAction: true),
-          onPressed: () => Navigator.pop(innerContext, false),
-          child: PlatformText(L10n.of(innerContext)!.cancelAction),
-        ),
-      ],
-    ),
+    title: L10n.of(context)!.deleteWorkoutAlertTitle,
+    message: L10n.of(context)!.deleteWorkoutAlertDescription,
+    actions: [
+      AdaptiveDialogAction(
+        title: L10n.of(context)!.deleteWorkoutConfirmAction,
+        isDestructive: true,
+        onPressed: () => Navigator.of(context, rootNavigator: true).pop(true),
+      ),
+      AdaptiveDialogAction(
+        title: L10n.of(context)!.cancelAction,
+        isPrimary: true,
+        onPressed: () => Navigator.of(context, rootNavigator: true).pop(false),
+      ),
+    ],
   );
 
   void _duplicateWorkout(Workout workout) async {

@@ -11,10 +11,7 @@ import '../model/f3_nation.dart';
 import '../services/f3_nation_client.dart';
 import '../model/formatted_workout.dart';
 import '../model/workout.dart';
-import '../ui/adaptive_app_bar.dart';
-import '../ui/adaptive_icons.dart';
-import '../ui/adaptive_modal_sheet.dart';
-import '../ui/adaptive_scaffold.dart';
+import '../ui/adaptive_widgets.dart';
 import '../ui/cupertino_sheet_fork.dart';
 import '../ui/simple_alert.dart';
 import '../utils/shared_app_prefs.dart';
@@ -295,33 +292,31 @@ class _SlackblastPickerSheetState
     required F3EventInstanceSummary event,
   }) async {
     final l10n = L10n.of(context)!;
-    return await showAdaptiveDialog<bool>(
-          context: context,
-          builder: (dialogContext) => AlertDialog.adaptive(
-            title: PlatformText(l10n.slackblastPostConfirmationMessage),
-            content: PlatformText(
-              l10n.slackblastPostConfirmationTitle(
-                region.name,
-                ao.name,
-                DateFormat.yMMMd().format(event.startDate),
-              ),
-              style: Theme.of(dialogContext).textTheme.titleSmall,
-            ),
-            actions: [
-              PlatformDialogAction(
-                onPressed: () => Navigator.of(dialogContext).pop(false),
-                child: PlatformText(l10n.cancelAction),
-              ),
-              PlatformDialogAction(
-                cupertino: (_, _) =>
-                    CupertinoDialogActionData(isDefaultAction: true),
-                onPressed: () => Navigator.of(dialogContext).pop(true),
-                child: PlatformText(l10n.fillBackblastAction),
-              ),
-            ],
-          ),
-        ) ??
-        false;
+    final result = await showAlertDialog<bool>(
+      context: context,
+      title: l10n.slackblastPostConfirmationMessage,
+      content: PlatformText(
+        l10n.slackblastPostConfirmationTitle(
+          region.name,
+          ao.name,
+          DateFormat.yMMMd().format(event.startDate),
+        ),
+        style: Theme.of(context).textTheme.titleSmall,
+      ),
+      actions: [
+        AdaptiveDialogAction(
+          onPressed: () =>
+              Navigator.of(context, rootNavigator: true).pop(false),
+          title: l10n.cancelAction,
+        ),
+        AdaptiveDialogAction(
+          isPrimary: true,
+          onPressed: () => Navigator.of(context, rootNavigator: true).pop(true),
+          title: l10n.fillBackblastAction,
+        ),
+      ],
+    );
+    return result ?? false;
   }
 
   /// Confirms a successful post and optionally opens the installed Slack app.

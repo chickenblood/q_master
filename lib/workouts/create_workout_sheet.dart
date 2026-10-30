@@ -255,31 +255,32 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       baseOffset: 0,
       extentOffset: initialText?.length ?? 0,
     );
-    return showAdaptiveDialog<String>(
+    return showAlertDialog<String>(
       context: context,
-      builder: (innerContext) => AlertDialog.adaptive(
-        title: PlatformText(title),
-        content: PlatformTextField(
-          controller: controller,
-          autofocus: true,
-          textCapitalization: TextCapitalization.words,
-          hintText: hintText,
-          onSubmitted: (_) =>
-              Navigator.of(innerContext).pop(controller.text.trim()),
-        ),
-        actions: [
-          PlatformDialogAction(
-            onPressed: () => Navigator.of(innerContext).pop(),
-            child: PlatformText(L10n.of(innerContext)!.cancelAction),
-          ),
-          PlatformDialogAction(
-            cupertino: (_, _) =>
-                CupertinoDialogActionData(isDestructiveAction: true),
-            onPressed: () => Navigator.of(innerContext).pop(controller.text),
-            child: PlatformText(buttonTitle),
-          ),
-        ],
+      title: title,
+      content: PlatformTextField(
+        controller: controller,
+        autofocus: true,
+        textCapitalization: TextCapitalization.words,
+        hintText: hintText,
+        onSubmitted: (_) => Navigator.of(
+          context,
+          rootNavigator: true,
+        ).pop(controller.text.trim()),
       ),
+      actions: [
+        AdaptiveDialogAction(
+          isPrimary: true,
+          onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+          title: L10n.of(context)!.cancelAction,
+        ),
+        AdaptiveDialogAction(
+          isDestructive: true,
+          onPressed: () =>
+              Navigator.of(context, rootNavigator: true).pop(controller.text),
+          title: buttonTitle,
+        ),
+      ],
     );
   }
 
@@ -935,34 +936,24 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       return true;
     }
 
-    return (await showAdaptiveDialog(
-          context: context,
-          builder: (BuildContext innerContext) => AlertDialog.adaptive(
-            title: PlatformText(
-              L10n.of(innerContext)!.confirmDiscardChangesAlertTitle,
-            ),
-            content: PlatformText(
-              L10n.of(innerContext)!.confirmDiscardChangesAlertMessage,
-            ),
-            actions: [
-              PlatformDialogAction(
-                cupertino: (_, _) =>
-                    CupertinoDialogActionData(isDefaultAction: true),
-                onPressed: () => Navigator.of(innerContext).pop(false),
-                child: PlatformText(L10n.of(innerContext)!.cancelAction),
-              ),
-              PlatformDialogAction(
-                cupertino: (_, _) =>
-                    CupertinoDialogActionData(isDestructiveAction: true),
-                onPressed: () => Navigator.of(innerContext).pop(true),
-                child: PlatformText(
-                  L10n.of(innerContext)!.confirmDiscardChangesAlertButton,
-                ),
-              ),
-            ],
-          ),
-        ) ??
-        false);
+    return (await showAlertDialog(
+      context: context,
+      title: L10n.of(context)!.confirmDiscardChangesAlertTitle,
+      message: L10n.of(context)!.confirmDiscardChangesAlertMessage,
+      actions: [
+        AdaptiveDialogAction(
+          isPrimary: true,
+          onPressed: () =>
+              Navigator.of(context, rootNavigator: true).pop(false),
+          title: L10n.of(context)!.cancelAction,
+        ),
+        AdaptiveDialogAction(
+          isDestructive: true,
+          onPressed: () => Navigator.of(context, rootNavigator: true).pop(true),
+          title: L10n.of(context)!.confirmDiscardChangesAlertButton,
+        ),
+      ],
+    ));
   }
 
   /// Builds a [Workout] object from the current state of the UI fields and
