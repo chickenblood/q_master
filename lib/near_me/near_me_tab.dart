@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,10 +11,21 @@ import '../ui/adaptive_app_bar.dart';
 import '../ui/adaptive_scaffold.dart';
 
 class NearMeTab extends StatelessWidget {
-  final controller = WebViewController()
+  late final WebViewController controller = WebViewController()
     ..setJavaScriptMode(.unrestricted)
     ..setNavigationDelegate(
       NavigationDelegate(
+        onPageFinished: (_) {
+          // The page is Ionic and pads itself by env(safe-area-inset-top),
+          // which Android WebView reports on phones with a status bar/cutout.
+          // Flutter's SafeArea already accounts for it, so zero it out.
+          if (defaultTargetPlatform == TargetPlatform.android) {
+            controller.runJavaScript(
+              "document.documentElement.style.setProperty("
+              "'--ion-safe-area-top', '0px');",
+            );
+          }
+        },
         onNavigationRequest: (NavigationRequest request) {
           if (request.url.startsWith('https://f3near.me/') ||
               request.url.startsWith('https://map.f3nation.com/') ||

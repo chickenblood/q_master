@@ -6,14 +6,12 @@
   "dart.debugExternalPackageLibraries": false,
   "dart.debugSdkLibraries": false,
   "dart.openDevTools": "never",
-
   // Editor
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
     "source.organizeImports": "explicit"
   },
-
   // Files
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
@@ -22,14 +20,14 @@
     "*.dart": "${capture}.freezed.dart, ${capture}.g.dart",
     "pubspec.yaml": "pubspec.lock, .flutter-plugins, .flutter-plugins-dependencies, .packages, .dart_tool"
   },
-
   // Debug
   "debug.openDebug": "openOnDebugBreak",
-
   // Dart-specific editor
   "[dart]": {
     "editor.defaultFormatter": "Dart-Code.dart-code",
-    "editor.rulers": [80],
+    "editor.rulers": [
+      80
+    ],
     "editor.tabSize": 2,
     "editor.selectionHighlight": false,
     "editor.codeActionsOnSave": {
@@ -40,5 +38,5 @@
   "chat.tools.terminal.autoApprove": {
     "open": true
   },
-  "java.gradle.buildServer.enabled": "off"
+  "java.gradle.buildServer.enabled": "on"
 }
