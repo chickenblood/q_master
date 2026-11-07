@@ -16,7 +16,7 @@ import '../ui/adaptive_route_page.dart';
 import '../ui/adaptive_widgets.dart';
 import '../ui/media_query.dart';
 import '../utils/datetime_utils.dart';
-import 'timer_tab.dart';
+import 'timer_screen.dart';
 
 /// TimerSetupTab — matches Option 3 "Timer Tab (Setup-First)" mock
 class TimerSetupTab extends ConsumerWidget {

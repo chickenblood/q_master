@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/workout.dart';
-import 'package:q_master/model/workout_list.dart';
+import 'package:q_master/model/workout_list_controller.dart';
 import 'package:q_master/workouts/create_workout_sheet.dart';
 
 Future<void> _pumpEditor(WidgetTester tester) async {
@@ -27,8 +27,8 @@ void main() {
 
     final container = ProviderContainer(
       overrides: [
-        workoutListProvider.overrideWith(
-          () => WorkoutList(
+        workoutListControllerProvider.overrideWith(
+          () => WorkoutListController(
             filenameProvider: () async => '${tempDir.path}/workouts.json',
           ),
         ),
@@ -36,7 +36,7 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    await container.read(workoutListProvider.notifier).loadFromDisk();
+    await container.read(workoutListControllerProvider.notifier).loadFromDisk();
 
     await tester.pumpWidget(
       UncontrolledProviderScope(
@@ -58,8 +58,11 @@ void main() {
     await tester.tap(find.byIcon(Icons.check));
     await _pumpEditor(tester);
 
-    expect(container.read(workoutListProvider), hasLength(1));
-    expect(container.read(workoutListProvider).single.name, 'First version');
+    expect(container.read(workoutListControllerProvider), hasLength(1));
+    expect(
+      container.read(workoutListControllerProvider).single.name,
+      'First version',
+    );
 
     await tester.tap(find.byIcon(Icons.edit));
     await _pumpEditor(tester);
@@ -67,7 +70,7 @@ void main() {
     await tester.tap(find.byIcon(Icons.check));
     await _pumpEditor(tester);
 
-    final workouts = container.read(workoutListProvider);
+    final workouts = container.read(workoutListControllerProvider);
     expect(workouts, hasLength(1));
     expect(workouts.single.name, 'Updated version');
   });
@@ -82,8 +85,8 @@ void main() {
 
     final container = ProviderContainer(
       overrides: [
-        workoutListProvider.overrideWith(
-          () => WorkoutList(
+        workoutListControllerProvider.overrideWith(
+          () => WorkoutListController(
             filenameProvider: () async => '${tempDir.path}/workouts.json',
           ),
         ),
@@ -91,7 +94,7 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    await container.read(workoutListProvider.notifier).loadFromDisk();
+    await container.read(workoutListControllerProvider.notifier).loadFromDisk();
 
     await tester.pumpWidget(
       UncontrolledProviderScope(
@@ -116,7 +119,10 @@ void main() {
     await tester.tap(find.byIcon(Icons.check));
     await _pumpEditor(tester);
 
-    final sections = container.read(workoutListProvider).single.sections;
+    final sections = container
+        .read(workoutListControllerProvider)
+        .single
+        .sections;
     expect(sections, hasLength(2));
     expect(sections.map((section) => section.name), ['Warm up', 'Warm up']);
   });

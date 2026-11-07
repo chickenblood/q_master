@@ -11,7 +11,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import '../l10n/l10n.dart';
 import '../model/formatted_workout.dart';
 import '../model/workout.dart';
-import '../model/workout_list.dart';
+import '../model/workout_list_controller.dart';
 import '../settings/settings_sheet.dart';
 import '../slack/slackblast_picker_sheet.dart';
 import '../ui/adaptive_app_bar.dart';
@@ -163,7 +163,7 @@ class WorkoutsTab extends ConsumerWidget {
 
     if (workout != null) {
       // Add the workout to the store before invoking the editor
-      final listNotifier = ref.read(workoutListProvider.notifier);
+      final listNotifier = ref.read(workoutListControllerProvider.notifier);
       await listNotifier.add(workout);
       if (!context.mounted) return;
 
@@ -226,8 +226,8 @@ class WorkoutsTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final workouts = ref.watch(workoutListProvider);
-    final listNotifier = ref.read(workoutListProvider.notifier);
+    final workouts = ref.watch(workoutListControllerProvider);
+    final listNotifier = ref.read(workoutListControllerProvider.notifier);
     return AdaptiveScaffold(
       appBar: AdaptiveAppBar(
         leading: [settingsGlassBarItem(id: 'left-item', context: context)],
@@ -302,7 +302,7 @@ final class _BeatdownBrowserRouteState extends State<_BeatdownBrowserRoute> {
 }
 
 final class _WorkoutTile extends StatelessWidget {
-  final WorkoutList listNotifier;
+  final WorkoutListController listNotifier;
   final Workout workout;
   final Future<Workout?> Function(
     BuildContext context, {

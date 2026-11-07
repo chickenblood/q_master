@@ -1,4 +1,4 @@
-import '../model/exicon_fetcher.dart';
+import '../model/exicon.dart';
 
 final class NormalizedExiconTag {
   final String key;

@@ -8,7 +8,7 @@ import 'package:q_master/ui/adaptive_scaffold.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/l10n.dart';
-import '../model/exicon_fetcher.dart';
+import '../services/exicon_fetcher.dart';
 import '../ui/adaptive_draggable_sheet.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_route_page.dart';

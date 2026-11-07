@@ -7,7 +7,8 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/l10n.dart';
-import '../model/f3_nation_fetcher.dart';
+import '../model/f3_nation.dart';
+import '../services/f3_nation_client.dart';
 import '../model/formatted_workout.dart';
 import '../model/workout.dart';
 import '../ui/adaptive_app_bar.dart';
@@ -59,7 +60,7 @@ class _SlackblastPickerSheetState
   F3Ao? _selectedAo;
   var _isPosting = false;
 
-  F3NationFetcher get _fetcher => ref.read(f3NationFetcherProvider.notifier);
+  F3NationClient get _fetcher => ref.read(f3NationClientProvider.notifier);
 
   @override
   /// Restores saved selections, loads Regions, and focuses the search.

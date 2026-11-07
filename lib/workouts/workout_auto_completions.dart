@@ -6,7 +6,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
-import '../model/exicon_fetcher.dart';
+import '../services/exicon_fetcher.dart';
 import '../utils/text_editing_value_utils.dart';
 import 'exicon_catalog.dart';
 

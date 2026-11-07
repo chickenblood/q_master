@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:q_master/model/f3_nation_fetcher.dart';
+import 'package:q_master/model/f3_nation.dart';
 
 void main() {
   group('F3Region.fromApiJson', () {
@@ -7,6 +7,15 @@ void main() {
       final region = F3Region.fromApiJson({'id': 1, 'name': 'Bay Area'});
       expect(region.id, 1);
       expect(region.name, 'Bay Area');
+    });
+
+    test('preserves generated equality and copy behavior', () {
+      const region = F3Region(id: 1, name: 'Bay Area');
+      expect(
+        region.copyWith(name: 'Other'),
+        const F3Region(id: 1, name: 'Other'),
+      );
+      expect(region, const F3Region(id: 1, name: 'Bay Area'));
     });
   });
 

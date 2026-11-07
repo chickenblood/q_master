@@ -1,8 +1,24 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
-import 'package:q_master/model/exicon_fetcher.dart';
+import 'package:q_master/model/exicon.dart';
 
 void main() {
   group('ExiconEntry.fromApiJson', () {
+    test('preserves generated JSON and copy behavior after parsing', () {
+      final entry = ExiconEntry.fromApiJson({
+        'name': 'Merkin',
+        'tags': [
+          {'id': 't1', 'name': 'Upper Body'},
+        ],
+        'videoLink': 'https://example.com/merkin',
+      });
+
+      final decoded = jsonDecode(jsonEncode(entry)) as Map<String, Object?>;
+      expect(ExiconEntry.fromJson(decoded), entry);
+      expect(entry.copyWith(name: 'Wide Merkin').tags, entry.tags);
+    });
+
     test('parses only schema-defined fields', () {
       final entry = ExiconEntry.fromApiJson({
         'id': 'exicon-1',

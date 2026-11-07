@@ -3,7 +3,7 @@ import 'dart:convert';
 import '../utils/datetime_utils.dart';
 import 'workout.dart';
 
-extension FormatttedOutput on Workout {
+extension WorkoutFormatting on Workout {
   /// Processes the workoout to share as plain text.
   ///
   /// Uses markdown formatting, since Slack knows how to display it.

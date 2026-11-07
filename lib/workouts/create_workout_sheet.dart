@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
-import '../model/workout_list.dart';
+import '../model/workout_list_controller.dart';
 import '../theme/theme.dart';
 import '../ui/action_button.dart';
 import '../ui/adaptive_widgets.dart';
@@ -898,7 +898,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
 
   Future<Workout> _saveWorkout() async {
     final workoutToSave = _buildWorkoutFromUi().copyWith(date: DateTime.now());
-    final listNotifier = ref.read(workoutListProvider.notifier);
+    final listNotifier = ref.read(workoutListControllerProvider.notifier);
     final persistedWorkout = _persistedWorkout;
     if (persistedWorkout == null) {
       await listNotifier.add(workoutToSave);

@@ -12,10 +12,10 @@ import 'package:watch_connectivity/watch_connectivity.dart';
 
 import 'workout.dart';
 
-part 'workout_list.g.dart';
+part 'workout_list_controller.g.dart';
 
 @Riverpod(keepAlive: true)
-final class WorkoutList extends _$WorkoutList {
+final class WorkoutListController extends _$WorkoutListController {
   static final _logger = Logger();
   final _watch = WatchConnectivity();
   final Future<String> Function() _filenameProvider;
@@ -26,7 +26,7 @@ final class WorkoutList extends _$WorkoutList {
   String? _cachedFilename;
   AppLifecycleListener? _appLifecycleListener;
 
-  WorkoutList({
+  WorkoutListController({
     Future<String> Function()? filenameProvider,
     Future<void> Function()? beforeDiskLoad,
     Future<void> Function()? beforeDiskSave,

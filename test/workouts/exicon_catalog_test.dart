@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:q_master/model/exicon_fetcher.dart';
+import 'package:q_master/model/exicon.dart';
 import 'package:q_master/workouts/exicon_catalog.dart';
 
 void main() {

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zikzak_share_handler/zikzak_share_handler.dart';
 
-import '../model/workout_list.dart';
+import '../model/workout_list_controller.dart';
 import '../ui/simple_alert.dart';
 
 /// Imports workout files received through the platform's share extension.
@@ -51,7 +51,9 @@ class _ReceivedWorkoutShareListenerState
 
     for (final attachment in attachments) {
       if (attachment.path.endsWith('.qmw')) {
-        ref.read(workoutListProvider.notifier).addFromFile(attachment.path);
+        ref
+            .read(workoutListControllerProvider.notifier)
+            .addFromFile(attachment.path);
         return;
       }
     }

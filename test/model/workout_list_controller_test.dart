@@ -3,13 +3,13 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:q_master/model/workout.dart';
-import 'package:q_master/model/workout_list.dart';
+import 'package:q_master/model/workout_list_controller.dart';
 import 'package:riverpod/riverpod.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('WorkoutList persistence', () {
+  group('WorkoutListController persistence', () {
     late Directory tempDir;
 
     setUp(() async {
@@ -38,14 +38,16 @@ void main() {
 
         final container = ProviderContainer(
           overrides: [
-            workoutListProvider.overrideWith(
-              () => WorkoutList(filenameProvider: () async => file.path),
+            workoutListControllerProvider.overrideWith(
+              () => WorkoutListController(
+                filenameProvider: () async => file.path,
+              ),
             ),
           ],
         );
         addTearDown(container.dispose);
 
-        final notifier = container.read(workoutListProvider.notifier);
+        final notifier = container.read(workoutListControllerProvider.notifier);
         notifier.state = [makeWorkout('Existing')];
         await notifier.loadFromDisk();
 
@@ -60,8 +62,8 @@ void main() {
 
       final container = ProviderContainer(
         overrides: [
-          workoutListProvider.overrideWith(
-            () => WorkoutList(
+          workoutListControllerProvider.overrideWith(
+            () => WorkoutListController(
               filenameProvider: () async => file.path,
               beforeDiskLoad: () async =>
                   Future<void>.delayed(const Duration(milliseconds: 25)),
@@ -71,7 +73,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      final notifier = container.read(workoutListProvider.notifier);
+      final notifier = container.read(workoutListControllerProvider.notifier);
       notifier.state = [];
 
       await notifier.add(makeWorkout('Fresh'));
