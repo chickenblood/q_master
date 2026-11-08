@@ -89,8 +89,9 @@ components:
 - **Models and state:** [`Workout` and `WorkoutSection`](lib/model/workout.dart)
   represent a beatdown. [`WorkoutListController`](lib/model/workout_list_controller.dart)
   is a Riverpod notifier that manages the list, disk persistence, and watch
-  sync. [`Timer`](lib/model/timer.dart) is a Riverpod notifier for timer state
-  and sounds. [`SharedAppPrefs`](lib/utils/shared_app_prefs.dart) exposes
+  sync. [`WorkoutTimerController`](lib/timer/workout_timer_controller.dart) is a
+  Riverpod notifier for timer state and sounds.
+  [`SharedAppPrefs`](lib/utils/shared_app_prefs.dart) exposes
   locally persisted settings through notifiers. Freezed models and Riverpod
   providers use generated Dart files.
 - **Local workout data:** The workout controller loads and saves
@@ -128,11 +129,11 @@ cached Exicon can be used without a network connection.
 | [`lib/main.dart`](lib/main.dart), [`lib/app_router.dart`](lib/app_router.dart) | Initialization, app configuration, and tab routes |
 | [`lib/workouts/`](lib/workouts/) | Beatdown list, editor, exercise picker, generation, sharing, and leading a workout |
 | [`lib/games/`](lib/games/) | Game selection, game views, dodecahedron rendering, and face definitions |
-| [`lib/timer/`](lib/timer/) | Timer setup tab and active timer screen |
+| [`lib/timer/`](lib/timer/) | Timer controller, setup tab, and active timer screen |
 | [`lib/near_me/`](lib/near_me/) | Near Me web view |
 | [`lib/settings/`](lib/settings/) | Shared settings sheet |
 | [`lib/slack/`](lib/slack/) | Region/AO/event picker for the Slackblast workflow |
-| [`lib/model/`](lib/model/) | Workout, timer, game, Exicon, and F3 Nation objects; workout and timer state |
+| [`lib/model/`](lib/model/) | Workout, game, Exicon, and F3 Nation objects; workout state |
 | [`lib/services/`](lib/services/) | Exicon fetching and F3 Nation network client |
 | [`lib/ai_clients/`](lib/ai_clients/) | Firebase AI workout generation client |
 | [`lib/ui/`](lib/ui/) | Shared adaptive navigation, menus, sheets, controls, and app shell |
@@ -153,10 +154,6 @@ and is also reused by adaptive accessory actions.
 
 ### Further organization considerations
 
-- [`Timer`](lib/model/timer.dart) is a stateful timer controller rather than
-  just a data model, and its name can be confused with Dart's `Timer`.
-  A future `WorkoutTimerController` name and a controller-oriented location
-  could clarify its role; this would also change its generated provider.
 - [`ContentView.swift`](ios/Q%20Master%20Watch%20App/ContentView.swift)
   contains watch models, the connectivity view model, and views. If the
   watch app grows, separating those responsibilities into model, connectivity,

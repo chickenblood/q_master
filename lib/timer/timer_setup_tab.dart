@@ -9,7 +9,6 @@ import 'package:q_master/settings/settings_sheet.dart';
 import 'package:q_master/utils/shared_app_prefs.dart';
 
 import '../l10n/l10n.dart';
-import '../model/timer.dart';
 import '../theme/theme.dart';
 import '../ui/action_button.dart';
 import '../ui/adaptive_route_page.dart';
@@ -17,6 +16,7 @@ import '../ui/adaptive_widgets.dart';
 import '../ui/media_query.dart';
 import '../utils/datetime_utils.dart';
 import 'timer_screen.dart';
+import 'workout_timer_controller.dart';
 
 /// TimerSetupTab — matches Option 3 "Timer Tab (Setup-First)" mock
 class TimerSetupTab extends ConsumerWidget {
@@ -38,7 +38,7 @@ class TimerSetupTab extends ConsumerWidget {
   void _showTimeIntervalPicker(
     BuildContext context,
     ValueNotifier<int> timeNotifier,
-    Timer timer,
+    WorkoutTimerController timer,
   ) {
     showPlatformModalSheet(
       context: context,
@@ -65,7 +65,7 @@ class TimerSetupTab extends ConsumerWidget {
   void _showIntegerPicker(
     BuildContext context,
     ValueNotifier<int> roundsNotifier,
-    Timer timer,
+    WorkoutTimerController timer,
     int maxValue,
   ) {
     showPlatformModalSheet(
@@ -105,7 +105,7 @@ class TimerSetupTab extends ConsumerWidget {
         MediaUtils.isTablet(context) ||
         MediaQuery.of(context).orientation == .portrait;
     final l10n = L10n.of(context)!;
-    final timer = ref.read(timerProvider.notifier);
+    final timer = ref.read(workoutTimerControllerProvider.notifier);
     final prefs = SharedAppPrefs.instance;
     return AdaptiveScaffold(
       appBar: AdaptiveAppBar(

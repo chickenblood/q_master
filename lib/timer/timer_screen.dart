@@ -4,7 +4,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../l10n/l10n.dart';
-import '../model/timer.dart';
 import '../theme/theme.dart';
 import '../ui/adaptive_accessory_action_item.dart';
 import '../ui/adaptive_app_bar.dart';
@@ -12,13 +11,14 @@ import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_scaffold.dart';
 import '../ui/media_query.dart';
 import '../utils/datetime_utils.dart';
+import 'workout_timer_controller.dart';
 
 final class TimerScreen extends ConsumerWidget {
   static const fontFamily = 'RobotoCondensed-VariableFont_wght';
   const TimerScreen({super.key});
 
   Future<void> _resetTimer(WidgetRef ref) async {
-    final notifier = ref.read(timerProvider.notifier);
+    final notifier = ref.read(workoutTimerControllerProvider.notifier);
     await notifier.reset();
   }
 
@@ -41,7 +41,7 @@ final class TimerScreen extends ConsumerWidget {
   Widget _layoutTiles(
     L10n l10n, {
     required bool isPortrait,
-    required Timer timerNotifier,
+    required WorkoutTimerController timerNotifier,
     required _TileSpec firstTile,
     required _TileSpec? secondTile,
   }) => isPortrait
@@ -116,9 +116,9 @@ final class TimerScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(timerProvider);
+    ref.watch(workoutTimerControllerProvider);
     final l10n = L10n.of(context)!;
-    final notifier = ref.read(timerProvider.notifier);
+    final notifier = ref.read(workoutTimerControllerProvider.notifier);
     final timerType = notifier.timerType;
     final isPortrait = MediaQuery.of(context).orientation == .portrait;
     final isTablet = MediaUtils.isTablet(context);
@@ -342,7 +342,7 @@ final class _SecondaryTile extends StatelessWidget {
 }
 
 final class _StatusTile extends StatelessWidget {
-  final Timer timerNotifier;
+  final WorkoutTimerController timerNotifier;
   final bool isPortrait;
 
   const _StatusTile({required this.timerNotifier, required this.isPortrait});

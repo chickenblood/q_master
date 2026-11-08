@@ -9,8 +9,8 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import '../utils/audio_session_coordinator.dart';
 import '../utils/shared_app_prefs.dart';
 
-part 'timer.freezed.dart';
-part 'timer.g.dart';
+part 'workout_timer_controller.freezed.dart';
+part 'workout_timer_controller.g.dart';
 
 enum TimerType {
   stopwatch,
@@ -38,7 +38,7 @@ abstract class TimerDisplay with _$TimerDisplay {
 }
 
 @riverpod
-final class Timer extends _$Timer {
+final class WorkoutTimerController extends _$WorkoutTimerController {
   final _prepareSound = AudioPlayer()
     ..setAsset('assets/sounds/prepare.m4a')
     ..setVolume(6.0);
