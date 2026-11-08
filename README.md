@@ -10,10 +10,12 @@ The phone app has four tabs. The settings button is available from each tab.
 
 ### Beatdowns
 
-<div style="display: flex; align-items: flex-start;">
-  <img src="README_images/beatdown_list.png" width="49%" />
-  <img src="README_images/beatdown_editor.png" width="49%" />
-</div>
+<table>
+<tr valign="top">
+  <td width="50%"><img src="README_images/beatdown_list.png" alt="settings" /></td>
+  <td width="50%"><img src="README_images/beatdown_editor.png" alt="watch"  /></td>
+</tr>
+</table>
 
 - **Create and edit:** Add a beatdown manually, give it a name, and organize
   exercises into named sections. Add, rename, delete, and reorder sections and
@@ -39,10 +41,12 @@ The phone app has four tabs. The settings button is available from each tab.
 
 ### Games
 
-<div style="display: flex; align-items: flex-start;">
-  <img src="README_images/games.png" width="49%" />
-  <img src="README_images/deck_of_pain.png" width="49%" />
-</div>
+<table>
+<tr valign="top">
+  <td width="50%"><img src="README_images/games.png" alt="settings" /></td>
+  <td width="50%"><img src="README_images/deck_of_pain.png" alt="watch"  /></td>
+</tr>
+</table>
 
 - **Dodecahedron of Doom:** Shake the device to roll the animated
   dodecahedron and select an exercise.
@@ -51,10 +55,12 @@ The phone app has four tabs. The settings button is available from each tab.
 
 ### Timer
 
-<div style="display: flex; align-items: flex-start;">
-  <img src="README_images/timer_setup.png" width="49%" />
-  <img src="README_images/timer.png" width="49%" />
-</div>
+<table>
+<tr valign="top">
+  <td width="50%"><img src="README_images/timer_setup.png" alt="timer setup" /></td>
+  <td width="50%"><img src="README_images/timer.png" alt="timer"  /></td>
+</tr>
+</table>
 
 Choose **Stopwatch**, **Tabata**, or **Countdown**. Configure the preparation
 interval and, depending on the mode, work and rest intervals, rounds, and
@@ -64,9 +70,12 @@ timer is running.
 
 ### Near me
 
-<div style="display: flex; align-items: flex-start;">
-  <img src="README_images/near_me.png" width="49%" />
-</div>
+<table>
+<tr valign="top">
+  <td width="50%"><img src="README_images/near_me.png" alt="near me" /></td>
+  <td />
+</tr>
+</table>
 
 Browse [F3 Near Me](https://f3near.me) in the app's web view to find workouts.
 The view can use location services, has a refresh action, and opens external
@@ -74,10 +83,12 @@ links outside the web view. The map requires a network connection.
 
 ### Settings and watches
 
-<div style="display: flex; align-items: flex-start;">
-  <img src="README_images/settings.png" width="49%" />
-  <img src="README_images/watch.png" width="49%" />
-</div>
+<table>
+<tr valign="top">
+  <td width="50%"><img src="README_images/settings.png" alt="settings" /></td>
+  <td width="50%"><img src="README_images/watch.png" alt="watch"  /></td>
+</tr>
+</table>
 
 Settings include exercises per beatdown page, system/light/dark appearance,
 the shake-triggered sound, and app information. Timer settings, exercise
