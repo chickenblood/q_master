@@ -7,11 +7,13 @@ synced beatdowns on a paired watch.
 ## App features
 
 The phone app has four tabs. The settings button is available from each tab.
-The images below are placeholders for screenshots to be supplied later.
 
 ### Beatdowns
 
-*Screenshot placeholder: beatdown list and workout editor.*
+<div style="display: flex; align-items: flex-start;">
+  <img src="README_images/beatdown_list.png" width="49%" />
+  <img src="README_images/beatdown_editor.png" width="49%" />
+</div>
 
 - **Create and edit:** Add a beatdown manually, give it a name, and organize
   exercises into named sections. Add, rename, delete, and reorder sections and
@@ -37,7 +39,10 @@ The images below are placeholders for screenshots to be supplied later.
 
 ### Games
 
-*Screenshot placeholder: game selection and a game in progress.*
+<div style="display: flex; align-items: flex-start;">
+  <img src="README_images/games.png" width="49%" />
+  <img src="README_images/deck_of_pain.png" width="49%" />
+</div>
 
 - **Dodecahedron of Doom:** Shake the device to roll the animated
   dodecahedron and select an exercise.
@@ -46,7 +51,10 @@ The images below are placeholders for screenshots to be supplied later.
 
 ### Timer
 
-*Screenshot placeholder: timer setup and active timer.*
+<div style="display: flex; align-items: flex-start;">
+  <img src="README_images/timer_setup.png" width="49%" />
+  <img src="README_images/timer.png" width="49%" />
+</div>
 
 Choose **Stopwatch**, **Tabata**, or **Countdown**. Configure the preparation
 interval and, depending on the mode, work and rest intervals, rounds, and
@@ -56,7 +64,9 @@ timer is running.
 
 ### Near me
 
-*Screenshot placeholder: Near Me map.*
+<div style="display: flex; align-items: flex-start;">
+  <img src="README_images/near_me.png" width="49%" />
+</div>
 
 Browse [F3 Near Me](https://f3near.me) in the app's web view to find workouts.
 The view can use location services, has a refresh action, and opens external
@@ -64,7 +74,10 @@ links outside the web view. The map requires a network connection.
 
 ### Settings and watches
 
-*Screenshot placeholder: settings or a watch workout view.*
+<div style="display: flex; align-items: flex-start;">
+  <img src="README_images/settings.png" width="49%" />
+  <img src="README_images/watch.png" width="49%" />
+</div>
 
 Settings include exercises per beatdown page, system/light/dark appearance,
 the shake-triggered sound, and app information. Timer settings, exercise
