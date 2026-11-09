@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 //   border     #1E1E1E   dividers, outlines
 //   text-pri   #F0F0F0   primary text
 //   text-sec   #808080   secondary / subtitle text (4.54:1 on #080808)
-//   accent     #E53935   F3 Red — all active states, labels, buttons
+//   accent     #D45B3B   F3 Red — all active states, labels, buttons
 //
 // Light surfaces:
 //   scaffold   #F5F5F5
@@ -20,10 +20,10 @@ import 'package:flutter/material.dart';
 //   border     #E8E8E8
 //   text-pri   #121212
 //   text-sec   #6F6F6F   secondary text (5.02:1 on #FFFFFF)
-//   accent     #D32F2F   darker red (4.98:1 on #FFFFFF)
+//   accent     #C25135   darker red (4.64:1 on #FFFFFF)
 
-const _f3Red = Color(0xFFE53935);
-const _f3RedLight = Color(0xFFD32F2F); // WCAG AA on white
+const _f3Red = Color(0xFFD45B3B);
+const _f3RedLight = Color(0xFFC25135); // WCAG AA on white
 
 // ─── Timer tile colors ─────────────────────────────────────────────────────
 // Resolved per-brightness. Dark uses tinted near-black backgrounds with bright
