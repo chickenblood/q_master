@@ -81,18 +81,27 @@ Browse [F3 Near Me](https://f3near.me) in the app's web view to find workouts.
 The view can use location services, has a refresh action, and opens external
 links outside the web view. The map requires a network connection.
 
-### Settings and watches
+### Settings
 
 <table>
 <tr valign="top">
   <td width="50%"><img src="README_images/settings.png" alt="settings" /></td>
-  <td width="50%"><img src="README_images/watch.png" alt="watch"  /></td>
+  <td width="50%"></td>
 </tr>
 </table>
 
 Settings include exercises per beatdown page, system/light/dark appearance,
 the shake-triggered sound, and app information. Timer settings, exercise
 filters, and the last selected Slackblast region and AO are also remembered.
+
+### Watches
+
+<table>
+<tr valign="top">
+  <td width="50%"><img src="README_images/watch.png" alt="watch" /></td>
+  <td width="50%"></td>
+</tr>
+</table>
 
 Saved phone workouts are sent to a paired Apple Watch or Wear OS watch when
 the list is saved. The watch apps display the synced workout list, sections,
