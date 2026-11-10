@@ -11,6 +11,8 @@ import '../ui/adaptive_app_bar.dart';
 import '../ui/adaptive_scaffold.dart';
 
 class NearMeTab extends StatelessWidget {
+  bool _isDark = false;
+
   late final WebViewController controller = WebViewController()
     ..setJavaScriptMode(.unrestricted)
     ..setNavigationDelegate(
@@ -19,6 +21,7 @@ class NearMeTab extends StatelessWidget {
           // The page is Ionic and pads itself by env(safe-area-inset-top),
           // which Android WebView reports on phones with a status bar/cutout.
           // Flutter's SafeArea already accounts for it, so zero it out.
+          _applyTheme();
           if (defaultTargetPlatform == TargetPlatform.android) {
             controller.runJavaScript(
               "document.documentElement.style.setProperty("
@@ -58,8 +61,27 @@ class NearMeTab extends StatelessWidget {
     }
   }
 
+  // The page is Ionic; dark mode is driven by the `ion-palette-dark` class.
+  void _applyTheme() {
+    controller.runJavaScript(
+      "document.documentElement.classList.toggle('ion-palette-dark', $_isDark);"
+      "document.documentElement.style.colorScheme = "
+      "'${_isDark ? 'dark' : 'light'}';",
+    );
+  }
+
   @override
-  Widget build(BuildContext context) => AdaptiveScaffold(
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (isDark != _isDark) {
+      _isDark = isDark;
+      controller.setBackgroundColor(isDark ? Colors.black : Colors.white);
+      _applyTheme();
+    }
+    return _buildScaffold(context);
+  }
+
+  Widget _buildScaffold(BuildContext context) => AdaptiveScaffold(
     appBar: AdaptiveAppBar(
       leading: [settingsGlassBarItem(id: 'left-item', context: context)],
       title: Text(
