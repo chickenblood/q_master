@@ -59,7 +59,7 @@ GoRouter createAppRouter({
           routes: [
             GoRoute(
               path: '/location',
-              builder: (context, state) => NearMeTab(),
+              builder: (context, state) => const NearMeTab(),
             ),
           ],
         ),

@@ -18,18 +18,17 @@ class NearMeTab extends StatefulWidget {
 }
 
 class _NearMeTabState extends State<NearMeTab> {
-  bool? _isDark;
+  bool _isDark = false;
 
   late final WebViewController controller = WebViewController()
     ..setJavaScriptMode(.unrestricted)
     ..setNavigationDelegate(
       NavigationDelegate(
-        onPageStarted: (_) => _applyTheme(),
         onPageFinished: (_) {
+          _applyTheme();
           // The page is Ionic and pads itself by env(safe-area-inset-top),
           // which Android WebView reports on phones with a status bar/cutout.
           // Flutter's SafeArea already accounts for it, so zero it out.
-          _applyTheme();
           if (defaultTargetPlatform == TargetPlatform.android) {
             controller.runJavaScript(
               "document.documentElement.style.setProperty("
@@ -71,39 +70,57 @@ class _NearMeTabState extends State<NearMeTab> {
     }
   }
 
-  // The page is Ionic and its SPA can re-render and reset the theme after
-  // load (and WKWebView follows the OS theme, not the app's), so enforce the
-  // `ion-palette-dark` class with an observer rather than setting it once.
+  // WKWebView evaluates `prefers-color-scheme` against the OS theme, not the
+  // app's. Rewrite those media rules (and matchMedia) so the page follows the
+  // in-app theme; also set the Ionic dark class for class-driven palettes.
   void _applyTheme() {
-    final isDark = _isDark ?? false;
     controller.runJavaScript('''
 (function() {
-  window.__qmDark = $isDark;
-  var apply = function() {
-    var dark = window.__qmDark;
-    [document.documentElement, document.body].forEach(function(el) {
-      if (el && el.classList.contains('ion-palette-dark') !== dark) {
-        el.classList.toggle('ion-palette-dark', dark);
+  var dark = $_isDark;
+  var re = /prefers-color-scheme:\\s*(dark|light)/;
+  var walk = function(rules) {
+    for (var i = 0; i < rules.length; i++) {
+      var r = rules[i];
+      if (r.media && re.test(r.media.mediaText)) {
+        var wantsDark = /dark/.test(r.media.mediaText);
+        if (!r.__qmOrig) r.__qmOrig = r.media.mediaText;
+        r.media.mediaText = (wantsDark === dark) ? 'all' : 'not all';
       }
-    });
+      if (r.cssRules) walk(r.cssRules);
+    }
+  };
+  window.__qmDark = dark;
+  if (!window.__qmMatchMedia) {
+    window.__qmMatchMedia = window.matchMedia.bind(window);
+    window.matchMedia = function(q) {
+      var m = /prefers-color-scheme:\\s*(dark|light)/.exec(q);
+      var res = window.__qmMatchMedia(q);
+      if (!m) return res;
+      var matches = (m[1] === 'dark') === window.__qmDark;
+      return new Proxy(res, {
+        get: function(t, k) {
+          if (k === 'matches') return matches;
+          var v = t[k];
+          return typeof v === 'function' ? v.bind(t) : v;
+        }
+      });
+    };
+  }
+  var run = function() {
+    for (var i = 0; i < document.styleSheets.length; i++) {
+      try { walk(document.styleSheets[i].cssRules); } catch (e) {}
+    }
+    document.documentElement.classList.toggle('ion-palette-dark', dark);
     document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
   };
-  window.__qmApplyTheme = apply;
-  apply();
-  if (!window.__qmThemeObserver) {
-    window.__qmThemeObserver = new MutationObserver(function() {
+  window.__qmApplyTheme = run;
+  run();
+  if (!window.__qmObserver) {
+    window.__qmObserver = new MutationObserver(function() {
       window.__qmApplyTheme();
     });
-    window.__qmThemeObserver.observe(document.documentElement, {
-      attributes: true, attributeFilter: ['class'], subtree: false,
-    });
-    document.addEventListener('DOMContentLoaded', function() {
-      if (document.body) {
-        window.__qmThemeObserver.observe(document.body, {
-          attributes: true, attributeFilter: ['class'],
-        });
-      }
-      window.__qmApplyTheme();
+    window.__qmObserver.observe(document.head || document.documentElement, {
+      childList: true, subtree: true,
     });
   }
 })();
