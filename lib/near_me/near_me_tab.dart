@@ -10,13 +10,21 @@ import '../settings/settings_sheet.dart';
 import '../ui/adaptive_app_bar.dart';
 import '../ui/adaptive_scaffold.dart';
 
-class NearMeTab extends StatelessWidget {
-  bool _isDark = false;
+class NearMeTab extends StatefulWidget {
+  const NearMeTab({super.key});
+
+  @override
+  State<NearMeTab> createState() => _NearMeTabState();
+}
+
+class _NearMeTabState extends State<NearMeTab> {
+  bool? _isDark;
 
   late final WebViewController controller = WebViewController()
     ..setJavaScriptMode(.unrestricted)
     ..setNavigationDelegate(
       NavigationDelegate(
+        onPageStarted: (_) => _applyTheme(),
         onPageFinished: (_) {
           // The page is Ionic and pads itself by env(safe-area-inset-top),
           // which Android WebView reports on phones with a status bar/cutout.
@@ -47,7 +55,9 @@ class NearMeTab extends StatelessWidget {
     )
     ..loadRequest(Uri.parse('https://f3near.me'));
 
-  NearMeTab({super.key}) {
+  @override
+  void initState() {
+    super.initState();
     if (controller.platform is AndroidWebViewController) {
       (controller.platform as AndroidWebViewController)
           .setGeolocationPermissionsPromptCallbacks(
@@ -61,13 +71,43 @@ class NearMeTab extends StatelessWidget {
     }
   }
 
-  // The page is Ionic; dark mode is driven by the `ion-palette-dark` class.
+  // The page is Ionic and its SPA can re-render and reset the theme after
+  // load (and WKWebView follows the OS theme, not the app's), so enforce the
+  // `ion-palette-dark` class with an observer rather than setting it once.
   void _applyTheme() {
-    controller.runJavaScript(
-      "document.documentElement.classList.toggle('ion-palette-dark', $_isDark);"
-      "document.documentElement.style.colorScheme = "
-      "'${_isDark ? 'dark' : 'light'}';",
-    );
+    final isDark = _isDark ?? false;
+    controller.runJavaScript('''
+(function() {
+  window.__qmDark = $isDark;
+  var apply = function() {
+    var dark = window.__qmDark;
+    [document.documentElement, document.body].forEach(function(el) {
+      if (el && el.classList.contains('ion-palette-dark') !== dark) {
+        el.classList.toggle('ion-palette-dark', dark);
+      }
+    });
+    document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+  };
+  window.__qmApplyTheme = apply;
+  apply();
+  if (!window.__qmThemeObserver) {
+    window.__qmThemeObserver = new MutationObserver(function() {
+      window.__qmApplyTheme();
+    });
+    window.__qmThemeObserver.observe(document.documentElement, {
+      attributes: true, attributeFilter: ['class'], subtree: false,
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+      if (document.body) {
+        window.__qmThemeObserver.observe(document.body, {
+          attributes: true, attributeFilter: ['class'],
+        });
+      }
+      window.__qmApplyTheme();
+    });
+  }
+})();
+''');
   }
 
   @override
