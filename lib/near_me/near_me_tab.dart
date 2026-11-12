@@ -19,6 +19,7 @@ class NearMeTab extends StatefulWidget {
 
 class _NearMeTabState extends State<NearMeTab> {
   bool _isDark = false;
+  bool _invert = false;
 
   late final WebViewController controller = WebViewController()
     ..setJavaScriptMode(.unrestricted)
@@ -70,59 +71,25 @@ class _NearMeTabState extends State<NearMeTab> {
     }
   }
 
-  // WKWebView evaluates `prefers-color-scheme` against the OS theme, not the
-  // app's. Rewrite those media rules (and matchMedia) so the page follows the
-  // in-app theme; also set the Ionic dark class for class-driven palettes.
+  // The page only themes itself via `prefers-color-scheme`, i.e. the OS theme.
+  // When the in-app theme differs from the OS theme, invert the page and then
+  // re-invert media so photos and map tiles keep their original colors.
   void _applyTheme() {
     controller.runJavaScript('''
 (function() {
-  var dark = $_isDark;
-  var re = /prefers-color-scheme:\\s*(dark|light)/;
-  var walk = function(rules) {
-    for (var i = 0; i < rules.length; i++) {
-      var r = rules[i];
-      if (r.media && re.test(r.media.mediaText)) {
-        var wantsDark = /dark/.test(r.media.mediaText);
-        if (!r.__qmOrig) r.__qmOrig = r.media.mediaText;
-        r.media.mediaText = (wantsDark === dark) ? 'all' : 'not all';
-      }
-      if (r.cssRules) walk(r.cssRules);
-    }
-  };
-  window.__qmDark = dark;
-  if (!window.__qmMatchMedia) {
-    window.__qmMatchMedia = window.matchMedia.bind(window);
-    window.matchMedia = function(q) {
-      var m = /prefers-color-scheme:\\s*(dark|light)/.exec(q);
-      var res = window.__qmMatchMedia(q);
-      if (!m) return res;
-      var matches = (m[1] === 'dark') === window.__qmDark;
-      return new Proxy(res, {
-        get: function(t, k) {
-          if (k === 'matches') return matches;
-          var v = t[k];
-          return typeof v === 'function' ? v.bind(t) : v;
-        }
-      });
-    };
+  var id = '__qmInvert';
+  var style = document.getElementById(id);
+  if (!$_invert) {
+    if (style) style.remove();
+    return;
   }
-  var run = function() {
-    for (var i = 0; i < document.styleSheets.length; i++) {
-      try { walk(document.styleSheets[i].cssRules); } catch (e) {}
-    }
-    document.documentElement.classList.toggle('ion-palette-dark', dark);
-    document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
-  };
-  window.__qmApplyTheme = run;
-  run();
-  if (!window.__qmObserver) {
-    window.__qmObserver = new MutationObserver(function() {
-      window.__qmApplyTheme();
-    });
-    window.__qmObserver.observe(document.head || document.documentElement, {
-      childList: true, subtree: true,
-    });
-  }
+  if (style) return;
+  style = document.createElement('style');
+  style.id = id;
+  style.textContent =
+    'html { filter: invert(1) hue-rotate(180deg); }' +
+    'img, video, canvas, iframe { filter: invert(1) hue-rotate(180deg); }';
+  document.head.appendChild(style);
 })();
 ''');
   }
@@ -130,9 +97,14 @@ class _NearMeTabState extends State<NearMeTab> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final invert =
+        isDark != (MediaQuery.platformBrightnessOf(context) == .dark);
     if (isDark != _isDark) {
       _isDark = isDark;
       controller.setBackgroundColor(isDark ? Colors.black : Colors.white);
+    }
+    if (invert != _invert) {
+      _invert = invert;
       _applyTheme();
     }
     return _buildScaffold(context);
