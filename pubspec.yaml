@@ -1,7 +1,7 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 3.5.2+650
+version: 3.5.2+651
 
 environment:
   sdk: ^3.10.0
@@ -28,7 +28,7 @@ dependencies: # keep sorted alphabetically
   intl: any
   json_annotation: ^4.9.0
   just_audio: ^0.10.5
-  liquid_glass_widgets: ^1.8.1
+  liquid_glass_widgets: ^1.17.3
   logger: ^2.6.2
   package_info_plus: ^10.2.1
   path_provider: ^2.1.5
