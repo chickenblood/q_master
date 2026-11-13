@@ -9,9 +9,9 @@
     "@workoutsTabTitle": {
       "description": "Header title for the Beatdowns tab."
     },
-    "workoutsTabShortTitle": "Beatdns",
+    "workoutsTabShortTitle": "Beatdowns",
     "@workoutsTabShortTitle": {
-      "description": "Label for the Beatdowns tab in bottom navigation. Abbreviated to fit inside tab when the plus button is showing"
+      "description": "Label for the Beatdowns tab in bottom navigation."
     },
     "gamesTabTitle": "Games",
     "@gamesTabTitle": {
