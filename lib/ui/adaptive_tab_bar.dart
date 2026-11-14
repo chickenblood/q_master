@@ -27,6 +27,9 @@ final class AdaptiveTabBar extends StatefulWidget {
   final Color? unselectedIconColor;
   final AdaptiveAccessoryActionItem? trailingButton;
   final ScrollController? scrollController;
+  final double? iconSize;
+  final TextStyle? selectedLabelStyle;
+  final TextStyle? unselectedLabelStyle;
 
   const AdaptiveTabBar({
     super.key,
@@ -38,6 +41,9 @@ final class AdaptiveTabBar extends StatefulWidget {
     this.unselectedIconColor,
     this.scrollController,
     this.trailingButton,
+    this.iconSize,
+    this.selectedLabelStyle,
+    this.unselectedLabelStyle,
   });
 
   @override
@@ -100,6 +106,9 @@ final class _AdaptiveTabBarState extends State<AdaptiveTabBar> {
         onTap: widget.onTabSelected,
         selectedItemColor: widget.selectedIconColor,
         unselectedItemColor: widget.unselectedIconColor,
+        iconSize: widget.iconSize ?? 24.0,
+        selectedLabelStyle: widget.selectedLabelStyle,
+        unselectedLabelStyle: widget.unselectedLabelStyle,
       ),
       cupertino: (_, _) => SafeArea(
         bottom: false,
@@ -111,6 +120,9 @@ final class _AdaptiveTabBarState extends State<AdaptiveTabBar> {
             selectedIndex: widget.selectedIndex,
             onTabSelected: widget.onTabSelected,
             selectedIconColor: widget.selectedIconColor,
+            iconSize: widget.iconSize,
+            selectedLabelStyle: widget.selectedLabelStyle,
+            unselectedLabelStyle: widget.unselectedLabelStyle,
             minimizeController: _minimizeController,
             scrollController: widget.scrollController,
             onMinimizedTabTap: _minimizeController.expand,

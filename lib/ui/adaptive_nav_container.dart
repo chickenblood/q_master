@@ -9,6 +9,9 @@ final class AdaptiveNavContainer extends StatelessWidget {
   final double? width;
   final double? height;
   final EdgeInsets? padding;
+  final AlignmentGeometry? alignment;
+  final EdgeInsetsGeometry? margin;
+  final Color? color;
   final Widget? child;
 
   const AdaptiveNavContainer({
@@ -16,6 +19,9 @@ final class AdaptiveNavContainer extends StatelessWidget {
     this.width,
     this.height,
     this.padding,
+    this.alignment,
+    this.margin,
+    this.color,
     this.child,
   });
 
@@ -26,9 +32,19 @@ final class AdaptiveNavContainer extends StatelessWidget {
       width: width,
       height: height,
       padding: padding,
+      alignment: alignment,
+      margin: margin,
+      color: color,
       child: child,
     ),
-    material: (context, platform) =>
-        Container(width: width, height: height, padding: padding, child: child),
+    material: (context, platform) => Container(
+      width: width,
+      height: height,
+      padding: padding,
+      alignment: alignment,
+      margin: margin,
+      color: color,
+      child: child,
+    ),
   );
 }
