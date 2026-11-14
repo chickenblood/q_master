@@ -1,7 +1,7 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 3.5.2+661
+version: 3.5.2+662
 
 environment:
   sdk: ^3.13.0
@@ -48,6 +48,7 @@ dependencies: # keep sorted alphabetically
   youtube_player_iframe: ^6.0.2
   zikzak_share_handler: ^1.0.1
 
+  material_ui: any
 dev_dependencies: # keep sorted alphabetically
   build_runner: ^2.10.4
   flutter_launcher_icons: ^0.14.4
@@ -55,6 +56,8 @@ dev_dependencies: # keep sorted alphabetically
   flutter_test:
     sdk: flutter
   freezed: ^4.0.1
+  integration_test:
+    sdk: flutter
   json_serializable: ^6.11.2
   riverpod_generator: ^4.0.0+1
 

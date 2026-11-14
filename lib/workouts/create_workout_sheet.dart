@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
@@ -618,9 +618,8 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           onPressed: hasStrings
               ? () async {
                   _focusNode.unfocus();
-                  final sectionTitle = L10n.of(
-                    context,
-                  )!.addSectionForPasteDialogTitle;
+                  final sectionTitle = L10n.of(context)!
+                      .addSectionForPasteDialogTitle;
                   final newSectionName = await _showNameChangeDialog(
                     context,
                     title: sectionTitle,
@@ -781,19 +780,21 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
             ],
           ),
         ),
-        bottomBar: AdaptiveButtonBar(
-          mainAxisAlignment: .end,
-          items: [
-            AdaptiveButtonBarItem(
-              icon: Icon(PlatformIcons(context).playArrowSolid),
-              onPressed: () {
-                widget.onShowBeatdownBrowser?.call(
-                  context,
-                  _buildWorkoutFromUi(),
-                );
-              },
-            ),
-          ],
+        bottomBar: SafeArea(
+          child: AdaptiveButtonBar(
+            mainAxisAlignment: .end,
+            items: [
+              AdaptiveButtonBarItem(
+                icon: Icon(PlatformIcons(context).playArrowSolid),
+                onPressed: () {
+                  widget.onShowBeatdownBrowser?.call(
+                    context,
+                    _buildWorkoutFromUi(),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     ),
