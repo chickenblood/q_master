@@ -1,3 +1,5 @@
+// Match the Flutter Material theme supplied by PlatformTheme.
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -58,10 +60,8 @@ class _SettingsSheet extends ConsumerWidget {
       fontWeight: FontWeight.w700,
       fontFeatures: [FontFeature.tabularFigures()],
     );
-    final rowLabelStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
-      fontSize: 16,
-      fontWeight: FontWeight.w500,
-    );
+    final rowLabelStyle = Theme.of(context).textTheme.titleMedium
+        ?.copyWith(fontSize: 16, fontWeight: FontWeight.w500);
 
     return ListenableBuilder(
       listenable: prefs,
@@ -89,6 +89,7 @@ class _SettingsSheet extends ConsumerWidget {
                             min: 1,
                             max: SharedAppPrefs.maxExercisesPerPage.toDouble(),
                             divisions: 30,
+                            activeColor: Theme.of(context).colorScheme.primary,
                             onChanged: (value) =>
                                 prefs.exercisesPerPage.value = value.round(),
                           ),
@@ -174,12 +175,10 @@ class _SettingsSheet extends ConsumerWidget {
         ],
         title: Text(
           L10n.of(context)!.settingsDialogTitle,
-          style: Theme.of(
-            context,
-          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-          textScaler: MediaQuery.textScalerOf(
-            context,
-          ).clamp(maxScaleFactor: 1.6),
+          style: Theme.of(context).textTheme.titleSmall
+              ?.copyWith(fontWeight: FontWeight.w800),
+          textScaler: MediaQuery.textScalerOf(context)
+              .clamp(maxScaleFactor: 1.6),
         ),
       ),
       body: Material(
