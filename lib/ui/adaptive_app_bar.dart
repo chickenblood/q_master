@@ -31,6 +31,9 @@ final class AdaptiveAppBar extends StatelessWidget
   final List<AdaptiveAppBarItem> leading;
   final List<AdaptiveAppBarItem> actions;
   final Color? backgroundColor;
+  final bool? centerTitle;
+  final double? toolbarHeight;
+  final PreferredSizeWidget? bottom;
 
   const AdaptiveAppBar({
     super.key,
@@ -38,11 +41,16 @@ final class AdaptiveAppBar extends StatelessWidget
     this.leading = const [],
     this.actions = const [],
     this.backgroundColor,
+    this.centerTitle,
+    this.toolbarHeight,
+    this.bottom,
   });
 
   // TODO: This could be wrong.
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => Size.fromHeight(
+    (toolbarHeight ?? kToolbarHeight) + (bottom?.preferredSize.height ?? 0),
+  );
 
   @override
   Widget build(BuildContext context) => PlatformWidget(
@@ -58,6 +66,9 @@ final class AdaptiveAppBar extends StatelessWidget
         leading: leadingItems.isNotEmpty ? Row(children: leadingItems) : null,
         actions: actionsItems,
         backgroundColor: backgroundColor,
+        centerTitle: centerTitle,
+        toolbarHeight: toolbarHeight,
+        bottom: bottom,
         elevation: 0,
       );
     },
@@ -84,8 +95,11 @@ final class AdaptiveAppBar extends StatelessWidget
         title: title,
         leading: leadingItems,
         actions: actionsItems,
+        centerTitle: centerTitle ?? true,
         backgroundColor:
             backgroundColor ?? Theme.of(context).appBarTheme.backgroundColor!,
+        toolbarHeight: toolbarHeight ?? 44.0,
+        bottom: bottom,
       );
     },
   );

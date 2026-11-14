@@ -27,6 +27,7 @@ final class AdaptiveScaffold extends StatelessWidget {
   final Color? backgroundColor;
   final AdaptiveAccessoryActionItem? floatingActionButton;
   final bool? resizeToAvoidBottomInset;
+  final bool? extendBody;
 
   const AdaptiveScaffold({
     super.key,
@@ -36,6 +37,7 @@ final class AdaptiveScaffold extends StatelessWidget {
     this.backgroundColor,
     this.floatingActionButton,
     this.resizeToAvoidBottomInset,
+    this.extendBody,
   });
 
   @override
@@ -43,9 +45,8 @@ final class AdaptiveScaffold extends StatelessWidget {
     return PlatformWidget(
       material: (_, _) => Scaffold(
         appBar: appBar,
-        // match the default for [GlassScaffold]
         extendBodyBehindAppBar: true,
-        extendBody: true,
+        extendBody: extendBody ?? false,
         backgroundColor: backgroundColor,
         body: body,
         bottomNavigationBar: bottomBar,
@@ -66,6 +67,7 @@ final class AdaptiveScaffold extends StatelessWidget {
         body: body,
         bottomBar: bottomBar,
         resizeToAvoidBottomInset: resizeToAvoidBottomInset,
+        extendBody: extendBody ?? true,
       ),
     );
   }

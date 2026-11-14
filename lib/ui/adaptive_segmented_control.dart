@@ -13,12 +13,14 @@ final class AdaptiveSegmentedControl extends StatelessWidget {
   final List<AdaptiveSegment> segments;
   final int selectedIndex;
   final ValueChanged<int> onSegmentSelected;
+  final Axis? direction;
 
   const AdaptiveSegmentedControl({
     super.key,
     required this.segments,
     this.selectedIndex = 0,
     required this.onSegmentSelected,
+    this.direction,
   });
 
   @override
@@ -30,6 +32,7 @@ final class AdaptiveSegmentedControl extends StatelessWidget {
       selectedIndex: selectedIndex,
       onSegmentSelected: onSegmentSelected,
       indicatorColor: Theme.of(innerContext).colorScheme.primary,
+      direction: direction ?? Axis.horizontal,
     ),
     material: (_, _) => SegmentedButton<int>(
       showSelectedIcon: false,
@@ -46,6 +49,7 @@ final class AdaptiveSegmentedControl extends StatelessWidget {
           .toList(),
       selected: {selectedIndex},
       onSelectionChanged: (values) => onSegmentSelected(values.first),
+      direction: direction ?? Axis.horizontal,
     ),
   );
 }
