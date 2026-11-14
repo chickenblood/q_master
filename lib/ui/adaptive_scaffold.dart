@@ -46,7 +46,7 @@ final class AdaptiveScaffold extends StatelessWidget {
       material: (_, _) => Scaffold(
         appBar: appBar,
         extendBodyBehindAppBar: true,
-        extendBody: extendBody ?? false,
+        extendBody: extendBody ?? true,
         backgroundColor: backgroundColor,
         body: body,
         bottomNavigationBar: bottomBar,
