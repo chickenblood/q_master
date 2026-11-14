@@ -62,13 +62,12 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
   }) {
     if (exercisesPerPage <= 0) return '';
     var cumulativePages = 0;
-    for (final section in widget.workout.sections) {
+    final sections = widget.workout.sections;
+    for (final section in sections) {
       cumulativePages += (section.exercises.length / exercisesPerPage).ceil();
       if (pageIndex < cumulativePages) return section.name;
     }
-    return widget.workout.sections.isNotEmpty
-        ? widget.workout.sections.first.name
-        : '';
+    return sections.isNotEmpty ? sections.first.name : '';
   }
 
   void _onNextPage(
