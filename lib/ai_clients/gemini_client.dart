@@ -64,7 +64,7 @@ final class GeminiClient {
 
   GeminiClient({String? apiKey})
     : model = FirebaseAI.googleAI().generativeModel(
-        model: 'gemini-2.5-flash-lite',
+        model: 'gemini-3.5-flash-lite',
       );
 
   /// Requests a workout plan based on the provided user details.

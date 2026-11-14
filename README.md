@@ -214,6 +214,19 @@ use `flutter test --exclude-tags live_network` for the remaining tests.
 Run the app on the relevant target device or simulator to verify platform and
 watch behavior.
 
+### Firebase App Check
+
+On iOS and Android, debug builds use App Check's debug provider. Register each
+device or emulator's debug token in Firebase Console under **App Check > Apps >
+Manage debug tokens**. See the [debug provider instructions](https://firebase.google.com/docs/app-check/flutter/debug-provider)
+for retrieving the token; keep it private and do not commit it.
+
+Profile and release builds use DeviceCheck on iOS and Play Integrity on Android.
+Register both apps with those providers in Firebase Console, including the
+[DeviceCheck key](https://firebase.google.com/docs/app-check/ios/devicecheck-provider)
+and [Android signing certificate and Play Integrity configuration](https://firebase.google.com/docs/app-check/android/play-integrity-provider).
+Web and desktop App Check are not configured.
+
 ## Why Flutter?
 Dart/Flutter was chosen over native Swift or Kotlin development, so that we can keep changes in lockstep and get them out to iOS and Android users with minimal additional effort. It is by far the, fastest most productive cross-platform development framework I have ever used and perfect for a small team.
 Downside: Dart is not a well-known language, but it is very similar to modern languages like Typescript, Swift and Kotlin and it's super-easy to learn.
