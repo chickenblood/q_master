@@ -11,6 +11,8 @@ then
     export PATH="$PATH:$HOME/flutter/bin"
 else
     echo "Flutter is already installed."
+    # Get the latest
+    flutter upgrade
 fi
 
 # Verify Flutter installation
