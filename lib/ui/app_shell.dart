@@ -32,10 +32,8 @@ class AppShell extends ConsumerWidget {
     super.key,
   });
 
-  /// Hides the tab bar on the workout editor and on phone timer landscape.
-  bool _shouldShowTabBar(BuildContext context, String location) {
-    if (location == '/workouts/editor') return false;
-
+  /// Hides the tab bar on phone timer landscape.
+  bool _shouldShowTabBar(BuildContext context) {
     final isTablet = MediaUtils.isTablet(context);
     final isTimerTab = _AppTab.values[navigationShell.currentIndex] == .timer;
     final isLandscape = MediaQuery.orientationOf(context) == .landscape;
@@ -69,7 +67,7 @@ class AppShell extends ConsumerWidget {
     return AdaptiveScaffold(
       body: SafeArea(top: false, child: navigationShell),
       bottomBar: AdaptiveTabBar(
-        visible: _shouldShowTabBar(context, location),
+        visible: _shouldShowTabBar(context),
         selectedIconColor: Theme.of(context).colorScheme.primary,
         selectedIndex: selectedIndex,
         onTabSelected: (index) => navigationShell.goBranch(index),

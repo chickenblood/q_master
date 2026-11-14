@@ -25,45 +25,12 @@ import 'generate_workout_sheet.dart';
 import 'workout_creation_picker.dart' as creation_picker;
 import 'workout_share_picker.dart';
 
-final class WorkoutEditorRouteArguments {
-  final Workout? workout;
-  final DisplayMode displayMode;
-
-  const WorkoutEditorRouteArguments({
-    required this.workout,
-    required this.displayMode,
-  });
-}
-
 class WorkoutsTab extends ConsumerWidget {
-  /// Route name for the workout editor.
-  static const editorRouteName = 'workout-editor';
-
   /// Route name for the beatdown exercise browser.
   static const beatdownBrowserRouteName = 'beatdown-browser';
 
-  /// Routes pushed above the workouts list while remaining in its tab branch.
+  /// Routes pushed above the workouts list in its tab branch.
   static List<RouteBase> get routes => [
-    GoRoute(
-      path: 'editor',
-      name: editorRouteName,
-      pageBuilder: (context, state) {
-        final arguments = state.extra;
-        if (arguments is! WorkoutEditorRouteArguments) {
-          throw StateError('Workout editor route requires editor arguments.');
-        }
-        return adaptiveRoutePage(
-          context,
-          state,
-          CreateWorkoutSheet(
-            originalWorkout: arguments.workout,
-            initialDisplayMode: arguments.displayMode,
-            onShare: _shareWorkout,
-            onShowBeatdownBrowser: _showBeatdownBrowser,
-          ),
-        );
-      },
-    ),
     GoRoute(
       path: 'beatdown-browser',
       name: beatdownBrowserRouteName,
@@ -103,7 +70,7 @@ class WorkoutsTab extends ConsumerWidget {
     if (!context.mounted) return;
 
     if (result == .manual) {
-      await invokeWorkoutEditor(context, displayMode: DisplayMode.edit);
+      await invokeWorkoutEditor(context);
     } else if (result == .generate) {
       await showGenerateWorkoutModal(context, ref: ref);
     }
@@ -163,11 +130,7 @@ class WorkoutsTab extends ConsumerWidget {
       await listNotifier.add(workout);
       if (!context.mounted) return;
 
-      await invokeWorkoutEditor(
-        context,
-        workout: workout,
-        displayMode: DisplayMode.edit,
-      );
+      await invokeWorkoutEditor(context, workout: workout);
     }
   }
 
@@ -208,17 +171,25 @@ class WorkoutsTab extends ConsumerWidget {
   static Future<Workout?> invokeWorkoutEditor(
     BuildContext context, {
     Workout? workout,
-    required DisplayMode displayMode,
-  }) => context.pushNamed<Workout>(
-    editorRouteName,
-    extra: WorkoutEditorRouteArguments(
-      workout: workout,
-      displayMode: displayMode,
-    ),
-  );
+  }) async {
+    final navigator = Navigator.of(context, rootNavigator: true);
+    final beatdown = await showAdaptiveModalSheet<Workout>(
+      context: navigator.context,
+      child: CreateWorkoutSheet(
+        originalWorkout: workout,
+        onShare: _shareWorkout,
+        onShowBeatdownBrowser: (sheetContext, workout) =>
+            Navigator.of(sheetContext, rootNavigator: true).pop(workout),
+      ),
+    );
+    if (beatdown != null && context.mounted) {
+      _showBeatdownBrowser(context, beatdown);
+    }
+    return beatdown;
+  }
 
   static void _showBeatdownBrowser(BuildContext context, Workout workout) =>
-      context.pushReplacementNamed(beatdownBrowserRouteName, extra: workout);
+      context.pushNamed(beatdownBrowserRouteName, extra: workout);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -252,13 +223,9 @@ class WorkoutsTab extends ConsumerWidget {
                   key: ValueKey(workouts[index]),
                   listNotifier: listNotifier,
                   workout: workouts[index],
-                  onInvokeWorkoutEditor:
-                      (context, {workout, required displayMode}) =>
-                          invokeWorkoutEditor(
-                            context,
-                            workout: workout,
-                            displayMode: displayMode,
-                          ),
+                  onInvokeWorkoutEditor: (context, workout) =>
+                      invokeWorkoutEditor(context, workout: workout),
+                  onShowBeatdownBrowser: _showBeatdownBrowser,
                   onShareWorkout: _shareWorkout,
                   onShareToBackblast: _showSlackblastPicker,
                 ),
@@ -300,12 +267,10 @@ final class _BeatdownBrowserRouteState extends State<_BeatdownBrowserRoute> {
 final class _WorkoutTile extends StatelessWidget {
   final WorkoutListController listNotifier;
   final Workout workout;
-  final Future<Workout?> Function(
-    BuildContext context, {
-    Workout? workout,
-    required DisplayMode displayMode,
-  })
+  final Future<Workout?> Function(BuildContext context, Workout workout)
   onInvokeWorkoutEditor;
+  final void Function(BuildContext context, Workout workout)
+  onShowBeatdownBrowser;
   final void Function(BuildContext context, Workout workout) onShareWorkout;
   final Future<void> Function(BuildContext context, Workout workout)
   onShareToBackblast;
@@ -315,6 +280,7 @@ final class _WorkoutTile extends StatelessWidget {
     required this.listNotifier,
     required this.workout,
     required this.onInvokeWorkoutEditor,
+    required this.onShowBeatdownBrowser,
     required this.onShareWorkout,
     required this.onShareToBackblast,
   });
@@ -402,6 +368,7 @@ final class _WorkoutTile extends StatelessWidget {
               ],
             ),
             trailing: _OverflowMenu(
+              onEdit: (context) => onInvokeWorkoutEditor(context, workout),
               onDuplicate: () => _duplicateWorkout(workout),
               onShare: (buttonContext) =>
                   onShareWorkout(buttonContext, workout),
@@ -409,11 +376,7 @@ final class _WorkoutTile extends StatelessWidget {
                   onShareToBackblast(buttonContext, workout),
               onDelete: () => _deleteWorkout(context, workout),
             ),
-            onTap: () => onInvokeWorkoutEditor(
-              context,
-              workout: workout,
-              displayMode: .display,
-            ),
+            onTap: () => onShowBeatdownBrowser(context, workout),
           ),
         ),
         Divider(indent: 16, endIndent: isIOS ? 16 : 24),
@@ -458,12 +421,14 @@ final class _SectionChip extends StatelessWidget {
 }
 
 final class _OverflowMenu extends StatelessWidget {
+  final void Function(BuildContext) onEdit;
   final void Function() onDuplicate;
   final void Function(BuildContext) onShare;
   final void Function(BuildContext) onShareToBackblast;
   final void Function() onDelete;
 
   const _OverflowMenu({
+    required this.onEdit,
     required this.onDuplicate,
     required this.onShare,
     required this.onShareToBackblast,
@@ -479,6 +444,11 @@ final class _OverflowMenu extends StatelessWidget {
           color: Theme.of(context).colorScheme.onSurface,
         ),
         menuChildren: [
+          AdaptiveMenuItem(
+            onPressed: () => onEdit(menuContext),
+            icon: Icon(Icons.edit),
+            title: L10n.of(context)!.editWorkoutText,
+          ),
           AdaptiveMenuItem(
             onPressed: () => onShareToBackblast(menuContext),
             icon: Icon(Menu.slack),

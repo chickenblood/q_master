@@ -10,16 +10,7 @@ import '../theme/theme.dart';
 import '../ui/action_button.dart';
 import '../ui/adaptive_widgets.dart';
 import '../ui/dismissible_row.dart';
-import '../utils/datetime_utils.dart';
 import 'exercise_picker_sheet.dart';
-
-/// The display mode the dialog is initially displayed in.
-///
-/// In [display] mode, the workout details are shown read-only with options to
-/// 1) edit (which switches to [edit] mode),
-/// 2) share
-/// 3) Start the beatdown.
-enum DisplayMode { display, edit }
 
 final class _SectionDraft {
   _SectionDraft({required this.name, List<String>? exercises})
@@ -43,14 +34,12 @@ final class _DraggedExercise {
 
 final class CreateWorkoutSheet extends ConsumerStatefulWidget {
   final Workout? originalWorkout;
-  final DisplayMode initialDisplayMode;
   final Function(BuildContext context, Workout workout)? onShare;
   final Function(BuildContext context, Workout workout)? onShowBeatdownBrowser;
 
   const CreateWorkoutSheet({
     super.key,
     this.originalWorkout,
-    this.initialDisplayMode = DisplayMode.display,
     this.onShare,
     this.onShowBeatdownBrowser,
   });
@@ -71,7 +60,6 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   // if the user cancels out of editing.
   Workout? _storedWorkout;
   Workout? _persistedWorkout;
-  var _displayMode = DisplayMode.display;
   var _pickerIsShown = false;
 
   // The exercise row to scroll into view after the next build.
@@ -84,7 +72,6 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   @override
   void initState() {
     super.initState();
-    _displayMode = widget.initialDisplayMode;
     _appLifecycleListener = AppLifecycleListener(
       onResume: () {
         if (mounted) {
@@ -130,24 +117,10 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     );
   }
 
-  String _titleTextForAppBar() {
-    if (_displayMode == DisplayMode.edit) {
-      return widget.originalWorkout == null
-          ? L10n.of(context)!.createWorkoutDialogTitle
-          : L10n.of(context)!.editWorkoutDialogTitle;
-    } else {
-      final currentName = _nameTextController.text.trim();
-      return currentName.isEmpty
-          ? L10n.of(context)!.defaultWorkoutName
-          : currentName;
-    }
-  }
-
   // --- Section & Exercise Manipulation ---
   bool _canAcceptDraggedExercise(_DraggedExercise draggedExercise) {
     final sourceExercises = draggedExercise.section.exercises;
-    return _displayMode == DisplayMode.edit &&
-        _sections.any(
+    return _sections.any(
           (section) => identical(section, draggedExercise.section),
         ) &&
         draggedExercise.index >= 0 &&
@@ -395,7 +368,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     );
     final row = DismissibleRow(
       key: ValueKey('dismissible_${identityHashCode(section)}_$exerciseIndex'),
-      enabled: _displayMode == DisplayMode.edit,
+      enabled: true,
       onDismissed: (direction) {
         setState(() {
           exercises.removeAt(exerciseIndex);
@@ -420,14 +393,12 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
             }
           });
           return GestureDetector(
-            onDoubleTap: () => _displayMode == .edit
-                ? _editExercise(
-                    context,
-                    exercises: exercises,
-                    index: exerciseIndex,
-                    section: section,
-                  )
-                : null,
+            onDoubleTap: () => _editExercise(
+              context,
+              exercises: exercises,
+              index: exerciseIndex,
+              section: section,
+            ),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 5, 8, 5),
               child: Row(
@@ -457,15 +428,14 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                       ),
                     ),
                   ),
-                  if (_displayMode == DisplayMode.edit)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 6.0),
-                      child: Icon(
-                        Icons.drag_handle,
-                        color: ThemeColors.dragHandle(context),
-                        size: 24,
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6.0),
+                    child: Icon(
+                      Icons.drag_handle,
+                      color: ThemeColors.dragHandle(context),
+                      size: 24,
                     ),
+                  ),
                 ],
               ),
             ),
@@ -474,7 +444,6 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       ),
     );
 
-    if (_displayMode != DisplayMode.edit) return row;
     final dropTargetKey = GlobalKey();
     return DragTarget<_DraggedExercise>(
       onWillAcceptWithDetails: (details) =>
@@ -590,11 +559,10 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                     section: section,
                     exerciseIndex: exerciseIndex,
                   ),
-                if (_displayMode == DisplayMode.edit)
-                  _exerciseDropTarget(
-                    section: section,
-                    targetIndex: exercises.length,
-                  ),
+                _exerciseDropTarget(
+                  section: section,
+                  targetIndex: exercises.length,
+                ),
               ],
             );
           },
@@ -605,22 +573,11 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           },
         ),
       ),
-      if (_displayMode == DisplayMode.edit) addSectionFooter(context),
+      addSectionFooter(context),
     ];
   }
 
   List<AdaptiveAppBarItem> _rightAppBarButtonItems(BuildContext context) {
-    if (_displayMode == .display) {
-      return [
-        AdaptiveAppBarItem(
-          icon: Icon(PlatformIcons(context).edit),
-          onPressed: () => setState(() {
-            _displayMode = .edit;
-            _focusNode.requestFocus();
-          }),
-        ),
-      ];
-    }
     final theme = Theme.of(context);
     final isEnabled =
         _nameTextController.text.isNotEmpty &&
@@ -640,7 +597,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                 if (!mounted) return;
                 setState(() {
                   _storedWorkout = savedWorkout;
-                  _displayMode = .display;
+                  _dismissEditor();
                 });
               }
             : null,
@@ -687,10 +644,9 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     required _SectionDraft section,
     required int sectionIndex,
   }) {
-    final isEditingMode = _displayMode == .edit;
     return DismissibleRow(
       key: ValueKey(section),
-      enabled: isEditingMode,
+      enabled: true,
       onDismissed: (_) {
         setState(() {
           _sections.remove(section);
@@ -698,14 +654,12 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       },
       child: ReorderableDelayedDragStartListener(
         index: sectionIndex,
-        enabled: isEditingMode,
+        enabled: true,
         child: Container(
           padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
           color: Theme.of(context).colorScheme.surface,
           child: GestureDetector(
-            onDoubleTap: () => isEditingMode
-                ? _editSectionTitle(context, section: section)
-                : null,
+            onDoubleTap: () => _editSectionTitle(context, section: section),
             child: Row(
               mainAxisAlignment: .spaceBetween,
               crossAxisAlignment: .center,
@@ -722,22 +676,21 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                     textAlign: TextAlign.left,
                   ),
                 ),
-                if (isEditingMode)
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          PlatformIcons(context).edit,
-                          color: Theme.of(context).colorScheme.onSurface,
-                          size: 20,
-                        ),
-                        tooltip: L10n.of(context)!.editSectionTooltip,
-                        onPressed: () =>
-                            _editSectionTitle(context, section: section),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        PlatformIcons(context).edit,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        size: 20,
                       ),
-                      _addExerciseButton(context, section: section),
-                    ],
-                  ),
+                      tooltip: L10n.of(context)!.editSectionTooltip,
+                      onPressed: () =>
+                          _editSectionTitle(context, section: section),
+                    ),
+                    _addExerciseButton(context, section: section),
+                  ],
+                ),
               ],
             ),
           ),
@@ -792,109 +745,76 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   );
 
   @override
-  Widget build(BuildContext context) => ListenableBuilder(
-    listenable: _nameTextController,
-    builder: (_, _) => AdaptiveScaffold(
-      appBar: AdaptiveAppBar(
-        backgroundColor: Colors.transparent,
-        leading: [
-          AdaptiveAppBarItem(
-            id: 'left-item',
-            icon: Icon(
-              _displayMode == .display
-                  ? PlatformIcons(context).back
-                  : AdaptiveIcons.close,
+  Widget build(BuildContext context) => PopScope(
+    canPop: false,
+    onPopInvokedWithResult: (didPop, _) {
+      if (!didPop) _dismissEditor();
+    },
+    child: ListenableBuilder(
+      listenable: _nameTextController,
+      builder: (_, _) => AdaptiveScaffold(
+        appBar: AdaptiveAppBar(
+          backgroundColor: Colors.transparent,
+          leading: [
+            AdaptiveAppBarItem(
+              id: 'left-item',
+              icon: Icon(AdaptiveIcons.close),
+              onPressed: _handleClose,
             ),
-            onPressed: _handleCancel,
+          ],
+          title: _titleForAppBar(context),
+          actions: _rightAppBarButtonItems(context),
+        ),
+        body: SafeArea(
+          child: CustomScrollView(
+            primary: true,
+            slivers: [
+              SliverPadding(padding: EdgeInsets.only(top: adaptivePadding.top)),
+              ...content(context),
+              SliverPadding(
+                padding: EdgeInsets.only(bottom: adaptivePadding.bottom),
+              ),
+              // Add padding when the picker is up, so we can scroll the content
+              // above the keyboard and picker without it being obscured
+              if (_pickerIsShown)
+                SliverFillRemaining(child: SizedBox(height: 800)),
+            ],
           ),
-        ],
-        title: _titleForAppBar(context),
-        actions: _rightAppBarButtonItems(context),
-      ),
-      body: SafeArea(
-        child: CustomScrollView(
-          primary: true,
-          slivers: [
-            SliverPadding(padding: EdgeInsets.only(top: adaptivePadding.top)),
-            ...content(context),
-            if (_displayMode == .display) _displayFooter(context),
-            SliverPadding(
-              padding: EdgeInsets.only(bottom: adaptivePadding.bottom),
+        ),
+        bottomBar: AdaptiveButtonBar(
+          mainAxisAlignment: .end,
+          items: [
+            AdaptiveButtonBarItem(
+              icon: Icon(PlatformIcons(context).playArrowSolid),
+              onPressed: () {
+                widget.onShowBeatdownBrowser?.call(
+                  context,
+                  _buildWorkoutFromUi(),
+                );
+              },
             ),
-            // Add padding when the picker is up, so we can scroll the content
-            // above the keyboard and picker without it being obscured
-            if (_pickerIsShown)
-              SliverFillRemaining(child: SizedBox(height: 800)),
           ],
         ),
       ),
-      bottomBar: _displayMode == .display
-          ? AdaptiveButtonBar(
-              mainAxisAlignment: .end,
-              items: [
-                AdaptiveButtonBarItem(
-                  icon: Icon(Icons.adaptive.share),
-                  onPressed: () =>
-                      widget.onShare?.call(context, _buildWorkoutFromUi()),
-                ),
-                AdaptiveButtonBarItem(
-                  icon: Icon(PlatformIcons(context).playArrowSolid),
-                  onPressed: () {
-                    widget.onShowBeatdownBrowser?.call(
-                      context,
-                      _buildWorkoutFromUi(),
-                    );
-                  },
-                ),
-              ],
-            )
-          : null,
     ),
   );
 
   // Returns the title widget for the app bar based on the current display mode.
   Widget _titleForAppBar(BuildContext context) {
-    if (_displayMode == .display) {
-      return AdaptiveNavContainer(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2),
-        width: 270,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            PlatformText(
-              _titleTextForAppBar(),
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.3,
-              ),
-              textScaler: MediaQuery.textScalerOf(
-                context,
-              ).clamp(maxScaleFactor: 1.5),
-            ),
-            if (_storedWorkout != null)
-              PlatformText(
-                _storedWorkout!.date.formattedForDisplay(),
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-          ],
+    return Padding(
+      padding: _headerInsets,
+      child: AdaptiveNavTextField(
+        controller: _nameTextController,
+        enabled: true,
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6),
+        focusNode: _focusNode,
+        textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
+          fontWeight: FontWeight.w800,
+          fontSize: 18,
+          letterSpacing: -0.3,
         ),
-      );
-    } else {
-      return Padding(
-        padding: _headerInsets,
-        child: AdaptiveNavTextField(
-          controller: _nameTextController,
-          enabled: _displayMode == .edit,
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6),
-          focusNode: _focusNode,
-          textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w800,
-            fontSize: 18,
-            letterSpacing: -0.3,
-          ),
-        ),
-      );
-    }
+      ),
+    );
   }
 
   Future<Workout> _saveWorkout() async {
@@ -911,22 +831,13 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     return workoutToSave;
   }
 
-  Future<void> _handleCancel() async {
-    if (_displayMode == .display) {
-      Navigator.of(context).pop();
-      return;
-    }
+  Future<void> _handleClose() async {
     if (!(await _confirmDiscardChanges())) {
       return;
     }
 
-    final storedWorkout = _storedWorkout;
-    setState(() {
-      _displayMode = .display;
-      if (storedWorkout != null) {
-        _updateUiFromWorkout(storedWorkout);
-      }
-    });
+    if (!mounted) return;
+    Navigator.of(context).pop();
   }
 
   Future<bool> _confirmDiscardChanges() async {
@@ -936,24 +847,31 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       return true;
     }
 
-    return (await showAlertDialog(
-      context: context,
-      title: L10n.of(context)!.confirmDiscardChangesAlertTitle,
-      message: L10n.of(context)!.confirmDiscardChangesAlertMessage,
-      actions: [
-        AdaptiveDialogAction(
-          isPrimary: true,
-          onPressed: () =>
-              Navigator.of(context, rootNavigator: true).pop(false),
-          title: L10n.of(context)!.cancelAction,
-        ),
-        AdaptiveDialogAction(
-          isDestructive: true,
-          onPressed: () => Navigator.of(context, rootNavigator: true).pop(true),
-          title: L10n.of(context)!.confirmDiscardChangesAlertButton,
-        ),
-      ],
-    ));
+    return await showAlertDialog<bool>(
+          context: context,
+          title: L10n.of(context)!.confirmDiscardChangesAlertTitle,
+          message: L10n.of(context)!.confirmDiscardChangesAlertMessage,
+          actions: [
+            AdaptiveDialogAction(
+              isPrimary: true,
+              onPressed: () =>
+                  Navigator.of(context, rootNavigator: true).pop(false),
+              title: L10n.of(context)!.cancelAction,
+            ),
+            AdaptiveDialogAction(
+              isDestructive: true,
+              onPressed: () =>
+                  Navigator.of(context, rootNavigator: true).pop(true),
+              title: L10n.of(context)!.confirmDiscardChangesAlertButton,
+            ),
+          ],
+        ) ??
+        false;
+  }
+
+  Future<void> _dismissEditor() async {
+    if (!await _confirmDiscardChanges()) return;
+    if (mounted) Navigator.of(context).pop();
   }
 
   /// Builds a [Workout] object from the current state of the UI fields and

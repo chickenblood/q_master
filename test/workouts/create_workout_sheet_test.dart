@@ -45,7 +45,7 @@ void main() {
           theme: ThemeData(platform: TargetPlatform.android),
           localizationsDelegates: L10n.localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
-          home: const CreateWorkoutSheet(initialDisplayMode: DisplayMode.edit),
+          home: const CreateWorkoutSheet(),
         ),
       ),
     );
@@ -103,7 +103,7 @@ void main() {
           theme: ThemeData(platform: TargetPlatform.android),
           localizationsDelegates: L10n.localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
-          home: const CreateWorkoutSheet(initialDisplayMode: DisplayMode.edit),
+          home: const CreateWorkoutSheet(),
         ),
       ),
     );
@@ -148,10 +148,7 @@ void main() {
           theme: ThemeData(platform: TargetPlatform.android),
           localizationsDelegates: L10n.localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
-          home: CreateWorkoutSheet(
-            originalWorkout: workout,
-            initialDisplayMode: DisplayMode.edit,
-          ),
+          home: CreateWorkoutSheet(originalWorkout: workout),
         ),
       ),
     );
@@ -197,10 +194,7 @@ void main() {
           theme: ThemeData(platform: TargetPlatform.android),
           localizationsDelegates: L10n.localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
-          home: CreateWorkoutSheet(
-            originalWorkout: workout,
-            initialDisplayMode: DisplayMode.edit,
-          ),
+          home: CreateWorkoutSheet(originalWorkout: workout),
         ),
       ),
     );
@@ -255,10 +249,7 @@ void main() {
           theme: ThemeData(platform: TargetPlatform.android),
           localizationsDelegates: L10n.localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
-          home: CreateWorkoutSheet(
-            originalWorkout: workout,
-            initialDisplayMode: DisplayMode.edit,
-          ),
+          home: CreateWorkoutSheet(originalWorkout: workout),
         ),
       ),
     );
