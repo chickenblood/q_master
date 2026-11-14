@@ -66,7 +66,9 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
       cumulativePages += (section.exercises.length / exercisesPerPage).ceil();
       if (pageIndex < cumulativePages) return section.name;
     }
-    return '';
+    return widget.workout.sections.isNotEmpty
+        ? widget.workout.sections.first.name
+        : '';
   }
 
   void _onNextPage(
@@ -180,9 +182,9 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                               child: LinearProgressIndicator(
                                 value: (_pageIndex.value + 1) / pages.length,
                                 minHeight: 3,
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.surfaceContainerHighest,
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerHighest,
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                   Theme.of(context).colorScheme.primary,
                                 ),
@@ -234,12 +236,12 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                                             color:
                                                 Theme.of(context).brightness ==
                                                     Brightness.dark
-                                                ? Theme.of(
-                                                    context,
-                                                  ).colorScheme.onPrimary
-                                                : Theme.of(
-                                                    context,
-                                                  ).colorScheme.onSurface,
+                                                ? Theme.of(context)
+                                                      .colorScheme
+                                                      .onPrimary
+                                                : Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurface,
                                             letterSpacing: -2,
                                             height: 1.05,
                                           ),
@@ -256,9 +258,9 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                                     horizontal: 1,
                                   ),
                                   child: PlatformElevatedButton(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primary,
 
                                     onPressed: () => _onNextPage(
                                       context,
@@ -271,9 +273,8 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                L10n.of(
-                                                  context,
-                                                )!.beatdownBrowserNextLabel,
+                                                L10n.of(context)!
+                                                    .beatdownBrowserNextLabel,
                                                 style: const TextStyle(
                                                   fontSize: 13,
                                                   fontWeight: FontWeight.w700,
@@ -298,9 +299,8 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                                             ],
                                           )
                                         : Text(
-                                            L10n.of(
-                                              context,
-                                            )!.workoutCompleteText,
+                                            L10n.of(context)!
+                                                .workoutCompleteText,
                                             style: const TextStyle(
                                               fontSize: 17,
                                               fontWeight: FontWeight.w800,
@@ -322,9 +322,8 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                       animate: true,
                       dotsCount: pages.length,
                       decorator: DotsDecorator(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withAlpha((0.24 * 255).round()),
+                        color: Theme.of(context).colorScheme.onSurface
+                            .withAlpha((0.24 * 255).round()),
                         activeColor: Theme.of(context).colorScheme.primary,
                       ),
                       position: _pageIndex.value.toDouble(),

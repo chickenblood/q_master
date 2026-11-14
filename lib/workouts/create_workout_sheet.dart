@@ -800,23 +800,20 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     ),
   );
 
-  // Returns the title widget for the app bar based on the current display mode.
-  Widget _titleForAppBar(BuildContext context) {
-    return Padding(
-      padding: _headerInsets,
-      child: AdaptiveNavTextField(
-        controller: _nameTextController,
-        enabled: true,
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6),
-        focusNode: _focusNode,
-        textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
-          fontWeight: FontWeight.w800,
-          fontSize: 18,
-          letterSpacing: -0.3,
-        ),
+  Widget _titleForAppBar(BuildContext context) => Padding(
+    padding: _headerInsets,
+    child: AdaptiveNavTextField(
+      controller: _nameTextController,
+      enabled: true,
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6),
+      focusNode: _focusNode,
+      textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
+        fontWeight: FontWeight.w800,
+        fontSize: 18,
+        letterSpacing: -0.3,
       ),
-    );
-  }
+    ),
+  );
 
   Future<Workout> _saveWorkout() async {
     final workoutToSave = _buildWorkoutFromUi().copyWith(date: DateTime.now());
