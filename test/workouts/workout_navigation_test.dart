@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/workout.dart';
+import 'package:q_master/settings/settings_sheet.dart';
 import 'package:q_master/utils/shared_app_prefs.dart';
 import 'package:q_master/workouts/beatdown_browser_screen.dart';
 import 'package:q_master/workouts/create_workout_sheet.dart';
@@ -19,6 +20,39 @@ void main() {
   setUpAll(() async {
     SharedPreferences.setMockInitialValues({});
     await SharedAppPrefs.ensureInitialized();
+  });
+
+  testWidgets('settings sheet uses the app theme', (tester) async {
+    const primary = Color(0xff126734);
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          theme: ThemeData(
+            platform: TargetPlatform.android,
+            colorScheme: ColorScheme.fromSeed(seedColor: primary).copyWith(
+              primary: primary,
+            ),
+          ),
+          localizationsDelegates: L10n.localizationsDelegates,
+          supportedLocales: L10n.supportedLocales,
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: settingsGlassBarItem(
+                  id: 'settings',
+                  context: context,
+                ).onPressed,
+                child: const Text('Open settings'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Open settings'));
+    await tester.pumpAndSettle();
+
+    expect(tester.widget<Text>(find.text('GENERAL')).style?.color, primary);
   });
 
   for (final (platform, tablet) in [
@@ -89,6 +123,9 @@ void main() {
               child: MaterialApp.router(
                 theme: ThemeData(
                   platform: platform,
+                  colorScheme: ColorScheme.fromSeed(
+                    seedColor: const Color(0xff126734),
+                  ).copyWith(primary: const Color(0xff126734)),
                   appBarTheme: const AppBarTheme(
                     backgroundColor: Colors.transparent,
                   ),
@@ -108,6 +145,10 @@ void main() {
           final editorFinder = find.byType(CreateWorkoutSheet);
           final editorContext = tester.element(editorFinder);
           expect(Navigator.of(editorContext), same(rootKey.currentState));
+          expect(
+            tester.widget<Text>(find.text('WARM UP')).style?.color,
+            const Color(0xff126734),
+          );
           final editorRoute = ModalRoute.of(editorContext)!;
           if (tablet) {
             expect(editorRoute, isA<PopupRoute<Object?>>());

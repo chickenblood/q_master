@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/gestures.dart';
@@ -14,15 +15,36 @@ Future<void> _pumpEditor(WidgetTester tester) async {
   await tester.pump(const Duration(milliseconds: 500));
 }
 
+final class _PopObserver extends NavigatorObserver {
+  Completer<void>? nextPop;
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    nextPop?.complete();
+  }
+}
+
+Future<void> _saveEditor(WidgetTester tester, _PopObserver observer) async {
+  await tester.runAsync(() async {
+    // Saving uses real filesystem I/O; the editor pops when it completes.
+    final popped = Completer<void>();
+    observer.nextPop = popped;
+    await tester.tap(find.byIcon(Icons.check));
+    await popped.future.timeout(const Duration(seconds: 15));
+    observer.nextPop = null;
+  });
+  await _pumpEditor(tester);
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('saving an edited new workout replaces it instead of adding it', (
     tester,
   ) async {
-    final tempDir = await Directory.systemTemp.createTemp(
-      'create_workout_sheet_test_',
-    );
+    final tempDir = (await tester.runAsync(
+      () => Directory.systemTemp.createTemp('create_workout_sheet_test_'),
+    ))!;
     addTearDown(() => tempDir.delete(recursive: true));
 
     final container = ProviderContainer(
@@ -36,18 +58,28 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    await container.read(workoutListControllerProvider.notifier).loadFromDisk();
+    await tester.runAsync(
+      () =>
+          container.read(workoutListControllerProvider.notifier).loadFromDisk(),
+    );
 
+    final navigatorKey = GlobalKey<NavigatorState>();
+    final observer = _PopObserver();
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
         child: MaterialApp(
+          navigatorKey: navigatorKey,
+          navigatorObservers: [observer],
           theme: ThemeData(platform: TargetPlatform.android),
           localizationsDelegates: L10n.localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
-          home: const CreateWorkoutSheet(),
+          home: const Scaffold(),
         ),
       ),
+    );
+    navigatorKey.currentState!.push<void>(
+      MaterialPageRoute(builder: (_) => const CreateWorkoutSheet()),
     );
     await _pumpEditor(tester);
 
@@ -55,8 +87,8 @@ void main() {
     expect(workoutNameField, findsOneWidget);
 
     await tester.enterText(workoutNameField, 'First version');
-    await tester.tap(find.byIcon(Icons.check));
     await _pumpEditor(tester);
+    await _saveEditor(tester, observer);
 
     expect(container.read(workoutListControllerProvider), hasLength(1));
     expect(
@@ -64,11 +96,17 @@ void main() {
       'First version',
     );
 
-    await tester.tap(find.byIcon(Icons.edit));
+    navigatorKey.currentState!.push<void>(
+      MaterialPageRoute(
+        builder: (_) => CreateWorkoutSheet(
+          originalWorkout: container.read(workoutListControllerProvider).single,
+        ),
+      ),
+    );
     await _pumpEditor(tester);
     await tester.enterText(workoutNameField, 'Updated version');
-    await tester.tap(find.byIcon(Icons.check));
     await _pumpEditor(tester);
+    await _saveEditor(tester, observer);
 
     final workouts = container.read(workoutListControllerProvider);
     expect(workouts, hasLength(1));
@@ -78,9 +116,9 @@ void main() {
   testWidgets('adding a section with an existing name keeps both sections', (
     tester,
   ) async {
-    final tempDir = await Directory.systemTemp.createTemp(
-      'create_workout_sheet_test_',
-    );
+    final tempDir = (await tester.runAsync(
+      () => Directory.systemTemp.createTemp('create_workout_sheet_test_'),
+    ))!;
     addTearDown(() => tempDir.delete(recursive: true));
 
     final container = ProviderContainer(
@@ -94,18 +132,28 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    await container.read(workoutListControllerProvider.notifier).loadFromDisk();
+    await tester.runAsync(
+      () =>
+          container.read(workoutListControllerProvider.notifier).loadFromDisk(),
+    );
 
+    final navigatorKey = GlobalKey<NavigatorState>();
+    final observer = _PopObserver();
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
         child: MaterialApp(
+          navigatorKey: navigatorKey,
+          navigatorObservers: [observer],
           theme: ThemeData(platform: TargetPlatform.android),
           localizationsDelegates: L10n.localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
-          home: const CreateWorkoutSheet(),
+          home: const Scaffold(),
         ),
       ),
+    );
+    navigatorKey.currentState!.push<void>(
+      MaterialPageRoute(builder: (_) => const CreateWorkoutSheet()),
     );
     await _pumpEditor(tester);
 
@@ -116,8 +164,8 @@ void main() {
     await _pumpEditor(tester);
 
     await tester.enterText(find.byType(TextField).first, 'Duplicate sections');
-    await tester.tap(find.byIcon(Icons.check));
     await _pumpEditor(tester);
+    await _saveEditor(tester, observer);
 
     final sections = container
         .read(workoutListControllerProvider)
