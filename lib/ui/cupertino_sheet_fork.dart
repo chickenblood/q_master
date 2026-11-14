@@ -746,7 +746,7 @@ class _CupertinoDownGestureDetectorState<T>
     );
   }
 
-  void handleScrollNotification(final ScrollNotification n) {
+  void handleScrollNotification(ScrollNotification n) {
     switch (n) {
       case final OverscrollNotification n:
         final details = n.dragDetails;
@@ -787,7 +787,7 @@ class _CupertinoDownGestureDetectorState<T>
   }
 
   @override
-  Widget build(final BuildContext context) {
+  Widget build(BuildContext context) {
     return RawGestureDetector(
       gestures: <Type, GestureRecognizerFactory>{
         if (!sheetOpeningAnimationInProgress)
@@ -797,7 +797,7 @@ class _CupertinoDownGestureDetectorState<T>
               >(() => _recognizer, (_) {}),
       },
       child: NotificationListener<ScrollNotification>(
-        onNotification: (final n) {
+        onNotification: (n) {
           if (sheetOpeningAnimationInProgress) return false;
           handleScrollNotification(n);
           return false;

@@ -3,12 +3,12 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  firebase_core
   firebase_app_check
   firebase_auth
-  firebase_core
-  share_plus
   speech_to_text_windows
   url_launcher_windows
+  share_plus
   zikzak_share_handler_windows
 )
 

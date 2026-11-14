@@ -13,9 +13,6 @@ else
     echo "Flutter is already installed."
 fi
 
-# Get the latest
-flutter upgrade
-
 # Verify Flutter installation
 flutter --version
 
@@ -40,6 +37,6 @@ flutter pub get
 cd "$CI_PRIMARY_REPOSITORY_PATH"
 
 echo "Flutter Build running…"
-flutter pub run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter build ios --no-codesign -t lib/main.dart
 

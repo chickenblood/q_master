@@ -1,10 +1,10 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 3.5.2+659
+version: 3.5.2+661
 
 environment:
-  sdk: ^3.10.0
+  sdk: ^3.13.0
 
 dependencies: # keep sorted alphabetically
   accessing_security_scoped_resource: ^3.5.0
@@ -27,7 +27,7 @@ dependencies: # keep sorted alphabetically
   freezed_annotation: ^3.1.0
   go_router: ^18.1.0
   intl: any
-  json_annotation: ^4.9.0
+  json_annotation: ^4.12.0
   just_audio: ^0.10.5
   liquid_glass_widgets: ^1.17.3
   logger: ^2.6.2
@@ -50,15 +50,13 @@ dependencies: # keep sorted alphabetically
 
 dev_dependencies: # keep sorted alphabetically
   build_runner: ^2.10.4
-  custom_lint: ^0.8.1
   flutter_launcher_icons: ^0.14.4
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
-  freezed: ^3.2.3
+  freezed: ^4.0.1
   json_serializable: ^6.11.2
   riverpod_generator: ^4.0.0+1
-  riverpod_lint: ^3.0.3
 
 flutter_launcher_icons:
   android: true

@@ -197,11 +197,12 @@ and is also reused by adaptive accessory actions.
 
 ## Development
 
-Install the Flutter SDK compatible with [`pubspec.yaml`](pubspec.yaml), then:
+Install a Flutter SDK with Dart 3.13 or newer, compatible with
+[`pubspec.yaml`](pubspec.yaml), then:
 
 ```sh
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter analyze
 flutter test
 ```

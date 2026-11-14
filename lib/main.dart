@@ -33,6 +33,8 @@ Future<void> main() async {
     );
   }
   await _configureAudioSession();
+  // ProviderScope wraps the app inside LiquidGlassWidgets.
+  // ignore: riverpod_lint/missing_provider_scope
   runApp(LiquidGlassWidgets.wrap(child: ProviderScope(child: _MainApp())));
 }
 
