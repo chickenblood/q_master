@@ -1,6 +1,8 @@
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+
+import 'src/adaptive_platform_widget.dart';
 
 /// A class representing an item in the adaptive button bar.
 ///
@@ -32,8 +34,8 @@ final class AdaptiveButtonBar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => PlatformWidget(
-    material: (_, _) => Padding(
+  Widget build(BuildContext context) => AdaptivePlatformWidget(
+    material: (_) => Padding(
       padding: EdgeInsets.only(bottom: 40, left: 16, right: 16),
       child: Row(
         mainAxisAlignment: mainAxisAlignment,
@@ -44,7 +46,7 @@ final class AdaptiveButtonBar extends StatelessWidget {
         ],
       ),
     ),
-    cupertino: (_, _) => Padding(
+    cupertino: (_) => Padding(
       padding: EdgeInsets.only(bottom: 8, left: 16, right: 16),
       child: Row(
         mainAxisAlignment: mainAxisAlignment,

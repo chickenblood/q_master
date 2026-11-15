@@ -1,6 +1,8 @@
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+
+import 'src/adaptive_platform_widget.dart';
 
 final class AdaptiveSegment {
   final String label;
@@ -24,8 +26,8 @@ final class AdaptiveSegmentedControl extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => PlatformWidget(
-    cupertino: (innerContext, _) => GlassSegmentedControl(
+  Widget build(BuildContext context) => AdaptivePlatformWidget(
+    cupertino: (innerContext) => GlassSegmentedControl(
       segments: segments
           .map((e) => GlassSegment(label: e.label, icon: e.icon))
           .toList(),
@@ -34,7 +36,7 @@ final class AdaptiveSegmentedControl extends StatelessWidget {
       indicatorColor: Theme.of(innerContext).colorScheme.primary,
       direction: direction ?? Axis.horizontal,
     ),
-    material: (_, _) => SegmentedButton<int>(
+    material: (_) => SegmentedButton<int>(
       showSelectedIcon: false,
       segments: segments
           .asMap()

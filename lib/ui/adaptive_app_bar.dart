@@ -1,6 +1,8 @@
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+
+import 'src/adaptive_platform_widget.dart';
 
 /// A class representing an item in the adaptive app bar.
 ///
@@ -46,15 +48,14 @@ final class AdaptiveAppBar extends StatelessWidget
     this.bottom,
   });
 
-  // TODO: This could be wrong.
   @override
   Size get preferredSize => Size.fromHeight(
     (toolbarHeight ?? kToolbarHeight) + (bottom?.preferredSize.height ?? 0),
   );
 
   @override
-  Widget build(BuildContext context) => PlatformWidget(
-    material: (_, _) {
+  Widget build(BuildContext context) => AdaptivePlatformWidget(
+    material: (_) {
       final leadingItems = leading
           .map((item) => IconButton(icon: item.icon, onPressed: item.onPressed))
           .toList();
@@ -72,7 +73,7 @@ final class AdaptiveAppBar extends StatelessWidget
         elevation: 0,
       );
     },
-    cupertino: (_, _) {
+    cupertino: (_) {
       final leadingItems = leading
           .map(
             (item) => GlassBarItem.icon(

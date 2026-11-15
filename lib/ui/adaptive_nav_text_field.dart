@@ -1,7 +1,9 @@
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:flutter/services.dart' show TextInputFormatter;
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+
+import 'src/adaptive_platform_widget.dart';
 
 /// Navigation text field that adapts to iOS Liquid Glass or Material style.
 ///
@@ -55,8 +57,8 @@ final class AdaptiveNavTextField extends StatelessWidget {
     this.onTapOutside,
   });
   @override
-  Widget build(BuildContext context) => PlatformWidget(
-    cupertino: (context, platform) => GlassTextField(
+  Widget build(BuildContext context) => AdaptivePlatformWidget(
+    cupertino: (_) => GlassTextField(
       controller: controller,
       enabled: enabled,
       padding: padding,
@@ -79,7 +81,7 @@ final class AdaptiveNavTextField extends StatelessWidget {
       autofocus: autofocus ?? false,
       onTapOutside: onTapOutside,
     ),
-    material: (context, platform) => TextField(
+    material: (_) => TextField(
       controller: controller,
       enabled: enabled,
       focusNode: focusNode,

@@ -1,3 +1,4 @@
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 /// A helper class to create a dismissible row with a red background for

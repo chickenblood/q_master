@@ -1,6 +1,9 @@
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+
+import 'src/adaptive_platform_widget.dart';
 
 /// A class representing a menu item with an icon, an optional label, and a
 /// callback.
@@ -33,8 +36,8 @@ final class AdaptiveMenu extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => PlatformWidget(
-    cupertino: (context, platform) => GlassPullDownButton(
+  Widget build(BuildContext context) => AdaptivePlatformWidget(
+    cupertino: (context) => GlassPullDownButton(
       menuWidth: 280,
       icon: icon,
       items: [
@@ -48,7 +51,7 @@ final class AdaptiveMenu extends StatelessWidget {
         ),
       ],
     ),
-    material: (context, platform) => MenuAnchor(
+    material: (context) => MenuAnchor(
       consumeOutsideTap: true,
       builder: (context, controller, child) => PlatformIconButton(
         icon: icon,

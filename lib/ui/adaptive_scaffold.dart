@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import './adaptive_accessory_action_item.dart';
 import './adaptive_app_bar.dart';
+import 'src/adaptive_platform_widget.dart';
 
 /// Returns the padding that should be applied to bodies in an adaptive
 /// scaffold.
@@ -42,8 +43,8 @@ final class AdaptiveScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformWidget(
-      material: (_, _) => Scaffold(
+    return AdaptivePlatformWidget(
+      material: (_) => Scaffold(
         appBar: appBar,
         extendBodyBehindAppBar: true,
         extendBody: extendBody ?? true,
@@ -61,7 +62,7 @@ final class AdaptiveScaffold extends StatelessWidget {
               )
             : null,
       ),
-      cupertino: (_, _) => GlassScaffold(
+      cupertino: (_) => GlassScaffold(
         backgroundColor: backgroundColor,
         appBar: appBar,
         body: body,

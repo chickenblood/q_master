@@ -1,7 +1,7 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 3.5.2+668
+version: 3.5.2+669
 
 environment:
   sdk: ^3.13.0
@@ -49,6 +49,7 @@ dependencies: # keep sorted alphabetically
   zikzak_share_handler: ^1.0.1
 
   material_ui: any
+  cupertino_ui: any
 dev_dependencies: # keep sorted alphabetically
   build_runner: ^2.10.4
   flutter_launcher_icons: ^0.14.4

@@ -1,7 +1,10 @@
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart' show CupertinoColors;
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+
+import 'src/adaptive_platform_widget.dart';
 
 final class AdaptiveSlider extends StatelessWidget {
   final double value;
@@ -36,8 +39,8 @@ final class AdaptiveSlider extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => PlatformWidget(
-    cupertino: (context, platform) => GlassSlider(
+  Widget build(BuildContext context) => AdaptivePlatformWidget(
+    cupertino: (_) => GlassSlider(
       value: value,
       min: min,
       max: max,
@@ -52,7 +55,7 @@ final class AdaptiveSlider extends StatelessWidget {
       focusNode: focusNode,
       autofocus: autofocus ?? false,
     ),
-    material: (context, platform) => Slider(
+    material: (_) => Slider(
       value: value,
       min: min,
       max: max,

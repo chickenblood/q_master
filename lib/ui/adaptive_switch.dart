@@ -1,6 +1,8 @@
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+
+import 'src/adaptive_platform_widget.dart';
 
 final class AdaptiveSwitch extends StatelessWidget {
   final bool value;
@@ -21,8 +23,8 @@ final class AdaptiveSwitch extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => PlatformWidget(
-    cupertino: (_, _) => GlassSwitch(
+  Widget build(BuildContext context) => AdaptivePlatformWidget(
+    cupertino: (_) => GlassSwitch(
       value: value,
       onChanged: onChanged,
       activeColor: activeColor,
@@ -30,7 +32,7 @@ final class AdaptiveSwitch extends StatelessWidget {
       focusNode: focusNode,
       autofocus: autofocus ?? false,
     ),
-    material: (_, _) => Switch(
+    material: (_) => Switch(
       value: value,
       onChanged: onChanged,
       activeTrackColor: activeColor,
