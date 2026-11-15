@@ -1,5 +1,7 @@
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart' show CupertinoPageRoute;
 import 'package:flutter/foundation.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,9 +31,8 @@ void main() {
         child: MaterialApp(
           theme: ThemeData(
             platform: TargetPlatform.android,
-            colorScheme: ColorScheme.fromSeed(seedColor: primary).copyWith(
-              primary: primary,
-            ),
+            colorScheme: ColorScheme.fromSeed(seedColor: primary)
+                .copyWith(primary: primary),
           ),
           localizationsDelegates: L10n.localizationsDelegates,
           supportedLocales: L10n.supportedLocales,

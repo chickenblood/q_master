@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/foundation.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -346,9 +347,8 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
               Text(
                 message,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+                style: Theme.of(context).textTheme.bodyLarge
+                    ?.copyWith(color: colorScheme.onSurfaceVariant),
               ),
               if (actionLabel != null && onAction != null) ...[
                 const SizedBox(height: 16),
@@ -505,12 +505,12 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
                           height: 40,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(
-                                context,
-                              ).colorScheme.primary,
-                              foregroundColor: Theme.of(
-                                context,
-                              ).colorScheme.onPrimary,
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .primary,
+                              foregroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimary,
                               textStyle: Theme.of(context).textTheme.labelLarge,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -545,9 +545,8 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
                           return _stateSliver(
                             context,
                             icon: AdaptiveIcons.notes,
-                            message: L10n.of(
-                              context,
-                            )!.exercisePickerEmptyCatalogLabel,
+                            message: L10n.of(context)!
+                                .exercisePickerEmptyCatalogLabel,
                           );
                         }
 
@@ -555,9 +554,8 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
                           return _stateSliver(
                             context,
                             icon: Icons.filter_alt_off,
-                            message: L10n.of(
-                              context,
-                            )!.exercisePickerEmptyFilteredLabel,
+                            message: L10n.of(context)!
+                                .exercisePickerEmptyFilteredLabel,
                           );
                         }
 
@@ -580,12 +578,10 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
                       error: (_, _) => _stateSliver(
                         context,
                         icon: Icons.cloud_off,
-                        message: L10n.of(
-                          context,
-                        )!.exercisePickerLoadErrorMessage,
-                        actionLabel: L10n.of(
-                          context,
-                        )!.exercisePickerRetryButtonLabel,
+                        message: L10n.of(context)!
+                            .exercisePickerLoadErrorMessage,
+                        actionLabel: L10n.of(context)!
+                            .exercisePickerRetryButtonLabel,
                         onAction: () =>
                             ref.read(exiconFetcherProvider.notifier).refresh(),
                       ),

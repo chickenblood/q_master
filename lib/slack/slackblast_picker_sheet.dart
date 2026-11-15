@@ -1,5 +1,6 @@
 import 'dart:async';
 
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,9 +9,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/l10n.dart';
 import '../model/f3_nation.dart';
-import '../services/f3_nation_client.dart';
 import '../model/formatted_workout.dart';
 import '../model/workout.dart';
+import '../services/f3_nation_client.dart';
 import '../ui/adaptive_widgets.dart';
 import '../ui/cupertino_sheet_fork.dart';
 import '../ui/simple_alert.dart';
@@ -384,12 +385,10 @@ class _SlackblastPickerSheetState
           ],
           title: PlatformText(
             l10n.postToBackblastText,
-            style: Theme.of(
-              context,
-            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-            textScaler: MediaQuery.textScalerOf(
-              context,
-            ).clamp(maxScaleFactor: 1.6),
+            style: Theme.of(context).textTheme.titleSmall
+                ?.copyWith(fontWeight: FontWeight.w800),
+            textScaler: MediaQuery.textScalerOf(context)
+                .clamp(maxScaleFactor: 1.6),
           ),
         ),
         body: SafeArea(
@@ -478,9 +477,8 @@ class _SlackblastPickerSheetState
               ),
               if (_isPosting)
                 ColoredBox(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.scrim.withValues(alpha: 0.4),
+                  color: Theme.of(context).colorScheme.scrim
+                      .withValues(alpha: 0.4),
                   child: const Center(child: CircularProgressIndicator()),
                 ),
             ],

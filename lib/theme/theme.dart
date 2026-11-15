@@ -1,4 +1,6 @@
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart' show CupertinoThemeData;
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 // ─── Option 3: The Gloom — Color Tokens ───────────────────────────────────

@@ -1,3 +1,4 @@
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -55,9 +56,8 @@ class SlackblastPickerSection<T> extends StatelessWidget {
             child: Text(
               message,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(color: colorScheme.onSurfaceVariant),
             ),
           ),
           if (onAction != null) ...[
@@ -139,9 +139,8 @@ class SlackblastPickerSection<T> extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
         child: Text(
           title,
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          style: Theme.of(context).textTheme.titleMedium
+              ?.copyWith(fontWeight: FontWeight.w700),
         ),
       ),
       if (headerChild != null)

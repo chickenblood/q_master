@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart' show listEquals;
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:just_audio/just_audio.dart';
@@ -362,9 +363,8 @@ final class _CaptureVoiceInputDialogState
       appBar: AdaptiveAppBar(
         title: PlatformText(
           l10n.captureVoiceInputPrompt,
-          style: Theme.of(
-            context,
-          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+          style: Theme.of(context).textTheme.titleSmall
+              ?.copyWith(fontWeight: FontWeight.w800),
         ),
         leading: [
           AdaptiveAppBarItem(

@@ -2,6 +2,7 @@
 /// four suits in a deck (hearts, clubs, diamond, spades).
 library;
 
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 enum Suit {

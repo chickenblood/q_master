@@ -1,6 +1,8 @@
 import 'dart:math';
 
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -111,12 +113,10 @@ class TimerSetupTab extends ConsumerWidget {
       appBar: AdaptiveAppBar(
         title: Text(
           l10n.timerSetupTabTitle,
-          style: Theme.of(
-            context,
-          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-          textScaler: MediaQuery.textScalerOf(
-            context,
-          ).clamp(maxScaleFactor: 1.6),
+          style: Theme.of(context).textTheme.titleSmall
+              ?.copyWith(fontWeight: FontWeight.w800),
+          textScaler: MediaQuery.textScalerOf(context)
+              .clamp(maxScaleFactor: 1.6),
         ),
         leading: [settingsGlassBarItem(id: 'left-item', context: context)],
       ),
@@ -143,9 +143,9 @@ class TimerSetupTab extends ConsumerWidget {
                     children: [
                       // Mode selector
                       Card(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.surfaceContainerHighest,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                           side: BorderSide(
@@ -163,9 +163,9 @@ class TimerSetupTab extends ConsumerWidget {
                                 style: Theme.of(context).textTheme.labelLarge
                                     ?.copyWith(
                                       letterSpacing: .1,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary,
                                       textBaseline: TextBaseline.alphabetic,
                                     ),
                               ),
@@ -198,9 +198,9 @@ class TimerSetupTab extends ConsumerWidget {
                       const SizedBox(height: 10),
                       // Interval card
                       Card(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.surfaceContainerHighest,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                           side: BorderSide(
@@ -219,21 +219,20 @@ class TimerSetupTab extends ConsumerWidget {
                                 color: Theme.of(context).colorScheme.surface,
                                 border: Border(
                                   bottom: BorderSide(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.outlineVariant,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .outlineVariant,
                                   ),
                                 ),
                               ),
                               child: Text(
-                                l10n.timerIntervalsLabel
-                                    .toUpperCase(), // Localized: "Intervals — tap to change"
+                                l10n.timerIntervalsLabel.toUpperCase(), // Localized: "Intervals — tap to change"
                                 style: Theme.of(context).textTheme.labelLarge
                                     ?.copyWith(
                                       letterSpacing: 1.0,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary,
                                     ),
                               ),
                             ),
@@ -269,10 +268,7 @@ class TimerSetupTab extends ConsumerWidget {
                                   timer,
                                 ),
                               ),
-                            if (prefs.timerType.value ==
-                                TimerType
-                                    .tabata
-                                    .index) // Only show rest interval for Tabata
+                            if (prefs.timerType.value == TimerType.tabata.index) // Only show rest interval for Tabata
                               _IntervalSetupRow(
                                 label: l10n.timerSettingsRestLabel,
                                 value: formatDuration(
@@ -292,9 +288,9 @@ class TimerSetupTab extends ConsumerWidget {
                               _IntervalSetupRow(
                                 label: l10n.timerSettingsRoundsLabel,
                                 value: prefs.rounds.value.toString(),
-                                valueColor: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface,
+                                valueColor: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface,
                                 onTap: () => _showIntegerPicker(
                                   context,
                                   prefs.rounds,
@@ -306,9 +302,9 @@ class TimerSetupTab extends ConsumerWidget {
                               _IntervalSetupRow(
                                 label: l10n.timerSettingsCyclesLabel,
                                 value: prefs.cycles.value.toString(),
-                                valueColor: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface,
+                                valueColor: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface,
                                 onTap: () => _showIntegerPicker(
                                   context,
                                   prefs.cycles,

@@ -1,3 +1,4 @@
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
@@ -66,10 +67,8 @@ class _OptionPicker<T> extends StatelessWidget {
           children: [
             Text(
               title,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontSize: 22,
-                letterSpacing: -0.3,
-              ),
+              style: Theme.of(context).textTheme.titleLarge
+                  ?.copyWith(fontSize: 22, letterSpacing: -0.3),
               textAlign: TextAlign.left,
             ),
             const SizedBox(height: 16),

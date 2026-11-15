@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
@@ -114,12 +115,10 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
         ],
         title: Text(
           L10n.of(context)!.generateWorkoutDialogTitle,
-          style: Theme.of(
-            context,
-          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-          textScaler: MediaQuery.textScalerOf(
-            context,
-          ).clamp(maxScaleFactor: 1.6),
+          style: Theme.of(context).textTheme.titleSmall
+              ?.copyWith(fontWeight: FontWeight.w800),
+          textScaler: MediaQuery.textScalerOf(context)
+              .clamp(maxScaleFactor: 1.6),
         ),
       ),
       body: SafeArea(
@@ -154,9 +153,8 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.primary.withValues(alpha: 0.15),
+                                color: Theme.of(context).colorScheme.primary
+                                    .withValues(alpha: 0.15),
                                 blurRadius: 0,
                                 spreadRadius: 14,
                               ),
@@ -196,9 +194,8 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
                                 child: SizedBox(
                                   height: 62,
                                   child: ActionButton(
-                                    label: L10n.of(
-                                      context,
-                                    )!.generateWorkoutButtonLabel,
+                                    label: L10n.of(context)!
+                                        .generateWorkoutButtonLabel,
                                     onPressed: hasPrompt
                                         ? _handleGenerateWorkout
                                         : null,
@@ -213,10 +210,8 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
                 PlatformText(
                   L10n.of(context)!.voiceGenerationInstructions,
                   textAlign: .center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium
+                      ?.copyWith(fontSize: 15, fontWeight: FontWeight.w500),
                 ),
               ],
             ),

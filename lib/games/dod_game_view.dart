@@ -1,3 +1,4 @@
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -30,13 +31,10 @@ final class DodGameView extends StatelessWidget {
           ],
           title: PlatformText(
             L10n.of(context)!.dodShakeToRollDiceMessage,
-            textScaler: MediaQuery.textScalerOf(
-              context,
-            ).clamp(maxScaleFactor: 1.6),
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-            ),
+            textScaler: MediaQuery.textScalerOf(context)
+                .clamp(maxScaleFactor: 1.6),
+            style: Theme.of(context).textTheme.titleSmall
+                ?.copyWith(fontWeight: FontWeight.w800, color: Colors.white),
           ),
         ),
         body: const Center(child: DodecahedronShader()),

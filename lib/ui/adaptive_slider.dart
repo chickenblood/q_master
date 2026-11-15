@@ -49,7 +49,7 @@ final class AdaptiveSlider extends StatelessWidget {
       onChangeStart: onChangeStart,
       onChangeEnd: onChangeEnd,
       label: label,
-      activeColor: activeColor,
+      activeColor: activeColor ?? Theme.of(context).colorScheme.primary,
       inactiveColor: inactiveColor,
       thumbColor: thumbColor ?? CupertinoColors.white,
       focusNode: focusNode,

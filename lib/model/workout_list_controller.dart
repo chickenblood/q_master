@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:accessing_security_scoped_resource/accessing_security_scoped_resource.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
@@ -28,11 +29,9 @@ final class WorkoutListController extends _$WorkoutListController {
 
   WorkoutListController({
     Future<String> Function()? filenameProvider,
-    Future<void> Function()? beforeDiskLoad,
-    Future<void> Function()? beforeDiskSave,
-  }) : _filenameProvider = filenameProvider ?? _defaultFilename,
-       _beforeDiskLoad = beforeDiskLoad,
-       _beforeDiskSave = beforeDiskSave;
+    this._beforeDiskLoad,
+    this._beforeDiskSave,
+  }) : _filenameProvider = filenameProvider ?? _defaultFilename;
 
   static Future<String> _defaultFilename() async {
     final directory = await getApplicationDocumentsDirectory();

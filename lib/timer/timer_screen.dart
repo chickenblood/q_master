@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -133,12 +134,10 @@ final class TimerScreen extends ConsumerWidget {
           ? AdaptiveAppBar(
               title: Text(
                 L10n.of(context)!.timerPageTitle,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-                textScaler: MediaQuery.textScalerOf(
-                  context,
-                ).clamp(maxScaleFactor: 1.6),
+                style: Theme.of(context).textTheme.titleSmall
+                    ?.copyWith(fontWeight: FontWeight.w800),
+                textScaler: MediaQuery.textScalerOf(context)
+                    .clamp(maxScaleFactor: 1.6),
               ),
               actions: [
                 // Action button for resetting the timer – iOS only
@@ -147,9 +146,9 @@ final class TimerScreen extends ConsumerWidget {
                   AdaptiveAppBarItem(
                     icon: Icon(
                       PlatformIcons(context).refresh,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.secondary, // Red from theme
+                      color: Theme.of(context)
+                          .colorScheme
+                          .secondary, // Red from theme
                     ),
                     onPressed: () => _resetTimer(ref),
                   ),
@@ -267,9 +266,8 @@ final class _PrimaryTile extends StatelessWidget {
         PlatformText(
           tileSpec.label,
           textAlign: .center,
-          style: Theme.of(
-            context,
-          ).textTheme.displayLarge!.copyWith(color: tileSpec.labelColor),
+          style: Theme.of(context).textTheme.displayLarge!
+              .copyWith(color: tileSpec.labelColor),
           textScaler: TextScaler.noScaling,
         ),
         Expanded(
@@ -313,9 +311,8 @@ final class _SecondaryTile extends StatelessWidget {
           PlatformText(
             tileSpec.label,
             textAlign: .center,
-            style: Theme.of(
-              context,
-            ).textTheme.displaySmall!.copyWith(color: tileSpec.labelColor),
+            style: Theme.of(context).textTheme.displaySmall!
+                .copyWith(color: tileSpec.labelColor),
             textScaler: TextScaler.noScaling,
           ),
           Expanded(
@@ -395,9 +392,8 @@ final class _StatusTile extends StatelessWidget {
                         : (timerHasStarted
                               ? l10n.timerResumeLabel
                               : l10n.timerStartLabel),
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: TimerColors.controlFg(context),
-                    ),
+                    style: Theme.of(context).textTheme.titleMedium!
+                        .copyWith(color: TimerColors.controlFg(context)),
                     textScaler: TextScaler.noScaling,
                   ),
               ],
@@ -451,9 +447,8 @@ final class _StatusElement extends StatelessWidget {
             label,
             softWrap: true,
             maxLines: 1,
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-              color: TimerColors.controlFg(context),
-            ),
+            style: Theme.of(context).textTheme.titleMedium!
+                .copyWith(color: TimerColors.controlFg(context)),
             textScaleFactor: 1,
             minFontSize: 10,
           ),

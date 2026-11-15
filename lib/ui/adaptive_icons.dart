@@ -1,6 +1,8 @@
 import 'dart:io' show Platform;
 
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 final class AdaptiveIcons {

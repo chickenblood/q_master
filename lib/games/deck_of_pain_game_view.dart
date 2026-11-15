@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/ui/media_query.dart';
@@ -38,13 +39,10 @@ final class DeckOfPainGameView extends StatelessWidget {
           ],
           title: PlatformText(
             L10n.of(context)!.dopGameScreenTitle,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-            ),
-            textScaler: MediaQuery.textScalerOf(
-              context,
-            ).clamp(maxScaleFactor: 1.6),
+            style: Theme.of(context).textTheme.titleSmall
+                ?.copyWith(fontWeight: FontWeight.w800, color: Colors.white),
+            textScaler: MediaQuery.textScalerOf(context)
+                .clamp(maxScaleFactor: 1.6),
           ),
         ),
         body: Center(child: _Deck()),
@@ -148,9 +146,8 @@ class _DeckState extends State<_Deck> with TickerProviderStateMixin {
             PlatformText(
               L10n.of(context)!.dopAllDoneLabel,
               textAlign: .center,
-              style: TextTheme.of(
-                context,
-              ).displayLarge!.copyWith(color: Colors.white),
+              style: TextTheme.of(context).displayLarge!
+                  .copyWith(color: Colors.white),
               textScaler: .noScaling,
             ),
           if (_bottomCard != null)

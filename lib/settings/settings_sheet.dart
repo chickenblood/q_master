@@ -89,7 +89,6 @@ class _SettingsSheet extends ConsumerWidget {
                             min: 1,
                             max: SharedAppPrefs.maxExercisesPerPage.toDouble(),
                             divisions: 30,
-                            activeColor: Theme.of(context).colorScheme.primary,
                             onChanged: (value) =>
                                 prefs.exercisesPerPage.value = value.round(),
                           ),
