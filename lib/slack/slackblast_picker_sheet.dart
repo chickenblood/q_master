@@ -325,29 +325,27 @@ class _SlackblastPickerSheetState
     BuildContext context, {
     required String title,
     required String message,
-  }) => showAdaptiveDialog<void>(
+  }) => showAlertDialog(
     context: context,
-    builder: (dialogContext) => AlertDialog.adaptive(
-      title: PlatformText(title),
-      content: PlatformText(message),
-      actions: [
-        PlatformDialogAction(
-          onPressed: () async {
-            await launchUrl(
-              Uri.parse('slack://open'),
-              mode: LaunchMode.externalApplication,
-            );
-            if (dialogContext.mounted) Navigator.of(dialogContext).pop();
-          },
-          child: PlatformText(L10n.of(dialogContext)!.goToSlackAction),
-        ),
-        PlatformDialogAction(
-          cupertino: (_, _) => CupertinoDialogActionData(isDefaultAction: true),
-          onPressed: () => Navigator.of(dialogContext).pop(),
-          child: PlatformText(L10n.of(dialogContext)!.closeAction),
-        ),
-      ],
-    ),
+    title: title,
+    message: message,
+    actions: [
+      AdaptiveDialogAction(
+        title: L10n.of(context)!.goToSlackAction,
+        onPressed: () async {
+          await launchUrl(
+            Uri.parse('slack://open'),
+            mode: LaunchMode.externalApplication,
+          );
+          if (context.mounted) Navigator.of(context).pop();
+        },
+      ),
+      AdaptiveDialogAction(
+        isPrimary: true,
+        title: L10n.of(context)!.closeAction,
+        onPressed: () => Navigator.of(context).pop(),
+      ),
+    ],
   );
 
   /// Formats an event's date, time, and name for its selectable list row.
