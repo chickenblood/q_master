@@ -1,11 +1,11 @@
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import '../l10n/l10n.dart';
 import '../ui/adaptive_app_bar.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_scaffold.dart';
+import '../ui/adaptive_text.dart';
 import 'dodecahedron_shader.dart';
 
 const _defaultDodHeroTag = 'dod_game';
@@ -29,7 +29,7 @@ final class DodGameView extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
             ),
           ],
-          title: PlatformText(
+          title: AdaptiveText(
             L10n.of(context)!.dodShakeToRollDiceMessage,
             textScaler: MediaQuery.textScalerOf(context)
                 .clamp(maxScaleFactor: 1.6),

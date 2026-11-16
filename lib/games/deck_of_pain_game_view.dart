@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:auto_size_text/auto_size_text.dart';
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:q_master/ui/media_query.dart';
 
 import '../l10n/l10n.dart';
@@ -12,6 +11,7 @@ import '../model/pain_card.dart';
 import '../ui/adaptive_app_bar.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_scaffold.dart';
+import '../ui/adaptive_text.dart';
 
 const _defaultDeckOfPainHeroTag = 'deck_of_pain_game';
 
@@ -37,7 +37,7 @@ final class DeckOfPainGameView extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
             ),
           ],
-          title: PlatformText(
+          title: AdaptiveText(
             L10n.of(context)!.dopGameScreenTitle,
             style: Theme.of(context).textTheme.titleSmall
                 ?.copyWith(fontWeight: FontWeight.w800, color: Colors.white),
@@ -143,7 +143,7 @@ class _DeckState extends State<_Deck> with TickerProviderStateMixin {
         children: [
           // Revealed when last card is slid off and no more are available.
           if (_topCard == null || _bottomCard == null)
-            PlatformText(
+            AdaptiveText(
               L10n.of(context)!.dopAllDoneLabel,
               textAlign: .center,
               style: TextTheme.of(context).displayLarge!
@@ -190,7 +190,7 @@ class _FrontCardView extends StatelessWidget {
     required TextStyle style,
     required Color color,
   }) {
-    return PlatformText(
+    return AdaptiveText(
       text,
       textAlign: .center,
       style: style.copyWith(fontWeight: .bold, color: color),

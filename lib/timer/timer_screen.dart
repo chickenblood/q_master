@@ -1,15 +1,16 @@
 import 'package:auto_size_text/auto_size_text.dart';
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../l10n/l10n.dart';
 import '../theme/theme.dart';
 import '../ui/adaptive_accessory_action_item.dart';
 import '../ui/adaptive_app_bar.dart';
+import '../ui/adaptive_buttons.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_scaffold.dart';
+import '../ui/adaptive_text.dart';
 import '../ui/media_query.dart';
 import '../utils/datetime_utils.dart';
 import 'workout_timer_controller.dart';
@@ -33,7 +34,7 @@ final class TimerScreen extends ConsumerWidget {
       backgroundColor: Theme.of(context).colorScheme.primary,
       onPressed: (_) => _resetTimer(ref),
       icon: Icon(
-        PlatformIcons(context).refreshBold,
+        AdaptiveIcons.refreshBold(context),
         color: Theme.of(context).colorScheme.onPrimary, // White from theme
       ),
     );
@@ -145,7 +146,7 @@ final class TimerScreen extends ConsumerWidget {
                 if (Theme.of(context).platform == TargetPlatform.iOS)
                   AdaptiveAppBarItem(
                     icon: Icon(
-                      PlatformIcons(context).refresh,
+                      AdaptiveIcons.refresh(context),
                       color: Theme.of(context)
                           .colorScheme
                           .secondary, // Red from theme
@@ -263,7 +264,7 @@ final class _PrimaryTile extends StatelessWidget {
       mainAxisAlignment: .spaceBetween,
       spacing: 8,
       children: [
-        PlatformText(
+        AdaptiveText(
           tileSpec.label,
           textAlign: .center,
           style: Theme.of(context).textTheme.displayLarge!
@@ -308,7 +309,7 @@ final class _SecondaryTile extends StatelessWidget {
         direction: isPortrait ? .vertical : .horizontal,
         spacing: 8,
         children: [
-          PlatformText(
+          AdaptiveText(
             tileSpec.label,
             textAlign: .center,
             style: Theme.of(context).textTheme.displaySmall!
@@ -369,11 +370,11 @@ final class _StatusTile extends StatelessWidget {
             child: Column(
               mainAxisAlignment: .center,
               children: [
-                PlatformIconButton(
+                AdaptiveIconButton(
                   icon: Icon(
                     timerNotifier.executionState == .playing
                         ? AdaptiveIcons.pauseCircle
-                        : context.platformIcons.playCircle,
+                        : AdaptiveIcons.playCircle(context),
                     size: isPortrait ? 80 : 52,
                     color: TimerColors.controlFg(context),
                   ),
@@ -386,7 +387,7 @@ final class _StatusTile extends StatelessWidget {
                   },
                 ),
                 if (isPortrait || isTablet)
-                  PlatformText(
+                  AdaptiveText(
                     timerNotifier.executionState == .playing
                         ? l10n.timerPauseLabel
                         : (timerHasStarted

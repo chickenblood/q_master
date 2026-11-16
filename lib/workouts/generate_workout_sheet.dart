@@ -2,7 +2,6 @@ import 'dart:convert';
 
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:q_master/ai_clients/gemini_client.dart';
 import 'package:q_master/ui/adaptive_app_bar.dart';
@@ -11,8 +10,10 @@ import 'package:q_master/ui/simple_alert.dart';
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
 import '../ui/action_button.dart';
+import '../ui/adaptive_activity_indicator.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_scaffold.dart';
+import '../ui/adaptive_text.dart';
 import 'capture_voice_input_dialog.dart';
 
 final class GenerateWorkoutSheet extends StatefulWidget {
@@ -185,7 +186,7 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 16.0,
                                 ),
-                                child: PlatformCircularProgressIndicator(),
+                                child: AdaptiveActivityIndicator(),
                               )
                             : Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -207,7 +208,7 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
                     ),
                   ],
                 ),
-                PlatformText(
+                AdaptiveText(
                   L10n.of(context)!.voiceGenerationInstructions,
                   textAlign: .center,
                   style: Theme.of(context).textTheme.bodyMedium

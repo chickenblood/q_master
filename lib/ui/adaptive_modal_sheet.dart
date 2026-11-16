@@ -1,7 +1,10 @@
+// ignore: deprecated_member_use
+import 'package:flutter/cupertino.dart' show CupertinoPageRoute;
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import '../ui/media_query.dart';
+import 'adaptive_platform.dart';
 
 /// Presents a modal sheet on phone.
 ///
@@ -34,10 +37,14 @@ Future<T?> showAdaptiveModalSheet<T>({
         )
       : Navigator.push(
           context,
-          platformPageRoute(
-            context: context,
-            fullscreenDialog: true,
-            builder: (_) => child,
-          ),
+          isMaterialPlatform(context)
+              ? MaterialPageRoute<T>(
+                  fullscreenDialog: true,
+                  builder: (_) => child,
+                )
+              : CupertinoPageRoute<T>(
+                  fullscreenDialog: true,
+                  builder: (_) => child,
+                ),
         );
 }

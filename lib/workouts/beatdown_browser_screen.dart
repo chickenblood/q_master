@@ -1,10 +1,12 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:material_ui/material_ui.dart' as material;
 
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
+import '../ui/adaptive_buttons.dart';
+import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_scaffold.dart';
 import '../utils/shared_app_prefs.dart';
 
@@ -138,9 +140,9 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                       height: 44,
                       child: Row(
                         children: [
-                          PlatformIconButton(
+                          AdaptiveIconButton(
                             icon: Icon(
-                              PlatformIcons(context).back,
+                              AdaptiveIcons.back(context),
                               color: Theme.of(context).colorScheme.onPrimary,
                               size: 24,
                             ),
@@ -256,8 +258,8 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 1,
                                   ),
-                                  child: PlatformElevatedButton(
-                                    color: Theme.of(context)
+                                  child: AdaptiveElevatedButton(
+                                    color: material.Theme.of(context)
                                         .colorScheme
                                         .primary,
 

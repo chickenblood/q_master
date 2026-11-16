@@ -1,7 +1,6 @@
-// Match the Flutter Material theme supplied by PlatformTheme.
+// Match the legacy Flutter Material theme supplied by AdaptiveApp.
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -16,7 +15,7 @@ AdaptiveAppBarItem settingsGlassBarItem({
   required BuildContext context,
 }) => AdaptiveAppBarItem(
   id: id,
-  icon: Icon(context.platformIcons.gearSolid),
+  icon: Icon(AdaptiveIcons.gearSolid(context)),
   onPressed: () async {
     final navigator = Navigator.of(context, rootNavigator: true);
     return showAdaptiveModalSheet(
@@ -146,7 +145,7 @@ class _SettingsSheet extends ConsumerWidget {
                     labelStyle: rowLabelStyle,
                     showDivider: false,
                     trailing: Icon(
-                      context.platformIcons.info,
+                      AdaptiveIcons.info(context),
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     onTap: () => _showAboutDialog(context),

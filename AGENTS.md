@@ -16,13 +16,13 @@ F3 beatdowns happen at 5:30am in the dark, cold, and rain. Design for:
 
 ## Platform-Adaptive UI
 
-**Always use `flutter_platform_widgets`** (`PlatformScaffold`, `PlatformAppBar`, `PlatformText`, etc.) instead of raw Material/Cupertino widgets.
+Use the project-owned `Adaptive*` widgets and helpers in [ui/](lib/ui/)
+for platform-adaptive controls and navigation. When a new wrapper is needed,
+use `material_ui` and `cupertino_ui` and preserve the existing platform behavior.
 
-For platform-specific behavior (see [main.dart#L44](lib/main.dart#L44)):
-```dart
-if (Theme.of(context).platform == TargetPlatform.iOS) { /* showCupertinoSheet */ }
-else { /* Navigator.push with platformPageRoute */ }
-```
+[AdaptiveApp](lib/theme/adaptive_app.dart) supplies both legacy Flutter and
+split-package themes while legacy widgets and Liquid Glass remain. Keep both
+theme definitions in sync and ensure root-pushed routes inherit them.
 
 ## State & Models
 

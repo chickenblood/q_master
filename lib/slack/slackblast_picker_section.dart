@@ -1,8 +1,10 @@
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import '../l10n/l10n.dart';
+import '../ui/adaptive_icons.dart';
+import '../ui/adaptive_list_tile.dart';
+import '../ui/adaptive_text.dart';
 
 /// A titled, drill-down list section used by the Slackblast picker sheet:
 /// shows a loading spinner, an error state with retry, an empty state, or a
@@ -111,14 +113,14 @@ class SlackblastPickerSection<T> extends StatelessWidget {
           child: Column(
             children: [
               for (final item in items)
-                PlatformListTile(
-                  title: PlatformText(
+                AdaptiveListTile(
+                  title: AdaptiveText(
                     itemLabel(item),
                     style: itemTextStyle?.call(context, item),
                   ),
                   trailing: item == selectedItem
                       ? Icon(
-                          context.platformIcons.checkMark,
+                          AdaptiveIcons.checkMark(context),
                           color: Theme.of(context).colorScheme.primary,
                         )
                       : null,

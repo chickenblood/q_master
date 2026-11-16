@@ -4,7 +4,6 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart' show listEquals;
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:logger/logger.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
@@ -16,6 +15,7 @@ import '../ui/action_button.dart';
 import '../ui/adaptive_app_bar.dart';
 import '../ui/adaptive_icons.dart';
 import '../ui/adaptive_scaffold.dart';
+import '../ui/adaptive_text.dart';
 import '../utils/audio_session_coordinator.dart';
 
 const _waveformBarCount = 14;
@@ -361,7 +361,7 @@ final class _CaptureVoiceInputDialogState
 
     return AdaptiveScaffold(
       appBar: AdaptiveAppBar(
-        title: PlatformText(
+        title: AdaptiveText(
           l10n.captureVoiceInputPrompt,
           style: Theme.of(context).textTheme.titleSmall
               ?.copyWith(fontWeight: FontWeight.w800),
@@ -385,7 +385,7 @@ final class _CaptureVoiceInputDialogState
               top: 16,
               left: 16,
               right: 16,
-              child: PlatformText(
+              child: AdaptiveText(
                 _recognizedText,
                 textAlign: .center,
                 style: Theme.of(context).textTheme.displaySmall,

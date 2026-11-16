@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -44,7 +43,7 @@ class AppShell extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) => AdaptiveAccessoryActionItem(
-    icon: Icon(PlatformIcons(context).add),
+    icon: Icon(AdaptiveIcons.add(context)),
     id: 'add-workout',
     onPressed: (anchor) => WorkoutsTab.showWorkoutCreationPicker(
       context: context,

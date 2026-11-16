@@ -4,15 +4,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import 'app_router.dart';
 import 'firebase_options.dart';
-import 'l10n/l10n.dart';
-import 'theme/theme.dart';
+import 'theme/adaptive_app.dart';
 import 'utils/easter_egg_shake_listener.dart';
 import 'utils/shared_app_prefs.dart';
 
@@ -69,35 +67,13 @@ final class _MainAppState extends State<_MainApp> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformProvider(
-      settings: PlatformSettingsData(
-        iosUsesMaterialWidgets: true,
-        iosUseZeroPaddingForAppbarPlatformIcon: true,
-      ),
-      builder: (_) => ListenableBuilder(
-        listenable: SharedAppPrefs.instance.theme,
-        builder: (_, _) => PlatformTheme(
-          materialLightTheme: lightTheme(),
-          materialDarkTheme: darkTheme(),
-          cupertinoLightTheme: MaterialBasedCupertinoThemeData(
-            materialTheme: lightTheme(),
-          ),
-          cupertinoDarkTheme: MaterialBasedCupertinoThemeData(
-            materialTheme: darkTheme(),
-          ),
-          themeMode: ThemeMode.values[SharedAppPrefs.instance.theme.value],
-          builder: (context) => ScaffoldMessenger(
-            child: PlatformApp.router(
-              title: 'Q Master',
-              localizationsDelegates: L10n.localizationsDelegates,
-              supportedLocales: L10n.supportedLocales,
-              routerConfig: _router,
-              debugShowCheckedModeBanner: false,
-              builder: (context, child) =>
-                  EasterEggShakeListener(router: _router, child: child!),
-            ),
-          ),
-        ),
+    return ListenableBuilder(
+      listenable: SharedAppPrefs.instance.theme,
+      builder: (_, _) => AdaptiveApp(
+        routerConfig: _router,
+        themeMode: ThemeMode.values[SharedAppPrefs.instance.theme.value],
+        builder: (context, child) =>
+            EasterEggShakeListener(router: _router, child: child!),
       ),
     );
   }

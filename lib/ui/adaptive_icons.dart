@@ -5,7 +5,49 @@ import 'package:flutter/cupertino.dart';
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
+import 'adaptive_platform.dart';
+
 final class AdaptiveIcons {
+  static IconData add(BuildContext context) =>
+      isMaterialPlatform(context) ? Icons.add : CupertinoIcons.add;
+
+  static IconData back(BuildContext context) =>
+      isMaterialPlatform(context) ? Icons.arrow_back : CupertinoIcons.back;
+
+  static IconData checkMark(BuildContext context) =>
+      isMaterialPlatform(context) ? Icons.check : CupertinoIcons.check_mark;
+
+  static IconData delete(BuildContext context) =>
+      isMaterialPlatform(context) ? Icons.delete : CupertinoIcons.delete;
+
+  static IconData edit(BuildContext context) =>
+      isMaterialPlatform(context) ? Icons.edit : CupertinoIcons.pencil;
+
+  static IconData gearSolid(BuildContext context) =>
+      isMaterialPlatform(context) ? Icons.settings : CupertinoIcons.gear_solid;
+
+  static IconData info(BuildContext context) =>
+      isMaterialPlatform(context) ? Icons.info : CupertinoIcons.info;
+
+  static IconData playArrowSolid(BuildContext context) =>
+      isMaterialPlatform(context)
+      ? Icons.play_arrow
+      : CupertinoIcons.play_arrow_solid;
+
+  static IconData playCircle(BuildContext context) =>
+      isMaterialPlatform(context)
+      ? Icons.play_circle_outline
+      : CupertinoIcons.play_circle;
+
+  static IconData refresh(BuildContext context) =>
+      isMaterialPlatform(context) ? Icons.refresh : CupertinoIcons.refresh;
+
+  static IconData refreshBold(BuildContext context) =>
+      isMaterialPlatform(context) ? Icons.refresh : CupertinoIcons.refresh_bold;
+
+  static IconData share(BuildContext context) =>
+      isMaterialPlatform(context) ? Icons.share : CupertinoIcons.share;
+
   static IconData get create =>
       Platform.isIOS ? CupertinoIcons.create : Icons.note_add;
 

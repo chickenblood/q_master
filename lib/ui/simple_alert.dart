@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -34,7 +33,7 @@ final class _AlertMessageContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!_containsHtmlMarkup(message)) {
-      return PlatformText(message);
+      return AdaptiveText(message);
     }
 
     final theme = Theme.of(context);

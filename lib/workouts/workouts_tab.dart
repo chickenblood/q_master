@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
@@ -335,7 +334,7 @@ final class _WorkoutTile extends StatelessWidget {
               horizontal: 10,
               vertical: 12,
             ),
-            title: PlatformText(
+            title: AdaptiveText(
               workout.name,
               style: TextTheme.of(context).titleMedium,
               overflow: .ellipsis,
@@ -461,12 +460,12 @@ final class _OverflowMenu extends StatelessWidget {
           ),
           AdaptiveMenuItem(
             onPressed: () => onShare(menuContext),
-            icon: Icon(context.platformIcons.share),
+            icon: Icon(AdaptiveIcons.share(context)),
             title: L10n.of(context)!.shareWorkoutText,
           ),
           AdaptiveMenuItem(
             onPressed: onDelete,
-            icon: Icon(context.platformIcons.delete),
+            icon: Icon(AdaptiveIcons.delete(context)),
             title: L10n.of(context)!.deleteWorkoutText,
             isDestructive: true,
           ),

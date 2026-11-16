@@ -6,10 +6,16 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart' as modern;
 import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/workout.dart';
 import 'package:q_master/model/workout_list_controller.dart';
 import 'package:q_master/workouts/create_workout_sheet.dart';
+
+const _localizationsDelegates = [
+  ...L10n.localizationsDelegates,
+  modern.GlobalMaterialLocalizations.delegate,
+];
 
 Future<void> _pumpEditor(WidgetTester tester) async {
   await tester.pump();
@@ -73,7 +79,7 @@ void main() {
           navigatorKey: navigatorKey,
           navigatorObservers: [observer],
           theme: ThemeData(platform: TargetPlatform.android),
-          localizationsDelegates: L10n.localizationsDelegates,
+          localizationsDelegates: _localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
           home: const Scaffold(),
         ),
@@ -147,7 +153,7 @@ void main() {
           navigatorKey: navigatorKey,
           navigatorObservers: [observer],
           theme: ThemeData(platform: TargetPlatform.android),
-          localizationsDelegates: L10n.localizationsDelegates,
+          localizationsDelegates: _localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
           home: const Scaffold(),
         ),
@@ -160,7 +166,7 @@ void main() {
 
     await tester.tap(find.text('Add Section').first);
     await _pumpEditor(tester);
-    await tester.enterText(find.byType(TextField).last, 'Warm up');
+    await tester.enterText(find.byType(modern.TextField), 'Warm up');
     await tester.tap(find.text('Add Section').last);
     await _pumpEditor(tester);
 
@@ -195,7 +201,7 @@ void main() {
         container: container,
         child: MaterialApp(
           theme: ThemeData(platform: TargetPlatform.android),
-          localizationsDelegates: L10n.localizationsDelegates,
+          localizationsDelegates: _localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
           home: CreateWorkoutSheet(originalWorkout: workout),
         ),
@@ -241,7 +247,7 @@ void main() {
         container: container,
         child: MaterialApp(
           theme: ThemeData(platform: TargetPlatform.android),
-          localizationsDelegates: L10n.localizationsDelegates,
+          localizationsDelegates: _localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
           home: CreateWorkoutSheet(originalWorkout: workout),
         ),
@@ -296,7 +302,7 @@ void main() {
         container: container,
         child: MaterialApp(
           theme: ThemeData(platform: TargetPlatform.android),
-          localizationsDelegates: L10n.localizationsDelegates,
+          localizationsDelegates: _localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
           home: CreateWorkoutSheet(originalWorkout: workout),
         ),

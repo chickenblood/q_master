@@ -1,7 +1,6 @@
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../l10n/l10n.dart';
@@ -232,7 +231,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     return showAlertDialog<String>(
       context: context,
       title: title,
-      content: PlatformTextField(
+      content: AdaptiveTextField(
         controller: controller,
         autofocus: true,
         textCapitalization: TextCapitalization.words,
@@ -309,13 +308,12 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
   Widget _addExerciseButton(
     BuildContext context, {
     required _SectionDraft section,
-  }) => PlatformIconButton(
+  }) => AdaptiveIconButton(
     icon: Icon(
-      PlatformIcons(context).add,
+      AdaptiveIcons.add(context),
       color: Theme.of(context).colorScheme.primary,
     ),
-    cupertino: (context, platform) =>
-        CupertinoIconButtonData(padding: EdgeInsets.only(right: 8)),
+    cupertinoPadding: const EdgeInsets.only(right: 8),
     onPressed: () async {
       _focusNode.unfocus();
       setState(() => _pickerIsShown = true);
@@ -406,7 +404,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
-                    child: PlatformListTile(
+                    child: AdaptiveListTile(
                       key: ValueKey(
                         'exercise_${identityHashCode(section)}_$exerciseIndex',
                       ),
@@ -421,12 +419,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                           textAlign: .left,
                         ),
                       ),
-                      material: (context, platform) => MaterialListTileData(
-                        contentPadding: EdgeInsets.only(left: 0, right: 8),
-                      ),
-                      cupertino: (context, platform) => CupertinoListTileData(
-                        padding: EdgeInsets.only(left: 0, right: 8),
-                      ),
+                      padding: const EdgeInsets.only(left: 0, right: 8),
                     ),
                   ),
                   Padding(
@@ -589,7 +582,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
       AdaptiveAppBarItem(
         id: 'right_item',
         icon: Icon(
-          PlatformIcons(context).checkMark,
+          AdaptiveIcons.checkMark(context),
           color: isEnabled ? enabledColor : disabledColor,
         ),
         onPressed: isEnabled
@@ -665,7 +658,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
               crossAxisAlignment: .center,
               children: [
                 Expanded(
-                  child: PlatformText(
+                  child: AdaptiveText(
                     section.name.toUpperCase(),
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       color: Theme.of(context).colorScheme.primary,
@@ -680,7 +673,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                   children: [
                     IconButton(
                       icon: Icon(
-                        PlatformIcons(context).edit,
+                        AdaptiveIcons.edit(context),
                         color: Theme.of(context).colorScheme.onSurface,
                         size: 20,
                       ),
@@ -710,7 +703,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           children: [
             ActionButton(
               label: L10n.of(context)!.addSectionButtonText,
-              icon: PlatformIcons(context).add,
+              icon: AdaptiveIcons.add(context),
               iconColor: Theme.of(context).colorScheme.primary,
               outlined: true,
               onPressed: () => _addSection(context),
@@ -731,7 +724,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
           height: 62,
           child: ActionButton(
             label: L10n.of(context)!.startBeatdownButtonText,
-            icon: PlatformIcons(context).playArrowSolid,
+            icon: AdaptiveIcons.playArrowSolid(context),
             onPressed: () {
               widget.onShowBeatdownBrowser?.call(
                 context,
@@ -786,7 +779,7 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
             mainAxisAlignment: .end,
             items: [
               AdaptiveButtonBarItem(
-                icon: Icon(PlatformIcons(context).playArrowSolid),
+                icon: Icon(AdaptiveIcons.playArrowSolid(context)),
                 onPressed: () {
                   widget.onShowBeatdownBrowser?.call(
                     context,

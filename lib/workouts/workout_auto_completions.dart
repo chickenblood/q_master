@@ -1,12 +1,11 @@
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import '../services/exicon_fetcher.dart';
+import '../ui/adaptive_text_field.dart';
 import '../utils/text_editing_value_utils.dart';
 import 'exicon_catalog.dart';
 
@@ -157,43 +156,17 @@ class _WorkoutAutocompleteTextFieldState
             FocusNode focusNode,
             VoidCallback onFieldSubmitted,
           ) {
-            return PlatformTextField(
+            return AdaptiveTextField(
               minLines: widget._minLines,
               maxLines: widget._maxLines,
-              expands: widget.expands,
+              expands: widget.expands ?? false,
               autocorrect: false,
               textCapitalization: TextCapitalization.sentences,
               controller: textEditingController,
               focusNode: focusNode,
               onTap: widget.onTap,
-              cupertino: (_, _) => CupertinoTextFieldData(
-                clearButtonMode: OverlayVisibilityMode.editing,
-              ),
-              material: (_, _) => MaterialTextFieldData(
-                decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.outline,
-                      width: 2.0,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.primary,
-                      width: 2.0,
-                    ),
-                  ),
-                  suffixIcon: _showClearButton
-                      ? IconButton(
-                          onPressed: _clearText,
-                          icon: const Icon(Icons.clear),
-                          tooltip: MaterialLocalizations.of(
-                            context,
-                          ).deleteButtonTooltip,
-                        )
-                      : null,
-                ),
-              ),
+              onMaterialClear: _clearText,
+              showClearButton: _showClearButton,
               onSubmitted: (_) => onFieldSubmitted,
               onEditingComplete: () {
                 widget.onSubmitted?.call();

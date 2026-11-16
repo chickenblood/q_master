@@ -257,17 +257,15 @@ Some helper classes have been added to handle the heavy lifting for UI masonry a
  * AdaptiveModalSheet
  * AdaptiveSlider
  * AdaptiveSwitch
- * AdaptiveIcons (for those not covered by Flutter Icons.adaptive and PlatformIcon).
+ * AdaptiveIcons (for those not covered by Flutter Icons.adaptive).
  * AdaptiveMenu
  * showAdaptiveDraggableSheet
  * showAdaptiveModalSheet (adapts the content into a dialog for tablets)
 
-* (Legacy) The [flutter_platform_widgets](https://pub.dev/packages/flutter_platform_widgets) package, which wraps equivalent higher-level widgets for both platforms and gives you a simple API to target both. Prefer the Adaptive* variant above where one exists or where you desire a glass layer on iOS. Use these for everything else.
-
-  * Use PlatformText rather than Text
-  * Use PlatformIconButton rather than IconButton
-  * Use PlatformTextButton rather than TextButton
-  * Use PlatformListTile rather than ListTile
+The app also provides adaptive text, buttons, list tiles, text fields, and
+activity indicators backed by `material_ui` and `cupertino_ui`. `AdaptiveApp`
+supplies matching legacy and split-package themes above the root navigator
+while legacy Flutter widgets and Liquid Glass remain.
 
 ## Workout JSON Format
 

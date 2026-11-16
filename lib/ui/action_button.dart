@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:material_ui/material_ui.dart';
+
+import 'adaptive_buttons.dart';
 
 /// ActionButton — A large, attention-grabbing button used for primary actions
 /// in modals and sheets.
@@ -33,7 +34,7 @@ class ActionButton extends StatelessWidget {
     final borderColor = isDisabled
         ? colorScheme.outline.withValues(alpha: 0.38)
         : colorScheme.outline;
-    return PlatformTextButton(
+    return AdaptiveTextButton(
       onPressed: onPressed,
       padding: EdgeInsets.zero,
       child: Container(
@@ -65,10 +66,8 @@ class ActionButton extends StatelessWidget {
             ],
             Text(
               label,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: textColor,
-                letterSpacing: -0.1,
-              ),
+              style: Theme.of(context).textTheme.labelLarge
+                  ?.copyWith(color: textColor, letterSpacing: -0.1),
             ),
           ],
         ),

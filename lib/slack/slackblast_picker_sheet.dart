@@ -2,7 +2,6 @@ import 'dart:async';
 
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -296,7 +295,7 @@ class _SlackblastPickerSheetState
     final result = await showAlertDialog<bool>(
       context: context,
       title: l10n.slackblastPostConfirmationMessage,
-      content: PlatformText(
+      content: AdaptiveText(
         l10n.slackblastPostConfirmationTitle(
           region.name,
           ao.name,
@@ -381,7 +380,7 @@ class _SlackblastPickerSheetState
               onPressed: () => Navigator.pop(context),
             ),
           ],
-          title: PlatformText(
+          title: AdaptiveText(
             l10n.postToBackblastText,
             style: Theme.of(context).textTheme.titleSmall
                 ?.copyWith(fontWeight: FontWeight.w800),

@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:q_master/settings/settings_sheet.dart';
@@ -13,6 +12,7 @@ import 'package:q_master/utils/shared_app_prefs.dart';
 import '../l10n/l10n.dart';
 import '../theme/theme.dart';
 import '../ui/action_button.dart';
+import '../ui/adaptive_platform.dart';
 import '../ui/adaptive_route_page.dart';
 import '../ui/adaptive_widgets.dart';
 import '../ui/media_query.dart';
@@ -37,17 +37,26 @@ class TimerSetupTab extends ConsumerWidget {
 
   const TimerSetupTab({super.key});
 
+  void _showPicker(BuildContext context, WidgetBuilder builder) {
+    if (isMaterialPlatform(context)) {
+      showModalBottomSheet<void>(
+        context: context,
+        constraints: BoxConstraints.tight(const Size.fromHeight(250)),
+        builder: builder,
+      );
+    } else {
+      showCupertinoModalPopup<void>(context: context, builder: builder);
+    }
+  }
+
   void _showTimeIntervalPicker(
     BuildContext context,
     ValueNotifier<int> timeNotifier,
     WorkoutTimerController timer,
   ) {
-    showPlatformModalSheet(
-      context: context,
-      material: MaterialModalSheetData(
-        constraints: BoxConstraints.tight(const Size.fromHeight(250)),
-      ),
-      builder: (context) => SafeArea(
+    _showPicker(
+      context,
+      (context) => SafeArea(
         bottom: false,
         child: CupertinoTimerPicker(
           mode: CupertinoTimerPickerMode.ms,
@@ -70,12 +79,9 @@ class TimerSetupTab extends ConsumerWidget {
     WorkoutTimerController timer,
     int maxValue,
   ) {
-    showPlatformModalSheet(
-      context: context,
-      material: MaterialModalSheetData(
-        constraints: BoxConstraints.tight(const Size.fromHeight(250)),
-      ),
-      builder: (context) => SafeArea(
+    _showPicker(
+      context,
+      (context) => SafeArea(
         bottom: false,
         child: SizedBox(
           height: 250,
@@ -335,7 +341,7 @@ class TimerSetupTab extends ConsumerWidget {
                   onPressed: () =>
                       context.pushNamed<void>(timerScreenRouteName),
                   label: l10n.timerStartButtonLabel,
-                  icon: context.platformIcons.playArrowSolid,
+                  icon: AdaptiveIcons.playArrowSolid(context),
                 ),
               ),
             ),

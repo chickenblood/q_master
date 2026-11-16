@@ -1,8 +1,6 @@
-// ignore: deprecated_member_use
-import 'package:flutter/cupertino.dart';
-// ignore: deprecated_member_use
-import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter/widgets.dart';
+
+import '../ui/adaptive_text_field.dart';
 
 /// A plain clearable search text field, styled to match
 /// [WorkoutAutocompleteTextField] but without autocomplete behavior.
@@ -51,37 +49,13 @@ class _SlackblastSearchFieldState extends State<SlackblastSearchField> {
   }
 
   @override
-  Widget build(BuildContext context) => PlatformTextField(
+  Widget build(BuildContext context) => AdaptiveTextField(
     controller: widget.controller,
     focusNode: widget.focusNode,
     hintText: widget.hintText,
     autocorrect: false,
     onChanged: widget.onChanged,
-    cupertino: (_, _) =>
-        CupertinoTextFieldData(clearButtonMode: OverlayVisibilityMode.editing),
-    material: (_, _) => MaterialTextFieldData(
-      decoration: InputDecoration(
-        hintText: widget.hintText,
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.outline,
-            width: 2.0,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.primary,
-            width: 2.0,
-          ),
-        ),
-        suffixIcon: _showClearButton
-            ? IconButton(
-                onPressed: _clearText,
-                icon: const Icon(Icons.clear),
-                tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
-              )
-            : null,
-      ),
-    ),
+    onMaterialClear: _clearText,
+    showClearButton: _showClearButton,
   );
 }

@@ -1,8 +1,9 @@
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
+import 'adaptive_buttons.dart';
+import 'adaptive_text.dart';
 import 'src/adaptive_platform_widget.dart';
 
 /// A class representing a menu item with an icon, an optional label, and a
@@ -53,7 +54,7 @@ final class AdaptiveMenu extends StatelessWidget {
     ),
     material: (context) => MenuAnchor(
       consumeOutsideTap: true,
-      builder: (context, controller, child) => PlatformIconButton(
+      builder: (context, controller, child) => AdaptiveIconButton(
         icon: icon,
         onPressed: () =>
             controller.isOpen ? controller.close() : controller.open(),
@@ -63,7 +64,7 @@ final class AdaptiveMenu extends StatelessWidget {
             (item) => MenuItemButton(
               leadingIcon: item.icon,
               onPressed: item.onPressed,
-              child: PlatformText(
+              child: AdaptiveText(
                 item.title,
                 style: TextTheme.of(context).titleLarge!,
               ),
