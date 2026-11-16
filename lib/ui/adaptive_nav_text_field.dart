@@ -1,7 +1,6 @@
-// ignore: deprecated_member_use
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show TextInputFormatter;
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'src/adaptive_platform_widget.dart';
 
@@ -81,29 +80,32 @@ final class AdaptiveNavTextField extends StatelessWidget {
       autofocus: autofocus ?? false,
       onTapOutside: onTapOutside,
     ),
-    material: (_) => TextField(
-      controller: controller,
-      enabled: enabled,
-      focusNode: focusNode,
-      style: textStyle,
-      keyboardType: keyboardType,
-      textInputAction: textInputAction,
-      obscureText: obscureText ?? false,
-      maxLines: maxLines,
-      minLines: minLines,
-      maxLength: maxLength,
-      onChanged: onChanged,
-      onSubmitted: onSubmitted,
-      inputFormatters: inputFormatters,
-      textCapitalization: textCapitalization ?? TextCapitalization.none,
-      readOnly: readOnly ?? false,
-      autofocus: autofocus ?? false,
-      onTapOutside: onTapOutside,
-      decoration: InputDecoration(
-        labelText: label,
-        contentPadding: padding,
-        prefixIcon: prefixIcon,
-        suffixIcon: suffixIcon,
+    material: (_) => Material(
+      type: MaterialType.transparency,
+      child: TextField(
+        controller: controller,
+        enabled: enabled,
+        focusNode: focusNode,
+        style: textStyle,
+        keyboardType: keyboardType,
+        textInputAction: textInputAction,
+        obscureText: obscureText ?? false,
+        maxLines: maxLines,
+        minLines: minLines,
+        maxLength: maxLength,
+        onChanged: onChanged,
+        onSubmitted: onSubmitted,
+        inputFormatters: inputFormatters,
+        textCapitalization: textCapitalization ?? TextCapitalization.none,
+        readOnly: readOnly ?? false,
+        autofocus: autofocus ?? false,
+        onTapOutside: onTapOutside,
+        decoration: InputDecoration(
+          labelText: label,
+          contentPadding: padding,
+          prefixIcon: prefixIcon,
+          suffixIcon: suffixIcon,
+        ),
       ),
     ),
   );

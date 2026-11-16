@@ -1,8 +1,7 @@
 import 'dart:convert';
 
-// ignore: deprecated_member_use
-import 'package:flutter/material.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:q_master/ai_clients/gemini_client.dart';
 import 'package:q_master/ui/adaptive_app_bar.dart';
 import 'package:q_master/ui/simple_alert.dart';
@@ -161,12 +160,15 @@ final class _GenerateWorkoutSheetState extends State<GenerateWorkoutSheet> {
                               ),
                             ],
                           ),
-                          child: IconButton(
-                            onPressed: _handleCaptureVoiceInput,
-                            icon: Icon(
-                              AdaptiveIcons.microphone,
-                              size: 36,
-                              color: Theme.of(context).colorScheme.onPrimary,
+                          child: Material(
+                            type: MaterialType.transparency,
+                            child: IconButton(
+                              onPressed: _handleCaptureVoiceInput,
+                              icon: Icon(
+                                AdaptiveIcons.microphone,
+                                size: 36,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
                             ),
                           ),
                         ),

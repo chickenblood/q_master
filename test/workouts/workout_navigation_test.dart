@@ -1,5 +1,8 @@
-// ignore: deprecated_member_use
-import 'package:flutter/cupertino.dart' show CupertinoPageRoute;
+import 'package:cupertino_ui/cupertino_ui.dart'
+    show
+        CupertinoPageRoute,
+        CupertinoRouteTransitionMixin,
+        GlobalCupertinoLocalizations;
 import 'package:flutter/foundation.dart';
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
@@ -7,9 +10,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_ui/material_ui.dart' as modern;
 import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/workout.dart';
+import 'package:q_master/model/workout_list_controller.dart';
 import 'package:q_master/settings/settings_sheet.dart';
+import 'package:q_master/theme/adaptive_app.dart';
 import 'package:q_master/utils/shared_app_prefs.dart';
 import 'package:q_master/workouts/beatdown_browser_screen.dart';
 import 'package:q_master/workouts/create_workout_sheet.dart';
@@ -34,8 +40,20 @@ void main() {
             colorScheme: ColorScheme.fromSeed(seedColor: primary)
                 .copyWith(primary: primary),
           ),
-          localizationsDelegates: L10n.localizationsDelegates,
+          localizationsDelegates: [
+            ...L10n.localizationsDelegates,
+            modern.GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
           supportedLocales: L10n.supportedLocales,
+          builder: (_, child) => modern.Theme(
+            data: modern.ThemeData(
+              platform: TargetPlatform.android,
+              colorScheme: modern.ColorScheme.fromSeed(seedColor: primary)
+                  .copyWith(primary: primary),
+            ),
+            child: child!,
+          ),
           home: Builder(
             builder: (context) => Scaffold(
               body: TextButton(
@@ -131,15 +149,32 @@ void main() {
                     backgroundColor: Colors.transparent,
                   ),
                 ),
-                localizationsDelegates: L10n.localizationsDelegates,
+                localizationsDelegates: [
+                  ...L10n.localizationsDelegates,
+                  modern.GlobalMaterialLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
                 supportedLocales: L10n.supportedLocales,
                 routerConfig: router,
+                builder: (_, child) => modern.Theme(
+                  data: modern.ThemeData(
+                    platform: platform,
+                    colorScheme: modern.ColorScheme.fromSeed(
+                      seedColor: const Color(0xff126734),
+                    ).copyWith(primary: const Color(0xff126734)),
+                    appBarTheme: const modern.AppBarTheme(
+                      backgroundColor: Colors.transparent,
+                    ),
+                  ),
+                  child: child!,
+                ),
               ),
             ),
           );
           await tester.pumpAndSettle();
 
           final workoutsContext = tester.element(find.text('Workouts'));
+          final workoutsRoute = ModalRoute.of(workoutsContext)!;
           WorkoutsTab.invokeWorkoutEditor(workoutsContext, workout: workout);
           await tester.pumpAndSettle();
 
@@ -150,6 +185,14 @@ void main() {
             tester.widget<Text>(find.text('WARM UP')).style?.color,
             const Color(0xff126734),
           );
+          if (platform == TargetPlatform.android) {
+            await tester.tap(find.byTooltip('Edit section'));
+            await tester.pump(const Duration(milliseconds: 350));
+            await tester.pumpAndSettle();
+            expect(find.text('Edit section name'), findsOneWidget);
+            await tester.tap(find.text('Cancel'));
+            await tester.pumpAndSettle();
+          }
           final editorRoute = ModalRoute.of(editorContext)!;
           if (tablet) {
             expect(editorRoute, isA<PopupRoute<Object?>>());
@@ -158,7 +201,7 @@ void main() {
             if (platform == TargetPlatform.iOS) {
               expect(editorRoute, isA<CupertinoPageRoute<Object?>>());
             } else {
-              expect(editorRoute, isA<MaterialPageRoute<Object?>>());
+              expect(editorRoute, isA<modern.MaterialPageRoute<Object?>>());
             }
           }
 
@@ -169,6 +212,28 @@ void main() {
           expect(find.byType(CreateWorkoutSheet), findsNothing);
           final browserContext = tester.element(find.byType(BeatdownBrowser));
           expect(Navigator.of(browserContext), same(branchKey.currentState));
+          expect(
+            tester
+                .widget<Container>(
+                  find
+                      .ancestor(
+                        of: find.text('WARM UP'),
+                        matching: find.byType(Container),
+                      )
+                      .first,
+                )
+                .color,
+            const Color(0xff126734),
+          );
+          expect(
+            ModalRoute.of(browserContext),
+            platform == TargetPlatform.android
+                ? isA<modern.MaterialRouteTransitionMixin>()
+                : isA<CupertinoRouteTransitionMixin>(),
+          );
+          final browserRoute = ModalRoute.of(browserContext)!;
+          expect(workoutsRoute.canTransitionTo(browserRoute), isTrue);
+          expect(browserRoute.canTransitionFrom(workoutsRoute), isTrue);
           expect(find.text('Tab bar'), findsOneWidget);
 
           Navigator.of(browserContext).pop();
@@ -206,5 +271,58 @@ void main() {
         }
       },
     );
+  }
+
+  for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+    testWidgets('workout list opens its beatdown on $platform', (tester) async {
+      debugDefaultTargetPlatformOverride = platform;
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+      const channel =
+          'dev.flutter.pigeon.wakelock_plus_platform_interface.WakelockPlusApi.toggle';
+      final messenger =
+          TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+      messenger.setMockMessageHandler(
+        channel,
+        (_) async => const StandardMessageCodec().encodeMessage([null]),
+      );
+      addTearDown(() => messenger.setMockMessageHandler(channel, null));
+      final workout = Workout(
+        name: 'Morning beatdown',
+        date: DateTime(2025),
+        sections: [
+          WorkoutSection(name: 'Warm up', exercises: ['Merkin']),
+        ],
+      );
+      final router = GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (_, _) => const WorkoutsTab(),
+            routes: WorkoutsTab.routes,
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            workoutListControllerProvider.overrideWithBuild(
+              (_, _) => [workout],
+            ),
+          ],
+          child: AdaptiveApp(
+            routerConfig: router,
+            themeMode: modern.ThemeMode.dark,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(modern.ReorderableListView), findsOneWidget);
+      expect(find.text('WARM UP'), findsOneWidget);
+      await tester.tap(find.text('WARM UP'));
+      await tester.pumpAndSettle();
+      expect(find.byType(BeatdownBrowser), findsOneWidget);
+    });
   }
 }

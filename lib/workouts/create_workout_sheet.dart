@@ -1,7 +1,6 @@
-// ignore: deprecated_member_use
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
@@ -671,15 +670,18 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
                 ),
                 Row(
                   children: [
-                    IconButton(
-                      icon: Icon(
-                        AdaptiveIcons.edit(context),
-                        color: Theme.of(context).colorScheme.onSurface,
-                        size: 20,
+                    Material(
+                      type: MaterialType.transparency,
+                      child: IconButton(
+                        icon: Icon(
+                          AdaptiveIcons.edit(context),
+                          color: Theme.of(context).colorScheme.onSurface,
+                          size: 20,
+                        ),
+                        tooltip: L10n.of(context)!.editSectionTooltip,
+                        onPressed: () =>
+                            _editSectionTitle(context, section: section),
                       ),
-                      tooltip: L10n.of(context)!.editSectionTooltip,
-                      onPressed: () =>
-                          _editSectionTitle(context, section: section),
                     ),
                     _addExerciseButton(context, section: section),
                   ],

@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -90,18 +90,15 @@ class WorkoutsTab extends ConsumerWidget {
             const SizedBox(height: 16),
             Text(
               L10n.of(context)!.noWorkoutsPlaceholderText,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontSize: 20,
-                letterSpacing: -0.2,
-              ),
+              style: Theme.of(context).textTheme.titleLarge
+                  ?.copyWith(fontSize: 20, letterSpacing: -0.2),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             Text(
               L10n.of(context)!.noWorkoutsPlaceholderDetailText,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(fontSize: 14, height: 1.6),
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(fontSize: 14, height: 1.6),
               textAlign: TextAlign.center,
             ),
             Spacer(),
@@ -199,12 +196,10 @@ class WorkoutsTab extends ConsumerWidget {
         leading: [settingsGlassBarItem(id: 'left-item', context: context)],
         title: Text(
           L10n.of(context)!.workoutsTabTitle,
-          style: Theme.of(
-            context,
-          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-          textScaler: MediaQuery.textScalerOf(
-            context,
-          ).clamp(maxScaleFactor: 1.6),
+          style: Theme.of(context).textTheme.titleSmall
+              ?.copyWith(fontWeight: FontWeight.w800),
+          textScaler: MediaQuery.textScalerOf(context)
+              .clamp(maxScaleFactor: 1.6),
         ),
       ),
       body: workouts.isNotEmpty
@@ -338,9 +333,8 @@ final class _WorkoutTile extends StatelessWidget {
               workout.name,
               style: TextTheme.of(context).titleMedium,
               overflow: .ellipsis,
-              textScaler: MediaQuery.textScalerOf(
-                context,
-              ).clamp(maxScaleFactor: 1.3),
+              textScaler: MediaQuery.textScalerOf(context)
+                  .clamp(maxScaleFactor: 1.3),
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

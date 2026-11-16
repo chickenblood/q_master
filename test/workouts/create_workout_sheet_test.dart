@@ -10,6 +10,8 @@ import 'package:material_ui/material_ui.dart' as modern;
 import 'package:q_master/l10n/l10n.dart';
 import 'package:q_master/model/workout.dart';
 import 'package:q_master/model/workout_list_controller.dart';
+import 'package:q_master/ui/adaptive_nav_text_field.dart';
+import 'package:q_master/ui/adaptive_text_field.dart';
 import 'package:q_master/workouts/create_workout_sheet.dart';
 
 const _localizationsDelegates = [
@@ -90,7 +92,10 @@ void main() {
     );
     await _pumpEditor(tester);
 
-    final workoutNameField = find.byType(TextField);
+    final workoutNameField = find.descendant(
+      of: find.byType(AdaptiveNavTextField),
+      matching: find.byType(modern.TextField),
+    );
     expect(workoutNameField, findsOneWidget);
 
     await tester.enterText(workoutNameField, 'First version');
@@ -166,11 +171,23 @@ void main() {
 
     await tester.tap(find.text('Add Section').first);
     await _pumpEditor(tester);
-    await tester.enterText(find.byType(modern.TextField), 'Warm up');
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(AdaptiveTextField),
+        matching: find.byType(modern.TextField),
+      ),
+      'Warm up',
+    );
     await tester.tap(find.text('Add Section').last);
     await _pumpEditor(tester);
 
-    await tester.enterText(find.byType(TextField).first, 'Duplicate sections');
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(AdaptiveNavTextField),
+        matching: find.byType(modern.TextField),
+      ),
+      'Duplicate sections',
+    );
     await _pumpEditor(tester);
     await _saveEditor(tester, observer);
 

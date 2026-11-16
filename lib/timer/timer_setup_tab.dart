@@ -1,11 +1,14 @@
 import 'dart:math';
 
-// ignore: deprecated_member_use
-import 'package:flutter/cupertino.dart';
-// ignore: deprecated_member_use
-import 'package:flutter/material.dart';
+import 'package:cupertino_ui/cupertino_ui.dart'
+    show
+        CupertinoPicker,
+        CupertinoTimerPicker,
+        CupertinoTimerPickerMode,
+        showCupertinoModalPopup;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:q_master/settings/settings_sheet.dart';
 import 'package:q_master/utils/shared_app_prefs.dart';
 

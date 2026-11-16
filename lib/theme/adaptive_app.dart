@@ -1,14 +1,13 @@
 import 'package:cupertino_ui/cupertino_ui.dart' as modern_cupertino;
 import 'package:flutter/foundation.dart';
 // ignore: deprecated_member_use
-import 'package:flutter/cupertino.dart' as legacy_cupertino;
-// ignore: deprecated_member_use
 import 'package:flutter/material.dart' as legacy;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:material_ui/material_ui.dart' as modern_material;
 
 import '../l10n/l10n.dart';
+import 'material_theme.dart' as modern_gloom;
 import 'theme.dart' as gloom;
 import 'transition_theme.dart';
 
@@ -25,7 +24,7 @@ class AdaptiveApp extends StatefulWidget {
   });
 
   final RouterConfig<Object> routerConfig;
-  final legacy.ThemeMode themeMode;
+  final modern_material.ThemeMode themeMode;
   final TransitionBuilder? builder;
 
   @override
@@ -57,11 +56,11 @@ class _AdaptiveAppState extends State<AdaptiveApp> with WidgetsBindingObserver {
         !kIsWeb &&
         (platform == TargetPlatform.iOS || platform == TargetPlatform.macOS);
     final isDark = switch (widget.themeMode) {
-      legacy.ThemeMode.system =>
+      modern_material.ThemeMode.system =>
         View.of(context).platformDispatcher.platformBrightness ==
             Brightness.dark,
-      legacy.ThemeMode.light => false,
-      legacy.ThemeMode.dark => true,
+      modern_material.ThemeMode.light => false,
+      modern_material.ThemeMode.dark => true,
     };
     final lightTheme = gloom.lightTheme();
     final darkTheme = gloom.darkTheme();
@@ -82,14 +81,18 @@ class _AdaptiveAppState extends State<AdaptiveApp> with WidgetsBindingObserver {
       modern_material.GlobalMaterialLocalizations.delegate,
       modern_cupertino.GlobalCupertinoLocalizations.delegate,
     ];
+    // The legacy Material theme also supplies the legacy Cupertino theme used
+    // by Liquid Glass, including dynamic colors that resolve in legacy widgets.
     return legacy.Theme(
       data: activeTheme,
       child: legacy.ScaffoldMessenger(
         child: isCupertino
-            ? legacy_cupertino.CupertinoApp.router(
+            ? modern_cupertino.CupertinoApp.router(
                 title: 'Q Master',
-                theme: legacy.MaterialBasedCupertinoThemeData(
-                  materialTheme: activeTheme,
+                theme: modern_material.MaterialBasedCupertinoThemeData(
+                  materialTheme: isDark
+                      ? modern_gloom.darkTheme()
+                      : modern_gloom.lightTheme(),
                 ),
                 localizationsDelegates: delegates,
                 supportedLocales: L10n.supportedLocales,
@@ -101,7 +104,11 @@ class _AdaptiveAppState extends State<AdaptiveApp> with WidgetsBindingObserver {
                 title: 'Q Master',
                 theme: lightTheme.copyWith(platform: TargetPlatform.android),
                 darkTheme: darkTheme.copyWith(platform: TargetPlatform.android),
-                themeMode: widget.themeMode,
+                themeMode: switch (widget.themeMode) {
+                  modern_material.ThemeMode.system => legacy.ThemeMode.system,
+                  modern_material.ThemeMode.light => legacy.ThemeMode.light,
+                  modern_material.ThemeMode.dark => legacy.ThemeMode.dark,
+                },
                 localizationsDelegates: delegates,
                 supportedLocales: L10n.supportedLocales,
                 routerConfig: widget.routerConfig,

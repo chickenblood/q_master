@@ -1,7 +1,5 @@
-// ignore: deprecated_member_use
-import 'package:flutter/cupertino.dart' show CupertinoPageRoute;
-// ignore: deprecated_member_use
-import 'package:flutter/material.dart';
+import 'package:cupertino_ui/cupertino_ui.dart' show CupertinoPageRoute;
+import 'package:material_ui/material_ui.dart';
 
 import '../ui/media_query.dart';
 import 'adaptive_platform.dart';

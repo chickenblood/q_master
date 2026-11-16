@@ -1,6 +1,4 @@
 // ignore: deprecated_member_use
-import 'package:flutter/cupertino.dart' show CupertinoThemeData;
-// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 // ─── Option 3: The Gloom — Color Tokens ───────────────────────────────────
@@ -225,7 +223,9 @@ ThemeData darkTheme() {
       onError: Colors.white,
     ),
     scaffoldBackgroundColor: bgPage,
-    cupertinoOverrideTheme: const CupertinoThemeData(primaryColor: textPrimary),
+    cupertinoOverrideTheme: MaterialBasedCupertinoThemeData(
+      materialTheme: ThemeData(),
+    ).copyWith(primaryColor: textPrimary).noDefault(),
     iconTheme: const IconThemeData(color: textPrimary),
     appBarTheme: AppBarTheme(
       backgroundColor: bgSurface.withAlpha(179),
@@ -402,7 +402,9 @@ ThemeData lightTheme() {
       onError: Colors.white,
     ),
     scaffoldBackgroundColor: bgPage,
-    cupertinoOverrideTheme: const CupertinoThemeData(primaryColor: textPrimary),
+    cupertinoOverrideTheme: MaterialBasedCupertinoThemeData(
+      materialTheme: ThemeData(),
+    ).copyWith(primaryColor: textPrimary).noDefault(),
     iconTheme: const IconThemeData(color: textPrimary),
     appBarTheme: AppBarTheme(
       backgroundColor: bgSurface.withAlpha(179),

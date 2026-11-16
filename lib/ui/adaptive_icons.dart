@@ -1,9 +1,7 @@
 import 'dart:io' show Platform;
 
-// ignore: deprecated_member_use
-import 'package:flutter/cupertino.dart';
-// ignore: deprecated_member_use
-import 'package:flutter/material.dart';
+import 'package:cupertino_ui/cupertino_ui.dart' show CupertinoIcons;
+import 'package:material_ui/material_ui.dart';
 
 import 'adaptive_platform.dart';
 

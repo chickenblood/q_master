@@ -265,7 +265,11 @@ Some helper classes have been added to handle the heavy lifting for UI masonry a
 The app also provides adaptive text, buttons, list tiles, text fields, and
 activity indicators backed by `material_ui` and `cupertino_ui`. `AdaptiveApp`
 supplies matching legacy and split-package themes above the root navigator
-while legacy Flutter widgets and Liquid Glass remain.
+while legacy Flutter widgets and Liquid Glass remain. The legacy Material theme
+also provides the legacy Cupertino theme required by Liquid Glass; the
+split-package compatibility bridge does not preserve its dynamic colors.
+`AdaptiveApp` accepts the split Material theme mode and maps it to the legacy
+mode at the app boundary.
 
 ## Workout JSON Format
 

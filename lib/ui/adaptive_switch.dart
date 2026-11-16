@@ -1,6 +1,5 @@
-// ignore: deprecated_member_use
-import 'package:flutter/material.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'src/adaptive_platform_widget.dart';
 
@@ -32,13 +31,16 @@ final class AdaptiveSwitch extends StatelessWidget {
       focusNode: focusNode,
       autofocus: autofocus ?? false,
     ),
-    material: (_) => Switch(
-      value: value,
-      onChanged: onChanged,
-      activeTrackColor: activeColor,
-      inactiveTrackColor: inactiveColor,
-      focusNode: focusNode,
-      autofocus: autofocus ?? false,
+    material: (_) => Material(
+      type: MaterialType.transparency,
+      child: Switch(
+        value: value,
+        onChanged: onChanged,
+        activeTrackColor: activeColor,
+        inactiveTrackColor: inactiveColor,
+        focusNode: focusNode,
+        autofocus: autofocus ?? false,
+      ),
     ),
   );
 }

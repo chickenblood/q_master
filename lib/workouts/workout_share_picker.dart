@@ -1,5 +1,4 @@
-// ignore: deprecated_member_use
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../l10n/l10n.dart';
 import '../ui/adaptive_icons.dart';

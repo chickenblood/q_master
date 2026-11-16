@@ -1,7 +1,7 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 3.5.2+673
+version: 3.5.2+674
 
 environment:
   sdk: ^3.13.0
@@ -60,6 +60,7 @@ dev_dependencies: # keep sorted alphabetically
     sdk: flutter
   json_serializable: ^6.11.2
   riverpod_generator: ^4.0.0+1
+  webview_flutter_platform_interface: ^2.15.1
 
 flutter_launcher_icons:
   android: true

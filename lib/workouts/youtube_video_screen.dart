@@ -1,5 +1,5 @@
-// ignore: deprecated_member_use
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:material_ui/material_ui.dart' show Colors;
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 import '../ui/adaptive_app_bar.dart';

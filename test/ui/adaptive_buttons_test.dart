@@ -262,27 +262,47 @@ void main() {
   ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.android;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    final mode = ValueNotifier(legacy.ThemeMode.light);
+    addTearDown(mode.dispose);
     var presses = 0;
     await tester.pumpWidget(
-      legacy.MaterialApp(
-        theme: gloom.lightTheme().copyWith(platform: TargetPlatform.android),
-        builder: (_, child) => TransitionTheme(child: child!),
-        home: legacy.Scaffold(
-          body: AdaptiveMenu(
-            icon: const Icon(legacy.Icons.more_vert),
-            menuChildren: [
-              AdaptiveMenuItem(
-                icon: const Icon(legacy.Icons.edit),
-                title: 'Edit',
-                onPressed: () => presses++,
-              ),
-            ],
+      ValueListenableBuilder<legacy.ThemeMode>(
+        valueListenable: mode,
+        builder: (_, themeMode, _) => legacy.MaterialApp(
+          theme: gloom.lightTheme().copyWith(platform: TargetPlatform.android),
+          darkTheme: gloom.darkTheme().copyWith(
+            platform: TargetPlatform.android,
+          ),
+          themeMode: themeMode,
+          builder: (_, child) => TransitionTheme(child: child!),
+          home: legacy.Scaffold(
+            body: AdaptiveMenu(
+              icon: const Icon(legacy.Icons.more_vert),
+              menuChildren: [
+                AdaptiveMenuItem(
+                  icon: const Icon(legacy.Icons.edit),
+                  title: 'Edit',
+                  onPressed: () => presses++,
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
     await tester.tap(find.byIcon(legacy.Icons.more_vert));
     await tester.pumpAndSettle();
+    expect(find.byType(material.MenuItemButton), findsOneWidget);
+    expect(
+      tester.widget<Text>(find.text('Edit')).style!.color,
+      gloom.lightTheme().textTheme.titleLarge!.color,
+    );
+    mode.value = legacy.ThemeMode.dark;
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<Text>(find.text('Edit')).style!.color,
+      gloom.darkTheme().textTheme.titleLarge!.color,
+    );
     await tester.tap(find.text('Edit'));
     await tester.pumpAndSettle();
     expect(presses, 1);

@@ -1,7 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dots_indicator/dots_indicator.dart';
-import 'package:flutter/material.dart';
-import 'package:material_ui/material_ui.dart' as material;
+import 'package:material_ui/material_ui.dart';
 
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
@@ -259,7 +258,7 @@ class _BeatdownBrowserState extends State<BeatdownBrowser> {
                                     horizontal: 1,
                                   ),
                                   child: AdaptiveElevatedButton(
-                                    color: material.Theme.of(context)
+                                    color: Theme.of(context)
                                         .colorScheme
                                         .primary,
 

@@ -1,10 +1,9 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/foundation.dart';
-// ignore: deprecated_member_use
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:q_master/ui/adaptive_scaffold.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -481,115 +480,121 @@ class _ExercisePickerSheetState extends ConsumerState<_ExercisePickerSheet> {
 
     return AdaptiveScaffold(
       backgroundColor: Colors.transparent,
-      body: SafeArea(
-        child: AdaptiveLiquidGlassLayer(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Column(
-                  mainAxisSize: .min,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: WorkoutAutocompleteTextField(
-                            textEditingController: widget.controller,
-                            minLines: 1,
-                            maxLines: 1,
-                            onSubmitted: _addExercise,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        SizedBox(
-                          height: 40,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .primary,
-                              foregroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimary,
-                              textStyle: Theme.of(context).textTheme.labelLarge,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                              ),
-                            ),
-                            onPressed: _canAdd ? _addExercise : null,
-                            child: Text(
-                              L10n.of(context)!.exercisePickerAddButtonLabel,
+      body: Material(
+        type: MaterialType.transparency,
+        child: SafeArea(
+          child: AdaptiveLiquidGlassLayer(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Column(
+                    mainAxisSize: .min,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: WorkoutAutocompleteTextField(
+                              textEditingController: widget.controller,
+                              minLines: 1,
+                              maxLines: 1,
+                              onSubmitted: _addExercise,
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                      ],
-                    ),
-                    _filterChips(
-                      context,
-                      availableTags: availableTags,
-                      selectedTagKeys: selectedTagKeys,
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: CustomScrollView(
-                  slivers: [
-                    exiconEntries.when(
-                      data: (_) {
-                        if (catalog.isEmpty) {
-                          return _stateSliver(
-                            context,
-                            icon: AdaptiveIcons.notes,
-                            message: L10n.of(context)!
-                                .exercisePickerEmptyCatalogLabel,
-                          );
-                        }
-
-                        if (filteredExercises.isEmpty) {
-                          return _stateSliver(
-                            context,
-                            icon: Icons.filter_alt_off,
-                            message: L10n.of(context)!
-                                .exercisePickerEmptyFilteredLabel,
-                          );
-                        }
-
-                        return SliverSafeArea(
-                          bottom: true,
-                          minimum: const EdgeInsets.only(bottom: 60),
-                          sliver: _exerciseGrid(
-                            context,
-                            gridColumnCount: gridColumnCount,
-                            exercises: filteredExercises,
+                          const SizedBox(width: 8),
+                          SizedBox(
+                            height: 40,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .primary,
+                                foregroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimary,
+                                textStyle: Theme.of(context)
+                                    .textTheme
+                                    .labelLarge,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                ),
+                              ),
+                              onPressed: _canAdd ? _addExercise : null,
+                              child: Text(
+                                L10n.of(context)!.exercisePickerAddButtonLabel,
+                              ),
+                            ),
                           ),
-                        );
-                      },
-                      loading: () => SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: Center(
-                          child: CircularProgressIndicator.adaptive(),
-                        ),
+                          const SizedBox(width: 8),
+                        ],
                       ),
-                      error: (_, _) => _stateSliver(
+                      _filterChips(
                         context,
-                        icon: Icons.cloud_off,
-                        message: L10n.of(context)!
-                            .exercisePickerLoadErrorMessage,
-                        actionLabel: L10n.of(context)!
-                            .exercisePickerRetryButtonLabel,
-                        onAction: () =>
-                            ref.read(exiconFetcherProvider.notifier).refresh(),
+                        availableTags: availableTags,
+                        selectedTagKeys: selectedTagKeys,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                Expanded(
+                  child: CustomScrollView(
+                    slivers: [
+                      exiconEntries.when(
+                        data: (_) {
+                          if (catalog.isEmpty) {
+                            return _stateSliver(
+                              context,
+                              icon: AdaptiveIcons.notes,
+                              message: L10n.of(context)!
+                                  .exercisePickerEmptyCatalogLabel,
+                            );
+                          }
+
+                          if (filteredExercises.isEmpty) {
+                            return _stateSliver(
+                              context,
+                              icon: Icons.filter_alt_off,
+                              message: L10n.of(context)!
+                                  .exercisePickerEmptyFilteredLabel,
+                            );
+                          }
+
+                          return SliverSafeArea(
+                            bottom: true,
+                            minimum: const EdgeInsets.only(bottom: 60),
+                            sliver: _exerciseGrid(
+                              context,
+                              gridColumnCount: gridColumnCount,
+                              exercises: filteredExercises,
+                            ),
+                          );
+                        },
+                        loading: () => SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: Center(
+                            child: CircularProgressIndicator.adaptive(),
+                          ),
+                        ),
+                        error: (_, _) => _stateSliver(
+                          context,
+                          icon: Icons.cloud_off,
+                          message: L10n.of(context)!
+                              .exercisePickerLoadErrorMessage,
+                          actionLabel: L10n.of(context)!
+                              .exercisePickerRetryButtonLabel,
+                          onAction: () => ref
+                              .read(exiconFetcherProvider.notifier)
+                              .refresh(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

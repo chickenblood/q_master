@@ -1,7 +1,5 @@
-// Match the legacy Flutter Material theme supplied by AdaptiveApp.
-// ignore: deprecated_member_use
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../l10n/l10n.dart';

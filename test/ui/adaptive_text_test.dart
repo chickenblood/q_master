@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' as legacy;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart' as material;
+import 'package:q_master/ui/adaptive_platform.dart';
 import 'package:q_master/ui/adaptive_text.dart';
 
 void main() {
@@ -21,6 +23,13 @@ void main() {
       await tester.pumpWidget(
         legacy.MaterialApp(
           theme: legacy.ThemeData(platform: platform, useMaterial3: material3),
+          builder: (_, child) => material.Theme(
+            data: material.ThemeData(
+              platform: platform,
+              useMaterial3: material3,
+            ),
+            child: child!,
+          ),
           home: const legacy.Scaffold(
             body: AdaptiveText(
               'Mixed Case',
@@ -41,4 +50,40 @@ void main() {
       expect(text.textScaler, const TextScaler.linear(1.3));
     });
   }
+
+  testWidgets('adaptive text and platform follow the split theme', (
+    tester,
+  ) async {
+    Future<void> check(TargetPlatform platform, String expected) async {
+      await tester.pumpWidget(
+        legacy.MaterialApp(
+          theme: legacy.ThemeData(
+            platform: platform == TargetPlatform.iOS
+                ? TargetPlatform.android
+                : TargetPlatform.iOS,
+            useMaterial3: true,
+          ),
+          builder: (_, child) => material.Theme(
+            data: material.ThemeData(platform: platform, useMaterial3: false),
+            child: child!,
+          ),
+          home: legacy.Scaffold(
+            body: Builder(
+              builder: (context) {
+                expect(
+                  isMaterialPlatform(context),
+                  platform == TargetPlatform.android,
+                );
+                return const AdaptiveText('Mixed Case');
+              },
+            ),
+          ),
+        ),
+      );
+      expect(find.text(expected), findsOneWidget);
+    }
+
+    await check(TargetPlatform.iOS, 'Mixed Case');
+    await check(TargetPlatform.android, 'MIXED CASE');
+  });
 }

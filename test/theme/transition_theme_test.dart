@@ -18,6 +18,7 @@ import 'package:q_master/slack/slackblast_search_field.dart';
 import 'package:q_master/theme/adaptive_app.dart';
 import 'package:q_master/theme/material_theme.dart' as modern_gloom;
 import 'package:q_master/theme/theme.dart' as legacy_gloom;
+import 'package:q_master/theme/transition_theme.dart';
 import 'package:q_master/ui/adaptive_modal_sheet.dart';
 import 'package:q_master/utils/shared_app_prefs.dart';
 import 'package:q_master/workouts/create_workout_sheet.dart';
@@ -42,6 +43,12 @@ void main() {
       const selected = {WidgetState.selected};
 
       expect(newTheme.brightness, oldTheme.brightness);
+      expect(
+        oldTheme.cupertinoOverrideTheme,
+        legacy_cupertino.CupertinoThemeData(
+          primaryColor: newTheme.cupertinoOverrideTheme!.primaryColor,
+        ).noDefault(),
+      );
       expect(newTheme.colorScheme.primary, oldTheme.colorScheme.primary);
       expect(newTheme.colorScheme.surface, oldTheme.colorScheme.surface);
       expect(newTheme.colorScheme.onSurface, oldTheme.colorScheme.onSurface);
@@ -107,6 +114,45 @@ void main() {
         oldTheme.switchTheme.trackColor?.resolve(selected),
       );
     });
+
+    testWidgets(
+      'split modal surfaces match legacy in ${dark ? 'dark' : 'light'} mode',
+      (tester) async {
+        await tester.pumpWidget(
+          legacy.MaterialApp(
+            theme: dark ? legacy_gloom.darkTheme() : legacy_gloom.lightTheme(),
+            builder: (_, child) => TransitionTheme(child: child!),
+            home: legacy.Scaffold(
+              body: Row(
+                children: [
+                  Expanded(
+                    child: legacy.Dialog(child: const SizedBox(height: 60)),
+                  ),
+                  Expanded(
+                    child: modern.Dialog(child: const SizedBox(height: 60)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+        final oldSurface = tester.widget<legacy.Material>(
+          find.descendant(
+            of: find.byType(legacy.Dialog),
+            matching: find.byType(legacy.Material),
+          ),
+        );
+        final newSurface = tester.widget<modern.Material>(
+          find.descendant(
+            of: find.byType(modern.Dialog),
+            matching: find.byType(modern.Material),
+          ),
+        );
+        expect(newSurface.color, oldSurface.color);
+        expect(newSurface.elevation, oldSurface.elevation);
+        expect(newSurface.shape, oldSurface.shape);
+      },
+    );
   }
 
   for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
@@ -123,7 +169,7 @@ void main() {
             addTearDown(tester.view.resetPhysicalSize);
           }
 
-          final mode = ValueNotifier(legacy.ThemeMode.light);
+          final mode = ValueNotifier(modern.ThemeMode.light);
           addTearDown(mode.dispose);
           final navigatorKey = GlobalKey<NavigatorState>();
           final router = GoRouter(
@@ -156,7 +202,7 @@ void main() {
 
           await tester.pumpWidget(
             ProviderScope(
-              child: ValueListenableBuilder<legacy.ThemeMode>(
+              child: ValueListenableBuilder<modern.ThemeMode>(
                 valueListenable: mode,
                 builder: (_, themeMode, _) =>
                     AdaptiveApp(routerConfig: router, themeMode: themeMode),
@@ -165,7 +211,7 @@ void main() {
           );
           await tester.pumpAndSettle();
           expect(
-            find.byType(legacy_cupertino.CupertinoApp),
+            find.byType(modern_cupertino.CupertinoApp),
             platform == TargetPlatform.iOS ? findsOneWidget : findsNothing,
           );
           expect(
@@ -180,6 +226,10 @@ void main() {
             final oldTheme = legacy.Theme.of(context);
             final newTheme = modern.Theme.of(context);
             final cupertinoTheme = modern_cupertino.CupertinoTheme.of(context);
+            final glassTheme = legacy_cupertino.CupertinoTheme.of(context);
+            final expectedGlassTheme = legacy.MaterialBasedCupertinoThemeData(
+              materialTheme: oldTheme,
+            );
             expect(Navigator.of(context), same(navigatorKey.currentState));
             expect(oldTheme.brightness, brightness);
             expect(newTheme.brightness, brightness);
@@ -194,6 +244,20 @@ void main() {
               cupertinoTheme.primaryColor,
               oldTheme.cupertinoOverrideTheme?.primaryColor,
             );
+            Color resolveGlassColor(Color color) =>
+                legacy_cupertino.CupertinoDynamicColor.resolve(color, context);
+            expect(
+              resolveGlassColor(glassTheme.barBackgroundColor).toARGB32(),
+              resolveGlassColor(expectedGlassTheme.barBackgroundColor)
+                  .toARGB32(),
+            );
+            expect(
+              resolveGlassColor(glassTheme.textTheme.textStyle.color!)
+                  .toARGB32(),
+              resolveGlassColor(expectedGlassTheme.textTheme.textStyle.color!)
+                  .toARGB32(),
+            );
+            expect(glassTheme.brightness, brightness);
             expect(modern.MaterialLocalizations.of(context), isNotNull);
             expect(
               modern_cupertino.CupertinoLocalizations.of(context),
@@ -202,10 +266,10 @@ void main() {
           }
 
           expectThemes(find.byType(_ThemeProbe), Brightness.light);
-          mode.value = legacy.ThemeMode.dark;
+          mode.value = modern.ThemeMode.dark;
           await tester.pumpAndSettle();
           expectThemes(find.byType(_ThemeProbe), Brightness.dark);
-          mode.value = legacy.ThemeMode.light;
+          mode.value = modern.ThemeMode.light;
           await tester.pumpAndSettle();
           expectThemes(find.byType(_ThemeProbe), Brightness.light);
 
@@ -214,7 +278,7 @@ void main() {
           addTearDown(
             tester.platformDispatcher.clearPlatformBrightnessTestValue,
           );
-          mode.value = legacy.ThemeMode.system;
+          mode.value = modern.ThemeMode.system;
           await tester.pumpAndSettle();
           expectThemes(find.byType(_ThemeProbe), Brightness.dark);
           tester.platformDispatcher.platformBrightnessTestValue =
@@ -260,7 +324,7 @@ void main() {
             ),
           ];
           for (final (open, finder, accentText) in sheets) {
-            mode.value = legacy.ThemeMode.light;
+            mode.value = modern.ThemeMode.light;
             await tester.pumpAndSettle();
             open();
             await tester.pumpAndSettle();
@@ -279,7 +343,7 @@ void main() {
                 findsOneWidget,
               );
             }
-            mode.value = legacy.ThemeMode.dark;
+            mode.value = modern.ThemeMode.dark;
             await tester.pumpAndSettle();
             expectThemes(finder, Brightness.dark);
             if (accentText != null) {
@@ -312,14 +376,14 @@ void main() {
     addTearDown(
       () => messenger.setMockMethodCallHandler(SystemChannels.platform, null),
     );
-    final mode = ValueNotifier(legacy.ThemeMode.light);
+    final mode = ValueNotifier(modern.ThemeMode.light);
     addTearDown(mode.dispose);
     final router = GoRouter(
       routes: [GoRoute(path: '/', builder: (_, _) => const Text('Home'))],
     );
     addTearDown(router.dispose);
     await tester.pumpWidget(
-      ValueListenableBuilder<legacy.ThemeMode>(
+      ValueListenableBuilder<modern.ThemeMode>(
         valueListenable: mode,
         builder: (_, themeMode, _) =>
             AdaptiveApp(routerConfig: router, themeMode: themeMode),
@@ -327,17 +391,21 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(styles.last['statusBarIconBrightness'], 'Brightness.dark');
-    mode.value = legacy.ThemeMode.dark;
+    expect(styles.last['statusBarBrightness'], 'Brightness.light');
+    mode.value = modern.ThemeMode.dark;
     await tester.pumpAndSettle();
     expect(styles.last['statusBarIconBrightness'], 'Brightness.light');
+    expect(styles.last['statusBarBrightness'], 'Brightness.dark');
     tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
     addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
-    mode.value = legacy.ThemeMode.system;
+    mode.value = modern.ThemeMode.system;
     await tester.pumpAndSettle();
     expect(styles.last['statusBarIconBrightness'], 'Brightness.dark');
+    expect(styles.last['statusBarBrightness'], 'Brightness.light');
     tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
     await tester.pumpAndSettle();
     expect(styles.last['statusBarIconBrightness'], 'Brightness.light');
+    expect(styles.last['statusBarBrightness'], 'Brightness.dark');
   });
 }
 
