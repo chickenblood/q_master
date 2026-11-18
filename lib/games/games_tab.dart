@@ -1,9 +1,9 @@
 import 'dart:math';
 
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:text_autosize/text_autosize.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../l10n/l10n.dart';
@@ -236,10 +236,8 @@ class _GameTile extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             color: textColor,
                           ),
-                      textScaleFactor: min(
-                        MediaQuery.textScalerOf(context).scale(1.0),
-                        1.4,
-                      ),
+                      textScaler: MediaQuery.textScalerOf(context)
+                          .clamp(maxScaleFactor: 1.4),
                     ),
                   ),
                 Ink(
@@ -272,10 +270,8 @@ class _GameTile extends StatelessWidget {
                     ),
                     softWrap: true,
                     maxLines: 1,
-                    textScaleFactor: min(
-                      MediaQuery.textScalerOf(context).scale(1.0),
-                      1.4,
-                    ),
+                    textScaler: MediaQuery.textScalerOf(context)
+                        .clamp(maxScaleFactor: 1.4),
                   ),
                 ),
               ],

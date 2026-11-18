@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:q_master/ui/media_query.dart';
+import 'package:text_autosize/text_autosize.dart';
 
 import '../l10n/l10n.dart';
 import '../model/deck_of_pain.dart';

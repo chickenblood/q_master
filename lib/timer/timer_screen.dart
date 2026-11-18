@@ -1,6 +1,6 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:text_autosize/text_autosize.dart';
 
 import '../l10n/l10n.dart';
 import '../theme/theme.dart';
@@ -281,7 +281,7 @@ final class _PrimaryTile extends StatelessWidget {
                 color: tileSpec.fgColor,
                 fontSize: 800,
               ),
-              textScaleFactor: 1.0,
+              textScaler: TextScaler.noScaling,
               maxLines: 1,
             ),
           ),
@@ -327,7 +327,7 @@ final class _SecondaryTile extends StatelessWidget {
                   fontWeight: .w900,
                   fontSize: 400,
                 ),
-                textScaleFactor: 1,
+                textScaler: TextScaler.noScaling,
                 maxLines: 1,
               ),
             ),
@@ -435,7 +435,7 @@ final class _StatusElement extends StatelessWidget {
               fontSize: 54,
               fontWeight: .bold,
             ),
-            textScaleFactor: 1,
+            textScaler: TextScaler.noScaling,
           ),
         ),
       ),
@@ -449,7 +449,7 @@ final class _StatusElement extends StatelessWidget {
             maxLines: 1,
             style: Theme.of(context).textTheme.titleMedium!
                 .copyWith(color: TimerColors.controlFg(context)),
-            textScaleFactor: 1,
+            textScaler: TextScaler.noScaling,
             minFontSize: 10,
           ),
         ),

@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -11,6 +10,7 @@ import 'package:q_master/games/dod_game_view.dart';
 import 'package:q_master/games/games_tab.dart';
 import 'package:q_master/theme/adaptive_app.dart';
 import 'package:q_master/theme/theme.dart' as gloom;
+import 'package:text_autosize/text_autosize.dart';
 
 void main() {
   for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {

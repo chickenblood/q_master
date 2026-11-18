@@ -1,7 +1,7 @@
 name: q_master
 description: "Unofficial app of f3nation.com."
 publish_to: 'none'
-version: 3.5.2+674
+version: 3.5.2+675
 
 environment:
   sdk: ^3.13.0
@@ -9,7 +9,7 @@ environment:
 dependencies: # keep sorted alphabetically
   accessing_security_scoped_resource: ^3.5.0
   audio_session: ^0.2.4
-  auto_size_text: ^3.0.0
+  text_autosize: ^1.3.1
   cloud_functions: ^6.5.0
   cupertino_icons: ^1.0.2
   dots_indicator: ^5.0.0

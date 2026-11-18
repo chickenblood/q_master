@@ -1,6 +1,6 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:text_autosize/text_autosize.dart';
 
 import '../l10n/l10n.dart';
 import '../model/workout.dart';
