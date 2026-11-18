@@ -717,28 +717,6 @@ final class _CreateWorkoutSheetState extends ConsumerState<CreateWorkoutSheet> {
     ),
   );
 
-  Widget _displayFooter(BuildContext context) => SliverSafeArea(
-    top: false,
-    sliver: SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-        child: SizedBox(
-          height: 62,
-          child: ActionButton(
-            label: L10n.of(context)!.startBeatdownButtonText,
-            icon: AdaptiveIcons.playArrowSolid(context),
-            onPressed: () {
-              widget.onShowBeatdownBrowser?.call(
-                context,
-                _buildWorkoutFromUi(),
-              );
-            },
-          ),
-        ),
-      ),
-    ),
-  );
-
   @override
   Widget build(BuildContext context) => PopScope(
     canPop: false,

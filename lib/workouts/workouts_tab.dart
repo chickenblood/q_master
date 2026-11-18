@@ -48,8 +48,7 @@ class WorkoutsTab extends ConsumerWidget {
   ];
 
   final ScrollController? _scrollController;
-  const WorkoutsTab({super.key, ScrollController? scrollController})
-    : _scrollController = scrollController;
+  const WorkoutsTab({super.key, this._scrollController});
 
   /// Shows the workout creation picker modal sheet.
   ///
