@@ -269,14 +269,21 @@ final class WorkoutListController extends _$WorkoutListController {
     final data = file.readAsStringSync();
     final json = jsonDecode(data);
     // Give incoming data the current date.
-    // TODO: This may not be in the correct format for a workout. We should
-    // catch the error if that is the case.
-    final workout = Workout.fromJson(json).copyWith(date: DateTime.now());
-    await add(workout);
-
-    if (isIOSSecureURL) {
-      await AccessingSecurityScopedResource()
-          .stopAccessingSecurityScopedResourceWithFilePath(filename);
+    try {
+      final workout = Workout.fromJson(json).copyWith(date: DateTime.now());
+      await add(workout);
+    } catch (error, stackTrace) {
+      _logger.e(
+        'Failed to add workout from file.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    } finally {
+      if (isIOSSecureURL) {
+        await AccessingSecurityScopedResource()
+            .stopAccessingSecurityScopedResourceWithFilePath(filename);
+      }
     }
   }
 

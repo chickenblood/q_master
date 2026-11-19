@@ -51,9 +51,13 @@ class _ReceivedWorkoutShareListenerState
 
     for (final attachment in attachments) {
       if (attachment.path.endsWith('.qmw')) {
-        ref
-            .read(workoutListControllerProvider.notifier)
-            .addFromFile(attachment.path);
+        try {
+          ref
+              .read(workoutListControllerProvider.notifier)
+              .addFromFile(attachment.path);
+        } catch (_) {
+          if (mounted) _showInvalidWorkoutAlert();
+        }
         return;
       }
     }
